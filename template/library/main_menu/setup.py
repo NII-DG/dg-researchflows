@@ -1,0 +1,5 @@
+
+class MainMenu():
+    """MainMenu class
+
+    """

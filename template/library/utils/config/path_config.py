@@ -5,8 +5,6 @@
 import os
 
 # Folder
-## /home/jovyan
-HOME_PATH = os.environ['HOME']
 ## 同期対象外フォルダ
 DOT_DATA_GOVERNANCE = '.data-governance'
 ## 同期対象フォルダ

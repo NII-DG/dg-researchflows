@@ -10,6 +10,7 @@ import panel as pn
 import os
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
+root_dir_path = os.path.abspath(os.path.join(script_dir, '../'))
 
 
 class MainMenu():
@@ -46,7 +47,7 @@ class MainMenu():
 
 
         ## プロジェクト操作コントローラーの定義
-        ### 遷移ボタン
+        ### 遷移ボタン for プロジェクト操作コントローラー
         self.button_for_project_sub_menu = pn.pane.HTML()
         self.button_for_project_sub_menu.object = html_button.create_button(msg=msg_config.get('main_menu', 'disable_jump_button'), disable=True, border=['dashed', '1px'],button_background_color='#ffffff')
 
@@ -70,6 +71,7 @@ class MainMenu():
         pass
 
     def update_button_for_project_sub_menu(self):
+        """遷移ボタン for プロジェクト操作コントローラーの更新"""
         pass
 
     def get_research_flow_status(self):

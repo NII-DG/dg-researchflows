@@ -3,8 +3,9 @@
 """
 
 import os
-
+script_dir = os.path.dirname(os.path.abspath(__file__))
 # Folder
+ROOT = os.path.abspath(os.path.join(script_dir, '../../../..'))
 ## 同期対象外フォルダ
 DOT_DATA_GOVERNANCE = '.data-governance'
 ## 同期対象フォルダ

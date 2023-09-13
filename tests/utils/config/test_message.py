@@ -2,7 +2,7 @@ from unittest import TestCase
 from template.library.utils.config import message
 import os
 
-class MessageConfig(TestCase):
+class TestMessageConfig(TestCase):
     # test exec : python -m unittest tests.utils.config.test_message
 
     def test_get(self):

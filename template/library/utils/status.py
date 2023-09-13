@@ -1,4 +1,4 @@
-
+from .file import JsonFile
 
 _STATUS_UNFEASIBLE = "unfeasible"
 _STATUS_UNEXECUTED = "unexecuted"
@@ -9,7 +9,7 @@ _allowed_statuses = [_STATUS_UNFEASIBLE, _STATUS_UNEXECUTED, _STATUS_DOING, _STA
 
 class TaskStatus:
 
-    def __init__(self, id:str, name:str, is_multiple:bool, is_optional:bool, completed_count:int, dependent_task_ids:list[str], status:str, execution_environments:list[str]) -> None:
+    def __init__(self, id: str, name: str, is_multiple: bool, is_optional: bool, completed_count: int, dependent_task_ids: list[str], status: str, execution_environments: list[str]) -> None:
         self._id = id
         self._name = name
         self._is_multiple = is_multiple
@@ -19,7 +19,7 @@ class TaskStatus:
         self._set_status(status)
         self._execution_environments = execution_environments
 
-    def _set_status(self, status:str):
+    def _set_status(self, status: str):
         if status in _allowed_statuses:
             self._status = status
         else:
@@ -42,13 +42,13 @@ class TaskStatus:
         return self._status
 
     @status.setter
-    def status(self, status:str):
+    def status(self, status: str):
         self._set_status(status)
 
 
 class StatusManager:
 
-    def __init__(self, tasks) -> None:
+    def __init__(self, tasks:list[dict]) -> None:
         self.task_statuses = [TaskStatus(**task) for task in tasks]
 
     def update_status(self):

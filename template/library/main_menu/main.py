@@ -12,7 +12,6 @@ import os
 script_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir_path = os.path.abspath(os.path.join(script_dir, '../'))
 
-
 class MainMenu():
     """MainMenu Class
 

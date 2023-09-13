@@ -3,7 +3,6 @@
 """
 
 import os
-
 # Folder
 ## 同期対象外フォルダ
 DOT_DATA_GOVERNANCE = '.data-governance'
@@ -15,3 +14,7 @@ DATA_GOVERNANCE = 'data-governance'
 
 # Path
 SETUP_COMPLETED_TEXT_PATH = os.path.join(DOT_DATA_GOVERNANCE, 'setup_completed.txt')
+
+
+def getResearchFlowStatusFilePath(abs_root)->str:
+    return os.path.join(abs_root, DATA_GOVERNANCE, 'researchflow/main_menu/status/research_flow_status.json')

@@ -111,7 +111,8 @@ class MainMenu():
         ## TODO:再調整要
         # https://github.com/NII-DG/dg-researchflowsのデータが配置されているディレクトリ
         # Jupyter環境では/home/jovyan
-        abs_root = working_path[0:working_path.find(path_config.DATA_GOVERNANCE)-1]
+        abs_root = working_path[0:working_path.rfind(path_config.DATA_GOVERNANCE)-1]
+        # 初期セットアップ完了フラグファイルパス
         abs_setup_completed_file_path = os.path.join(abs_root, path_config.SETUP_COMPLETED_TEXT_PATH)
 
 

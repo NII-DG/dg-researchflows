@@ -2,7 +2,21 @@
     "research_flow_pahse_data": [
         {
             "seq_number": 1,
-            "name": ""
+            "name": "research_preparation",
+            "sub_flow_data": [
+                {
+                    "id": "00000000-0000-0000-0000-000000000000",
+                    "name": "研究準備",
+                    "link": "../../plan/menu/plan.ipynb?init_nb=true",
+                    "parent_ids": [],
+                    "create_datetime": -1
+                }
+            ]
+        },
+        {
+            "seq_number": 2,
+            "name": "experiment",
+            "sub_flow_data": []
         }
     ]
 }

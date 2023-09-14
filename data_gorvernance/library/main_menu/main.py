@@ -1,12 +1,12 @@
 
 
 import json
-from typing import List
+from typing import Dict, List
 from ..utils.config import path_config, message as msg_config
 from ..utils.html import text as html_text, button as html_button
 from IPython.display import display
 from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus, FlowDrawer
-from ..main_menu.research_flow_status import ResearchFlowStatusFile as rfsf
+from ..main_menu.research_flow_status import ResearchFlowStatusOperater as re_fl_operater
 
 import panel as pn
 import os
@@ -39,9 +39,9 @@ class MainMenu():
         self._research_flow_status_file_path = path_config.getResearchFlowStatusFilePath(abs_root)
 
         # プロジェクトで初回のリサーチフロー図アクセス時の初期化
-        rfsf.init_research_preparation(self._research_flow_status_file_path)
+        re_fl_operater.init_research_preparation(self._research_flow_status_file_path)
         ## リサーチフロー図オブジェクトの定義
-        self._research_flow_image = pn.pane.HTML(rfsf.get_svg_of_research_flow_status(self._research_flow_status_file_path))
+        self._research_flow_image = pn.pane.HTML(re_fl_operater.get_svg_of_research_flow_status(self._research_flow_status_file_path))
         self._research_flow_image.width = 1000
 
         ######################################
@@ -58,7 +58,7 @@ class MainMenu():
         ################################
 
         # 機能コントローラーの定義
-        self.menu_tabs = pn.Tabs()
+        self._menu_tabs = pn.Tabs()
 
         ## プロジェクト操作コントローラーの定義
         ### 遷移ボタン for プロジェクト操作コントローラー
@@ -89,39 +89,108 @@ class MainMenu():
         sub_flow_menu_options[msg_config.get('main_menu','update_sub_flow_name_title')] = 3
         sub_flow_menu_options[msg_config.get('main_menu','delete_sub_flow_title')] = 4
         ## サブフロー操作コントローラー
-        self.sub_flow_menu = pn.widgets.Select(options=sub_flow_menu_options, value=0)
-        self.sub_flow_menu.param.watch(self.update_sub_flow_form,'value')
+        self._sub_flow_menu = pn.widgets.Select(options=sub_flow_menu_options, value=0)
+        ## サブフロー操作コントローラーのイベントリスナー
+        self._sub_flow_menu.param.watch(self.update_sub_flow_form,'value')
         ## サブフロー操作フォーム
-        self.sub_flow_form = pn.WidgetBox()
-        sub_flow_menu_layout = pn.Column(self.sub_flow_menu, self.sub_flow_form)
+        self._sub_flow_form = pn.WidgetBox()
+        sub_flow_menu_layout = pn.Column(self._sub_flow_menu, self._sub_flow_form)
 
-        self.menu_tabs.append((project_menu_title, project_menu_layout)) # tab_index = 0
-        self.menu_tabs.append((sub_flow_menu_title, sub_flow_menu_layout)) # tab_index = 1
-
+        self._menu_tabs.append((sub_flow_menu_title, sub_flow_menu_layout)) # tab_index = 0
+        self._menu_tabs.append((project_menu_title, project_menu_layout)) # tab_index = 1
         # 機能コントローラーのイベントリスナー
-        self.menu_tabs.param.watch(self.change_tabs, 'active')
+        self._menu_tabs.param.watch(self.change_tabs, 'active')
         pass
+
+
+    ######################################
+    # イベントリスナーコールバックメソッド #
+    ######################################
 
     def change_tabs(self, event):
         tab_index = event.new
         if tab_index == 0:
-            # プロジェクト操作
-            self.sub_flow_form.clear()
-        if tab_index == 1:
             # サブフロー操作
-            self.sub_flow_menu.value = 0
+            ## サブフロー操作コントローラーオプションを初期化
+            self._sub_flow_menu.value = 0
+        if tab_index == 1:
+            # プロジェクト操作
+            ## サブフロー操作フォームを初期化
+            self._sub_flow_form.clear()
+
 
     def update_button_for_project_sub_menu(self):
         """遷移ボタン for プロジェクト操作コントローラーの更新"""
         pass
 
-    def update_sub_flow_form(self):
+    def update_sub_flow_form(self, event):
+        """サブフロー操作フォーム by サブフロー操作コントローラーオプション"""
+        selected_value = self._sub_flow_menu.value
+        if selected_value == 0: ## 選択なし
+
+            self._sub_flow_form.clear()
+        elif selected_value == 1: ## サブフロー新規作成
+            self.update_sub_flow_form_new_sub_flow()
+        elif selected_value == 2: ## サブフロー間接続編集
+            self.update_sub_flow_form_relink()
+        elif selected_value == 3: ## サブフロー名称変更
+            self.update_sub_flow_form_rename()
+        elif selected_value == 4: ## サブフロー削除
+            self.update_sub_flow_form_delete()
+
+
+    #########################
+    # サブフロー操作フォーム #
+    #########################
+
+    def update_sub_flow_form_new_sub_flow(self):
+        ### サブフロー新規作成フォーム
         pass
 
-    def get_research_flow_status(self):
-        with open(self._research_flow_status_file_path) as file:
-            return json.load(file)
+    def generate_new_sub_flow_form_options(self)->Dict[str, List[str]]:
+        research_flow_status = ResearchFlowStatus.load_from_json(self._research_flow_status_file_path)
 
+        options = {}
+        options['--'] = []
+        for phase_index, phase_status in enumerate(research_flow_status):
+            if phase_index == 0:
+                continue
+            else:
+                phase_name = phase_status._name
+                sub_flow_name_list = []
+                for sub_flow_unit in research_flow_status[phase_index-1]._sub_flow_data:
+                    sub_flow_name_list.append(sub_flow_unit._name)
+                if len(sub_flow_name_list) > 0:
+                    options[msg_config.get('research_flow_phase_display_name',phase_name)] = sub_flow_name_list
+
+
+
+
+
+
+
+
+
+
+
+
+    def update_sub_flow_form_relink(self):
+        # サブフロー間接続編集フォーム
+        pass
+
+    def update_sub_flow_form_rename(self):
+        # サブフロー名称変更フォーム
+        pass
+
+    def update_sub_flow_form_delete(self):
+        # サブフロー削除フォーム
+        pass
+
+
+
+    #################
+    # クラスメソッド #
+    #################
 
     @classmethod
     def generate(cls, working_path:str):

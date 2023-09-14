@@ -2,9 +2,9 @@ import json
 from typing import List
 from datetime import datetime
 from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus, FlowDrawer
-from ..utils.config import path_config, message as msg_config
+from ..utils.config import message as msg_config
 
-class ResearchFlowStatusFile():
+class ResearchFlowStatusOperater():
 
     @classmethod
     def get_research_flow_status(cls, file_path:str):
@@ -21,7 +21,7 @@ class ResearchFlowStatusFile():
         """
         research_flow_status = ResearchFlowStatus.load_from_json(file_path)
         # Update display pahse name
-        research_flow_status = ResearchFlowStatusFile.update_display_phase_name(research_flow_status)
+        research_flow_status = ResearchFlowStatusOperater.update_display_phase_name(research_flow_status)
         fd = FlowDrawer(research_flow_status=research_flow_status)
         # generate SVG of Research Flow Image
         return fd.draw()
@@ -53,7 +53,7 @@ class ResearchFlowStatusFile():
                 continue
 
         #リサーチフローステータス管理JSONを更新する。
-        ResearchFlowStatusFile.update_file(file_path, research_flow_status)
+        ResearchFlowStatusOperater.update_file(file_path, research_flow_status)
 
 
 

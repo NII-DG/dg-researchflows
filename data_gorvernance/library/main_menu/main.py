@@ -173,8 +173,7 @@ class MainMenu():
         self._sub_flow_type_selector = pn.widgets.Select(
             name=msg_config.get('main_menu', 'sub_flow_type'),
             options=sub_flow_type_options,
-            value=sub_flow_type_options[msg_config.get('form', 'selector_default')],
-            disabled_options=[sub_flow_type_options[msg_config.get('form', 'selector_default')]]
+            value=sub_flow_type_options[msg_config.get('form', 'selector_default')]
             )
         # サブフロー種別(フェーズ)のイベントリスナー
         self._sub_flow_type_selector.param.watch(self.callback_sub_flow_type_selector, 'value')
@@ -193,7 +192,6 @@ class MainMenu():
             name=msg_config.get('main_menu', 'parent_sub_flow_type'),
             options=parent_sub_flow_type_options,
             value=parent_sub_flow_type_options[msg_config.get('form', 'selector_default')],
-            disabled_options=[parent_sub_flow_type_options[msg_config.get('form', 'selector_default')]]
             )
         # 親サブフロー種別(フェーズ)のイベントリスナー
         self._parent_sub_flow_type_selector.param.watch(self.callback_parent_sub_flow_type_selector, 'value')

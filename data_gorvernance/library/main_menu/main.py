@@ -4,6 +4,7 @@ from ..utils.html import text as html_text, button as html_button
 from IPython.display import display, Javascript
 from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus
 from ..main_menu.research_flow_status import ResearchFlowStatusOperater as re_fl_operater
+import traceback
 
 import panel as pn
 import os
@@ -119,7 +120,7 @@ class MainMenu():
                 ## サブフロー操作フォームを初期化
                 self._sub_flow_form.clear()
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {str(e)}')
+            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {traceback.format_exc()}')
             self._err_output.height = 100
 
 
@@ -143,7 +144,7 @@ class MainMenu():
             elif selected_value == 4: ## サブフロー削除
                 self.update_sub_flow_form_delete()
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {str(e)}')
+            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {traceback.format_exc()}')
             self._err_output.height = 100
 
 
@@ -309,7 +310,7 @@ class MainMenu():
             # 新規作成ボタンのボタンの有効化チェック
             self.change_diable_creating_button()
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {str(e)}')
+            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {traceback.format_exc()}')
             self._err_output.height = 100
 
     def callback_sub_flow_name_form(self, event):
@@ -318,7 +319,7 @@ class MainMenu():
             # 新規作成ボタンのボタンの有効化チェック
             self.change_diable_creating_button()
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {str(e)}')
+            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {traceback.format_exc()}')
             self._err_output.height = 100
 
     def callback_parent_sub_flow_type_selector(self, event):
@@ -336,7 +337,7 @@ class MainMenu():
             # 新規作成ボタンのボタンの有効化チェック
             self.change_diable_creating_button()
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {str(e)}')
+            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {traceback.format_exc()}')
             self._err_output.height = 100
 
     def callback_parent_sub_flow_selector(self, event):
@@ -344,7 +345,7 @@ class MainMenu():
             # 新規作成ボタンのボタンの有効化チェック
             self.change_diable_creating_button()
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {str(e)}')
+            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {traceback.format_exc()}')
             self._err_output.height = 100
 
 
@@ -455,7 +456,7 @@ class MainMenu():
             initial_setup_link_button.object = html_button.create_button(
                 url = './setup.ipynb',
                 msg=msg_config.get('main_menu', 'access_initial_setup'),
-                button_width='500'
+                button_width='500px'
             )
             initial_setup_link_button.width = 500
             display(initial_setup_link_button)

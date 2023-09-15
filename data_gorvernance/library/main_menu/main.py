@@ -12,7 +12,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir_path = os.path.abspath(os.path.join(script_dir, '../'))
 
 # git clone https://github.com/NII-DG/dg-researchflows.git -b feature/main_menu_v2 ./demo
-# mv ./demo* ./
+# mv ./demo/* ./
 # rm -rf ./demo
 
 class MainMenu():
@@ -450,5 +450,6 @@ class MainMenu():
                 msg=msg_config.get('main_menu', 'access_initial_setup'),
                 button_width='500'
             )
+            initial_setup_link_button.width = 500
             display(initial_setup_link_button)
             display(Javascript('IPython.notebook.save_checkpoint();'))

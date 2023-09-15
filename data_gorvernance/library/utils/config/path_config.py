@@ -17,4 +17,4 @@ SETUP_COMPLETED_TEXT_PATH = os.path.join(DOT_DATA_GOVERNANCE, 'setup_completed.t
 
 
 def getResearchFlowStatusFilePath(abs_root)->str:
-    return os.path.join(abs_root, DATA_GOVERNANCE, 'researchflow/main_menu/research_flow_status.json')
+    return os.path.join(abs_root, DATA_GOVERNANCE, 'researchflow/research_flow_status.json')

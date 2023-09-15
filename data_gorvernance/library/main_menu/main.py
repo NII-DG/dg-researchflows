@@ -132,6 +132,8 @@ class MainMenu():
     def update_sub_flow_form(self, event):
         """サブフロー操作フォーム by サブフロー操作コントローラーオプション"""
         try:
+            self._err_output.object = ''
+            self._err_output.height = 1
             selected_value = self._sub_flow_menu.value
             if selected_value == 0: ## 選択なし
                 self._sub_flow_form.clear()

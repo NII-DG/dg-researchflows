@@ -101,7 +101,6 @@ class MainMenu():
         self._menu_tabs.append((project_menu_title, project_menu_layout)) # tab_index = 1
         # 機能コントローラーのイベントリスナー
         self._menu_tabs.param.watch(self.change_tabs, 'active')
-        pass
 
 
     ######################################
@@ -109,15 +108,20 @@ class MainMenu():
     ######################################
 
     def change_tabs(self, event):
-        tab_index = event.new
-        if tab_index == 0:
-            # サブフロー操作
-            ## サブフロー操作コントローラーオプションを初期化
-            self._sub_flow_menu.value = 0
-        if tab_index == 1:
-            # プロジェクト操作
-            ## サブフロー操作フォームを初期化
-            self._sub_flow_form.clear()
+        try:
+            tab_index = event.new
+            if tab_index == 0:
+                # サブフロー操作
+                ## サブフロー操作コントローラーオプションを初期化
+                self._sub_flow_menu.value = 0
+            if tab_index == 1:
+                # プロジェクト操作
+                ## サブフロー操作フォームを初期化
+                self._sub_flow_form.clear()
+        except Exception as e:
+            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {str(e)}')
+            self._err_output.height = 100
+
 
 
     def update_button_for_project_sub_menu(self):
@@ -126,18 +130,21 @@ class MainMenu():
 
     def update_sub_flow_form(self, event):
         """サブフロー操作フォーム by サブフロー操作コントローラーオプション"""
-        selected_value = self._sub_flow_menu.value
-        if selected_value == 0: ## 選択なし
-
-            self._sub_flow_form.clear()
-        elif selected_value == 1: ## サブフロー新規作成
-            self.update_sub_flow_form_new_sub_flow()
-        elif selected_value == 2: ## サブフロー間接続編集
-            self.update_sub_flow_form_relink()
-        elif selected_value == 3: ## サブフロー名称変更
-            self.update_sub_flow_form_rename()
-        elif selected_value == 4: ## サブフロー削除
-            self.update_sub_flow_form_delete()
+        try:
+            selected_value = self._sub_flow_menu.value
+            if selected_value == 0: ## 選択なし
+                self._sub_flow_form.clear()
+            elif selected_value == 1: ## サブフロー新規作成
+                self.update_sub_flow_form_new_sub_flow()
+            elif selected_value == 2: ## サブフロー間接続編集
+                self.update_sub_flow_form_relink()
+            elif selected_value == 3: ## サブフロー名称変更
+                self.update_sub_flow_form_rename()
+            elif selected_value == 4: ## サブフロー削除
+                self.update_sub_flow_form_delete()
+        except Exception as e:
+            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {str(e)}')
+            self._err_output.height = 100
 
 
 

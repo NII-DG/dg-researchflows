@@ -5,9 +5,9 @@
 import os
 # Folder
 ## 同期対象外フォルダ
-DOT_DATA_GOVERNANCE = '.data-governance'
+DOT_DATA_GOVERNANCE = '.data_gorvernance'
 ## 同期対象フォルダ
-DATA_GOVERNANCE = 'data-governance'
+DATA_GOVERNANCE = 'data_gorvernance'
 
 
 # File

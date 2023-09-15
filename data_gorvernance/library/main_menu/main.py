@@ -204,10 +204,17 @@ class MainMenu():
         # 新規作成ボタンのイベントリスナー
         self.submit_button.on_click(self.callback_create_new_sub_flow)
 
+        self._sub_flow_form.clear()
+        sub_flow_form_layout = pn.Column(
+            f'### {msg_config.get("main_menu", "create_sub_flow_title")}',
+            self._sub_flow_type_selector,
+            self._sub_flow_name_form,
+            self._parent_sub_flow_type_selector,
+            self._parent_sub_flow_selector,
+            self.submit_button
+            )
+        self._sub_flow_form.append(sub_flow_form_layout)
 
-
-
-        pass
 
     def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus])->Dict[str, int]:
         # サブフロー種別(フェーズ)オプション(表示名をKey、順序値をVauleとする)

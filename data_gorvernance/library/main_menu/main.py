@@ -4,7 +4,7 @@ import json
 from typing import Dict, List
 from ..utils.config import path_config, message as msg_config
 from ..utils.html import text as html_text, button as html_button
-from IPython.display import display
+from IPython.display import display, Javascript
 from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus, FlowDrawer
 from ..main_menu.research_flow_status import ResearchFlowStatusOperater as re_fl_operater
 
@@ -13,6 +13,8 @@ import os
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir_path = os.path.abspath(os.path.join(script_dir, '../'))
+
+# git clone https://github.com/NII-DG/dg-researchflows.git -b feature/main_menu_v2 ./demo
 
 class MainMenu():
     """MainMenu Class
@@ -459,8 +461,10 @@ class MainMenu():
             initial_setup_link_button = pn.pane.HTML()
             ## TODO:再調整要
             initial_setup_link_button.object = html_button.create_button(
-                url = './setup.py',
+                url = './setup.ipynb',
                 msg=msg_config.get('main_menu', 'access_initial_setup'),
 
             )
+            initial_setup_link_button.width = 500
             display(initial_setup_link_button)
+            display(Javascript('IPython.notebook.save_checkpoint();'))

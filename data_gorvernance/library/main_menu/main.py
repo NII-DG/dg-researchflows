@@ -446,8 +446,7 @@ class MainMenu():
             initial_setup_link_button.object = html_button.create_button(
                 url = './setup.ipynb',
                 msg=msg_config.get('main_menu', 'access_initial_setup'),
-
+                button_height='500'
             )
-            initial_setup_link_button.width = 500
             display(initial_setup_link_button)
             display(Javascript('IPython.notebook.save_checkpoint();'))

@@ -96,6 +96,7 @@ class MainMenu():
         self._sub_flow_menu.param.watch(self.update_sub_flow_form,'value')
         ## サブフロー操作フォーム
         self._sub_flow_form = pn.WidgetBox()
+        self._sub_flow_form.width = 900
         sub_flow_menu_layout = pn.Column(self._sub_flow_menu, self._sub_flow_form)
 
         self._menu_tabs.append((sub_flow_menu_title, sub_flow_menu_layout)) # tab_index = 0
@@ -120,7 +121,7 @@ class MainMenu():
                 ## サブフロー操作フォームを初期化
                 self._sub_flow_form.clear()
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {traceback.format_exc()}')
+            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR] : {traceback.format_exc()}')
             self._err_output.height = 100
 
 
@@ -146,7 +147,7 @@ class MainMenu():
             elif selected_value == 4: ## サブフロー削除
                 self.update_sub_flow_form_delete()
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {traceback.format_exc()}')
+            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR] : {traceback.format_exc()}')
             self._err_output.height = 100
 
 
@@ -306,11 +307,10 @@ class MainMenu():
             # 親サブフロー種別(フェーズ)（必須)：シングルセレクトの更新
             parent_sub_flow_type_options = self.generate_parent_sub_flow_type_options(selected_value, research_flow_status)
             self._parent_sub_flow_type_selector.options = parent_sub_flow_type_options
-            self._parent_sub_flow_type_selector.disabled_options = [parent_sub_flow_type_options[msg_config.get('form', 'selector_default')]]
             # 新規作成ボタンのボタンの有効化チェック
             self.change_diable_creating_button()
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {traceback.format_exc()}')
+            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR] : {traceback.format_exc()}')
             self._err_output.height = 100
 
     def callback_sub_flow_name_form(self, event):
@@ -319,7 +319,7 @@ class MainMenu():
             # 新規作成ボタンのボタンの有効化チェック
             self.change_diable_creating_button()
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {traceback.format_exc()}')
+            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR] : {traceback.format_exc()}')
             self._err_output.height = 100
 
     def callback_parent_sub_flow_type_selector(self, event):
@@ -337,7 +337,7 @@ class MainMenu():
             # 新規作成ボタンのボタンの有効化チェック
             self.change_diable_creating_button()
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {traceback.format_exc()}')
+            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR] : {traceback.format_exc()}')
             self._err_output.height = 100
 
     def callback_parent_sub_flow_selector(self, event):
@@ -345,7 +345,7 @@ class MainMenu():
             # 新規作成ボタンのボタンの有効化チェック
             self.change_diable_creating_button()
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR in update_sub_fl_selector()] : {traceback.format_exc()}')
+            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR] : {traceback.format_exc()}')
             self._err_output.height = 100
 
 

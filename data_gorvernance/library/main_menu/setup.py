@@ -1,5 +1,5 @@
 
-class MainMenu():
+class Setup():
     """MainMenu class
 
     """

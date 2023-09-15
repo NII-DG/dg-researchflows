@@ -58,7 +58,6 @@ class MainMenu():
         ################################
         # 機能コントローラーオブジェクト #
         ################################
-
         # 機能コントローラーの定義
         self._menu_tabs = pn.Tabs()
 
@@ -103,6 +102,16 @@ class MainMenu():
         self._menu_tabs.append((project_menu_title, project_menu_layout)) # tab_index = 1
         # 機能コントローラーのイベントリスナー
         self._menu_tabs.param.watch(self.change_tabs, 'active')
+
+        # 研究準備サブフローの進行状況を把握する
+        # ある条件に満たしてない場合。
+        # サブフロー操作コントローラーを無効化
+        # アラートを表示する。
+        self._sub_flow_menu.disabled = True
+        alert = pn.pane.Alert(msg_config.get('main_menu','required_research_preparation'),sizing_mode="stretch_width",alert_type='warning')
+        self._sub_flow_form.append(alert)
+
+
 
 
     ######################################
@@ -291,6 +300,7 @@ class MainMenu():
         # 新規作成ボタンコールバックファンクション
         # サブフロー作成処理
         try:
+            self.change_submit_button_processing(msg_config.get('main_menu', 'creating_sub_flow'))
             pass
         except Exception as e:
             pass

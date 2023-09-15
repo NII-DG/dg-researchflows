@@ -16,13 +16,13 @@ class File:
 
     def read(self):
         with self.path.open('r') as file:
-                content = file.read()
+            content = file.read()
         return content
 
     def write(self, content: str):
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with self.path.open('w') as file:
-                file.write(content)
+            file.write(content)
 
     def create(self):
         if not self.path.exists():
@@ -37,12 +37,10 @@ class JsonFile(File):
     def __init__(self, file_path: str):
         super().__init__(file_path)
 
-    def read_json(self):
-        content = self.read()
-        if content:
-            return json.loads(content)
-        return None
+    def read(self):
+        content = super().read()
+        return json.loads(content)
 
-    def write_json(self, data:dict):
+    def write(self, data:dict):
         json_data = json.dumps(data, indent=4)
-        self.write(json_data)
+        super().write(json_data)

@@ -1,4 +1,4 @@
-
+from .file import JsonFile
 
 class TaskConfig:
 
@@ -49,6 +49,12 @@ class TaskConfig:
     def status(self, status: str):
         self._set_status(status)
 
+    def to_dict(self):
+        return {
+            'id': self.id
+
+        }
+
 
 class Tasks:
 
@@ -62,7 +68,26 @@ class Tasks:
             if con.status != con.STATUS_UNFEASIBLE:
                 continue
 
-            is_all_completed = all(count_dict.get(id, 0) >= 1 for id in ts.dependent_task_ids)
+            is_all_completed = all(count_dict.get(id, 0) >= 1 for id in con.dependent_task_ids)
             if is_all_completed:
                 con.status = con.STATUS_UNEXECUTED
 
+    def to_dict(self):
+        return {
+            'tasks': [
+                con.to_dict() for con in self.config
+            ]
+        }
+
+class StatusFile(JsonFile):
+
+    def __init__(self, file_path: str):
+        super().__init__(file_path)
+
+    def read(self):
+        content = super().read()
+        return Tasks(content)
+
+    def write(self, tasks: Tasks):
+        data = tasks.to_dict()
+        super().write(data)

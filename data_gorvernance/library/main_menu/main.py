@@ -1,11 +1,8 @@
-
-
-import json
 from typing import Dict, List
 from ..utils.config import path_config, message as msg_config
 from ..utils.html import text as html_text, button as html_button
 from IPython.display import display, Javascript
-from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus, FlowDrawer
+from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus
 from ..main_menu.research_flow_status import ResearchFlowStatusOperater as re_fl_operater
 
 import panel as pn
@@ -379,20 +376,6 @@ class MainMenu():
             return
 
         self.submit_button.disabled = False
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     #########################
     # サブフロー間接続編集フォーム #

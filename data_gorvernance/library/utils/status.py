@@ -1,15 +1,14 @@
-from .file import JsonFile
-
-_STATUS_UNFEASIBLE = "unfeasible"
-_STATUS_UNEXECUTED = "unexecuted"
-_STATUS_DOING = "doing"
-_STATUS_DONE = "done"
-_allowed_statuses = [_STATUS_UNFEASIBLE, _STATUS_UNEXECUTED, _STATUS_DOING, _STATUS_DONE]
 
 
-class TaskStatus:
+class TaskConfig:
 
-    def __init__(self, id: str, name: str, is_multiple: bool, is_optional: bool, completed_count: int, dependent_task_ids: list[str], status: str, execution_environments: list[str]) -> None:
+    STATUS_UNFEASIBLE = "unfeasible"
+    STATUS_UNEXECUTED = "unexecuted"
+    STATUS_DOING = "doing"
+    STATUS_DONE = "done"
+    allowed_statuses = [STATUS_UNFEASIBLE, STATUS_UNEXECUTED, STATUS_DOING, STATUS_DONE]
+
+    def __init__(self, id: str, name: str, is_multiple: bool, is_optional: bool, completed_count: int, dependent_task_ids: list[str], status: str, execution_environments: list[str], disabled: bool) -> None:
         self._id = id
         self._name = name
         self._is_multiple = is_multiple
@@ -18,9 +17,10 @@ class TaskStatus:
         self._dependent_task_ids = dependent_task_ids
         self._set_status(status)
         self._execution_environments = execution_environments
+        self._disabled = disabled
 
     def _set_status(self, status: str):
-        if status in _allowed_statuses:
+        if status in self.allowed_statuses:
             self._status = status
         else:
             raise ValueError
@@ -41,25 +41,28 @@ class TaskStatus:
     def status(self):
         return self._status
 
+    @property
+    def disabled(self):
+        return self._disabled
+
     @status.setter
     def status(self, status: str):
         self._set_status(status)
 
 
-class StatusManager:
+class Tasks:
 
     def __init__(self, tasks:list[dict]) -> None:
-        self.task_statuses = [TaskStatus(**task) for task in tasks]
+        self.config = [TaskConfig(**task) for task in tasks]
 
     def update_status(self):
-        count_dict = {ts.id: ts.completed_count for ts in self.task_statuses}
+        count_dict = {con.id: con.completed_count for con in self.config}
 
-        for ts in self.task_statuses:
-            if ts.status != _STATUS_UNFEASIBLE:
+        for con in self.config:
+            if con.status != con.STATUS_UNFEASIBLE:
                 continue
 
             is_all_completed = all(count_dict.get(id, 0) >= 1 for id in ts.dependent_task_ids)
             if is_all_completed:
-                ts.status = _STATUS_UNEXECUTED
-
+                con.status = con.STATUS_UNEXECUTED
 

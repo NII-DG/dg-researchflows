@@ -351,7 +351,7 @@ class MainMenu():
 
         # サブフロー関係図を更新
         try:
-            self._research_flow_image = pn.pane.HTML(self.reserch_flow_status_operater.get_svg_of_research_flow_status())
+            self._research_flow_image.object = pn.pane.HTML(self.reserch_flow_status_operater.get_svg_of_research_flow_status())
         except Exception as e:
             self._err_output.clear()
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')

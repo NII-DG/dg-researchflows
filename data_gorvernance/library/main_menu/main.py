@@ -504,15 +504,15 @@ class MainMenu():
             # Leads you to the initial setup
 
             # display message
-            html_text.display_msg_warm(msg=msg_config.get('main_menu', 'required_initial_setup'))
+            alert = pn.pane.Alert(msg_config.get('main_menu', 'required_initial_setup'),sizing_mode="stretch_width",alert_type='warning')
             # display initial setup link button
             initial_setup_link_button = pn.pane.HTML()
-            ## TODO:再調整要
             initial_setup_link_button.object = html_button.create_button(
                 url = './setup.ipynb',
                 msg=msg_config.get('main_menu', 'access_initial_setup'),
                 button_width='500px'
             )
             initial_setup_link_button.width = 500
+            display(alert)
             display(initial_setup_link_button)
             display(Javascript('IPython.notebook.save_checkpoint();'))

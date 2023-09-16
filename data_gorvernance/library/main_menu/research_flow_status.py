@@ -211,12 +211,12 @@ class ResearchFlowStatusOperater():
 
 
 
-    def is_unique_subflow_name(self, creating_phase_seq_number, sub_flow_name)->bool:
+    def is_unique_subflow_name(self, phase_seq_number, sub_flow_name)->bool:
         """サブフロー名のユニークチェック"""
         exist_phase = False
         research_flow_status = ResearchFlowStatus.load_from_json(self.file_path)
         for phase_status in research_flow_status:
-            if phase_status._seq_number == creating_phase_seq_number:
+            if phase_status._seq_number == phase_seq_number:
                 exist_phase = True
                 for sub_flow_item in phase_status._sub_flow_data:
                     if sub_flow_item._name == sub_flow_name:
@@ -225,6 +225,6 @@ class ResearchFlowStatusOperater():
                 continue
 
         if not exist_phase:
-            raise Exception(f'Not Found phase. target phase seq_number : {creating_phase_seq_number}')
+            raise Exception(f'Not Found phase. target phase seq_number : {phase_seq_number}')
 
         return True

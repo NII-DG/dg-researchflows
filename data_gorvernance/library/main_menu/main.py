@@ -334,7 +334,15 @@ class MainMenu():
             creating_phase_seq_number = self._sub_flow_type_selector.value
             sub_flow_name = self._sub_flow_name_form.value_input
             parent_sub_flow_ids = self._parent_sub_flow_selector.value
-            self.reserch_flow_status_operater.update_research_flow_status(creating_phase_seq_number, sub_flow_name, parent_sub_flow_ids)
+            # サブフロー名がユニークかどうかチェック
+            if self.reserch_flow_status_operater.is_unique_subflow_name(creating_phase_seq_number, sub_flow_name):
+                # サブフロー名がユニークの場合
+                self.reserch_flow_status_operater.update_research_flow_status(creating_phase_seq_number, sub_flow_name, parent_sub_flow_ids)
+            else:
+                # サブフロー名がユニークでないの場合
+                self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_subflow_name'))
+                return
+
         except Exception as e:
             # サブフロー作成処理が失敗した場合
             self._err_output.clear()

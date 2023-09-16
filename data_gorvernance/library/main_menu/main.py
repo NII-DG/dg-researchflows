@@ -357,12 +357,12 @@ class MainMenu():
         try:
             phase_name, new_sub_flow_id = self.reserch_flow_status_operater.update_research_flow_status(creating_phase_seq_number, sub_flow_name, parent_sub_flow_ids)
         except Exception as e:
+            self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             # リサーチフローステータス管理JSONの更新が失敗した場合
             self._err_output.clear()
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
             # 新規作成ボタンを作成失敗ステータスに更新する
-            self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             raise
 
         # 新規サブフローデータの用意
@@ -370,12 +370,13 @@ class MainMenu():
             self.prepare_new_subflow_data(phase_name, new_sub_flow_id, sub_flow_name)
         except Exception as e:
             # 失敗した場合は、リサーチフローステータス管理JSONをロールバック
+            self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             self._err_output.clear()
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
             self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
             # 新規作成ボタンを作成失敗ステータスに更新する
-            self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
+
             raise
 
         # 新規作成ボタンを作成完了ステータスに更新する
@@ -410,7 +411,7 @@ class MainMenu():
                 shutil.copyfile(src_path, dect_path)
                 # menu.ipynbファイルの場合は、menu.ipynbのヘッダーにサブフロー名を埋め込む
                 if copy_file_name == path_config.MENU_NOTEBOOK:
-                    nb_file = NbFile(dect_dir_path)
+                    nb_file = NbFile(dect_path)
                     nb_file.embed_subflow_name_on_header(sub_flow_name)
         except Exception as e:
             # 失敗した場合は、コピー先フォルダごと削除する（ロールバック）

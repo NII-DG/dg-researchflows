@@ -151,7 +151,7 @@ class MainMenu():
 
 
 
-    def callback_project_menu(self):
+    def callback_project_menu(self, event):
         """遷移ボタン for プロジェクト操作コントローラーの更新"""
         # 開発中のためアラートを表示する。
         alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')

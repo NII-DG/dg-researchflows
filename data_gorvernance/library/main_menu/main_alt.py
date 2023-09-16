@@ -3,7 +3,7 @@ from ..utils.config import path_config, message as msg_config
 from ..utils.html import text as html_text, button as html_button
 from IPython.display import display, Javascript
 from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus
-from .research_flow_status import ResearchFlowStatusOperater as re_fl_operater
+from ..main_menu.research_flow_status import ResearchFlowStatusOperater as re_fl_operater
 import traceback
 
 import panel as pn
@@ -16,7 +16,7 @@ root_dir_path = os.path.abspath(os.path.join(script_dir, '../'))
 # mv ./demo/* ./
 # rm -rf ./demo
 
-class MainMenu():
+class MainMenu_alt():
     """MainMenu Class
 
     FUNCTION:

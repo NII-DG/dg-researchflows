@@ -1,34 +1,42 @@
 import json
+import os
 from typing import List
 from datetime import datetime
-from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus, FlowDrawer
-from ..utils.config import message as msg_config
+from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus, SubFlowStatus,FlowDrawer
+from ..utils.config import message as msg_config, path_config
 import uuid
+import shutil
+from ..utils.error import ExistSubflowDirError, NotFoundSubflowDataError
 
 class ResearchFlowStatusOperater():
 
-    @classmethod
-    def get_research_flow_status(cls, file_path:str):
-        with open(file_path) as file:
+    def __init__(self, file_path:str) -> None:
+        if os.path.isfile(file_path):
+            self.file_path = file_path
+        else:
+            raise FileNotFoundError(f'[ERROR] : Not Found File. File Path : {file_path}')
+
+
+
+    def get_research_flow_status(self):
+        with open(self.file_path) as file:
             return json.load(file)
 
 
-    @classmethod
-    def get_svg_of_research_flow_status(cls, file_path:str)->str:
+    def get_svg_of_research_flow_status(self)->str:
         """Get SVG data of Research Flow Image by file path
 
         Returns:
             str: SVG data of Research Flow Image
         """
-        research_flow_status = ResearchFlowStatus.load_from_json(file_path)
+        research_flow_status = ResearchFlowStatus.load_from_json(self.file_path)
         # Update display pahse name
-        research_flow_status = ResearchFlowStatusOperater.update_display_phase_name(research_flow_status)
+        research_flow_status = self.update_display_phase_name(research_flow_status)
         fd = FlowDrawer(research_flow_status=research_flow_status)
         # generate SVG of Research Flow Image
         return fd.draw()
 
-    @classmethod
-    def update_display_phase_name(cls, research_flow_status:List[PhaseStatus])-> List[PhaseStatus]:
+    def update_display_phase_name(self, research_flow_status:List[PhaseStatus])-> List[PhaseStatus]:
         """フェーズの表示名更新"""
         update_research_flow_status = []
         for phase in research_flow_status:
@@ -36,8 +44,7 @@ class ResearchFlowStatusOperater():
             update_research_flow_status.append(phase)
         return update_research_flow_status
 
-    @classmethod
-    def init_research_preparation(cls, file_path:str):
+    def init_research_preparation(self, file_path:str):
         """研究準備ステータスの初期化"""
         # 研究準備のサブフローデータのサブフロー作成時間が-1の場合、現在の現時刻に更新する。
         research_flow_status = ResearchFlowStatus.load_from_json(file_path)
@@ -54,12 +61,11 @@ class ResearchFlowStatusOperater():
                 continue
 
         #リサーチフローステータス管理JSONを更新する。
-        ResearchFlowStatusOperater.update_file(file_path, research_flow_status)
+        self.update_file(research_flow_status)
 
 
 
-    @classmethod
-    def update_file(cls, file_path:str, research_flow_status:List[PhaseStatus]):
+    def update_file(self, research_flow_status:List[PhaseStatus]):
         # research_flow_statusを基にリサーチフローステータス管理JSONを更新する。
         research_flow_status_data = {}
         research_flow_status_data['research_flow_pahse_data'] = []
@@ -79,16 +85,16 @@ class ResearchFlowStatusOperater():
                 phase_status_data['sub_flow_data'].append(sub_flow_unit_data)
             research_flow_status_data['research_flow_pahse_data'].append(phase_status_data)
         # リサーチフローステータス管理JSONをアップデート
-        with open(file_path, 'w') as file:
+        with open(self.file_path, 'w') as file:
             json.dump(research_flow_status_data, file, indent=4)
 
-    @classmethod
-    def issue_uuidv4(cls)->str:
+
+    def issue_uuidv4(self)->str:
         """UUIDv4の発行"""
         return str(uuid.uuid4())
 
-    @classmethod
-    def exist_sub_flow_id_in_research_flow_status(cls, research_flow_status:List[PhaseStatus], target_id:str)->bool:
+
+    def exist_sub_flow_id_in_research_flow_status(self, research_flow_status:List[PhaseStatus], target_id:str)->bool:
         """リサーチフローステータス管理情報にサブフローIDが存在するかチェック"""
 
         for phase in research_flow_status:
@@ -97,15 +103,128 @@ class ResearchFlowStatusOperater():
                     return True
         return False
 
-    @classmethod
-    def issue_unique_sub_flow_id(cls, file_path:str)->str:
+
+    def issue_unique_sub_flow_id(self)->str:
         """ユニークなサブフローIDを発行する"""
         while True:
-            candidate_id = ResearchFlowStatusOperater.issue_uuidv4()
-            research_flow_status = ResearchFlowStatus.load_from_json(file_path)
-            if ResearchFlowStatusOperater.exist_sub_flow_id_in_research_flow_status(research_flow_status, candidate_id):
+            candidate_id = self.issue_uuidv4()
+            research_flow_status = ResearchFlowStatus.load_from_json(self.file_path)
+            if self.exist_sub_flow_id_in_research_flow_status(research_flow_status, candidate_id):
                 ## 存在する場合は、発行し直し
                 continue
             else:
                 ## ユニークID取得に成功
                 return candidate_id
+
+    def update_research_flow_status(self, creating_phase_seq_number, sub_flow_name, parent_sub_flow_ids):
+        """リサーチフローステータスの更新
+
+        Args:
+            creating_phase_seq_number (int): [作成フェーズ]
+
+            sub_flow_name (str): [新規サブフロー名]
+
+            parent_sub_flow_id (list[str]): [親サブフローID]
+        """
+        # リサーチフローステータス管理JSONの更新
+        research_flow_status = ResearchFlowStatus.load_from_json(self.file_path)
+        phase_name = None
+        new_sub_flow_id = None
+        for phase_status in research_flow_status:
+            if phase_status._seq_number == creating_phase_seq_number:
+                phase_name = phase_status._name
+                current_datetime = datetime.now()
+                new_sub_flow_id = self.issue_unique_sub_flow_id()
+                new_subflow_item = SubFlowStatus(
+                    id=new_sub_flow_id,
+                    name=sub_flow_name,
+                    link='',
+                    parent_ids=parent_sub_flow_ids,
+                    create_datetime=int(current_datetime.timestamp())
+                )
+                phase_status._sub_flow_data.append(new_subflow_item)
+            else:
+                continue
+
+        if phase_name is None:
+            raise Exception(f'Not Found phase. target phase seq_number : {creating_phase_seq_number}')
+        if new_sub_flow_id is None:
+            raise Exception(f'Cannot Issue New Sub Flow ID')
+        self.update_file(research_flow_status)
+
+        # 新規サブフローデータの用意
+        try:
+            self.prepare_new_subflow_data(phase_name, new_sub_flow_id)
+        except Exception as e:
+            # 失敗した場合は、リサーチフローステータス管理JSONをロールバック
+            self.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
+            raise
+
+    def del_sub_flow_data_by_sub_flow_id(self, sub_flow_id):
+        research_flow_status = ResearchFlowStatus.load_from_json(self.file_path)
+
+        for phase_status in research_flow_status:
+            remove_subflow = None
+            for subflow in phase_status._sub_flow_data:
+                if subflow._id == sub_flow_id:
+                    remove_subflow = subflow
+                else:
+                    continue
+            if remove_subflow is not None:
+                phase_status._sub_flow_data.remove(remove_subflow)
+            else:
+                raise NotFoundSubflowDataError(f'There Is No Subflow Data to Delete. sub_flow_id : {sub_flow_id}')
+
+
+
+
+    def prepare_new_subflow_data(self, phase_name:str, new_sub_flow_id:str):
+
+        # 新規サブフローデータの用意
+        abs_root = path_config.get_abs_root_form_working_dg_file_path(self.file_path)
+        # data_gorvernance\researchflowを取得
+        dg_researchflow_path = os.path.join(abs_root, path_config.get_dg_researchflow_folder(False))
+        # data_gorvernance\base\subflowを取得する
+        dg_base_subflow_path = os.path.join(abs_root, path_config.get_dg_sub_flow_base_data_folder())
+
+        # コピー先フォルダパス
+        dect_dir_path = os.path.join(dg_researchflow_path, phase_name, new_sub_flow_id)
+
+        # コピー先フォルダの作成
+        os.makedirs(dect_dir_path) # 既に存在している場合はエラーになる
+
+        # 対象コピーファイルリスト
+        copy_files = path_config.get_prepare_file_name_list_for_subflow()
+
+        try:
+            for copy_file_name in copy_files:
+                # コピー元ファイルパス
+                src_path = os.path.join(dg_base_subflow_path, phase_name, copy_file_name)
+                dect_path = os.path.join(dg_researchflow_path, phase_name, new_sub_flow_id, copy_file_name)
+                shutil.copyfile(src_path, dect_path)
+        except Exception as e:
+            # 失敗した場合は、コピー先フォルダごと削除する（ロールバック）
+            shutil.rmtree(dect_dir_path)
+            raise
+
+
+
+
+
+    def is_unique_subflow_name(self, creating_phase_seq_number, sub_flow_name)->bool:
+        """サブフロー名のユニークチェック"""
+        exist_phase = False
+        research_flow_status = ResearchFlowStatus.load_from_json(self.file_path)
+        for phase_status in research_flow_status:
+            if phase_status._seq_number == creating_phase_seq_number:
+                exist_phase = True
+                for sub_flow_item in phase_status._sub_flow_data:
+                    if sub_flow_item._name == sub_flow_name:
+                        raise Exception(f'Not Unique sub flow name. target sub flow name : {sub_flow_name}')
+            else:
+                continue
+
+        if not exist_phase:
+            raise Exception(f'Not Found phase. target phase seq_number : {creating_phase_seq_number}')
+
+        return True

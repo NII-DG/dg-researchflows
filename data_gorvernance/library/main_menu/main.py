@@ -3,7 +3,7 @@ from ..utils.config import path_config, message as msg_config
 from ..utils.html import text as html_text, button as html_button
 from IPython.display import display, Javascript
 from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus
-from ..main_menu.research_flow_status import ResearchFlowStatusOperater as re_fl_operater
+from ..main_menu.research_flow_status import ResearchFlowStatusOperater
 import traceback
 
 import panel as pn
@@ -38,12 +38,13 @@ class MainMenu():
 
         # リサーチフロー図の生成
         ## data_gorvernance\researchflow\main_menu\status\research_flow_status.json
-        self._research_flow_status_file_path = path_config.getResearchFlowStatusFilePath(abs_root)
+        self._research_flow_status_file_path = path_config.get_research_flow_status_file_path(abs_root)
 
+        self.reserch_flow_status_operater = ResearchFlowStatusOperater(self._research_flow_status_file_path)
         # プロジェクトで初回のリサーチフロー図アクセス時の初期化
-        re_fl_operater.init_research_preparation(self._research_flow_status_file_path)
+        self.reserch_flow_status_operater.init_research_preparation(self._research_flow_status_file_path)
         ## リサーチフロー図オブジェクトの定義
-        self._research_flow_image = pn.pane.HTML(re_fl_operater.get_svg_of_research_flow_status(self._research_flow_status_file_path))
+        self._research_flow_image = pn.pane.HTML(self.reserch_flow_status_operater.get_svg_of_research_flow_status())
         self._research_flow_image.width = 1000
 
         ######################################
@@ -329,10 +330,31 @@ class MainMenu():
         # 新規作成ボタンコールバックファンクション
         # サブフロー作成処理
         try:
+            # 新規作成ボタンを処理中ステータスに更新する
             self.change_submit_button_processing(msg_config.get('main_menu', 'creating_sub_flow'))
-            pass
+
+            # 入力情報を取得する。
+            creating_phase_seq_number = self._sub_flow_type_selector.value
+            sub_flow_name = self._sub_flow_name_form.value_input
+            parent_sub_flow_ids = self._parent_sub_flow_selector.value
+            self.reserch_flow_status_operater.update_research_flow_status(creating_phase_seq_number, sub_flow_name, parent_sub_flow_ids)
         except Exception as e:
-            pass
+            # サブフロー作成処理が失敗した場合
+            self._err_output.clear()
+            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
+            self._err_output.append(alert)
+            # 新規作成ボタンを作成失敗ステータスに更新する
+            self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
+
+        # サブフロー関係図を更新
+        try:
+            self._research_flow_image = pn.pane.HTML(self.reserch_flow_status_operater.get_svg_of_research_flow_status())
+        except Exception as e:
+            self._err_output.clear()
+            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
+            self._err_output.append(alert)
+
+
 
     def callback_sub_flow_type_selector(self, event):
         # サブフロー種別(フェーズ):シングルセレクトコールバックファンクション
@@ -482,7 +504,7 @@ class MainMenu():
         ## TODO:再調整要
         # https://github.com/NII-DG/dg-researchflowsのデータが配置されているディレクトリ
         # Jupyter環境では/home/jovyan
-        abs_root = working_path[0:working_path.rfind(path_config.DATA_GOVERNANCE)-1]
+        abs_root = path_config.get_abs_root_working_dg_file_path(working_path)
         # 初期セットアップ完了フラグファイルパス
         abs_setup_completed_file_path = os.path.join(abs_root, path_config.SETUP_COMPLETED_TEXT_PATH)
 

@@ -20,17 +20,14 @@ class NbFile(File):
             subflow_name (str): [サブフロー名]
         """
         notebook = self.read()
-        # for cell in notebook.cells:
-        #      if cell.cell_type == 'markdown' and msg_config.get('DEFAULT', 'param_subflow_name') in cell.source:
-        #         cell.source = cell.source.replace(msg_config.get('DEFAULT', 'param_subflow_name'), security.escape_html_text(subflow_name))
+        for cell in notebook.cells:
+             if cell.cell_type == 'markdown' and msg_config.get('DEFAULT', 'param_subflow_name') in cell.source:
+                cell.source = cell.source.replace(msg_config.get('DEFAULT', 'param_subflow_name'), security.escape_html_text(subflow_name))
         self.write(notebook)
 
 
     def read(self):
-        with self.path.open('r') as f:
-            j = json.dumps(f, indent=4)
-            raise Exception(f'JOSON : {j}')
-        return nbformat.read(self.path, as_version=4)
+        return nbformat.read(str(self.path), as_version=4)
 
     def write(self, notebook_data: Any):
-        nbformat.write(notebook_data, self.path)
+        nbformat.write(notebook_data, str(self.path))

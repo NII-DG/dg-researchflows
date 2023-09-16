@@ -171,15 +171,15 @@ class MainMenu():
             self._err_output.height = 1
             selected_value = self._sub_flow_menu.value
             if selected_value == 0: ## 選択なし
-                self._sub_flow_widget_box.clear()
+                self.update_sub_flow_widget_box_for_init()
             elif selected_value == 1: ## サブフロー新規作成
-                self.update_sub_flow_form_new_sub_flow()
+                self.update_sub_flow_widget_box_for_new_sub_flow()
             elif selected_value == 2: ## サブフロー間接続編集
-                self.update_sub_flow_form_relink()
+                self.update_sub_flow_widget_box_for_relink()
             elif selected_value == 3: ## サブフロー名称変更
-                self.update_sub_flow_form_rename()
+                self.update_sub_flow_widget_box_for_rename()
             elif selected_value == 4: ## サブフロー削除
-                self.update_sub_flow_form_delete()
+                self.update_sub_flow_widget_box_for_delete()
         except Exception as e:
             self._err_output.object = html_text.creat_html_msg_err(f'[ERROR] : {traceback.format_exc()}')
             self._err_output.height = 100
@@ -194,7 +194,12 @@ class MainMenu():
     # サブフロー新規作成フォーム #
     #########################
 
-    def update_sub_flow_form_new_sub_flow(self):
+    def update_sub_flow_widget_box_for_init(self):
+        self._sub_flow_widget_box.clear()
+        alert = pn.pane.Alert(msg_config.get('main_menu','guide_select_action'),sizing_mode="stretch_width",alert_type='info')
+        self._sub_flow_widget_box.append(alert)
+
+    def update_sub_flow_widget_box_for_new_sub_flow(self):
         ### サブフロー新規作成フォーム
         # リサーチフローステータス管理情報の取得
         research_flow_status = ResearchFlowStatus.load_from_json(self._research_flow_status_file_path)
@@ -422,7 +427,7 @@ class MainMenu():
     #########################
     # サブフロー間接続編集フォーム #
     #########################
-    def update_sub_flow_form_relink(self):
+    def update_sub_flow_widget_box_for_relink(self):
         # サブフロー間接続編集フォーム
         # 開発中のためアラートを表示する。
         alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
@@ -432,7 +437,7 @@ class MainMenu():
     #########################
     # サブフロー名称変更フォーム #
     #########################
-    def update_sub_flow_form_rename(self):
+    def update_sub_flow_widget_box_for_rename(self):
         # サブフロー名称変更フォーム
         # 開発中のためアラートを表示する。
         alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
@@ -444,7 +449,7 @@ class MainMenu():
     #########################
     # サブフロー削除フォーム #
     #########################
-    def update_sub_flow_form_delete(self):
+    def update_sub_flow_widget_box_for_delete(self):
         # サブフロー削除フォーム
         # 開発中のためアラートを表示する。
         alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')

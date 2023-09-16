@@ -171,6 +171,8 @@ class ResearchFlowStatusOperater():
             else:
                 raise NotFoundSubflowDataError(f'There Is No Subflow Data to Delete. sub_flow_id : {sub_flow_id}')
 
+        self.update_file(research_flow_status)
+
 
     def is_unique_subflow_name(self, phase_seq_number, sub_flow_name)->bool:
         """サブフロー名のユニークチェック"""

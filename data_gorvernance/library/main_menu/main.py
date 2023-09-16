@@ -374,6 +374,8 @@ class MainMenu():
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
             self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
+            # 新規作成ボタンを作成失敗ステータスに更新する
+            self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             raise
 
         # 新規作成ボタンを作成完了ステータスに更新する

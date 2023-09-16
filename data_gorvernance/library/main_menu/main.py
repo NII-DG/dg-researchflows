@@ -407,7 +407,7 @@ class MainMenu():
                 # コピーする。
                 shutil.copyfile(src_path, dect_path)
                 # menu.ipynbファイルの場合は、menu.ipynbのヘッダーにサブフロー名を埋め込む
-                nb_file = NbFile(dect_path)
+                nb_file = NbFile(src_path)
                 nb_file.embed_subflow_name_on_header(sub_flow_name)
         except Exception as e:
             # 失敗した場合は、コピー先フォルダごと削除する（ロールバック）

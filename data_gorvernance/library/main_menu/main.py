@@ -138,8 +138,6 @@ class MainMenu():
     def callback_menu_tabs(self, event):
         try:
             tab_index = event.new
-            ## ウェジットボックスを初期化
-            self._sub_flow_widget_box.clear()
             if tab_index == 0:
                 # サブフロー操作
                 ## サブフロー操作コントローラーオプションを初期化
@@ -157,9 +155,9 @@ class MainMenu():
         """遷移ボタン for プロジェクト操作コントローラーの更新"""
         # 開発中のためアラートを表示する。
         try:
-            self._sub_flow_widget_box.clear()
+            self._project_widget_box.clear()
             alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
-            self._sub_flow_widget_box.append(alert)
+            self._project_widget_box.append(alert)
         except Exception as e:
             self._err_output.object = html_text.creat_html_msg_err(f'[ERROR] : {traceback.format_exc()}')
             self._err_output.height = 100
@@ -170,7 +168,6 @@ class MainMenu():
             self._err_output.object = ''
             self._err_output.height = 1
             selected_value = self._sub_flow_menu.value
-            self._sub_flow_widget_box.clear()
             if selected_value == 0: ## 選択なし
                 return
             elif selected_value == 1: ## サブフロー新規作成
@@ -254,6 +251,7 @@ class MainMenu():
             self._parent_sub_flow_selector,
             self.submit_button
             )
+        self._sub_flow_widget_box.clear()
         self._sub_flow_widget_box.append(sub_flow_form_layout)
 
 
@@ -426,6 +424,7 @@ class MainMenu():
         # サブフロー間接続編集フォーム
         # 開発中のためアラートを表示する。
         alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
+        self._sub_flow_widget_box.clear()
         self._sub_flow_widget_box.append(alert)
 
     #########################
@@ -435,6 +434,7 @@ class MainMenu():
         # サブフロー名称変更フォーム
         # 開発中のためアラートを表示する。
         alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
+        self._sub_flow_widget_box.clear()
         self._sub_flow_widget_box.append(alert)
 
 
@@ -446,6 +446,7 @@ class MainMenu():
         # サブフロー削除フォーム
         # 開発中のためアラートを表示する。
         alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
+        self._sub_flow_widget_box.clear()
         self._sub_flow_widget_box.append(alert)
 
 

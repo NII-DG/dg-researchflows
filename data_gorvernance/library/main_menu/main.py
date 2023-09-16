@@ -328,62 +328,55 @@ class MainMenu():
     def callback_create_new_sub_flow(self, event):
         # 新規作成ボタンコールバックファンクション
         # サブフロー作成処理
-
-        # 新規作成ボタンを処理中ステータスに更新する
-        self.change_submit_button_processing(msg_config.get('main_menu', 'creating_sub_flow'))
-
-        # 入力情報を取得する。
-        creating_phase_seq_number = self._sub_flow_type_selector.value
-        sub_flow_name = self._sub_flow_name_form.value_input
-        parent_sub_flow_ids = self._parent_sub_flow_selector.value
-        # サブフロー名がユニークかどうかチェック
-
-        if sub_flow_name is None:
-            # sub_flow_nameがNoneの場合、ユーザ警告
-            self.change_submit_button_warning(msg_config.get('main_menu','not_input_subflow_name'))
-            return
-
-        if not self.reserch_flow_status_operater.is_unique_subflow_name(creating_phase_seq_number, sub_flow_name):
-            # サブフロー名がユニークでないの場合、ユーザ警告
-            self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_subflow_name'))
-            return
-
-        if len(str(sub_flow_name).replace(" ", "").replace("　", "")) < 1:
-            # 半角と全角スペースのみの場合、ユーザ警告
-            self.change_submit_button_warning(msg_config.get('main_menu','must_not_only_space'))
-            return
-
-        # リサーチフローステータス管理JSONの更新
         try:
+
+            # 新規作成ボタンを処理中ステータスに更新する
+            self.change_submit_button_processing(msg_config.get('main_menu', 'creating_sub_flow'))
+
+            # 入力情報を取得する。
+            creating_phase_seq_number = self._sub_flow_type_selector.value
+            sub_flow_name = self._sub_flow_name_form.value_input
+            parent_sub_flow_ids = self._parent_sub_flow_selector.value
+            # サブフロー名がユニークかどうかチェック
+
+            if sub_flow_name is None:
+                # sub_flow_nameがNoneの場合、ユーザ警告
+                self.change_submit_button_warning(msg_config.get('main_menu','not_input_subflow_name'))
+                return
+
+            if not self.reserch_flow_status_operater.is_unique_subflow_name(creating_phase_seq_number, sub_flow_name):
+                # サブフロー名がユニークでないの場合、ユーザ警告
+                self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_subflow_name'))
+                return
+
+            if len(str(sub_flow_name).replace(" ", "").replace("　", "")) < 1:
+                # 半角と全角スペースのみの場合、ユーザ警告
+                self.change_submit_button_warning(msg_config.get('main_menu','must_not_only_space'))
+                return
+
+            # リサーチフローステータス管理JSONの更新
             phase_name, new_sub_flow_id = self.reserch_flow_status_operater.update_research_flow_status(creating_phase_seq_number, sub_flow_name, parent_sub_flow_ids)
-        except Exception as e:
+
+            # 新規サブフローデータの用意
+            try:
+                self.prepare_new_subflow_data(phase_name, new_sub_flow_id, sub_flow_name)
+            except Exception as e:
+                # 失敗した場合は、リサーチフローステータス管理JSONをロールバック
+                self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
+                # 新規作成ボタンを作成失敗ステータスに更新する
+                raise
+
+            # 新規作成ボタンを作成完了ステータスに更新する
+            self.change_submit_button_success(msg_config.get('main_menu', 'success_create_sub_flow'))
+
+            # サブフロー関係図を更新
+            self.update_research_flow_image()
+        except  Exception as e:
             self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
-            # リサーチフローステータス管理JSONの更新が失敗した場合
             self._err_output.clear()
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
-            # 新規作成ボタンを作成失敗ステータスに更新する
-            raise
 
-        # 新規サブフローデータの用意
-        try:
-            self.prepare_new_subflow_data(phase_name, new_sub_flow_id, sub_flow_name)
-        except Exception as e:
-            # 失敗した場合は、リサーチフローステータス管理JSONをロールバック
-            self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
-            self._err_output.clear()
-            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
-            self._err_output.append(alert)
-            self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
-            # 新規作成ボタンを作成失敗ステータスに更新する
-
-            raise
-
-        # 新規作成ボタンを作成完了ステータスに更新する
-        self.change_submit_button_success(msg_config.get('main_menu', 'success_create_sub_flow'))
-
-        # サブフロー関係図を更新
-        self.update_research_flow_image()
 
     def prepare_new_subflow_data(self, phase_name:str, new_sub_flow_id:str, sub_flow_name):
 

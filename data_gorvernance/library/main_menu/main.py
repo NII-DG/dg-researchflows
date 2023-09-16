@@ -347,7 +347,7 @@ class MainMenu():
         # 新規作成ボタンを作成完了ステータスに更新する
         self.change_submit_button_success(msg_config.get('main_menu', 'success_create_sub_flow'))
         # サブフロー名フォームの初期化
-        self._sub_flow_name_form.value = ''
+        self._sub_flow_name_form.value_input = ''
 
         # サブフロー関係図を更新
         self.update_research_flow_image()
@@ -449,6 +449,7 @@ class MainMenu():
             return
 
         self.submit_button.disabled = False
+        self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
 
     #########################
     # サブフロー間接続編集フォーム #

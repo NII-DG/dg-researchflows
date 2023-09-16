@@ -337,7 +337,7 @@ class MainMenu():
         sub_flow_name = self._sub_flow_name_form.value_input
         parent_sub_flow_ids = self._parent_sub_flow_selector.value
         # サブフロー名がユニークかどうかチェック
-        if not self.reserch_flow_status_operater.is_unique_subflow_name:
+        if not self.reserch_flow_status_operater.is_unique_subflow_name(creating_phase_seq_number, sub_flow_name):
             # サブフロー名がユニークでないの場合
             self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_subflow_name'))
             return

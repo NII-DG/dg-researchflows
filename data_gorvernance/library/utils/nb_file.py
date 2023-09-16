@@ -9,7 +9,7 @@ class NbFile(File):
     def __init__(self, file_path: str):
         super().__init__(file_path)
 
-    def embed_subflow_name(self, subflow_name:str):
+    def embed_subflow_name_on_header(self, subflow_name:str):
         """サブフローメニュNotebookのヘッダーサブフロー名を埋める
 
         Args:

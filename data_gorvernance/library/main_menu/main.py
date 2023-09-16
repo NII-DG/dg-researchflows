@@ -420,21 +420,27 @@ class MainMenu():
     #########################
     def update_sub_flow_form_relink(self):
         # サブフロー間接続編集フォーム
-        pass
+        # 開発中のためアラートを表示する。
+        alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
+        self._widget_box.append(alert)
 
     #########################
     # サブフロー名称変更フォーム #
     #########################
     def update_sub_flow_form_rename(self):
         # サブフロー名称変更フォーム
-        pass
+        # 開発中のためアラートを表示する。
+        alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
+        self._widget_box.append(alert)
 
     #########################
     # サブフロー削除フォーム #
     #########################
     def update_sub_flow_form_delete(self):
         # サブフロー削除フォーム
-        pass
+        # 開発中のためアラートを表示する。
+        alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
+        self._widget_box.append(alert)
 
 
 

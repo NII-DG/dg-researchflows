@@ -371,6 +371,9 @@ class MainMenu():
             self.prepare_new_subflow_data(phase_name, new_sub_flow_id, sub_flow_name)
         except Exception as e:
             # 失敗した場合は、リサーチフローステータス管理JSONをロールバック
+            self._err_output.clear()
+            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
+            self._err_output.append(alert)
             self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
             raise
 
@@ -586,8 +589,8 @@ class MainMenu():
             display(main_menu_box)
             ## リサーチフロー図を配置
             research_flow_image_title = pn.pane.Markdown(f'### {msg_config.get("main_menu", "subflow_relationship_diagram")}')
-            research_flow_layout = pn.Column(research_flow_image_title, main_menu._research_flow_image)
-            display(research_flow_layout)
+            display(research_flow_image_title)
+            display(main_menu._research_flow_image)
             ## システムエラー表示オブジェクトを配置
             display(main_menu._err_output)
         else:

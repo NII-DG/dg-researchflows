@@ -26,8 +26,7 @@ class NbFile(File):
 
 
     def read(self):
-        with open(self.path, 'r', encoding='utf-8') as file:
-            return nbformat.read(file, as_version=4)
+        return nbformat.read(self.path, as_version=4)
 
     def write(self, notebook_data: Any):
          with open(self.path, 'w', encoding='utf-8') as file:

@@ -134,16 +134,14 @@ class MainMenu():
     def callback_menu_tabs(self, event):
         try:
             tab_index = event.new
+            ## ウェジットボックスを初期化
+            self._widget_box.clear()
             if tab_index == 0:
                 # サブフロー操作
-                # ウェジットボックスを初期化
-                self._widget_box.clear()
                 ## サブフロー操作コントローラーオプションを初期化
                 self._sub_flow_menu.value = 0
             if tab_index == 1:
                 # プロジェクト操作
-                ## ウェジットボックスを初期化
-                self._widget_box.clear()
                 self._project_menu.value = 0
         except Exception as e:
             self._err_output.object = html_text.creat_html_msg_err(f'[ERROR] : {traceback.format_exc()}')

@@ -9,9 +9,6 @@ import traceback
 import panel as pn
 import os
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-root_dir_path = os.path.abspath(os.path.join(script_dir, '../'))
-
 # git clone https://github.com/NII-DG/dg-researchflows.git -b feature/main_menu_v2 ./demo
 # mv ./demo/* ./
 # rm -rf ./demo
@@ -504,7 +501,7 @@ class MainMenu():
         ## TODO:再調整要
         # https://github.com/NII-DG/dg-researchflowsのデータが配置されているディレクトリ
         # Jupyter環境では/home/jovyan
-        abs_root = path_config.get_abs_root_working_dg_file_path(working_path)
+        abs_root = path_config.get_abs_root_form_working_dg_file_path(working_path)
         # 初期セットアップ完了フラグファイルパス
         abs_setup_completed_file_path = os.path.join(abs_root, path_config.SETUP_COMPLETED_TEXT_PATH)
 

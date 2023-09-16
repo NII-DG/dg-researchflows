@@ -152,9 +152,13 @@ class MainMenu():
     def callback_project_menu(self, event):
         """遷移ボタン for プロジェクト操作コントローラーの更新"""
         # 開発中のためアラートを表示する。
-        self._widget_box.clear()
-        alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
-        self._widget_box.append(alert)
+        try:
+            self._widget_box.clear()
+            alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
+            self._widget_box.append(alert)
+        except Exception as e:
+            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR] : {traceback.format_exc()}')
+            self._err_output.height = 100
 
     def callback_sub_flow_menu(self, event):
         """サブフロー操作フォーム by サブフロー操作コントローラーオプション"""
@@ -429,6 +433,8 @@ class MainMenu():
         alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
         self._widget_box.append(alert)
 
+
+
     #########################
     # サブフロー削除フォーム #
     #########################
@@ -437,6 +443,7 @@ class MainMenu():
         # 開発中のためアラートを表示する。
         alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
         self._widget_box.append(alert)
+
 
 
 

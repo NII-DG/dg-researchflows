@@ -342,6 +342,9 @@ class MainMenu():
             self._err_output.append(alert)
             # 新規作成ボタンを作成失敗ステータスに更新する
             self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
+            raise
+
+        self.change_submit_button_success(msg_config.get('main_menu', 'success_create_sub_flow'))
 
         # サブフロー関係図を更新
         try:
@@ -350,6 +353,7 @@ class MainMenu():
             self._err_output.clear()
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
+            raise
 
 
 

@@ -77,7 +77,7 @@ class MainMenu():
         project_menu_options[msg_config.get('main_menu', 'finish_research_title')] = 5
         self._project_menu = pn.widgets.Select(options=project_menu_options, value=0)
         ## プロジェクト操作アクションセレクタ―のイベントリスナー
-        self._project_menu.param.watch(self.update_button_for_project_sub_menu,'value')
+        self._project_menu.param.watch(self.callback_project_menu,'value')
         project_menu_layout = pn.Row(self._project_menu, self.button_for_project_menu)
 
         ## サブフロー操作コントローラーの定義
@@ -92,7 +92,7 @@ class MainMenu():
         ## サブフロー操作コントローラー
         self._sub_flow_menu = pn.widgets.Select(options=sub_flow_menu_options, value=0)
         ## サブフロー操作コントローラーのイベントリスナー
-        self._sub_flow_menu.param.watch(self.update_sub_flow_form,'value')
+        self._sub_flow_menu.param.watch(self.callback_sub_flow_menu,'value')
         ## サブフロー操作フォーム
         self._sub_flow_form = pn.WidgetBox()
         self._sub_flow_form.width = 900
@@ -101,7 +101,7 @@ class MainMenu():
         self._menu_tabs.append((sub_flow_menu_title, sub_flow_menu_layout)) # tab_index = 0
         self._menu_tabs.append((project_menu_title, project_menu_layout)) # tab_index = 1
         # 機能コントローラーのイベントリスナー
-        self._menu_tabs.param.watch(self.change_tabs, 'active')
+        self._menu_tabs.param.watch(self.callback_menu_tabs, 'active')
 
         # 研究準備サブフローの進行状況を把握する
         # ある条件に満たしてない場合。
@@ -118,7 +118,7 @@ class MainMenu():
     # イベントリスナーコールバックメソッド #
     ######################################
 
-    def change_tabs(self, event):
+    def callback_menu_tabs(self, event):
         try:
             tab_index = event.new
             if tab_index == 0:
@@ -135,11 +135,11 @@ class MainMenu():
 
 
 
-    def update_button_for_project_sub_menu(self):
+    def callback_project_menu(self):
         """遷移ボタン for プロジェクト操作コントローラーの更新"""
         pass
 
-    def update_sub_flow_form(self, event):
+    def callback_sub_flow_menu(self, event):
         """サブフロー操作フォーム by サブフロー操作コントローラーオプション"""
         try:
             self._err_output.object = ''

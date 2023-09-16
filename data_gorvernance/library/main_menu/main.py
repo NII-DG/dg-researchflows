@@ -76,9 +76,10 @@ class MainMenu():
         project_menu_options[msg_config.get('main_menu', 'update_dmp_title')] = 4
         project_menu_options[msg_config.get('main_menu', 'finish_research_title')] = 5
         self._project_menu = pn.widgets.Select(options=project_menu_options, value=0)
+
         ## プロジェクト操作アクションセレクタ―のイベントリスナー
         self._project_menu.param.watch(self.callback_project_menu,'value')
-        project_menu_layout = pn.Row(self._project_menu, self.button_for_project_menu)
+
 
         ## サブフロー操作コントローラーの定義
         ### サブフロー操作コントローラーオプション
@@ -93,24 +94,36 @@ class MainMenu():
         self._sub_flow_menu = pn.widgets.Select(options=sub_flow_menu_options, value=0)
         ## サブフロー操作コントローラーのイベントリスナー
         self._sub_flow_menu.param.watch(self.callback_sub_flow_menu,'value')
-        ## サブフロー操作フォーム
-        self._sub_flow_form = pn.WidgetBox()
-        self._sub_flow_form.width = 900
-        sub_flow_menu_layout = pn.Column(self._sub_flow_menu, self._sub_flow_form)
+
+
+        ## ウェジットボックス（後からなんでもいれる事ができます）
+        self._widget_box = pn.WidgetBox()
+        self._widget_box.width = 900
+
+
+        sub_flow_menu_layout = pn.Column(self._sub_flow_menu, self._widget_box)
+        project_menu_layout = pn.Column(pn.Row(self._project_menu, self.button_for_project_menu), self._widget_box)
 
         self._menu_tabs.append((sub_flow_menu_title, sub_flow_menu_layout)) # tab_index = 0
         self._menu_tabs.append((project_menu_title, project_menu_layout)) # tab_index = 1
         # 機能コントローラーのイベントリスナー
         self._menu_tabs.param.watch(self.callback_menu_tabs, 'active')
 
-        # 研究準備サブフローの進行状況を把握する
-        # ある条件に満たしてない場合。
-        # サブフロー操作コントローラーを無効化
-        # アラートを表示する。
-        self._sub_flow_menu.disabled = True
-        alert = pn.pane.Alert(msg_config.get('main_menu','required_research_preparation'),sizing_mode="stretch_width",alert_type='warning')
-        self._sub_flow_form.append(alert)
 
+
+    def check_status_research_preparation_flow(self):
+        # 研究準備サブフローの進行状況をチェックする。
+
+        # 必須タスクが全て完了している場合、何もしない。
+
+        # 未完了必須タスクがある場合、以下の処理をする。
+        # サブフロー操作コントローラーを無効化
+        self._sub_flow_menu.disabled = True
+        # プロジェクト操作コントローラーを無効化
+        self._project_menu.disabled = True
+        # アラートを表示する。
+        alert = pn.pane.Alert(msg_config.get('main_menu','required_research_preparation'),sizing_mode="stretch_width",alert_type='warning')
+        self._widget_box.append(alert)
 
 
 
@@ -123,12 +136,16 @@ class MainMenu():
             tab_index = event.new
             if tab_index == 0:
                 # サブフロー操作
+
+                # ウェジットボックスを初期化
+                self._widget_box.clear()
                 ## サブフロー操作コントローラーオプションを初期化
                 self._sub_flow_menu.value = 0
             if tab_index == 1:
                 # プロジェクト操作
-                ## サブフロー操作フォームを初期化
-                self._sub_flow_form.clear()
+                ## ウェジットボックスを初期化
+                self._widget_box.clear()
+                self._project_menu.value = 0
         except Exception as e:
             self._err_output.object = html_text.creat_html_msg_err(f'[ERROR] : {traceback.format_exc()}')
             self._err_output.height = 100
@@ -146,7 +163,7 @@ class MainMenu():
             self._err_output.height = 1
             selected_value = self._sub_flow_menu.value
             if selected_value == 0: ## 選択なし
-                self._sub_flow_form.clear()
+                self._widget_box.clear()
             elif selected_value == 1: ## サブフロー新規作成
                 self.update_sub_flow_form_new_sub_flow()
             elif selected_value == 2: ## サブフロー間接続編集
@@ -172,7 +189,7 @@ class MainMenu():
     def update_sub_flow_form_new_sub_flow(self):
         ### サブフロー新規作成フォーム
         # サブフロー操作フォームをクリア
-        self._sub_flow_form.clear()
+        self._widget_box.clear()
 
         # リサーチフローステータス管理情報の取得
         research_flow_status = ResearchFlowStatus.load_from_json(self._research_flow_status_file_path)
@@ -223,7 +240,7 @@ class MainMenu():
         # 新規作成ボタンのイベントリスナー
         self.submit_button.on_click(self.callback_create_new_sub_flow)
 
-        self._sub_flow_form.clear()
+        self._widget_box.clear()
         sub_flow_form_layout = pn.Column(
             f'### {msg_config.get("main_menu", "create_sub_flow_title")}',
             self._sub_flow_type_selector,
@@ -232,7 +249,7 @@ class MainMenu():
             self._parent_sub_flow_selector,
             self.submit_button
             )
-        self._sub_flow_form.append(sub_flow_form_layout)
+        self._widget_box.append(sub_flow_form_layout)
 
 
     def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus])->Dict[str, int]:

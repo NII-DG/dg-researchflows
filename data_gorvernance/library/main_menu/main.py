@@ -191,14 +191,17 @@ class MainMenu():
     # サブフロー操作フォーム #
     #########################
 
+    def update_sub_flow_widget_box_for_init(self):
+        """サブフロー操作オプションの選択誘導"""
+        self._sub_flow_widget_box.clear()
+        alert = pn.pane.Alert(msg_config.get('main_menu','guide_select_action'),sizing_mode="stretch_width",alert_type='info')
+        self._sub_flow_widget_box.append(alert)
+
     #########################
     # サブフロー新規作成フォーム #
     #########################
 
-    def update_sub_flow_widget_box_for_init(self):
-        self._sub_flow_widget_box.clear()
-        alert = pn.pane.Alert(msg_config.get('main_menu','guide_select_action'),sizing_mode="stretch_width",alert_type='info')
-        self._sub_flow_widget_box.append(alert)
+
 
     def update_sub_flow_widget_box_for_new_sub_flow(self):
         ### サブフロー新規作成フォーム

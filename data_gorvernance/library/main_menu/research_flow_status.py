@@ -153,6 +153,7 @@ class ResearchFlowStatusOperater():
             raise Exception(f'Not Found phase. target phase seq_number : {creating_phase_seq_number}')
         if new_sub_flow_id is None:
             raise Exception(f'Cannot Issue New Sub Flow ID')
+        # リサーチフローステータス管理JSONの上書き
         self.update_file(research_flow_status)
         return phase_name, new_sub_flow_id
 
@@ -170,7 +171,7 @@ class ResearchFlowStatusOperater():
                 phase_status._sub_flow_data.remove(remove_subflow)
             else:
                 raise NotFoundSubflowDataError(f'There Is No Subflow Data to Delete. sub_flow_id : {sub_flow_id}')
-
+        # リサーチフローステータス管理JSONの上書き
         self.update_file(research_flow_status)
 
 

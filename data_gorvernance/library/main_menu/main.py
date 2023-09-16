@@ -337,11 +337,21 @@ class MainMenu():
         sub_flow_name = self._sub_flow_name_form.value_input
         parent_sub_flow_ids = self._parent_sub_flow_selector.value
         # サブフロー名がユニークかどうかチェック
+
+        if sub_flow_name is None:
+            # sub_flow_nameがNoneの場合、ユーザ警告
+            self.change_submit_button_warning(msg_config.get('main_menu','not_input_subflow_name'))
+            return
+
         if not self.reserch_flow_status_operater.is_unique_subflow_name(creating_phase_seq_number, sub_flow_name):
-            # サブフロー名がユニークでないの場合
+            # サブフロー名がユニークでないの場合、ユーザ警告
             self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_subflow_name'))
             return
 
+        if len(str(sub_flow_name).replace(" ", "").replace("　", "")) < 1:
+            # 半角と全角スペースのみの場合、ユーザ警告
+            self.change_submit_button_warning(msg_config.get('main_menu','must_not_only_space'))
+            return
 
         # リサーチフローステータス管理JSONの更新
         try:

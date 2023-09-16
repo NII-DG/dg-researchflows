@@ -1,3 +1,4 @@
+import json
 from typing import Any
 from .file import File
 import nbformat
@@ -26,6 +27,9 @@ class NbFile(File):
 
 
     def read(self):
+        with open(self.path) as f:
+            j = json.dumps(f, indent=4)
+            raise Exception(f'JOSON : {j}')
         return nbformat.read(self.path, as_version=4)
 
     def write(self, notebook_data: Any):

@@ -350,13 +350,7 @@ class MainMenu():
         self._sub_flow_name_form.value = ''
 
         # サブフロー関係図を更新
-        try:
-            self._research_flow_image.object = pn.pane.HTML(self.reserch_flow_status_operater.get_svg_of_research_flow_status())
-        except Exception as e:
-            self._err_output.clear()
-            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
-            self._err_output.append(alert)
-            raise
+        self.update_research_flow_image()
 
 
 
@@ -487,6 +481,16 @@ class MainMenu():
         alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
         self._sub_flow_widget_box.clear()
         self._sub_flow_widget_box.append(alert)
+
+
+    def update_research_flow_image(self):
+        try:
+            self._research_flow_image.object = self.reserch_flow_status_operater.get_svg_of_research_flow_status()
+        except Exception as e:
+            self._err_output.clear()
+            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
+            self._err_output.append(alert)
+            raise
 
 
 

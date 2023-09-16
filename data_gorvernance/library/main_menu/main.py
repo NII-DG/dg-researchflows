@@ -406,7 +406,7 @@ class MainMenu():
                 shutil.copyfile(src_path, dect_path)
                 # menu.ipynbファイルの場合は、menu.ipynbのヘッダーにサブフロー名を埋め込む
                 nb_file = NbFile(dect_path)
-                nb_file.embed_subflow_name(sub_flow_name)
+                nb_file.embed_subflow_name_on_header(sub_flow_name)
         except Exception as e:
             # 失敗した場合は、コピー先フォルダごと削除する（ロールバック）
             shutil.rmtree(dect_dir_path)
@@ -585,7 +585,9 @@ class MainMenu():
             main_menu_box = pn.WidgetBox(f'## {main_menu_title}', main_menu._menu_tabs)
             display(main_menu_box)
             ## リサーチフロー図を配置
-            display(main_menu._research_flow_image)
+            research_flow_image_title = pn.pane.Markdown(f'### {msg_config.get("main_menu", "subflow_relationship_diagram")}')
+            research_flow_layout = pn.Column(research_flow_image_title, main_menu._research_flow_image)
+            display(research_flow_layout)
             ## システムエラー表示オブジェクトを配置
             display(main_menu._err_output)
         else:

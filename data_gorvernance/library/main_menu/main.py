@@ -238,7 +238,6 @@ class MainMenu():
         # 新規作成ボタンのイベントリスナー
         self.submit_button.on_click(self.callback_create_new_sub_flow)
 
-        self._widget_box.clear()
         sub_flow_form_layout = pn.Column(
             f'### {msg_config.get("main_menu", "create_sub_flow_title")}',
             self._sub_flow_type_selector,
@@ -418,7 +417,6 @@ class MainMenu():
     def update_sub_flow_form_relink(self):
         # サブフロー間接続編集フォーム
         # 開発中のためアラートを表示する。
-        self._widget_box.clear()
         alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
         self._widget_box.append(alert)
 
@@ -428,7 +426,6 @@ class MainMenu():
     def update_sub_flow_form_rename(self):
         # サブフロー名称変更フォーム
         # 開発中のためアラートを表示する。
-        self._widget_box.clear()
         alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
         self._widget_box.append(alert)
 
@@ -438,7 +435,6 @@ class MainMenu():
     def update_sub_flow_form_delete(self):
         # サブフロー削除フォーム
         # 開発中のためアラートを表示する。
-        self._widget_box.clear()
         alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
         self._widget_box.append(alert)
 

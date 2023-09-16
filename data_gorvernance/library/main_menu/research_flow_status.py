@@ -3,6 +3,7 @@ from typing import List
 from datetime import datetime
 from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus, FlowDrawer
 from ..utils.config import message as msg_config
+import uuid
 
 class ResearchFlowStatusOperater():
 
@@ -80,3 +81,31 @@ class ResearchFlowStatusOperater():
         # リサーチフローステータス管理JSONをアップデート
         with open(file_path, 'w') as file:
             json.dump(research_flow_status_data, file, indent=4)
+
+    @classmethod
+    def issue_uuidv4(cls)->str:
+        """UUIDv4の発行"""
+        return str(uuid.uuid4())
+
+    @classmethod
+    def exist_sub_flow_id_in_research_flow_status(cls, research_flow_status:List[PhaseStatus], target_id:str)->bool:
+        """リサーチフローステータス管理情報にサブフローIDが存在するかチェック"""
+
+        for phase in research_flow_status:
+            for sub_flow in phase._sub_flow_data:
+                if sub_flow._id == target_id:
+                    return True
+        return False
+
+    @classmethod
+    def issue_unique_sub_flow_id(cls, file_path:str)->str:
+        """ユニークなサブフローIDを発行する"""
+        while True:
+            candidate_id = ResearchFlowStatusOperater.issue_uuidv4()
+            research_flow_status = ResearchFlowStatus.load_from_json(file_path)
+            if ResearchFlowStatusOperater.exist_sub_flow_id_in_research_flow_status(research_flow_status, candidate_id):
+                ## 存在する場合は、発行し直し
+                continue
+            else:
+                ## ユニークID取得に成功
+                return candidate_id

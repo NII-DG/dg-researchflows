@@ -97,11 +97,10 @@ class MainMenu():
         self._sub_flow_menu = pn.widgets.Select(options=sub_flow_menu_options, value=0)
         ## サブフロー操作コントローラーのイベントリスナー
         self._sub_flow_menu.param.watch(self.callback_sub_flow_menu,'value')
-
-
         ## サブフロー操作コントローラーウェジットボックス（後からなんでもいれる事ができます）
         self._sub_flow_widget_box = pn.WidgetBox()
         self._sub_flow_widget_box.width = 900
+        self.update_sub_flow_widget_box_for_init()
 
 
         sub_flow_menu_layout = pn.Column(self._sub_flow_menu, self._sub_flow_widget_box)
@@ -146,10 +145,9 @@ class MainMenu():
                 # プロジェクト操作が選択
                 self._project_menu.value = 0
                 self._sub_flow_widget_box.clear()
-                raise Exception('test')
         except Exception as e:
             self._err_output.clear()
-            alert = pn.pane.Alert(f'## INTERNAL ERROR!!!!<br><br><hr>[ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
+            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
 
 
@@ -163,7 +161,7 @@ class MainMenu():
             self._project_widget_box.append(alert)
         except Exception as e:
             self._err_output.clear()
-            alert = pn.pane.Alert(f'## INTERNAL ERROR!!!!<br><br><hr>[ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
+            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
 
     def callback_sub_flow_menu(self, event):
@@ -182,7 +180,7 @@ class MainMenu():
                 self.update_sub_flow_widget_box_for_delete()
         except Exception as e:
             self._err_output.clear()
-            alert = pn.pane.Alert(f'## INTERNAL ERROR!!!!<br><br><hr>[ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
+            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
 
 
@@ -352,7 +350,7 @@ class MainMenu():
             self.change_diable_creating_button()
         except Exception as e:
             self._err_output.clear()
-            alert = pn.pane.Alert(f'## INTERNAL ERROR!!!!<br><br><hr>[ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
+            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
 
     def callback_sub_flow_name_form(self, event):
@@ -362,7 +360,7 @@ class MainMenu():
             self.change_diable_creating_button()
         except Exception as e:
             self._err_output.clear()
-            alert = pn.pane.Alert(f'## INTERNAL ERROR!!!!<br><br><hr>[ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
+            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
 
     def callback_parent_sub_flow_type_selector(self, event):
@@ -381,7 +379,7 @@ class MainMenu():
             self.change_diable_creating_button()
         except Exception as e:
             self._err_output.clear()
-            alert = pn.pane.Alert(f'## INTERNAL ERROR!!!!<br><br><hr>[ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
+            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
 
     def callback_parent_sub_flow_selector(self, event):
@@ -390,7 +388,7 @@ class MainMenu():
             self.change_diable_creating_button()
         except Exception as e:
             self._err_output.clear()
-            alert = pn.pane.Alert(f'## INTERNAL ERROR!!!!<br><br><hr>[ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
+            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
 
 

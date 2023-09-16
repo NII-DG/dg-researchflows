@@ -20,9 +20,9 @@ class NbFile(File):
             subflow_name (str): [サブフロー名]
         """
         notebook = self.read()
-        for cell in notebook.cells:
-             if cell.cell_type == 'markdown' and msg_config.get('DEFAULT', 'param_subflow_name') in cell.source:
-                cell.source = cell.source.replace(msg_config.get('DEFAULT', 'param_subflow_name'), security.escape_html_text(subflow_name))
+        # for cell in notebook.cells:
+        #      if cell.cell_type == 'markdown' and msg_config.get('DEFAULT', 'param_subflow_name') in cell.source:
+        #         cell.source = cell.source.replace(msg_config.get('DEFAULT', 'param_subflow_name'), security.escape_html_text(subflow_name))
         self.write(notebook)
 
 

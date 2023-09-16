@@ -43,8 +43,7 @@ class ResearchFlowStatusOperater():
         for phase in research_flow_status:
             phase.update_name(name = msg_config.get('research_flow_phase_display_name', phase._name))
             for sb in phase._sub_flow_data:
-                # sb._name = escape_html_text(sb._name)
-                sb._name = sb._name
+                sb._name = escape_html_text(sb._name)
             update_research_flow_status.append(phase)
         return update_research_flow_status
 

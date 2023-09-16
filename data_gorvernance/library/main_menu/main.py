@@ -154,6 +154,7 @@ class MainMenu():
     def callback_project_menu(self, event):
         """遷移ボタン for プロジェクト操作コントローラーの更新"""
         # 開発中のためアラートを表示する。
+        self._widget_box.clear()
         alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
         self._widget_box.append(alert)
 
@@ -163,8 +164,9 @@ class MainMenu():
             self._err_output.object = ''
             self._err_output.height = 1
             selected_value = self._sub_flow_menu.value
+            self._widget_box.clear()
             if selected_value == 0: ## 選択なし
-                self._widget_box.clear()
+                return
             elif selected_value == 1: ## サブフロー新規作成
                 self.update_sub_flow_form_new_sub_flow()
             elif selected_value == 2: ## サブフロー間接続編集
@@ -189,9 +191,6 @@ class MainMenu():
 
     def update_sub_flow_form_new_sub_flow(self):
         ### サブフロー新規作成フォーム
-        # サブフロー操作フォームをクリア
-        self._widget_box.clear()
-
         # リサーチフローステータス管理情報の取得
         research_flow_status = ResearchFlowStatus.load_from_json(self._research_flow_status_file_path)
 
@@ -421,6 +420,7 @@ class MainMenu():
     def update_sub_flow_form_relink(self):
         # サブフロー間接続編集フォーム
         # 開発中のためアラートを表示する。
+        self._widget_box.clear()
         alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
         self._widget_box.append(alert)
 
@@ -430,6 +430,7 @@ class MainMenu():
     def update_sub_flow_form_rename(self):
         # サブフロー名称変更フォーム
         # 開発中のためアラートを表示する。
+        self._widget_box.clear()
         alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
         self._widget_box.append(alert)
 
@@ -439,6 +440,7 @@ class MainMenu():
     def update_sub_flow_form_delete(self):
         # サブフロー削除フォーム
         # 開発中のためアラートを表示する。
+        self._widget_box.clear()
         alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
         self._widget_box.append(alert)
 

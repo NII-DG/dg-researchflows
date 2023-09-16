@@ -7,6 +7,7 @@ from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus
 from ..main_menu.research_flow_status import ResearchFlowStatusOperater
 import traceback
 from ..utils.error import ExistSubflowDirError, NotFoundSubflowDataError
+from ..utils.nb_file import NbFile
 
 import panel as pn
 import os
@@ -367,7 +368,7 @@ class MainMenu():
 
         # 新規サブフローデータの用意
         try:
-            self.prepare_new_subflow_data(phase_name, new_sub_flow_id)
+            self.prepare_new_subflow_data(phase_name, new_sub_flow_id, sub_flow_name)
         except Exception as e:
             # 失敗した場合は、リサーチフローステータス管理JSONをロールバック
             self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
@@ -379,7 +380,7 @@ class MainMenu():
         # サブフロー関係図を更新
         self.update_research_flow_image()
 
-    def prepare_new_subflow_data(self, phase_name:str, new_sub_flow_id:str):
+    def prepare_new_subflow_data(self, phase_name:str, new_sub_flow_id:str, sub_flow_name):
 
         # 新規サブフローデータの用意
         # data_gorvernance\researchflowを取得
@@ -401,15 +402,15 @@ class MainMenu():
                 # コピー元ファイルパス
                 src_path = os.path.join(dg_base_subflow_path, phase_name, copy_file_name)
                 dect_path = os.path.join(dg_researchflow_path, phase_name, new_sub_flow_id, copy_file_name)
+                # コピーする。
                 shutil.copyfile(src_path, dect_path)
+                # menu.ipynbファイルの場合は、menu.ipynbのヘッダーにサブフロー名を埋め込む
+                nb_file = NbFile(dect_path)
+                nb_file.embed_subflow_name(sub_flow_name)
         except Exception as e:
             # 失敗した場合は、コピー先フォルダごと削除する（ロールバック）
             shutil.rmtree(dect_dir_path)
             raise
-
-
-
-
 
     def callback_sub_flow_type_selector(self, event):
         # サブフロー種別(フェーズ):シングルセレクトコールバックファンクション

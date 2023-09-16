@@ -27,7 +27,7 @@ class NbFile(File):
 
 
     def read(self):
-        with open(self.path) as f:
+        with self.path.open('r') as f:
             j = json.dumps(f, indent=4)
             raise Exception(f'JOSON : {j}')
         return nbformat.read(self.path, as_version=4)

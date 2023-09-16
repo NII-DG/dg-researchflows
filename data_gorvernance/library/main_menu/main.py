@@ -302,13 +302,13 @@ class MainMenu():
     def change_submit_button_init(self, name):
         self.submit_button.name = name
         self.submit_button.button_type = 'primary'
-        self.submit_button.button_style = 'outline'
+        self.submit_button.button_style = 'solid'
         self.submit_button.icon = 'plus'
 
     def change_submit_button_processing(self, name):
         self.submit_button.name = name
         self.submit_button.button_type = 'primary'
-        self.submit_button.button_style = 'solid'
+        self.submit_button.button_style = 'outline'
 
     def change_submit_button_success(self, name):
         self.submit_button.name = name

@@ -27,7 +27,7 @@ class MainMenu():
 
     NOTE:
 
-    Called from data_gorvernance/researchflow/main_menu/main.ipynb
+    Called from data_gorvernance/researchflow/main.ipynb
     """
 
     def __init__(self, abs_root) -> None:

@@ -51,9 +51,8 @@ class MainMenu():
         ######################################
 
         # システムエラーメッセージオブジェクトの定義
-        self._err_output  = pn.pane.HTML()
-        self._err_output.object = ''
-        self._err_output.width = 700
+        self._err_output = pn.WidgetBox()
+        self._err_output.width = 900
 
         ################################
         # 機能コントローラーオブジェクト #
@@ -147,9 +146,11 @@ class MainMenu():
                 # プロジェクト操作が選択
                 self._project_menu.value = 0
                 self._sub_flow_widget_box.clear()
+                raise Exception('test')
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR] : {traceback.format_exc()}')
-            self._err_output.height = 100
+            self._err_output.clear()
+            alert = pn.pane.Alert(f'## INTERNAL ERROR!!!!<br>[ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='warning')
+            self._err_output.append(alert)
 
 
 
@@ -161,14 +162,13 @@ class MainMenu():
             alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
             self._project_widget_box.append(alert)
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR] : {traceback.format_exc()}')
-            self._err_output.height = 100
+            self._err_output.clear()
+            alert = pn.pane.Alert(f'## INTERNAL ERROR!!!!<br>[ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='warning')
+            self._err_output.append(alert)
 
     def callback_sub_flow_menu(self, event):
         """サブフロー操作フォーム by サブフロー操作コントローラーオプション"""
         try:
-            self._err_output.object = ''
-            self._err_output.height = 1
             selected_value = self._sub_flow_menu.value
             if selected_value == 0: ## 選択なし
                 self.update_sub_flow_widget_box_for_init()
@@ -181,8 +181,9 @@ class MainMenu():
             elif selected_value == 4: ## サブフロー削除
                 self.update_sub_flow_widget_box_for_delete()
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR] : {traceback.format_exc()}')
-            self._err_output.height = 100
+            self._err_output.clear()
+            alert = pn.pane.Alert(f'## INTERNAL ERROR!!!!<br>[ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='warning')
+            self._err_output.append(alert)
 
 
 
@@ -347,8 +348,9 @@ class MainMenu():
             # 新規作成ボタンのボタンの有効化チェック
             self.change_diable_creating_button()
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR] : {traceback.format_exc()}')
-            self._err_output.height = 100
+            self._err_output.clear()
+            alert = pn.pane.Alert(f'## INTERNAL ERROR!!!!<br>[ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='warning')
+            self._err_output.append(alert)
 
     def callback_sub_flow_name_form(self, event):
         # サブフロー名称（必須）：テキストフォームコールバックファンクション
@@ -356,8 +358,9 @@ class MainMenu():
             # 新規作成ボタンのボタンの有効化チェック
             self.change_diable_creating_button()
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR] : {traceback.format_exc()}')
-            self._err_output.height = 100
+            self._err_output.clear()
+            alert = pn.pane.Alert(f'## INTERNAL ERROR!!!!<br>[ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='warning')
+            self._err_output.append(alert)
 
     def callback_parent_sub_flow_type_selector(self, event):
         # 親サブフロー種別(フェーズ)のコールバックファンクション
@@ -374,16 +377,18 @@ class MainMenu():
             # 新規作成ボタンのボタンの有効化チェック
             self.change_diable_creating_button()
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR] : {traceback.format_exc()}')
-            self._err_output.height = 100
+            self._err_output.clear()
+            alert = pn.pane.Alert(f'## INTERNAL ERROR!!!!<br>[ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='warning')
+            self._err_output.append(alert)
 
     def callback_parent_sub_flow_selector(self, event):
         try:
             # 新規作成ボタンのボタンの有効化チェック
             self.change_diable_creating_button()
         except Exception as e:
-            self._err_output.object = html_text.creat_html_msg_err(f'[ERROR] : {traceback.format_exc()}')
-            self._err_output.height = 100
+            self._err_output.clear()
+            alert = pn.pane.Alert(f'## INTERNAL ERROR!!!!<br>[ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='warning')
+            self._err_output.append(alert)
 
 
     def change_diable_creating_button(self):

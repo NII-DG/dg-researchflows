@@ -344,7 +344,10 @@ class MainMenu():
             self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             raise
 
+        # 新規作成ボタンを作成完了ステータスに更新する
         self.change_submit_button_success(msg_config.get('main_menu', 'success_create_sub_flow'))
+        # サブフロー名フォームの初期化
+        self._sub_flow_name_form.value = ''
 
         # サブフロー関係図を更新
         try:

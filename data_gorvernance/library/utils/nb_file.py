@@ -3,10 +3,13 @@ from .file import File
 import nbformat
 from .config import message as msg_config
 from .html import security
+import os
 
 class NbFile(File):
 
     def __init__(self, file_path: str):
+        if not os.path.isfile(file_path):
+            raise FileNotFoundError(f'Not Found File. file path : {file_path}')
         super().__init__(file_path)
 
     def embed_subflow_name_on_header(self, subflow_name:str):

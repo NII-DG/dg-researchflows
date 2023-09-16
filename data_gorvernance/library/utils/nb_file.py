@@ -29,5 +29,4 @@ class NbFile(File):
         return nbformat.read(self.path, as_version=4)
 
     def write(self, notebook_data: Any):
-         with open(self.path, 'w', encoding='utf-8') as file:
-            nbformat.write(notebook_data, file)
+        nbformat.write(notebook_data, self.path)

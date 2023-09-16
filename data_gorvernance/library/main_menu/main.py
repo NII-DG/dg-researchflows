@@ -136,7 +136,6 @@ class MainMenu():
             tab_index = event.new
             if tab_index == 0:
                 # サブフロー操作
-
                 # ウェジットボックスを初期化
                 self._widget_box.clear()
                 ## サブフロー操作コントローラーオプションを初期化
@@ -154,7 +153,9 @@ class MainMenu():
 
     def callback_project_menu(self):
         """遷移ボタン for プロジェクト操作コントローラーの更新"""
-        pass
+        # 開発中のためアラートを表示する。
+        alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
+        self._widget_box.append(alert)
 
     def callback_sub_flow_menu(self, event):
         """サブフロー操作フォーム by サブフロー操作コントローラーオプション"""

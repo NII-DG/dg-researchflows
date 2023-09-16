@@ -138,7 +138,7 @@ class ResearchFlowStatusOperater():
                 new_subflow_item = SubFlowStatus(
                     id=new_sub_flow_id,
                     name=sub_flow_name,
-                    link='',
+                    link=f'./{phase_name}/{new_sub_flow_id}/{path_config.MENU_NOTEBOOK}',
                     parent_ids=parent_sub_flow_ids,
                     create_datetime=int(current_datetime.timestamp())
                 )
@@ -151,14 +151,7 @@ class ResearchFlowStatusOperater():
         if new_sub_flow_id is None:
             raise Exception(f'Cannot Issue New Sub Flow ID')
         self.update_file(research_flow_status)
-
-        # 新規サブフローデータの用意
-        try:
-            self.prepare_new_subflow_data(phase_name, new_sub_flow_id)
-        except Exception as e:
-            # 失敗した場合は、リサーチフローステータス管理JSONをロールバック
-            self.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
-            raise
+        return phase_name, new_sub_flow_id
 
     def del_sub_flow_data_by_sub_flow_id(self, sub_flow_id):
         research_flow_status = ResearchFlowStatus.load_from_json(self.file_path)
@@ -176,41 +169,6 @@ class ResearchFlowStatusOperater():
                 raise NotFoundSubflowDataError(f'There Is No Subflow Data to Delete. sub_flow_id : {sub_flow_id}')
 
 
-
-
-    def prepare_new_subflow_data(self, phase_name:str, new_sub_flow_id:str):
-
-        # 新規サブフローデータの用意
-        abs_root = path_config.get_abs_root_form_working_dg_file_path(self.file_path)
-        # data_gorvernance\researchflowを取得
-        dg_researchflow_path = os.path.join(abs_root, path_config.get_dg_researchflow_folder(False))
-        # data_gorvernance\base\subflowを取得する
-        dg_base_subflow_path = os.path.join(abs_root, path_config.get_dg_sub_flow_base_data_folder())
-
-        # コピー先フォルダパス
-        dect_dir_path = os.path.join(dg_researchflow_path, phase_name, new_sub_flow_id)
-
-        # コピー先フォルダの作成
-        os.makedirs(dect_dir_path) # 既に存在している場合はエラーになる
-
-        # 対象コピーファイルリスト
-        copy_files = path_config.get_prepare_file_name_list_for_subflow()
-
-        try:
-            for copy_file_name in copy_files:
-                # コピー元ファイルパス
-                src_path = os.path.join(dg_base_subflow_path, phase_name, copy_file_name)
-                dect_path = os.path.join(dg_researchflow_path, phase_name, new_sub_flow_id, copy_file_name)
-                shutil.copyfile(src_path, dect_path)
-        except Exception as e:
-            # 失敗した場合は、コピー先フォルダごと削除する（ロールバック）
-            shutil.rmtree(dect_dir_path)
-            raise
-
-
-
-
-
     def is_unique_subflow_name(self, phase_seq_number, sub_flow_name)->bool:
         """サブフロー名のユニークチェック"""
         exist_phase = False
@@ -220,7 +178,7 @@ class ResearchFlowStatusOperater():
                 exist_phase = True
                 for sub_flow_item in phase_status._sub_flow_data:
                     if sub_flow_item._name == sub_flow_name:
-                        raise Exception(f'Not Unique sub flow name. target sub flow name : {sub_flow_name}')
+                        return False
             else:
                 continue
 

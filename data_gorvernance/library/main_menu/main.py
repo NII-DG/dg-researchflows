@@ -1,3 +1,4 @@
+import shutil
 from typing import Dict, List
 from ..utils.config import path_config, message as msg_config
 from ..utils.html import text as html_text, button as html_button
@@ -5,6 +6,7 @@ from IPython.display import display, Javascript
 from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus
 from ..main_menu.research_flow_status import ResearchFlowStatusOperater
 import traceback
+from ..utils.error import ExistSubflowDirError, NotFoundSubflowDataError
 
 import panel as pn
 import os
@@ -32,9 +34,9 @@ class MainMenu():
         ##############################
         # リサーチフロー図オブジェクト #
         ##############################
-
+        self.abs_root = abs_root
         # リサーチフロー図の生成
-        ## data_gorvernance\researchflow\main_menu\status\research_flow_status.json
+        ## data_gorvernance\researchflow\research_flow_status.json
         self._research_flow_status_file_path = path_config.get_research_flow_status_file_path(abs_root)
 
         self.reserch_flow_status_operater = ResearchFlowStatusOperater(self._research_flow_status_file_path)
@@ -326,25 +328,26 @@ class MainMenu():
     def callback_create_new_sub_flow(self, event):
         # 新規作成ボタンコールバックファンクション
         # サブフロー作成処理
+
+        # 新規作成ボタンを処理中ステータスに更新する
+        self.change_submit_button_processing(msg_config.get('main_menu', 'creating_sub_flow'))
+
+        # 入力情報を取得する。
+        creating_phase_seq_number = self._sub_flow_type_selector.value
+        sub_flow_name = self._sub_flow_name_form.value_input
+        parent_sub_flow_ids = self._parent_sub_flow_selector.value
+        # サブフロー名がユニークかどうかチェック
+        if not self.reserch_flow_status_operater.is_unique_subflow_name:
+            # サブフロー名がユニークでないの場合
+            self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_subflow_name'))
+            return
+
+
+        # リサーチフローステータス管理JSONの更新
         try:
-            # 新規作成ボタンを処理中ステータスに更新する
-            self.change_submit_button_processing(msg_config.get('main_menu', 'creating_sub_flow'))
-
-            # 入力情報を取得する。
-            creating_phase_seq_number = self._sub_flow_type_selector.value
-            sub_flow_name = self._sub_flow_name_form.value_input
-            parent_sub_flow_ids = self._parent_sub_flow_selector.value
-            # サブフロー名がユニークかどうかチェック
-            if self.reserch_flow_status_operater.is_unique_subflow_name(creating_phase_seq_number, sub_flow_name):
-                # サブフロー名がユニークの場合
-                self.reserch_flow_status_operater.update_research_flow_status(creating_phase_seq_number, sub_flow_name, parent_sub_flow_ids)
-            else:
-                # サブフロー名がユニークでないの場合
-                self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_subflow_name'))
-                return
-
+            phase_name, new_sub_flow_id = self.reserch_flow_status_operater.update_research_flow_status(creating_phase_seq_number, sub_flow_name, parent_sub_flow_ids)
         except Exception as e:
-            # サブフロー作成処理が失敗した場合
+            # リサーチフローステータス管理JSONの更新が失敗した場合
             self._err_output.clear()
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
@@ -352,11 +355,49 @@ class MainMenu():
             self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             raise
 
+        # 新規サブフローデータの用意
+        try:
+            self.prepare_new_subflow_data(phase_name, new_sub_flow_id)
+        except Exception as e:
+            # 失敗した場合は、リサーチフローステータス管理JSONをロールバック
+            self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
+            raise
+
         # 新規作成ボタンを作成完了ステータスに更新する
         self.change_submit_button_success(msg_config.get('main_menu', 'success_create_sub_flow'))
 
         # サブフロー関係図を更新
         self.update_research_flow_image()
+
+    def prepare_new_subflow_data(self, phase_name:str, new_sub_flow_id:str):
+
+        # 新規サブフローデータの用意
+        # data_gorvernance\researchflowを取得
+        dg_researchflow_path = os.path.join(self.abs_root, path_config.get_dg_researchflow_folder(False))
+        # data_gorvernance\base\subflowを取得する
+        dg_base_subflow_path = os.path.join(self.abs_root, path_config.get_dg_sub_flow_base_data_folder())
+
+        # コピー先フォルダパス
+        dect_dir_path = os.path.join(dg_researchflow_path, phase_name, new_sub_flow_id)
+
+        # コピー先フォルダの作成
+        os.makedirs(dect_dir_path) # 既に存在している場合はエラーになる
+
+        # 対象コピーファイルリスト
+        copy_files = path_config.get_prepare_file_name_list_for_subflow()
+
+        try:
+            for copy_file_name in copy_files:
+                # コピー元ファイルパス
+                src_path = os.path.join(dg_base_subflow_path, phase_name, copy_file_name)
+                dect_path = os.path.join(dg_researchflow_path, phase_name, new_sub_flow_id, copy_file_name)
+                shutil.copyfile(src_path, dect_path)
+        except Exception as e:
+            # 失敗した場合は、コピー先フォルダごと削除する（ロールバック）
+            shutil.rmtree(dect_dir_path)
+            raise
+
+
 
 
 

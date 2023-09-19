@@ -133,6 +133,7 @@ class MainMenu():
             self._project_menu.disabled = True
             # アラートを表示する。
             alert = pn.pane.Alert(msg_config.get('main_menu','required_research_preparation'),sizing_mode="stretch_width",alert_type='warning')
+            self._sub_flow_widget_box.clear()
             self._sub_flow_widget_box.append(alert)
 
 

@@ -12,7 +12,6 @@ class NbFile(File):
         if not os.path.isfile(file_path):
             raise FileNotFoundError(f'Not Found File. file path : {file_path}')
         super().__init__(file_path)
-        self.file_path = file_path
 
     def embed_subflow_name_on_header(self, subflow_name:str):
         """サブフローメニュNotebookのヘッダーサブフロー名を埋める
@@ -28,7 +27,7 @@ class NbFile(File):
 
 
     def read(self):
-        return nbformat.read(self.file_path, as_version=4)
+        return nbformat.read(self.path, as_version=4)
 
     def write(self, notebook_data: Any):
-        nbformat.write(notebook_data, self.file_path)
+        nbformat.write(notebook_data, self.path)

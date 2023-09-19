@@ -91,3 +91,7 @@ class StatusFile(JsonFile):
     def write(self, tasks: Tasks):
         data = tasks.to_dict()
         super().write(data)
+
+    def is_complete_required_tasks(self):
+        """タスクの必須タスクがすべて一回以上実行されているか確認する"""
+        pass

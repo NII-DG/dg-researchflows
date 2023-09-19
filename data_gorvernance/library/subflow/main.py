@@ -49,5 +49,11 @@ class SubflowMenu:
                 display()
             display(diagram)
 
-    def 
+
+    def submit_callback(self):
+
+        def callback(event):
+            pass
+
+        return callback
 

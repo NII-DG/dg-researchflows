@@ -100,4 +100,4 @@ class StatusFile(JsonFile):
             # 完了していないタスクが合った場合はFalseを返却
             # return False
             continue
-        return True
+        return False

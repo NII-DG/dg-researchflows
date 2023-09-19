@@ -8,7 +8,8 @@
             "completed_count": 0,
             "dependent_task_ids": [],
             "status": "unexecuted",
-            "execution_environments": []
+            "execution_environments": [],
+            "disabled": false
         },
         {
             "id": "SFCT002000",
@@ -20,7 +21,8 @@
                 "SFIT001001"
             ],
             "status": "unfeasible",
-            "execution_environments": []
+            "execution_environments": [],
+            "disabled": false
         }
     ]
 }

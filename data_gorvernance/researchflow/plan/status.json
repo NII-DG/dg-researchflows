@@ -1,0 +1,26 @@
+{
+    "tasks": [
+        {
+            "id": "SFIT001001",
+            "name": "make_rdm_plan",
+            "is_multiple": false,
+            "is_optional": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": []
+        },
+        {
+            "id": "SFCT002000",
+            "name": "manage_collaborators",
+            "is_multiple": true,
+            "is_optional": false,
+            "completed_count": 0,
+            "dependent_task_ids": [
+                "SFIT001001"
+            ],
+            "status": "unfeasible",
+            "execution_environments": []
+        }
+    ]
+}

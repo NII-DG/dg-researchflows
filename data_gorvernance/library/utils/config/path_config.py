@@ -13,6 +13,7 @@ BASE = 'base'
 SUB_FLOW = 'subflow'
 TASK = 'task'
 RESEARCHFLOW = 'researchflow'
+PLAN = 'plan'
 
 
 # Folder Path
@@ -47,6 +48,7 @@ PROPERTY_JSON = 'property.json'
 
 # File Path
 SETUP_COMPLETED_TEXT_PATH = os.path.join(DOT_DATA_GOVERNANCE, 'setup_completed.txt')
+PLAN_TASK_STATUS_FILE_PATH = os.path.join(get_dg_researchflow_folder(False), PLAN, STATUS_JSON)
 
 def get_research_flow_status_file_path(abs_root)->str:
     return os.path.join(abs_root, get_dg_researchflow_folder(), 'research_flow_status.json')

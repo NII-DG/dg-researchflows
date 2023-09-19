@@ -7,6 +7,7 @@ from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus
 from ..main_menu.research_flow_status import ResearchFlowStatusOperater
 import traceback
 from ..utils.nb_file import NbFile
+from ..utils.status import StatusFile as TaskStatusFile
 
 import panel as pn
 import os
@@ -111,12 +112,22 @@ class MainMenu():
         # 機能コントローラーのイベントリスナー
         self._menu_tabs.param.watch(self.callback_menu_tabs, 'active')
 
-        # 研究準備の実行ステータス確認をする。
+        # TODO:研究準備の実行ステータス確認をする。
         # ファイル：data_gorvernance\researchflow\plan\status.json
-        # 必須タスクが全て1回以上実行完了していない場合、実験準備サブフローへ誘導する。
-        #
+        # 必須タスクが全て1回以上実行完了していない場合、研究準備サブフローへ誘導する。
+        # サブフロー操作コントローラーを無効化する。
+        # 必須タスクが完了している場合は、何もしない
 
-
+        task_status_file = TaskStatusFile(path_config.PLAN_TASK_STATUS_FILE_PATH)
+        if task_status_file.is_complete_required_tasks():
+            pass
+        else:
+            # 研究準備サブフローへ誘導する。
+            # サブフロー操作コントローラーを無効化する。
+            self._sub_flow_menu.disabled = True
+            alert = pn.pane.Alert(msg_config.get('main_menu','required_research_preparation'),sizing_mode="stretch_width",alert_type='warning')
+            self._sub_flow_widget_box.clear()
+            self._sub_flow_widget_box.append(alert)
 
     def check_status_research_preparation_flow(self):
         # 研究準備サブフローの進行状況をチェックする。

@@ -1,6 +1,5 @@
 from unittest import TestCase
-from template.library.utils.config import message
-import os
+from data_gorvernance.library.utils.config import message
 
 class TestMessageConfig(TestCase):
     # test exec : python -m unittest tests.utils.config.test_message

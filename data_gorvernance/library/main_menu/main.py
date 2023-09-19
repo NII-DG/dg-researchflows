@@ -122,7 +122,7 @@ class MainMenu():
     def check_status_research_preparation_flow(self):
         task_status_file = TaskStatusFile(os.path.join(self.abs_root, path_config.PLAN_TASK_STATUS_FILE_PATH))
         # 研究準備サブフローの進行状況をチェックする。
-        if task_status_file.is_complete_required_tasks():
+        if task_status_file.is_completed():
             # 必須タスクが全て完了している場合、何もしない。
             pass
         else:

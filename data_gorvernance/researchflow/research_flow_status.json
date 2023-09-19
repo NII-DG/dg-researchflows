@@ -2,7 +2,7 @@
     "research_flow_pahse_data": [
         {
             "seq_number": 1,
-            "name": "research_preparation",
+            "name": "plan",
             "sub_flow_data": [
                 {
                     "id": "00000000-0000-0000-0000-000000000000",

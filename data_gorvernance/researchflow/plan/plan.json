@@ -1,0 +1,24 @@
+{
+    "governance_plan": [
+        {
+            "id": "A001",
+            "is_enabled": false
+        },
+        {
+            "id": "A002",
+            "is_enabled": false
+        },
+        {
+            "id": "A003",
+            "is_enabled": false
+        },
+        {
+            "id": "A004",
+            "is_enabled": false
+        },
+        {
+            "id": "A005",
+            "is_enabled": false
+        }
+    ]
+}

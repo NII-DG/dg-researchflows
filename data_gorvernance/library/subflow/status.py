@@ -115,3 +115,7 @@ class StatusFile(JsonFile):
     def write(self, tasks: SubflowStatus):
         data = tasks.to_dict()
         super().write(data)
+
+    def is_completed(self)->bool:
+        content = super().read()
+        return content['is_completed']

@@ -5,23 +5,21 @@ from datetime import datetime
 from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus, SubFlowStatus,FlowDrawer
 from ..utils.config import message as msg_config, path_config
 import uuid
-import shutil
-from ..utils.error import ExistSubflowDirError, NotFoundSubflowDataError
+from ..utils.error import NotFoundSubflowDataError
 from ..utils.html.security import escape_html_text
+from ..utils.file import JsonFile
 
-class ResearchFlowStatusOperater():
+class ResearchFlowStatusOperater(JsonFile):
 
-    def __init__(self, file_path:str) -> None:
+    def __init__(self, file_path: str):
         if os.path.isfile(file_path):
-            self.file_path = file_path
+            super().__init__(file_path)
         else:
             raise FileNotFoundError(f'[ERROR] : Not Found File. File Path : {file_path}')
 
 
-
     def get_research_flow_status(self):
-        with open(self.file_path) as file:
-            return json.load(file)
+        return super().read()
 
 
     def get_svg_of_research_flow_status(self)->str:
@@ -30,7 +28,7 @@ class ResearchFlowStatusOperater():
         Returns:
             str: SVG data of Research Flow Image
         """
-        research_flow_status = ResearchFlowStatus.load_from_json(self.file_path)
+        research_flow_status = self.load_research_flow_status()
         # Update display pahse name
         research_flow_status = self.update_display_object(research_flow_status)
         fd = FlowDrawer(research_flow_status=research_flow_status)
@@ -50,7 +48,7 @@ class ResearchFlowStatusOperater():
     def init_research_preparation(self, file_path:str):
         """研究準備ステータスの初期化"""
         # 研究準備のサブフローデータのサブフロー作成時間が-1の場合、現在の現時刻に更新する。
-        research_flow_status = ResearchFlowStatus.load_from_json(file_path)
+        research_flow_status = self.load_research_flow_status()
         for phase_status in research_flow_status:
             if phase_status._seq_number == 1:
                 # 研究準備フェーズ
@@ -88,8 +86,7 @@ class ResearchFlowStatusOperater():
                 phase_status_data['sub_flow_data'].append(sub_flow_unit_data)
             research_flow_status_data['research_flow_pahse_data'].append(phase_status_data)
         # リサーチフローステータス管理JSONをアップデート
-        with open(self.file_path, 'w') as file:
-            json.dump(research_flow_status_data, file, indent=4)
+        super().write(research_flow_status_data)
 
 
     def issue_uuidv4(self)->str:
@@ -111,7 +108,7 @@ class ResearchFlowStatusOperater():
         """ユニークなサブフローIDを発行する"""
         while True:
             candidate_id = self.issue_uuidv4()
-            research_flow_status = ResearchFlowStatus.load_from_json(self.file_path)
+            research_flow_status = self.load_research_flow_status()
             if self.exist_sub_flow_id_in_research_flow_status(research_flow_status, candidate_id):
                 ## 存在する場合は、発行し直し
                 continue
@@ -130,7 +127,7 @@ class ResearchFlowStatusOperater():
             parent_sub_flow_id (list[str]): [親サブフローID]
         """
         # リサーチフローステータス管理JSONの更新
-        research_flow_status = ResearchFlowStatus.load_from_json(self.file_path)
+        research_flow_status = self.load_research_flow_status()
         phase_name = None
         new_sub_flow_id = None
         for phase_status in research_flow_status:
@@ -158,7 +155,7 @@ class ResearchFlowStatusOperater():
         return phase_name, new_sub_flow_id
 
     def del_sub_flow_data_by_sub_flow_id(self, sub_flow_id):
-        research_flow_status = ResearchFlowStatus.load_from_json(self.file_path)
+        research_flow_status = self.load_research_flow_status()
 
         for phase_status in research_flow_status:
             remove_subflow = None
@@ -178,7 +175,7 @@ class ResearchFlowStatusOperater():
     def is_unique_subflow_name(self, phase_seq_number, sub_flow_name)->bool:
         """サブフロー名のユニークチェック"""
         exist_phase = False
-        research_flow_status = ResearchFlowStatus.load_from_json(self.file_path)
+        research_flow_status = self.load_research_flow_status()
         for phase_status in research_flow_status:
             if phase_status._seq_number == phase_seq_number:
                 exist_phase = True
@@ -192,3 +189,7 @@ class ResearchFlowStatusOperater():
             raise Exception(f'Not Found phase. target phase seq_number : {phase_seq_number}')
 
         return True
+
+    def load_research_flow_status(self)->List[PhaseStatus]:
+        """リサーチフローステータス管理JSONからリサーチフローステータスインスタンスを取得する"""
+        return ResearchFlowStatus.load_from_json(str(self.path))

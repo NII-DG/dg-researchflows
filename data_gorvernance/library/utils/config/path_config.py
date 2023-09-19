@@ -4,14 +4,6 @@
 
 import os
 from typing import List
-
-
-# root
-def get_abs_root_form_working_dg_file_path(working_dg_file_path:str)->str:
-    abs_root = working_dg_file_path[0:working_dg_file_path.rfind(DATA_GOVERNANCE)-1]
-    return abs_root
-
-
 # Folder
 ## 同期対象外フォルダ
 DOT_DATA_GOVERNANCE = '.data_gorvernance'
@@ -59,6 +51,9 @@ SETUP_COMPLETED_TEXT_PATH = os.path.join(DOT_DATA_GOVERNANCE, 'setup_completed.t
 def get_research_flow_status_file_path(abs_root)->str:
     return os.path.join(abs_root, get_dg_researchflow_folder(), 'research_flow_status.json')
 
+def get_abs_root_form_working_dg_file_path(working_dg_file_path:str)->str:
+    abs_root = working_dg_file_path[0:working_dg_file_path.rfind(DATA_GOVERNANCE)-1]
+    return abs_root
 
 # other method
 def get_prepare_file_name_list_for_subflow()->List[str]:

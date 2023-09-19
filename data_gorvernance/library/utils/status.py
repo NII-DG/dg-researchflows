@@ -86,7 +86,7 @@ class StatusFile(JsonFile):
 
     def read(self):
         content = super().read()
-        return Tasks(content)
+        return Tasks(content['tasks'])
 
     def write(self, tasks: Tasks):
         data = tasks.to_dict()

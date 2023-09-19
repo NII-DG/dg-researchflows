@@ -118,7 +118,7 @@ class MainMenu():
         # サブフロー操作コントローラーを無効化する。
         # 必須タスクが完了している場合は、何もしない
 
-        task_status_file = TaskStatusFile(path_config.PLAN_TASK_STATUS_FILE_PATH)
+        task_status_file = TaskStatusFile(os.path.join(abs_root, path_config.PLAN_TASK_STATUS_FILE_PATH))
         if task_status_file.is_complete_required_tasks():
             pass
         else:

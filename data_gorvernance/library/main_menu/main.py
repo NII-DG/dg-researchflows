@@ -111,6 +111,11 @@ class MainMenu():
         # 機能コントローラーのイベントリスナー
         self._menu_tabs.param.watch(self.callback_menu_tabs, 'active')
 
+        # 研究準備の実行ステータス確認をする。
+        # ファイル：data_gorvernance\researchflow\plan\status.json
+        # 必須タスクが全て1回以上実行完了していない場合、実験準備サブフローへ誘導する。
+        #
+
 
 
     def check_status_research_preparation_flow(self):

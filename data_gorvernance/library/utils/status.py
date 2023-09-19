@@ -93,6 +93,5 @@ class StatusFile(JsonFile):
         super().write(data)
 
     def is_completed(self)->bool:
-        """タスクの必須タスクがすべて一回以上実行されているか確認する"""
         content = super().read()
         return content['is_completed']

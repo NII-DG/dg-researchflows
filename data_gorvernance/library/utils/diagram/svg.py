@@ -21,9 +21,9 @@ SVG_TEXT = '{http://www.w3.org/2000/svg}text'
 SVG_RECT = '{http://www.w3.org/2000/svg}rect'
 
 
-def generate_svg_diag(output, diag, font, abs_current, notebook_dir):
-        _generate_svg_cmd(output, Path(diag), Path(font))
-        _embed_detail_information(abs_current, Path(output), Path(notebook_dir))
+def generate_svg_diag(output: str, diag: str, font:str, current_file:str, notebook_dir:str):
+        _generate_svg_cmd(Path(output), Path(diag), Path(font))
+        _embed_detail_information(current_file, Path(output), Path(notebook_dir))
 
 def _generate_svg_cmd(output, diag, font):
     run(['blockdiag', '-f', font, '-Tsvg', '-o', output, diag], check=True)
@@ -129,10 +129,10 @@ def notebooks_toc(nb_dir):
     ]))
 
 
-def _embed_info_in_one_rect(elem, nb_headers, nb_name, abs_current):
+def _embed_info_in_one_rect(elem, nb_headers, nb_name, current_file):
     headers = nb_headers[nb_name]
     nb_file = nb_headers[nb_name]['path']
-    nb_file = os.path.relpath(nb_file, abs_current)
+    nb_file = os.path.relpath(nb_file, current_file)
     rect_elem = elem.getprevious()
     rect = (
         (int(rect_elem.attrib['x']), int(rect_elem.attrib['y'])),

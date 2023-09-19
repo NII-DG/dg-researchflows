@@ -1,6 +1,12 @@
-from .file import JsonFile
+from ..utils.file import JsonFile
 
-class TaskConfig:
+__IS_COMPLETED = 'is_completed'
+__TASKS = 'tasks'
+__ID = 'id'
+
+
+
+class TaskStatus:
 
     STATUS_UNFEASIBLE = "unfeasible"
     STATUS_UNEXECUTED = "unexecuted"
@@ -17,7 +23,6 @@ class TaskConfig:
         self._dependent_task_ids = dependent_task_ids
         self._set_status(status)
         self._execution_environments = execution_environments
-        self._disabled = disabled
 
     def _set_status(self, status: str):
         if status in self.allowed_statuses:
@@ -28,6 +33,14 @@ class TaskConfig:
     @property
     def id(self):
         return self._id
+
+    @property
+    def name(self):
+        return self._name
+
+    @property
+    def is_optional(self):
+        return self._is_optional
 
     @property
     def completed_count(self):
@@ -41,30 +54,39 @@ class TaskConfig:
     def status(self):
         return self._status
 
-    @property
-    def disabled(self):
-        return self._disabled
-
     @status.setter
     def status(self, status: str):
         self._set_status(status)
 
     def to_dict(self):
         return {
-            'id': self.id
+            __ID: self.id
 
         }
 
 
-class Tasks:
+class SubflowStatus:
 
-    def __init__(self, tasks:list[dict]) -> None:
-        self.config = [TaskConfig(**task) for task in tasks]
+    def __init__(self, is_completed: bool, tasks: list[dict]) -> None:
+        self._is_completed = is_completed
+        self._tasks = [TaskStatus(**task) for task in tasks]
+
+    @property
+    def is_completed(self):
+        return self._is_completed
+
+    @property
+    def tasks(self):
+        return self._tasks
+
+    @is_completed.setter
+    def is_completed(self, is_completed: bool):
+        self._is_completed = is_completed
 
     def update_status(self):
-        count_dict = {con.id: con.completed_count for con in self.config}
+        count_dict = {con.id: con.completed_count for con in self.tasks}
 
-        for con in self.config:
+        for con in self.tasks:
             if con.status != con.STATUS_UNFEASIBLE:
                 continue
 
@@ -74,10 +96,12 @@ class Tasks:
 
     def to_dict(self):
         return {
-            'tasks': [
-                con.to_dict() for con in self.config
+            __IS_COMPLETED : self.is_completed,
+            __TASKS: [
+                con.to_dict() for con in self.tasks
             ]
         }
+
 
 class StatusFile(JsonFile):
 
@@ -86,8 +110,8 @@ class StatusFile(JsonFile):
 
     def read(self):
         content = super().read()
-        return Tasks(content)
+        return SubflowStatus(content[__IS_COMPLETED], content[__TASKS])
 
-    def write(self, tasks: Tasks):
+    def write(self, tasks: SubflowStatus):
         data = tasks.to_dict()
         super().write(data)

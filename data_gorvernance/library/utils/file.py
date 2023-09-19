@@ -4,9 +4,30 @@ import json
 from pathlib import Path
 
 
-def copy_file(source_path, destination_path, exist_ok=True):
-    os.makedirs(os.path.dirname(destination_path), exist_ok=exist_ok)
+def copy_file(source_path, destination_path):
+    os.makedirs(os.path.dirname(destination_path), exist_ok=True)
     shutil.copyfile(source_path, destination_path)
+
+
+def relative_path(target_path, current_path):
+    return os.path.relpath(target_path, start=current_path)
+
+
+def get_next_directory(path: str, target_directory: str):
+    """pathの中でtarget_directoryの一つ下のディレクトリ名を返す
+
+    Args:
+        path (str): _description_
+        target_directory (str): _description_
+    """
+    # ファイルパスをパーツに分割
+    parts = os.path.normpath(path).split(os.sep)
+    # ディレクトリ名が存在する場合、そのディレクトリ名を返す
+    if target_directory in parts:
+        index = parts.index(target_directory)
+        if index < len(parts) - 1:
+            return parts[index + 1]
+    # ディレクトリ名が見つからない場合(エラーハンドリングは後日)
 
 
 class File:

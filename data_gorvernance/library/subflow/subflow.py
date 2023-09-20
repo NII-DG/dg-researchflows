@@ -5,14 +5,56 @@ from .status import StatusFile, SubflowStatus, TaskStatus
 from ..utils import file
 from ..utils.file import File
 from ..utils.diagram import DiagManager, generate_svg_diag
-from ..utils.config import path_config as p
+from ..utils.config import path_config
+from ..main_menu import ResearchFlowStatusOperater
+
+
+def get_subflow_type_and_id(working_file_path: str):
+    """ノートブックのパスを受け取ってsubflowの種別とidを返す
+
+    Args:
+        working_file_path (str): ノートブックのパス
+
+    Raises:
+        ValueError: working_file_pathにsubflow_typeが含まれない場合
+
+    Returns:
+        str: サブフロー種別
+        str: サブフローID（無い場合はNone）
+    """
+    parts = os.path.normpath(working_file_path).split(os.sep)
+    target_directory = path_config.RESEARCHFLOW
+    subflow_type = ""
+    subflow_id = None
+
+    try:
+        index = parts.index(target_directory)
+    except:
+        raise
+
+    if index < len(parts) - 1:
+        subflow_type = parts[index + 1]
+    else:
+        raise ValueError
+
+    if index + 2 < len(parts) - 1:
+        abs_root = path_config.get_abs_root_form_working_dg_file_path(working_file_path)
+        id_list = ResearchFlowStatusOperater(
+                    path_config.get_research_flow_status_file_path(abs_root)
+                ).get_subflow_id(subflow_type)
+        dir_name = parts[index + 2]
+        if dir_name in id_list:
+            subflow_id = dir_name
+
+    return subflow_type, subflow_id
 
 
 class SubFlow:
 
     def __init__(self, current_path: str, status_file :str, diag_file :str, using_task_dir: str) -> None:
         self.current_path = current_path
-        self.subflow_status = StatusFile(status_file).read()
+        self.subflow_status_file = StatusFile(status_file)
+        self.subflow_status = self.subflow_status_file.read()
         self.diag = DiagManager(diag_file)
         self.task_dir = using_task_dir
 
@@ -31,14 +73,14 @@ class SubFlow:
                     file.copy_file(source_path, destination_path)
 
     def update_status(self):
-        self.subflow_status.update_task_unexcuted()
+        self.subflow_status.update_task_enabled()
+        self.subflow_status_file.write(self.subflow_status)
 
-    def generate(self, workdir, font, display_all=True):
+    def generate(self, svg_path, tmp_diag, font, display_all=True):
+        # tmp_diagは暫定的なもの。将来的にはself.diagを利用できるようにする
         self._update_flow(self.diag, self.subflow_status, display_all)
-        tmp_diag = Path(workdir) / 'skeleton.diag'
         File(str(tmp_diag)).write(self.diag.content)
-        skeleton = Path(workdir) / 'skeleton.svg'
-        generate_svg_diag(str(skeleton), str(tmp_diag), font, self.current_path, self.task_dir)
+        generate_svg_diag(str(svg_path), str(tmp_diag), font, self.current_path, self.task_dir)
 
     def _update_flow(self, diag: DiagManager, status: SubflowStatus, display_all=True):
         for task in status.tasks:

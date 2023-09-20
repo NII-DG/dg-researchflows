@@ -110,7 +110,8 @@ class SubflowStatus:
     def is_completed(self, is_completed: bool):
         self._is_completed = is_completed
 
-    def update_task_unexcuted(self):
+    def update_task_enabled(self):
+        """タスクを利用可能状態にする"""
         count_dict = {con.id: con.completed_count for con in self.tasks}
         for con in self.tasks:
             if con.status != con.STATUS_UNFEASIBLE:

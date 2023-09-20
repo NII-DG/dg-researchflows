@@ -76,8 +76,15 @@ class TaskStatus:
 
     def to_dict(self):
         return {
-            self.__ID: self.id
-            self.__
+            self.__ID: self._id,
+            self.__NAME: self._name,
+            self.__IS_MULTIPLE: self._is_multiple,
+            self.__IS_REQURED: self._is_required,
+            self.__COMPLETED_COUNT: self._completed_count,
+            self.__DEPENDENT_TASK_IDS: self._dependent_task_ids,
+            self.__STATUS: self._status,
+            self.__EXECUTION_ENVIRONMENTS: self._execution_environments,
+            self.__DISABLED: self._disable
         }
 
 
@@ -129,7 +136,3 @@ class StatusFile(JsonFile):
     def write(self, tasks: SubflowStatus):
         data = tasks.to_dict()
         super().write(data)
-
-    def is_completed(self)->bool:
-        content = super().read()
-        return content['is_completed']

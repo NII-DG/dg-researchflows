@@ -37,9 +37,9 @@ class DGPlaner():
         # フォームボックス
         self._form_box = pn.WidgetBox()
         self._form_box.width = 900
-        # エラーメッセージ用ボックス
-        self._err_output = pn.WidgetBox()
-        self._err_output.width = 900
+        # メッセージ用ボックス
+        self._msg_output = pn.WidgetBox()
+        self._msg_output.width = 900
 
     def define_form(self):
         """フォーム定義"""
@@ -68,33 +68,35 @@ class DGPlaner():
 
         with plan_path.open('r') as file:
             plan_file = json.loads(file.read())
-
+        registration_content = ''
         for index, cb in enumerate(self._checkbox_list):
-            if type(cb) is Checkbox:
+            if type(cb) is Checkbox and type(cb.value) is bool:
                 plan_file['governance_plan'][index]['is_enabled'] = cb.value
+                governance_plan_id = plan_file['governance_plan'][index]['id']
+                registration_content += f'{msg_config.get("data_governance_customize_property", governance_plan_id)} : {self.get_msg_disable_or_able(cb.value)}<br>'
             else:
-                self._err_output.clear()
+                self._msg_output.clear()
                 alert = pn.pane.Alert(f'## [INTERNAL ERROR] : cb variable is not panel.widgets.Checkbox',sizing_mode="stretch_width",alert_type='danger')
-                self._err_output.append(alert)
+                self._msg_output.append(alert)
 
         with plan_path.open('w') as file:
             file.write(json.dumps(plan_file, indent=4))
 
+        # 登録内容を出力する
+        registration_msg = f'## {msg_config.get("form", "registration_content")}<br><hr>{registration_content}'
+        self._msg_output.clear()
+        alert = pn.pane.Alert(registration_msg, sizing_mode="stretch_width",alert_type='info')
+        self._msg_output.append(alert)
 
+    def get_msg_disable_or_able(self, b:bool)->str:
+        if b:
+            return msg_config.get('DEFAULT', 'able')
+        else:
+            return msg_config.get('DEFAULT', 'disable')
 
     def get_data_governance_customize_id_by_index(self, index)->str:
         ids = self.get_data_governance_customize_ids()
         return ids[index]
-
-
-
-
-
-
-
-
-
-
 
     def get_data_governance_customize_data(self)->List[dict]:
         with data_governance_customize_file.open('r') as file:
@@ -103,10 +105,6 @@ class DGPlaner():
 
     def get_data_governance_customize_ids(self)->List:
         return [p['id'] for p in self.get_data_governance_customize_data()]
-
-
-
-
 
     @classmethod
     def generateFormScetion(cls, working_path:str):
@@ -129,12 +127,11 @@ class DGPlaner():
         sf.write(plan_status)
 
         # フォーム定義
-
-
+        dg_planer.define_form()
 
         # フォーム表示
         pn.extension()
         form_section = pn.WidgetBox()
         form_section.append(dg_planer._form_box)
-        form_section.append(dg_planer._err_output)
+        form_section.append(dg_planer._msg_output)
         display(form_section)

@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from tempfile import TemporaryDirectory
 
 from .status import StatusFile, SubflowStatus, TaskStatus
 from ..utils import file
@@ -18,8 +17,9 @@ class SubFlow:
         self.task_dir = using_task_dir
 
     def setup_tasks(self, souce_task_dir: str):
-        for task in self.subflow_status.tasks:
-            self._copy_file_by_name(task.name + '.ipynb', souce_task_dir, self.task_dir)
+        if os.path.isdir(self.task_dir):
+            for task in self.subflow_status.tasks:
+                self._copy_file_by_name(task.name + '.ipynb', souce_task_dir, self.task_dir)
 
     def _copy_file_by_name(self, target_filename: str, search_directory :str, destination_directory: str):
         for root, dirs, files in os.walk(search_directory):
@@ -27,10 +27,11 @@ class SubFlow:
                 source_path = os.path.join(root, target_filename)
                 relative_path = os.path.relpath(root, start=search_directory)
                 destination_path = os.path.join(destination_directory, relative_path, target_filename)
-                file.copy_file(source_path, destination_path)
+                if not os.path.isfile(destination_path):
+                    file.copy_file(source_path, destination_path)
 
     def update_status(self):
-        self.subflow_status.update_status()
+        self.subflow_status.update_task_unexcuted()
 
     def generate(self, workdir, font, display_all=True):
         self._update_flow(self.diag, self.subflow_status, display_all)
@@ -45,7 +46,7 @@ class SubFlow:
             self._adjust_by_optional(diag, task, display_all)
 
     def _adjust_by_optional(self, diag: DiagManager, task: TaskStatus, display_all=True):
-        if task.is_optional:
+        if task.disable:
             if display_all:
                 diag.change_node_style(task.id, 'dotted')
             else:

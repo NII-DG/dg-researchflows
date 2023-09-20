@@ -17,6 +17,11 @@ PLAN = 'plan'
 
 
 # Folder Path
+
+def get_abs_root_form_working_dg_file_path(working_dg_file_path:str)->str:
+    abs_root = working_dg_file_path[0:working_dg_file_path.rfind(DATA_GOVERNANCE)-1]
+    return abs_root
+
 def get_dg_sub_flow_base_data_folder()->str:
     """サブフローベースデータのフォルダパス"""
     return os.path.join(DATA_GOVERNANCE, BASE, SUB_FLOW)
@@ -45,6 +50,7 @@ MENU_NOTEBOOK = 'menu.ipynb'
 STATUS_JSON = 'status.json'
 PROPERTY_JSON = 'property.json'
 
+FLOW_DIAG = 'flow.diag'
 
 # File Path
 SETUP_COMPLETED_TEXT_PATH = os.path.join(DOT_DATA_GOVERNANCE, 'setup_completed.txt')
@@ -53,10 +59,27 @@ PLAN_TASK_STATUS_FILE_PATH = os.path.join(get_dg_researchflow_folder(False), PLA
 def get_research_flow_status_file_path(abs_root)->str:
     return os.path.join(abs_root, get_dg_researchflow_folder(), 'research_flow_status.json')
 
-def get_abs_root_form_working_dg_file_path(working_dg_file_path:str)->str:
-    abs_root = working_dg_file_path[0:working_dg_file_path.rfind(DATA_GOVERNANCE)-1]
-    return abs_root
 
 # other method
 def get_prepare_file_name_list_for_subflow()->List[str]:
     return [MENU_NOTEBOOK, STATUS_JSON, PROPERTY_JSON]
+
+
+def get_subflow_type_and_id(working_file_path: str):
+    parts = os.path.normpath(working_file_path).split(os.sep)
+    target_directory = RESEARCHFLOW
+    subflow_id = None
+    subflow_type = None
+    if target_directory in parts:
+
+        try:
+            index = parts.index(target_directory)
+        except Exception:
+            raise
+
+        if index < len(parts) - 1:
+            subflow_type = parts[index + 1]
+        if index + 2 < len(parts) - 1:
+            subflow_id = parts[index + 2]
+
+    return subflow_type, subflow_id

@@ -31,11 +31,11 @@ class SubflowMenu:
         parent = Path(os.path.dirname(working_path))
         status_file = parent / path_config.STATUS_JSON
         diag_file = (
-            Path(path_config.get_dg_sub_flow_base_data_folder())
+            Path(path_config.DG_SUB_FLOW_BASE_DATA_FOLDER)
             / subflow_type / path_config.FLOW_DIAG
         )
         using_task_dir = (
-            Path(path_config.get_dg_researchflow_folder(is_dot=True))
+            Path(path_config.DG_WORKING_FOLDER)
             / subflow_rel_path / path_config.TASK
         )
         root_folder = Path(path_config.get_abs_root_form_working_dg_file_path(working_path))

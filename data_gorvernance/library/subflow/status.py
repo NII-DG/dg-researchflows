@@ -70,6 +70,10 @@ class TaskStatus:
     def disable(self):
         return self._disable
 
+    @disable.setter
+    def disable(self, is_disable:bool):
+        self._disable = is_disable
+
     @status.setter
     def status(self, status: str):
         self._set_status(status)

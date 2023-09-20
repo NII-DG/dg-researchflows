@@ -41,11 +41,16 @@ PLAN_JSON = 'plan.json'
 
 # File Path
 SETUP_COMPLETED_TEXT_PATH = os.path.join(DG_WORKING_FOLDER, 'setup_completed.txt')
+# data_gorvernance/researchflow/plan/status.json
 PLAN_TASK_STATUS_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, STATUS_JSON)
 PLAN_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, PLAN_JSON)
 
 def get_research_flow_status_file_path(abs_root)->str:
     return os.path.join(abs_root, DG_RESEARCHFLOW_FOLDER, 'research_flow_status.json')
+
+def get_base_subflow_pahse_status_file_path(pahse:str)->str:
+    # data_gorvernance\base\subflow\<フェーズ>\status.jsonを更新する。
+    return os.path.join(DG_SUB_FLOW_BASE_DATA_FOLDER, pahse, STATUS_JSON)
 
 
 # other method

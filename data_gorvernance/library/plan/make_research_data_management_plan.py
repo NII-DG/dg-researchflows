@@ -83,9 +83,16 @@ class DGPlaner():
                 file.write(json.dumps(plan_file, indent=4))
 
             # 登録内容を出力する
-            registration_msg = f'## {msg_config.get("form", "registration_content")}<br><hr>{registration_content}'
+            registration_msg = f'## {msg_config.get("form", "registration_content")}<br><hr><br>{registration_content}'
+
+            msg = f"""{registration_msg}
+
+<hr>
+
+{registration_content}
+            """
             self._msg_output.clear()
-            alert = pn.pane.Alert(registration_msg, sizing_mode="stretch_width",alert_type='info')
+            alert = pn.pane.Alert(msg, sizing_mode="stretch_width",alert_type='info')
             self._msg_output.append(alert)
 
         except Exception as e:

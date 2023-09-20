@@ -1,7 +1,7 @@
 from ..utils.file import JsonFile
 
-__IS_COMPLETED = 'is_completed'
-__TASKS = 'tasks'
+_IS_COMPLETED = 'is_completed'
+_TASKS = 'tasks'
 
 
 class TaskStatus:
@@ -117,8 +117,8 @@ class SubflowStatus:
 
     def to_dict(self):
         return {
-            __IS_COMPLETED : self.is_completed,
-            __TASKS: [
+            _IS_COMPLETED : self.is_completed,
+            _TASKS: [
                 con.to_dict() for con in self.tasks
             ]
         }
@@ -131,7 +131,7 @@ class StatusFile(JsonFile):
 
     def read(self):
         content = super().read()
-        return SubflowStatus(content[__IS_COMPLETED], content[__TASKS])
+        return SubflowStatus(content[_IS_COMPLETED], content[_TASKS])
 
     def write(self, tasks: SubflowStatus):
         data = tasks.to_dict()

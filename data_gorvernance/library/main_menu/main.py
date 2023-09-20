@@ -393,9 +393,9 @@ class MainMenu():
 
         # 新規サブフローデータの用意
         # data_gorvernance\researchflowを取得
-        dg_researchflow_path = os.path.join(self.abs_root, path_config.get_dg_researchflow_folder(False))
+        dg_researchflow_path = os.path.join(self.abs_root, path_config.DG_RESEARCHFLOW_FOLDER)
         # data_gorvernance\base\subflowを取得する
-        dg_base_subflow_path = os.path.join(self.abs_root, path_config.get_dg_sub_flow_base_data_folder())
+        dg_base_subflow_path = os.path.join(self.abs_root, path_config.DG_SUB_FLOW_BASE_DATA_FOLDER)
 
         # コピー先フォルダパス
         dect_dir_path = os.path.join(dg_researchflow_path, phase_name, new_sub_flow_id)

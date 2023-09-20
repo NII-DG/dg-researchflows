@@ -31,16 +31,15 @@ DG_WORKING_FOLDER = os.path.join(DATA_GOVERNANCE, WORKING)
 
 
 # File
-## base
-FLOW_DIAG = 'flow.diag'
-## researchflow
 MENU_NOTEBOOK = 'menu.ipynb'
 STATUS_JSON = 'status.json'
 PROPERTY_JSON = 'property.json'
 PLAN_JSON = 'plan.json'
+FLOW_DIAG = 'flow.diag'
 
 # File Path
 SETUP_COMPLETED_TEXT_PATH = os.path.join(DG_WORKING_FOLDER, 'setup_completed.txt')
+MAIN_MENU_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, 'main.ipynb')
 PLAN_TASK_STATUS_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, STATUS_JSON)
 PLAN_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, PLAN_JSON)
 

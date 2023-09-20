@@ -2,8 +2,8 @@
     "is_completed": false,
     "tasks": [
         {
-            "id": "SFIT001001",
-            "name": "make_rdm_plan",
+            "id": "RF002001",
+            "name": "make_research_data_management_plan",
             "is_multiple": false,
             "is_optional": false,
             "completed_count": 0,
@@ -13,13 +13,13 @@
             "disabled": false
         },
         {
-            "id": "SFCT002000",
+            "id": "RF009002",
             "name": "manage_collaborators",
             "is_multiple": true,
             "is_optional": false,
             "completed_count": 0,
             "dependent_task_ids": [
-                "SFIT001001"
+                "RF002001"
             ],
             "status": "unfeasible",
             "execution_environments": [],

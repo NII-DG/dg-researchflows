@@ -7,7 +7,7 @@ from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus
 from ..main_menu.research_flow_status import ResearchFlowStatusOperater
 import traceback
 from ..utils.nb_file import NbFile
-from ..utils.status import StatusFile as TaskStatusFile
+from ..subflow.status import StatusFile
 
 import panel as pn
 import os
@@ -120,9 +120,10 @@ class MainMenu():
         self.check_status_research_preparation_flow()
 
     def check_status_research_preparation_flow(self):
-        task_status_file = TaskStatusFile(os.path.join(self.abs_root, path_config.PLAN_TASK_STATUS_FILE_PATH))
+        sf = StatusFile(os.path.join(self.abs_root, path_config.PLAN_TASK_STATUS_FILE_PATH))
+        plan_sub_flow_status = sf.read()
         # 研究準備サブフローの進行状況をチェックする。
-        if task_status_file.is_completed():
+        if plan_sub_flow_status.is_completed:
             # 必須タスクが全て完了している場合、何もしない。
             pass
         else:

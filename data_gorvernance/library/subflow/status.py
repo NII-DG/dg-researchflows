@@ -30,6 +30,9 @@ class TaskStatus:
         else:
             raise ValueError
 
+    def add_execution_environments(self, id:str):
+        self._execution_environments.append(id)
+
     @property
     def id(self):
         return self._id

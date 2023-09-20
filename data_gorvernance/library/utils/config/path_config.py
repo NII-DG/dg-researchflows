@@ -44,18 +44,22 @@ def get_dg_researchflow_folder(is_dot:bool=False)->str:
 MENU_NOTEBOOK = 'menu.ipynb'
 STATUS_JSON = 'status.json'
 PROPERTY_JSON = 'property.json'
+PLAN_JSON = 'plan.json'
 
 
 # File Path
 SETUP_COMPLETED_TEXT_PATH = os.path.join(DOT_DATA_GOVERNANCE, 'setup_completed.txt')
 PLAN_TASK_STATUS_FILE_PATH = os.path.join(get_dg_researchflow_folder(False), PLAN, STATUS_JSON)
+PLAN_FILE_PATH = os.path.join(get_dg_researchflow_folder(False), PLAN, PLAN_JSON)
 
 def get_research_flow_status_file_path(abs_root)->str:
     return os.path.join(abs_root, get_dg_researchflow_folder(), 'research_flow_status.json')
 
 def get_abs_root_form_working_dg_file_path(working_dg_file_path:str)->str:
-    abs_root = working_dg_file_path[0:working_dg_file_path.rfind(DATA_GOVERNANCE)-1]
-    return abs_root
+    if DOT_DATA_GOVERNANCE in working_dg_file_path:
+        return working_dg_file_path[0:working_dg_file_path.rfind(DOT_DATA_GOVERNANCE)-1]
+    else:
+        return working_dg_file_path[0:working_dg_file_path.rfind(DATA_GOVERNANCE)-1]
 
 # other method
 def get_prepare_file_name_list_for_subflow()->List[str]:

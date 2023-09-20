@@ -44,7 +44,7 @@ class DGPlaner():
 
     def define_form(self):
         """フォーム定義"""
-        # DGカスタマイズプロパティチェックボックスリスト
+        # α設定チェックボックスリスト
         self._checkbox_list = pn.Column()
         for id in self.get_data_governance_customize_ids():
             check_book = pn.widgets.Checkbox(name=msg_config.get('data_governance_customize_property', id))
@@ -63,24 +63,31 @@ class DGPlaner():
         for object in objects:
             self._form_box.append(object)
 
+    def get_plan_data(self)->dict:
+        plan_path = Path(self._plan_path)
+        with plan_path.open('r') as file:
+            return json.loads(file.read())
+
+    def update_plan_data(self, data:dict):
+        plan_path = Path(self._plan_path)
+        with plan_path.open('w') as file:
+            file.write(json.dumps(data, indent=4))
+
     def callback_submit_input(self, event):
         try:
-            # 適応するDGカスタマイズプロパティの設定値をplan.json(data_gorvernance\researchflow\plan\plan.json)に記録する。
-            plan_path = Path(self._plan_path)
+            # 適応するDGカスタマイズプロパティの設定値をα設定JSON定義書(data_gorvernance\researchflow\plan\plan.json)に記録する。
+            plan_data = self.get_plan_data()
 
-            with plan_path.open('r') as file:
-                plan_file = json.loads(file.read())
             registration_content = ''
             for index, cb in enumerate(self._checkbox_list):
                 if type(cb) is Checkbox and type(cb.value) is bool:
-                    plan_file['governance_plan'][index]['is_enabled'] = cb.value
-                    governance_plan_id = plan_file['governance_plan'][index]['id']
+                    plan_data['governance_plan'][index]['is_enabled'] = cb.value
+                    governance_plan_id = plan_data['governance_plan'][index]['id']
                     registration_content += f'{msg_config.get("data_governance_customize_property", governance_plan_id)} : {self.get_msg_disable_or_able(cb.value)}<br>'
                 else:
                     raise Exception('cb variable is not panel.widgets.Checkbox or cb value is not bool type')
 
-            with plan_path.open('w') as file:
-                file.write(json.dumps(plan_file, indent=4))
+            self.update_plan_data(plan_data)
 
             # 登録内容を出力する
             registration_msg = f'## {msg_config.get("form", "registration_content")}'
@@ -118,10 +125,12 @@ class DGPlaner():
     def get_data_governance_customize_ids(self)->List:
         return [p['id'] for p in self.get_data_governance_customize_data()]
 
+
     @classmethod
     def generateFormScetion(cls, working_path:str):
-        dg_planer = DGPlaner(working_path)
         """フォームセクション用"""
+
+        dg_planer = DGPlaner(working_path)
         # 研究準備のサブフローステータス管理JSONの更新
         sf = StatusFile(dg_planer._plan_sub_flow_status_file_path)
         plan_status: SubflowStatus = sf.read()
@@ -147,3 +156,63 @@ class DGPlaner():
         form_section.append(dg_planer._form_box)
         form_section.append(dg_planer._msg_output)
         display(form_section)
+
+    def get_disable_task_ids_on_phase(self)->dict[str, list[str]]:
+        """無効化（非表示：任意タスク）のタスクIDをフェーズごとに集計する"""
+
+        # α設定JSON定義書の設定値を取得
+        plan_data = self.get_plan_data()
+
+        # DGカスタマイズJSONデータを取得する
+        data_governance_customize_data = self.get_data_governance_customize_data()
+
+
+        # 無効化タスクIDデータ
+        disable_task_ids_on_phase:dict[str, list[str]] = {}
+        # 無効化タスクIDデータの初期化
+        for phase in data_governance_customize_data[0]['customize'].keys():
+            if phase != 'plan':
+                disable_task_ids_on_phase[phase] = []
+            else:
+                continue
+
+
+        # DGカスタマイズプロパティの設定値とDGカスタマイズJSONデータから無効にするタスクIDを取得する
+        for plan_property in plan_data['governance_plan']:
+            if plan_property['is_enabled'] == False:
+                # 無効なDGカスタマイズプロパティ（α項目）のIDを取得する
+                alpha_id = plan_property['id']
+                for customize_rule_set in data_governance_customize_data:
+                    if customize_rule_set['id'] == alpha_id:
+                        customize_rule:dict = customize_rule_set['customize']
+                        for phase, rule in customize_rule.items():
+                            if phase != 'plan':
+                                disable_task_ids_on_phase[phase].extend(rule['task_ids'])
+                            else:
+                                continue
+                    else:
+                        continue
+            else:
+                continue
+
+        return disable_task_ids_on_phase
+
+    def disable_task_by_phase(self):
+        disable_task_ids_data = self.get_disable_task_ids_on_phase()
+        for phase, disable_task_ids in disable_task_ids_data.items():
+            # data_gorvernance\base\subflow\<フェーズ>\status.jsonを更新する。
+            status_path = path_config.get_base_subflow_pahse_status_file_path(phase)
+
+            sf = StatusFile(status_path)
+            sub_flow_status:SubflowStatus = sf.read()
+            for task in sub_flow_status._tasks:
+                if task.id in disable_task_ids and not task.is_required:
+                    # 無効化タスクIDリストに標的タスクIDが含まれ、かつ必須タスクではない場合、disabledを真にする
+                    task.disable = True
+            sf.write(sub_flow_status)
+
+    @classmethod
+    def customize_research_flow(cls, working_path:str):
+        dg_planer = DGPlaner(working_path)
+        # タスクの無効化処理
+        dg_planer.disable_task_by_phase()

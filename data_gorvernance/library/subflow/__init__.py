@@ -1,2 +1,2 @@
-from .main import SubflowMenu
+from .menu import SubflowMenu
 from .status import StatusFile, SubflowStatus, TaskStatus

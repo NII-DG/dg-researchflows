@@ -5,7 +5,7 @@
             "id": "RF002001",
             "name": "make_research_data_management_plan",
             "is_multiple": false,
-            "is_optional": false,
+            "is_required": false,
             "completed_count": 0,
             "dependent_task_ids": [],
             "status": "unexecuted",
@@ -16,7 +16,7 @@
             "id": "RF009002",
             "name": "manage_collaborators",
             "is_multiple": true,
-            "is_optional": false,
+            "is_required": false,
             "completed_count": 0,
             "dependent_task_ids": [
                 "RF002001"

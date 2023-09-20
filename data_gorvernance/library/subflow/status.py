@@ -2,11 +2,19 @@ from ..utils.file import JsonFile
 
 __IS_COMPLETED = 'is_completed'
 __TASKS = 'tasks'
-__ID = 'id'
-
 
 
 class TaskStatus:
+
+    __ID = 'id'
+    __NAME = 'name'
+    __IS_MULTIPLE = 'is_multiple'
+    __IS_REQURED = 'is_required'
+    __COMPLETED_COUNT = 'completed_count'
+    __DEPENDENT_TASK_IDS = 'dependent_task_ids'
+    __STATUS = 'status'
+    __EXECUTION_ENVIRONMENTS = 'execution_environments'
+    __DISABLED = 'disabled'
 
     STATUS_UNFEASIBLE = "unfeasible"
     STATUS_UNEXECUTED = "unexecuted"
@@ -14,15 +22,16 @@ class TaskStatus:
     STATUS_DONE = "done"
     allowed_statuses = [STATUS_UNFEASIBLE, STATUS_UNEXECUTED, STATUS_DOING, STATUS_DONE]
 
-    def __init__(self, id: str, name: str, is_multiple: bool, is_optional: bool, completed_count: int, dependent_task_ids: list[str], status: str, execution_environments: list[str], disabled: bool) -> None:
+    def __init__(self, id: str, name: str, is_multiple: bool, is_required: bool, completed_count: int, dependent_task_ids: list[str], status: str, execution_environments: list[str], disabled: bool) -> None:
         self._id = id
         self._name = name
         self._is_multiple = is_multiple
-        self._is_optional = is_optional
+        self._is_required = is_required
         self._completed_count = completed_count
         self._dependent_task_ids = dependent_task_ids
         self._set_status(status)
         self._execution_environments = execution_environments
+        self._disable = disabled
 
     def _set_status(self, status: str):
         if status in self.allowed_statuses:
@@ -42,8 +51,8 @@ class TaskStatus:
         return self._name
 
     @property
-    def is_optional(self):
-        return self._is_optional
+    def is_required(self):
+        return self._is_required
 
     @property
     def completed_count(self):
@@ -57,14 +66,18 @@ class TaskStatus:
     def status(self):
         return self._status
 
+    @property
+    def disable(self):
+        return self._disable
+
     @status.setter
     def status(self, status: str):
         self._set_status(status)
 
     def to_dict(self):
         return {
-            __ID: self.id
-
+            self.__ID: self.id
+            self.__
         }
 
 
@@ -86,13 +99,11 @@ class SubflowStatus:
     def is_completed(self, is_completed: bool):
         self._is_completed = is_completed
 
-    def update_status(self):
+    def update_task_unexcuted(self):
         count_dict = {con.id: con.completed_count for con in self.tasks}
-
         for con in self.tasks:
             if con.status != con.STATUS_UNFEASIBLE:
                 continue
-
             is_all_completed = all(count_dict.get(id, 0) >= 1 for id in con.dependent_task_ids)
             if is_all_completed:
                 con.status = con.STATUS_UNEXECUTED

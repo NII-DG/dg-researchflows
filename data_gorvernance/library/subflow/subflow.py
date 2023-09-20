@@ -53,7 +53,8 @@ class SubFlow:
 
     def __init__(self, current_path: str, status_file :str, diag_file :str, using_task_dir: str) -> None:
         self.current_path = current_path
-        self.subflow_status = StatusFile(status_file).read()
+        self.subflow_status_file = StatusFile(status_file)
+        self.subflow_status = self.subflow_status_file.read()
         self.diag = DiagManager(diag_file)
         self.task_dir = using_task_dir
 
@@ -72,7 +73,8 @@ class SubFlow:
                     file.copy_file(source_path, destination_path)
 
     def update_status(self):
-        self.subflow_status.update_task_unexcuted()
+        self.subflow_status.update_task_enabled()
+        self.subflow_status_file.write(self.subflow_status)
 
     def generate(self, svg_path, tmp_diag, font, display_all=True):
         # tmp_diagは暫定的なもの。将来的にはself.diagを利用できるようにする

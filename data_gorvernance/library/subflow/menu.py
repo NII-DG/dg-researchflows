@@ -10,10 +10,33 @@ from ..utils.config import path_config, message
 
 
 class SubflowMenu:
-    def __init__(self) -> None:
-        pass
 
-    def render(self, working_path: str, option=False):
+    def __init__(self) -> None:
+        # サブフロー図
+        self.diagram = pn.pane.SVG()
+        # ラジオボタン
+        self.selector = pn.widgets.RadioBoxGroup()
+        options = [
+                message.get('subflow_menu', 'select_abled_task'),
+                message.get('subflow_menu', 'select_all_task')
+        ]
+        self.selector.options = options
+        self.selector.value = options[0]
+        # ボタン
+        self.button = pn.widgets.Button(
+                name=message.get('subflow_menu', 'select_button_name'),
+                button_type= "default"
+                align= 'end'
+        )
+        self.button.on_click(self.select_flow)
+        # エラー出力
+        self.error_output = pn.WidgetBox()
+
+    def select_flow(self, event):
+
+
+    @classmethod
+    def render(cls, working_path: str, is_selected=False):
         # get subflow type and id from path
         subflow_type, subflow_id = get_subflow_type_and_id(working_path)
         subflow_rel_path = Path(subflow_type)
@@ -40,19 +63,9 @@ class SubflowMenu:
 
         # panel activation
         pn.extension()
-        diagram = pn.pane.SVG()
-        if option:
-            options = [
-                message.get('subflow_menu', 'select_abled_task'),
-                message.get('subflow_menu', 'select_all_task')
-            ]
-            selector = pn.widgets.RadioBoxGroup(options=options, value=options[0])
-            button = pn.widgets.Button(
-                name=message.get('subflow_menu', 'select_button_name'),
-                button_type= "default"
-            )
-            button.on_click(self.submit_callback(selector, button, diagram))
-            display(pn.Column(selector, button))
+        subflow_menu = cls()
+        if is_selected:
+            display(pn.Row(subflow_menu.selector, subflow_menu.button))
         with TemporaryDirectory() as workdir:
             tmp_diag = Path(workdir) / 'skeleton.diag'
             skeleton = Path(workdir) / 'skeleton.svg'
@@ -61,14 +74,5 @@ class SubflowMenu:
                 tmp_diag=tmp_diag,
                 font=str(root_folder / '.fonts/ipag.ttf')
             )
-            diagram.object = skeleton
-            display(diagram)
-
-
-    def submit_callback(self, selector, button, diagram):
-
-        def callback(event):
-            pass
-
-        return callback
-
+            subflow_menu.diagram.object = skeleton
+            display(subflow_menu.diagram)

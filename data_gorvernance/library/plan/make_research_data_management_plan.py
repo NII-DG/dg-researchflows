@@ -1,4 +1,5 @@
 import os
+import traceback
 from typing import Any, List
 import panel as pn
 from panel.widgets import Checkbox
@@ -63,30 +64,34 @@ class DGPlaner():
             self._form_box.append(object)
 
     def callback_submit_input(self, event):
-        # 適応するDGカスタマイズプロパティの設定値をplan.json(data_gorvernance\researchflow\plan\plan.json)に記録する。
-        plan_path = Path(self._plan_path)
+        try:
+            # 適応するDGカスタマイズプロパティの設定値をplan.json(data_gorvernance\researchflow\plan\plan.json)に記録する。
+            plan_path = Path(self._plan_path)
 
-        with plan_path.open('r') as file:
-            plan_file = json.loads(file.read())
-        registration_content = ''
-        for index, cb in enumerate(self._checkbox_list):
-            if type(cb) is Checkbox and type(cb.value) is bool:
-                plan_file['governance_plan'][index]['is_enabled'] = cb.value
-                governance_plan_id = plan_file['governance_plan'][index]['id']
-                registration_content += f'{msg_config.get("data_governance_customize_property", governance_plan_id)} : {self.get_msg_disable_or_able(cb.value)}<br>'
-            else:
-                self._msg_output.clear()
-                alert = pn.pane.Alert(f'## [INTERNAL ERROR] : cb variable is not panel.widgets.Checkbox',sizing_mode="stretch_width",alert_type='danger')
-                self._msg_output.append(alert)
+            with plan_path.open('r') as file:
+                plan_file = json.loads(file.read())
+            registration_content = ''
+            for index, cb in enumerate(self._checkbox_list):
+                if type(cb) is Checkbox and type(cb.value) is bool:
+                    plan_file['governance_plan'][index]['is_enabled'] = cb.value
+                    governance_plan_id = plan_file['governance_plan'][index]['id']
+                    registration_content += f'{msg_config.get("data_governance_customize_property", governance_plan_id)} : {self.get_msg_disable_or_able(cb.value)}<br>'
+                else:
+                    raise Exception('cb variable is not panel.widgets.Checkbox or cb value is not bool type')
 
-        with plan_path.open('w') as file:
-            file.write(json.dumps(plan_file, indent=4))
+            with plan_path.open('w') as file:
+                file.write(json.dumps(plan_file, indent=4))
 
-        # 登録内容を出力する
-        registration_msg = f'## {msg_config.get("form", "registration_content")}<br><hr>{registration_content}'
-        self._msg_output.clear()
-        alert = pn.pane.Alert(registration_msg, sizing_mode="stretch_width",alert_type='info')
-        self._msg_output.append(alert)
+            # 登録内容を出力する
+            registration_msg = f'## {msg_config.get("form", "registration_content")}<br><hr>{registration_content}'
+            self._msg_output.clear()
+            alert = pn.pane.Alert(registration_msg, sizing_mode="stretch_width",alert_type='info')
+            self._msg_output.append(alert)
+
+        except Exception as e:
+            self._msg_output.clear()
+            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
+            self._msg_output.append(alert)
 
     def get_msg_disable_or_able(self, b:bool)->str:
         if b:

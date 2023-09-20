@@ -51,23 +51,3 @@ def get_research_flow_status_file_path(abs_root)->str:
 # other method
 def get_prepare_file_name_list_for_subflow()->List[str]:
     return [MENU_NOTEBOOK, STATUS_JSON, PROPERTY_JSON]
-
-
-def get_subflow_type_and_id(working_file_path: str):
-    parts = os.path.normpath(working_file_path).split(os.sep)
-    target_directory = RESEARCHFLOW
-    subflow_id = None
-    subflow_type = None
-    if target_directory in parts:
-
-        try:
-            index = parts.index(target_directory)
-        except Exception:
-            raise
-
-        if index < len(parts) - 1:
-            subflow_type = parts[index + 1]
-        if index + 2 < len(parts) - 1:
-            subflow_id = parts[index + 2]
-
-    return subflow_type, subflow_id

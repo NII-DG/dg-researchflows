@@ -193,3 +193,14 @@ class ResearchFlowStatusOperater(JsonFile):
     def load_research_flow_status(self)->List[PhaseStatus]:
         """リサーチフローステータス管理JSONからリサーチフローステータスインスタンスを取得する"""
         return ResearchFlowStatus.load_from_json(str(self.path))
+
+    def get_subflow_id(self, phase_name: str)->List[str]:
+        research_flow_status = self.load_research_flow_status()
+        id_list = []
+        for phase_status in research_flow_status:
+            if phase_status._name != phase_name:
+                continue
+            # phase_status._name == phase_name
+            for subflow_data in phase_status._sub_flow_data:
+                id_list.append(subflow_data.id)
+        return id_list

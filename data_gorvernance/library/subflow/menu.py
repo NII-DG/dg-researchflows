@@ -5,8 +5,7 @@ from tempfile import TemporaryDirectory
 import panel as pn
 from IPython.display import display
 
-from .subflow import SubFlow
-from ..utils import file
+from .subflow import SubFlow, get_subflow_type_and_id
 from ..utils.config import path_config, message
 
 
@@ -16,16 +15,10 @@ class SubflowMenu:
 
     def render(self, working_path: str, option=False):
         # get subflow type and id from path
-        subflow_type_dir, subflow_id = path_config.get_subflow_type_and_id(working_path)
-        subflow_type = ''
-        subflow_rel_path = Path()
-        if subflow_type_dir:
-            subflow_type = subflow_type_dir
-            subflow_rel_path = Path(subflow_type)
-            if subflow_id:
-                subflow_rel_path = subflow_rel_path / subflow_id
-        else:
-            raise ValueError
+        subflow_type, subflow_id = get_subflow_type_and_id(working_path)
+        subflow_rel_path = Path(subflow_type)
+        if subflow_id:
+            subflow_rel_path = subflow_rel_path / subflow_id
 
         # create path
         parent = Path(os.path.dirname(working_path))
@@ -42,29 +35,33 @@ class SubflowMenu:
 
         # setup
         subflow = SubFlow(working_path, str(status_file), str(diag_file), str(using_task_dir))
-        subflow.setup_tasks(path_config.get_dg_task_base_data_folder())
+        subflow.setup_tasks(path_config.DG_TASK_BASE_DATA_FOLDER)
         subflow.update_status()
 
         # panel activation
         pn.extension()
+        diagram = pn.pane.SVG()
+        if option:
+            options = [
+                message.get('subflow_menu', 'select_abled_task'),
+                message.get('subflow_menu', 'select_all_task')
+            ]
+            selector = pn.widgets.RadioBoxGroup(options=options, value=options[0])
+            button = pn.widgets.Button(
+                name=message.get('subflow_menu', 'select_button_name'),
+                button_type= "default"
+            )
+            button.on_click(self.submit_callback(selector, button, diagram))
+            display(pn.Column(selector, button))
         with TemporaryDirectory() as workdir:
+            tmp_diag = Path(workdir) / 'skeleton.diag'
+            skeleton = Path(workdir) / 'skeleton.svg'
             subflow.generate(
-                workdir=workdir,
+                svg_path=skeleton,
+                tmp_diag=tmp_diag,
                 font=str(root_folder / '.fonts/ipag.ttf')
             )
-            diagram = pn.pane.SVG(workdir)
-            if option:
-                options = [
-                    message.get('subflow_menu', 'select_abled_task'),
-                    message.get('subflow_menu', 'select_all_task')
-                ]
-                selector = pn.widgets.RadioBoxGroup(options=options, value=options[0])
-                button = pn.widgets.Button(
-                    name=message.get('subflow_menu', 'select_button_name'),
-                    button_type= "default"
-                )
-                button.on_click(self.submit_callback(selector, button, diagram))
-                display(pn.Column(selector, button))
+            diagram.object = skeleton
             display(diagram)
 
 

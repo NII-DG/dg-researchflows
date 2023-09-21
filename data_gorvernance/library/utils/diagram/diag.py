@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 import traceback
 from subprocess import run
@@ -30,8 +29,6 @@ class DiagManager:
 
     def generate_svg(self, tmp_diag: str, output: str, font: str):
         File(str(tmp_diag)).write(self.content)
-        if not os.path.isfile(tmp_diag):
-            raise FileNotFoundError
         diag = tmp_diag
         run(['blockdiag', '-f', font, '-Tsvg', '-o', output, diag], check=True)
 

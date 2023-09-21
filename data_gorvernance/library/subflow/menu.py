@@ -28,6 +28,7 @@ class SubflowMenu:
     def __init__(self) -> None:
         # サブフロー図
         self.diagram = pn.pane.SVG()
+        self.diagram.width = 1000
         # ラジオボタン
         self.selector = pn.widgets.RadioBoxGroup()
         options = [

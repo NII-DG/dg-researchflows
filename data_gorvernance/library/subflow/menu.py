@@ -78,7 +78,6 @@ class SubflowMenu:
             working_path, str(status_file), str(diag_file), str(using_task_dir)
         )
         subflow.setup_tasks(path_config.DG_TASK_BASE_DATA_FOLDER)
-        subflow.update_status()
 
         # panel activation
         pn.extension()

@@ -21,12 +21,8 @@ SVG_TEXT = '{http://www.w3.org/2000/svg}text'
 SVG_RECT = '{http://www.w3.org/2000/svg}rect'
 
 
-def generate_svg_diag(output: str, diag: str, font:str, current_file:str, notebook_dir:str):
-        _generate_svg_cmd(Path(output), Path(diag), Path(font))
+def add_link(output: str, current_file:str, notebook_dir:str):
         _embed_detail_information(current_file, Path(output), Path(notebook_dir))
-
-def _generate_svg_cmd(output, diag, font):
-    run(['blockdiag', '-f', font, '-Tsvg', '-o', output, diag], check=True)
 
 def setup_python_path():
     ver = sys.version_info

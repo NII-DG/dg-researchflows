@@ -1,2 +1,2 @@
 from .diag import DiagManager
-from .svg import generate_svg_diag
+from .svg import add_link

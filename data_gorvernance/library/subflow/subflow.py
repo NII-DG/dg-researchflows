@@ -4,7 +4,7 @@ from pathlib import Path
 from .status import StatusFile, SubflowStatus, TaskStatus
 from ..utils import file
 from ..utils.file import File
-from ..utils.diagram import DiagManager, generate_svg_diag
+from ..utils.diagram import DiagManager, add_link
 from ..utils.config import path_config
 from ..main_menu import ResearchFlowStatusOperater
 
@@ -53,8 +53,7 @@ class SubFlow:
 
     def __init__(self, current_path: str, status_file :str, diag_file :str, using_task_dir: str) -> None:
         self.current_path = current_path
-        self.subflow_status_file = StatusFile(status_file)
-        self.subflow_status = self.subflow_status_file.read()
+        self.subflow_status = StatusFile(status_file).read()
         self.diag = DiagManager(diag_file)
         self.task_dir = using_task_dir
 
@@ -72,32 +71,28 @@ class SubFlow:
                 if not os.path.isfile(destination_path):
                     file.copy_file(source_path, destination_path)
 
-    def update_status(self):
-        self.subflow_status.update_task_enabled()
-        self.subflow_status_file.write(self.subflow_status)
-
     def generate(self, svg_path, tmp_diag, font, display_all=True):
         # tmp_diagは暫定的なもの。将来的にはself.diagを利用できるようにする
-        self._update_flow(self.diag, self.subflow_status, display_all)
-        File(str(tmp_diag)).write(self.diag.content)
-        generate_svg_diag(str(svg_path), str(tmp_diag), font, self.current_path, self.task_dir)
+        self._update_diag(display_all)
+        self.diag.generate_svg(tmp_diag, svg_path, font)
+        add_link(str(svg_path), self.current_path, self.task_dir)
 
-    def _update_flow(self, diag: DiagManager, status: SubflowStatus, display_all=True):
-        for task in status.tasks:
-            self._adjust_by_status(diag, task)
-            self._adjust_by_optional(diag, task, display_all)
+    def _update_diag(self, display_all=True):
+        for task in self.subflow_status.tasks:
+            self._adjust_by_status(task)
+            self._adjust_by_optional(task, display_all)
 
-    def _adjust_by_optional(self, diag: DiagManager, task: TaskStatus, display_all=True):
+    def _adjust_by_optional(self, task: TaskStatus, display_all=True):
         if task.disable:
             if display_all:
-                diag.change_node_style(task.id, 'dotted')
+                self.diag.change_node_style(task.id, 'dotted')
             else:
-                diag.delete_node(task.id)
+                self.diag.delete_node(task.id)
 
-    def _adjust_by_status(self, diag: DiagManager, task: TaskStatus):
+    def _adjust_by_status(self, task: TaskStatus):
         if task.status == task.STATUS_UNFEASIBLE:
-            diag.change_group_color(task.id, "#77787B")
+            self.diag.change_group_color(task.id, "#77787B")
         elif task.status == task.STATUS_DONE:
-            diag.update_mark(task.id, "実行中")
+            self.diag.update_mark(task.id, "実行中")
         elif task.status == task.STATUS_DOING:
-            diag.update_mark(task.id, "実行完了")
+            self.diag.update_mark(task.id, "実行完了")

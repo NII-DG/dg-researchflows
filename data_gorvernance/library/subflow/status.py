@@ -107,7 +107,7 @@ class SubflowStatus:
         self._is_completed = is_completed
 
     def update_task_enabled(self):
-        """タスクを利用可能状態にする"""
+        """タスクの利用可能状態を更新する"""
         count_dict = {con.id: con.completed_count for con in self.tasks}
         for con in self.tasks:
             if con.status != con.STATUS_UNFEASIBLE:
@@ -134,6 +134,6 @@ class StatusFile(JsonFile):
         content = super().read()
         return SubflowStatus(content[_IS_COMPLETED], content[_TASKS])
 
-    def write(self, tasks: SubflowStatus):
-        data = tasks.to_dict()
+    def write(self, subflow_status: SubflowStatus):
+        data = subflow_status.to_dict()
         super().write(data)

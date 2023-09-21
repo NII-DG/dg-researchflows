@@ -216,3 +216,18 @@ class DGPlaner():
         dg_planer = DGPlaner(working_path)
         # タスクの無効化処理
         dg_planer.disable_task_by_phase()
+
+    @classmethod
+    def completed_task(cls, working_path:str):
+        # タスク実行の完了情報を研究準備のサブフローステータス管理JSONに書き込む
+        # 更新対象タスク
+        # id = RF002001
+        # 更新項目
+        # completed_count, status, execution_environments
+        dg_planer = DGPlaner(working_path)
+
+        sf = StatusFile(dg_planer._plan_sub_flow_status_file_path)
+        plan_status: SubflowStatus = sf.read()
+        plan_status.completed_task_by_task_name(script_file_name, os.environ["JUPYTERHUB_SERVER_NAME"])
+        # 更新内容を記録する。
+        sf.write(plan_status)

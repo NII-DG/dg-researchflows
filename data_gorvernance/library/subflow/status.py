@@ -58,6 +58,9 @@ class TaskStatus:
     def completed_count(self):
         return self._completed_count
 
+    def increme_completed_count(self):
+        self._completed_count += 1
+
     @property
     def dependent_task_ids(self):
         return self._dependent_task_ids
@@ -65,6 +68,10 @@ class TaskStatus:
     @property
     def status(self):
         return self._status
+
+    @status.setter
+    def status(self, status: str):
+        self._set_status(status)
 
     @property
     def disable(self):
@@ -74,9 +81,11 @@ class TaskStatus:
     def disable(self, is_disable:bool):
         self._disable = is_disable
 
-    @status.setter
-    def status(self, status: str):
-        self._set_status(status)
+    @property
+    def execution_environments(self):
+        return self._execution_environments
+
+
 
     def to_dict(self):
         return {
@@ -127,6 +136,21 @@ class SubflowStatus:
                 con.to_dict() for con in self.tasks
             ]
         }
+
+    def completed_task_by_task_name(self, task_name:str, environment_id):
+        for task in self._tasks:
+            if task.name == task_name:
+                ## completed_countに１プラス
+                task.increme_completed_count()
+                ## ステータスへ更新
+                if len(task.execution_environments) == 1:
+                    task.status = TaskStatus.STATUS_DONE
+                else:
+                    continue
+                ## 実行環境IDをリストから削除する。
+                task._execution_environments.remove(environment_id)
+
+
 
 
 class StatusFile(JsonFile):

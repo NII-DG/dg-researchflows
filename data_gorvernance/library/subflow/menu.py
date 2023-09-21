@@ -28,6 +28,7 @@ class SubflowMenu:
     def __init__(self) -> None:
         # サブフロー図
         self.diagram = pn.pane.SVG()
+        self.diagram.width = 1000
         # ラジオボタン
         self.selector = pn.widgets.RadioBoxGroup()
         options = [
@@ -72,12 +73,13 @@ class SubflowMenu:
             root_folder / path_config.DG_WORKING_FOLDER
             / subflow_rel_path / path_config.TASK
         )
+        souce_task_dir = root_folder / path_config.DG_TASK_BASE_DATA_FOLDER
 
         # setup
         subflow = SubFlow(
             working_path, str(status_file), str(diag_file), str(using_task_dir)
         )
-        subflow.setup_tasks(path_config.DG_TASK_BASE_DATA_FOLDER)
+        subflow.setup_tasks(str(souce_task_dir))
 
         # panel activation
         pn.extension()

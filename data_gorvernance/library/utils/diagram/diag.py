@@ -27,7 +27,7 @@ class DiagManager:
     def delete_node(self, node_id):
         pass
 
-    def generate_svg(self, tmp_diag, output, font):
+    def generate_svg(self, tmp_diag: str, output: str, font: str):
         File(str(tmp_diag)).write(self.content)
         diag = tmp_diag
         run(['blockdiag', '-f', font, '-Tsvg', '-o', output, diag], check=True)

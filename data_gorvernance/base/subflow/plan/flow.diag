@@ -11,12 +11,12 @@ blockdiag {
         style = none;
 
         group RF002001 {
-            color = #FFFFCC;
+            color = "#FFFFCC";
             RF002001;
         }
 
         group RF009002 {
-            color = #FFFFCC;
+            color = "#FFFFCC";
             RF009002[stacked];
         }
     }

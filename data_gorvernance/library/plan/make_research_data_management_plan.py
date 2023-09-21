@@ -94,7 +94,7 @@ class DGPlaner():
             # 登録内容を出力する
             registration_msg = f'## {msg_config.get("form", "registration_content")}'
 
-            registration_msg = f"""{msg_config.get("form", "registration_content")}
+            registration_msg = f"""### {msg_config.get("form", "registration_content")}
 
 <hr>
 
@@ -195,7 +195,7 @@ class DGPlaner():
         disable_task_ids_data = self.get_disable_task_ids_on_phase()
         for phase, disable_task_ids in disable_task_ids_data.items():
             # data_gorvernance\base\subflow\<フェーズ>\status.jsonを更新する。
-            status_path = path_config.get_base_subflow_pahse_status_file_path(phase)
+            status_path = os.path.join(self._abs_root_path, path_config.get_base_subflow_pahse_status_file_path(phase))
 
             sf = StatusFile(status_path)
             sub_flow_status:SubflowStatus = sf.read()

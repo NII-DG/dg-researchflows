@@ -9,6 +9,8 @@ import json
 
 from ..utils.config import path_config, message as msg_config
 from ..subflow.status import StatusFile, SubflowStatus, TaskStatus
+from ..subflow.subflow import get_return_sub_flow_menu_relative_url_path
+from ..utils.html.button import create_button
 
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
 script_dir_path = os.path.dirname(__file__)
@@ -223,3 +225,16 @@ class DGPlaner():
         plan_status.completed_task_by_task_name(script_file_name, os.environ["JUPYTERHUB_SERVER_NAME"])
         # 更新内容を記録する。
         sf.write(plan_status)
+
+    @classmethod
+    def return_subflow_menu(cls, working_path:str):
+        sub_flow_menu_relative_url = get_return_sub_flow_menu_relative_url_path(working_path)
+        sub_flow_menu_link_button = pn.pane.HTML()
+        sub_flow_menu_link_button.object = create_button(
+            url=sub_flow_menu_relative_url,
+            msg=msg_config.get('task', 'retun_sub_flow_menu'),
+            button_width='500px'
+        )
+        sub_flow_menu_link_button.width = 500
+        display(sub_flow_menu_link_button)
+        display(Javascript('IPython.notebook.save_checkpoint();'))

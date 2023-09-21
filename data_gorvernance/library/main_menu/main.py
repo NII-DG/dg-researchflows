@@ -140,9 +140,9 @@ class MainMenu():
 
 
 
-    ######################################
-    # イベントリスナーコールバックメソッド #
-    ######################################
+    #######################################################
+    # 機能コントローラー イベントリスナーコールバックメソッド #
+    #######################################################
 
     def callback_menu_tabs(self, event):
         try:
@@ -206,9 +206,9 @@ class MainMenu():
         alert = pn.pane.Alert(msg_config.get('main_menu','guide_select_action'),sizing_mode="stretch_width",alert_type='info')
         self._sub_flow_widget_box.append(alert)
 
-    #########################
+    ############################
     # サブフロー新規作成フォーム #
-    #########################
+    ############################
 
 
 
@@ -226,14 +226,14 @@ class MainMenu():
             value=sub_flow_type_options[msg_config.get('form', 'selector_default')]
             )
         # サブフロー種別(フェーズ)のイベントリスナー
-        self._sub_flow_type_selector.param.watch(self.callback_sub_flow_type_selector, 'value')
+        self._sub_flow_type_selector.param.watch(self.callback_sub_flow_type_selector_for_create_new_sub_flow, 'value')
 
         # サブフロー名称（必須）：テキストフォーム
         self._sub_flow_name_form = pn.widgets.TextInput(
             name=msg_config.get('main_menu', 'sub_flow_name'),
             placeholder='Enter a sub flow name here…', max_length=15)
         # サブフロー名称（必須）：テキストフォームのイベントリスナー
-        self._sub_flow_name_form.param.watch(self.callback_sub_flow_name_form, 'value')
+        self._sub_flow_name_form.param.watch(self.callback_sub_flow_name_form_for_create_new_sub_flow, 'value')
 
         # 親サブフロー種別(フェーズ)オプション
         parent_sub_flow_type_options = self.generate_parent_sub_flow_type_options(sub_flow_type_options[msg_config.get('form', 'selector_default')], research_flow_status)
@@ -244,17 +244,17 @@ class MainMenu():
             value=parent_sub_flow_type_options[msg_config.get('form', 'selector_default')],
             )
         # 親サブフロー種別(フェーズ)のイベントリスナー
-        self._parent_sub_flow_type_selector.param.watch(self.callback_parent_sub_flow_type_selector, 'value')
+        self._parent_sub_flow_type_selector.param.watch(self.callback_parent_sub_flow_type_selector_for_create_new_sub_flow, 'value')
 
         # 親サブフロー選択オプション
-        parent_sub_flow_options = self.generate_parent_sub_flow_options(parent_sub_flow_type_options[msg_config.get('form', 'selector_default')], research_flow_status)
+        parent_sub_flow_options = self.generate_sub_flow_options_for_multi_selector(parent_sub_flow_type_options[msg_config.get('form', 'selector_default')], research_flow_status)
         # 親サブフロー選択 : マルチセレクト
         self._parent_sub_flow_selector = pn.widgets.MultiSelect(
             name=msg_config.get('main_menu', 'parent_sub_flow_name'),
             options=parent_sub_flow_options
             )
         # 親サブフロー選択のイベントリスナー
-        self._parent_sub_flow_selector.param.watch(self.callback_parent_sub_flow_selector, 'value')
+        self._parent_sub_flow_selector.param.watch(self.callback_parent_sub_flow_selector_for_create_new_sub_flow, 'value')
 
         # 新規作成ボタン
         self.submit_button = pn.widgets.Button(disabled=True)
@@ -298,8 +298,8 @@ class MainMenu():
                     pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
         return pahse_options
 
-    def generate_parent_sub_flow_options(self, pahase_seq_number:int, research_flow_status:List[PhaseStatus])->Dict[str, str]:
-        # 親サブフロー選択オプション(表示名をKey、サブフローIDをVauleとする)
+    def generate_sub_flow_options_for_multi_selector(self, pahase_seq_number:int, research_flow_status:List[PhaseStatus])->Dict[str, str]:
+        # サブフロー種別（フェーズ）の順序値に基づいて、そのフェーズのサブフローのマルチセレクト用のオプションを作成する。
         pahse_options = {}
         if pahase_seq_number == 0:
             return pahse_options
@@ -310,31 +310,24 @@ class MainMenu():
                         pahse_options[sf._name] = sf._id
         return pahse_options
 
-    def change_submit_button_init(self, name):
-        self.submit_button.name = name
-        self.submit_button.button_type = 'primary'
-        self.submit_button.button_style = 'solid'
-        self.submit_button.icon = 'plus'
+    def generate_sub_flow_options_for_single_selector(self, pahase_seq_number:int, research_flow_status:List[PhaseStatus])->Dict[str, str]:
+        # サブフロー種別（フェーズ）の順序値に基づいて、そのフェーズのサブフローのシングルセレクト用のオプションを作成する。
+        pahse_options = {}
+        pahse_options[msg_config.get('form', 'selector_default')] = msg_config.get('form', 'selector_default')
+        if pahase_seq_number == 0:
+            return pahse_options
+        else:
+            for phase_status in research_flow_status:
+                if phase_status._seq_number == pahase_seq_number:
+                    for sf in phase_status._sub_flow_data:
+                        pahse_options[sf._name] = sf._id
+        return pahse_options
 
-    def change_submit_button_processing(self, name):
-        self.submit_button.name = name
-        self.submit_button.button_type = 'primary'
-        self.submit_button.button_style = 'outline'
 
-    def change_submit_button_success(self, name):
-        self.submit_button.name = name
-        self.submit_button.button_type = 'success'
-        self.submit_button.button_style = 'solid'
 
-    def change_submit_button_warning(self, name):
-        self.submit_button.name = name
-        self.submit_button.button_type = 'warning'
-        self.submit_button.button_style = 'solid'
-
-    def change_submit_button_error(self, name):
-        self.submit_button.name = name
-        self.submit_button.button_type = 'danger'
-        self.submit_button.button_style = 'solid'
+    ###############################################################
+    # サブフロー新規作成フォーム イベントリスナーコールバックメソッド #
+    ###############################################################
 
     def callback_create_new_sub_flow(self, event):
         # 新規作成ボタンコールバックファンクション
@@ -422,7 +415,7 @@ class MainMenu():
             shutil.rmtree(dect_dir_path)
             raise
 
-    def callback_sub_flow_type_selector(self, event):
+    def callback_sub_flow_type_selector_for_create_new_sub_flow(self, event):
         # サブフロー種別(フェーズ):シングルセレクトコールバックファンクション
         try:
             # リサーチフローステータス管理情報の取得
@@ -441,7 +434,7 @@ class MainMenu():
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
 
-    def callback_sub_flow_name_form(self, event):
+    def callback_sub_flow_name_form_for_create_new_sub_flow(self, event):
         # サブフロー名称（必須）：テキストフォームコールバックファンクション
         try:
             # 新規作成ボタンのボタンの有効化チェック
@@ -451,7 +444,7 @@ class MainMenu():
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
 
-    def callback_parent_sub_flow_type_selector(self, event):
+    def callback_parent_sub_flow_type_selector_for_create_new_sub_flow(self, event):
         # 親サブフロー種別(フェーズ)のコールバックファンクション
         try:
             # リサーチフローステータス管理情報の取得
@@ -461,7 +454,7 @@ class MainMenu():
             if selected_value is None:
                 raise Exception('Parent Sub Flow Type Selector has None')
 
-            parent_sub_flow_options = self.generate_parent_sub_flow_options(selected_value, research_flow_status)
+            parent_sub_flow_options = self.generate_sub_flow_options_for_multi_selector(selected_value, research_flow_status)
             self._parent_sub_flow_selector.options = parent_sub_flow_options
             # 新規作成ボタンのボタンの有効化チェック
             self.change_diable_creating_button()
@@ -470,7 +463,7 @@ class MainMenu():
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
 
-    def callback_parent_sub_flow_selector(self, event):
+    def callback_parent_sub_flow_selector_for_create_new_sub_flow(self, event):
         try:
             # 新規作成ボタンのボタンの有効化チェック
             self.change_diable_creating_button()
@@ -478,6 +471,8 @@ class MainMenu():
             self._err_output.clear()
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
+
+
 
 
     def change_diable_creating_button(self):
@@ -539,6 +534,39 @@ class MainMenu():
         self._sub_flow_widget_box.clear()
         self._sub_flow_widget_box.append(alert)
 
+        # リサーチフローステータス管理情報の取得
+        research_flow_status = ResearchFlowStatus.load_from_json(self._research_flow_status_file_path)
+
+        # サブフロー種別(フェーズ)オプション
+        sub_flow_type_options = self.generate_sub_flow_type_options(research_flow_status)
+        # サブフロー種別(フェーズ):シングルセレクト
+        self._sub_flow_type_selector = pn.widgets.Select(
+            name=msg_config.get('main_menu', 'sub_flow_type'),
+            options=sub_flow_type_options,
+            value=sub_flow_type_options[msg_config.get('form', 'selector_default')]
+            )
+        # サブフロー種別(フェーズ)のイベントリスナー
+        self._sub_flow_type_selector.param.watch(self.callback_sub_flow_type_selector, 'value')
+
+        # サブフロー名:シングルセレクト
+        parent_sub_flow_options = self.generate_sub_flow_options_for_multi_selector(sub_flow_type_options[msg_config.get('form', 'selector_default')], research_flow_status)
+        # 親サブフロー選択 : マルチセレクト
+        self._parent_sub_flow_selector = pn.widgets.MultiSelect(
+            name=msg_config.get('main_menu', 'parent_sub_flow_name'),
+            options=parent_sub_flow_options
+            )
+        # 親サブフロー選択のイベントリスナー
+        self._parent_sub_flow_selector.param.watch(self.callback_parent_sub_flow_selector, 'value')
+
+
+
+        # サブフロー名称（必須）：テキストフォーム
+        self._sub_flow_name_form = pn.widgets.TextInput(
+            name=msg_config.get('main_menu', 'sub_flow_name'),
+            placeholder='Enter a sub flow name here…', max_length=15)
+        # サブフロー名称（必須）：テキストフォームのイベントリスナー
+        self._sub_flow_name_form.param.watch(self.callback_sub_flow_name_form, 'value')
+
 
 
     #########################
@@ -551,8 +579,9 @@ class MainMenu():
         self._sub_flow_widget_box.clear()
         self._sub_flow_widget_box.append(alert)
 
-
     def update_research_flow_image(self):
+        """サブフロー関係図の更新
+        """
         try:
             self._research_flow_image.object = self.reserch_flow_status_operater.get_svg_of_research_flow_status()
         except Exception as e:
@@ -560,6 +589,32 @@ class MainMenu():
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
             raise
+
+    def change_submit_button_init(self, name):
+        self.submit_button.name = name
+        self.submit_button.button_type = 'primary'
+        self.submit_button.button_style = 'solid'
+        self.submit_button.icon = 'plus'
+
+    def change_submit_button_processing(self, name):
+        self.submit_button.name = name
+        self.submit_button.button_type = 'primary'
+        self.submit_button.button_style = 'outline'
+
+    def change_submit_button_success(self, name):
+        self.submit_button.name = name
+        self.submit_button.button_type = 'success'
+        self.submit_button.button_style = 'solid'
+
+    def change_submit_button_warning(self, name):
+        self.submit_button.name = name
+        self.submit_button.button_type = 'warning'
+        self.submit_button.button_style = 'solid'
+
+    def change_submit_button_error(self, name):
+        self.submit_button.name = name
+        self.submit_button.button_type = 'danger'
+        self.submit_button.button_style = 'solid'
 
 
 

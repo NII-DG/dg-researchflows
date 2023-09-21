@@ -66,7 +66,7 @@ class SubFlow:
         self.task_dir = using_task_dir
 
     def setup_tasks(self, souce_task_dir: str):
-        if os.path.isdir(self.task_dir):
+        if os.path.isdir(souce_task_dir):
             for task in self.subflow_status.tasks:
                 self._copy_file_by_name(task.name + '.ipynb', souce_task_dir, self.task_dir)
 

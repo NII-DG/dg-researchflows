@@ -214,10 +214,6 @@ class DGPlaner():
     @classmethod
     def completed_task(cls, working_path:str):
         # タスク実行の完了情報を研究準備のサブフローステータス管理JSONに書き込む
-        # 更新対象タスク
-        # id = RF002001
-        # 更新項目
-        # completed_count, status, execution_environments
         dg_planer = DGPlaner(working_path)
 
         sf = StatusFile(dg_planer._plan_sub_flow_status_file_path)

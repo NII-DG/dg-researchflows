@@ -137,6 +137,12 @@ class SubflowStatus:
             ]
         }
 
+    def get_task_by_task_id(self, id:str)->TaskStatus:
+        for task in self._tasks:
+            if task.id == id:
+                return task
+        raise Exception(f'Not Found task status by {id}')
+
     def doing_task_by_task_name(self, task_name:str, environment_id:str):
         for task in self._tasks:
             if task.name == task_name:
@@ -146,6 +152,7 @@ class SubflowStatus:
 
 
     def completed_task_by_task_name(self, task_name:str, environment_id:str):
+        # 対象タスクのステータスを完了に更新する。
         for task in self._tasks:
             if task.name == task_name:
                 ## completed_countに１プラス
@@ -157,6 +164,24 @@ class SubflowStatus:
                     continue
                 ## 実行環境IDをリストから削除する。
                 task._execution_environments.remove(environment_id)
+
+        # 上記の更新を受け、下流の実行可能状態を更新する。
+        for task in self._tasks:
+            if len(task.dependent_task_ids) > 0 and task.status == TaskStatus.STATUS_UNFEASIBLE:
+                # 上流依存タスクを持ち、実行不可状態タスクのみ処理する。
+                is_executable_state = True
+                for dependent_task_id in task.dependent_task_ids:
+                    upstream_task = self.get_task_by_task_id(dependent_task_id)
+                    if upstream_task.completed_count <= 0:
+                        # 一度も実行されていない
+                        is_executable_state = False
+                        break
+                if is_executable_state:
+                    #実行可能の場合、ステータスを実行不可から未実行に変更
+                    task.status = TaskStatus.STATUS_UNEXECUTED
+            else:
+                continue
+
 
 
 

@@ -51,6 +51,27 @@ def get_base_subflow_pahse_status_file_path(pahse:str)->str:
     # data_gorvernance\base\subflow\<フェーズ>\status.jsonを更新する。
     return os.path.join(DG_SUB_FLOW_BASE_DATA_FOLDER, pahse, STATUS_JSON)
 
+def get_sub_flow_menu_path(phase:str, subflow_id:str='')->str:
+    """各サブフロー種別（フェーズ）のサブフローメニューNotebookへのパスを取得する
+
+    Args:
+        phase (str): サブフロー種別（フェーズ）
+
+        subflow_id (str, optional): サブフローID. Defaults to ''.
+
+    Returns:
+        str : サブフローメニューNotebookへのパス
+
+        phase, subflow_idに意味ある値が与えられた場合、researchflow/{:phase}/{:subflow_id}/menu.ipynbを返却する
+
+        phaseのみに意味ある値が与えられた場合、researchflow/{:phase}/menu.ipynbを返却する
+    """
+
+    if len(subflow_id) > 0:
+        return os.path.join(RESEARCHFLOW, phase, subflow_id, MENU_NOTEBOOK)
+    else:
+        return os.path.join(RESEARCHFLOW, phase, MENU_NOTEBOOK)
+
 
 # other method
 def get_prepare_file_name_list_for_subflow()->List[str]:

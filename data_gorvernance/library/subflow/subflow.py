@@ -39,12 +39,22 @@ def get_subflow_type_and_id(working_file_path: str):
         abs_root = path_config.get_abs_root_form_working_dg_file_path(working_file_path)
         id_list = ResearchFlowStatusOperater(
                     path_config.get_research_flow_status_file_path(abs_root)
-                ).get_subflow_id(subflow_type)
+                ).get_subflow_ids(subflow_type)
         dir_name = parts[index + 2]
         if dir_name in id_list:
             subflow_id = dir_name
 
     return subflow_type, subflow_id
+
+def get_return_sub_flow_menu_relative_url_path(working_file_path: str)->str:
+    subflow_type, subflow_id = get_subflow_type_and_id(working_file_path)
+    if subflow_id is None:
+        menu_path = path_config.get_sub_flow_menu_path(subflow_type)
+        return os.path.join('../../../../../..', menu_path)
+    else:
+        menu_path = path_config.get_sub_flow_menu_path(subflow_type, subflow_id)
+        return os.path.join('../../../../../../..', menu_path)
+
 
 
 class SubFlow:

@@ -5,7 +5,7 @@
             "id": "RF002001",
             "name": "make_research_data_management_plan",
             "is_multiple": false,
-            "is_required": false,
+            "is_required": true,
             "completed_count": 0,
             "dependent_task_ids": [],
             "status": "unexecuted",

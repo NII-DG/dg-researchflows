@@ -88,8 +88,8 @@ class SubflowMenu:
             tmp_diag = Path(workdir) / 'skeleton.diag'
             skeleton = Path(workdir) / 'skeleton.svg'
             subflow.generate(
-                svg_path=skeleton,
-                tmp_diag=tmp_diag,
+                svg_path=str(skeleton),
+                tmp_diag=str(tmp_diag),
                 font=str(root_folder / '.fonts/ipag.ttf')
             )
             subflow_menu.diagram.object = skeleton

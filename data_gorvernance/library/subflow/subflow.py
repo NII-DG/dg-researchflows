@@ -46,6 +46,7 @@ def get_subflow_type_and_id(working_file_path: str):
 
     return subflow_type, subflow_id
 
+
 def get_return_sub_flow_menu_relative_url_path(working_file_path: str)->str:
     subflow_type, subflow_id = get_subflow_type_and_id(working_file_path)
     if subflow_id is None:
@@ -54,7 +55,6 @@ def get_return_sub_flow_menu_relative_url_path(working_file_path: str)->str:
     else:
         menu_path = path_config.get_sub_flow_menu_path(subflow_type, subflow_id)
         return os.path.join('../../../../../../..', menu_path)
-
 
 
 class SubFlow:
@@ -79,11 +79,11 @@ class SubFlow:
                 if not os.path.isfile(destination_path):
                     file.copy_file(source_path, destination_path)
 
-    def generate(self, svg_path, tmp_diag, font, display_all=True):
+    def generate(self, svg_path: str, tmp_diag: str, font: str, display_all=True):
         # tmp_diagは暫定的なもの。将来的にはself.diagを利用できるようにする
         self._update_diag(display_all)
         self.diag.generate_svg(tmp_diag, svg_path, font)
-        add_link(str(svg_path), self.current_path, self.task_dir)
+        add_link(svg_path, self.current_path, self.task_dir)
 
     def _update_diag(self, display_all=True):
         for task in self.subflow_status.tasks:

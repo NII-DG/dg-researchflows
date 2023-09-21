@@ -1,0 +1,16 @@
+{
+    "is_completed": false,
+    "tasks": [
+        {
+            "id": "dummy",
+            "name": "dummy",
+            "is_multiple": false,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "disabled": false
+        }
+    ]
+}

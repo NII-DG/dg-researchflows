@@ -41,7 +41,7 @@ def get_subflow_type_and_id(working_file_path: str):
         abs_root = path_config.get_abs_root_form_working_dg_file_path(working_file_path)
         id_list = ResearchFlowStatusOperater(
                     path_config.get_research_flow_status_file_path(abs_root)
-                ).get_subflow_id(subflow_type)
+                ).get_subflow_ids(subflow_type)
         dir_name = parts[index + 2]
         if dir_name in id_list:
             subflow_id = dir_name

@@ -4,7 +4,7 @@ from .status import StatusFile, TaskStatus
 from ..utils import file
 from ..utils.diagram import DiagManager, add_link
 from ..utils.config import path_config
-from ..main_menu import ResearchFlowStatusOperater
+from ..main_menu.research_flow_status import ResearchFlowStatusOperater
 
 
 def get_subflow_type_and_id(working_file_path: str):

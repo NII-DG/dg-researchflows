@@ -1,9 +1,7 @@
 import os
-from pathlib import Path
 
-from .status import StatusFile, SubflowStatus, TaskStatus
+from .status import StatusFile, TaskStatus
 from ..utils import file
-from ..utils.file import File
 from ..utils.diagram import DiagManager, add_link
 from ..utils.config import path_config
 from ..main_menu import ResearchFlowStatusOperater

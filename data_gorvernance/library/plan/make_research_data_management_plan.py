@@ -134,16 +134,8 @@ class DGPlaner():
         # 研究準備のサブフローステータス管理JSONの更新
         sf = StatusFile(dg_planer._plan_sub_flow_status_file_path)
         plan_status: SubflowStatus = sf.read()
-        for task in plan_status.tasks:
-            if task.name == script_file_name:
-                # 更新タスク情報（make_research_data_management_plan）
-                ## status を実行中ステータスへ更新
-                task.status = TaskStatus.STATUS_DOING
-                ## 実行環境IDを記録
-                execution_environment_id = os.environ["JUPYTERHUB_SERVER_NAME"]
-                task.add_execution_environments(execution_environment_id)
-            else:
-                continue
+        # 実行ステータスを記録する。
+        plan_status.doing_task_by_task_name(script_file_name, os.environ["JUPYTERHUB_SERVER_NAME"])
         # 更新内容を記録する。
         sf.write(plan_status)
 

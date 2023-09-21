@@ -137,7 +137,15 @@ class SubflowStatus:
             ]
         }
 
-    def completed_task_by_task_name(self, task_name:str, environment_id):
+    def doing_task_by_task_name(self, task_name:str, environment_id:str):
+        for task in self._tasks:
+            if task.name == task_name:
+                ## status を実行中ステータスへ更新
+                task.status = TaskStatus.STATUS_DOING
+                task.add_execution_environments(environment_id)
+
+
+    def completed_task_by_task_name(self, task_name:str, environment_id:str):
         for task in self._tasks:
             if task.name == task_name:
                 ## completed_countに１プラス

@@ -18,18 +18,18 @@ class DiagManager:
     def change_node_property(self, node_id: str, key:str, value: str):
         find = f'{node_id}['
         replace = f'{node_id}[{key} = {value}, '
-        update_content = self.content.replace(find, replace)
+        update_content = self.content.replace(find, replace, 1)
         if update_content == self.content:
             find = f'{node_id}'
             replace = f'{node_id}[{key} = {value}] '
-            update_content = self.content.replace(find, replace)
+            update_content = self.content.replace(find, replace, 1)
         self.content = update_content
 
     def update_node_color(self, node_id: str, color: str):
-        self.change_node_property(node_id, "color", color)
+        self.change_node_property(node_id, "color", f'"{color}"')
 
     def update_node_icon(self, node_id: str, path: str):
-        self.change_node_property(node_id, "icon", path)
+        self.change_node_property(node_id, "icon", f'"{path}"')
 
     def update_node_style(self, node_id, style):
         self.change_node_property(node_id, "style", style)

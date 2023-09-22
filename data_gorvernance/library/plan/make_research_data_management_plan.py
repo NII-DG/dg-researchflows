@@ -89,8 +89,6 @@ class DGPlaner(TaskDirector):
             self.update_plan_data(plan_data)
 
             # 登録内容を出力する
-            registration_msg = f'## {msg_config.get("form", "registration_content")}'
-
             registration_msg = f"""### {msg_config.get("form", "registration_content")}
 
 <hr>
@@ -109,7 +107,7 @@ class DGPlaner(TaskDirector):
 
     def get_msg_disable_or_able(self, b:bool)->str:
         if b:
-            return msg_config.get('DEFAULT', 'able')
+            return f'<span style="color: red; ">**{msg_config.get("DEFAULT", "able")}**</span>'
         else:
             return msg_config.get('DEFAULT', 'disable')
 

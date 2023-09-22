@@ -5,7 +5,8 @@ from .subflow.status import StatusFile, SubflowStatus
 import panel as pn
 from panel.pane import HTML
 from .utils.html.button import create_button
-from IPython.display import display, Javascript
+from IPython.display import display
+from IPython.core.display import Javascript
 
 class TaskDirector():
 

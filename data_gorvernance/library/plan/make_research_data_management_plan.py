@@ -154,6 +154,7 @@ class DGPlaner(TaskDirector):
         return disable_task_ids_on_phase
 
     def disable_task_by_phase(self):
+        """各サブフローの各タスクステータスのdisabledを更新"""
         disable_task_ids_data = self.get_disable_task_ids_on_phase()
         for phase, disable_task_ids in disable_task_ids_data.items():
             # data_gorvernance\base\subflow\<フェーズ>\status.jsonを更新する。

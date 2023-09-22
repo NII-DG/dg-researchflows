@@ -68,8 +68,10 @@ def _find_matching_notebook(notebooks, title, task_dict):
         str: ノートブック名
     """
     # IDからノートブック名(拡張子無し)を取得
-    title = task_dict[title]
+    title = task_dict.get(title, "")
     # ノートブック名が一致するものがあれば返す
+    if not title:
+        return
     for nb in notebooks:
         if nb.startswith(title):
             return nb

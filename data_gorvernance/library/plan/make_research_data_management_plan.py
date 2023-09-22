@@ -11,7 +11,7 @@ from ..utils.config import path_config, message as msg_config
 from ..subflow.status import StatusFile, SubflowStatus, TaskStatus
 from ..subflow.subflow import get_return_sub_flow_menu_relative_url_path, get_subflow_type_and_id
 from ..utils.html.button import create_button
-from ..task_interface import TaskInterface
+from ..task_director import TaskDirector
 
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
 script_dir_path = os.path.dirname(__file__)
@@ -21,7 +21,7 @@ data_governance_customize_file = p.joinpath('..', 'data/data_governance_customiz
 
 
 
-class DGPlaner(TaskInterface):
+class DGPlaner(TaskDirector):
     """フェーズ：研究準備、タスク：研究データ管理計画を立てるのコントローラークラス"""
 
     def __init__(self, working_path:str) -> None:
@@ -127,18 +127,18 @@ class DGPlaner(TaskInterface):
     def generateFormScetion(cls, working_path:str):
         """フォームセクション用"""
 
-        dg_planer = DGPlaner(working_path)
+        task_director = DGPlaner(working_path)
         # タスク開始による研究準備のサブフローステータス管理JSONの更新
-        dg_planer.doing_task(script_file_name)
+        task_director.doing_task(script_file_name)
 
         # フォーム定義
-        dg_planer.define_form()
+        task_director.define_form()
 
         # フォーム表示
         pn.extension()
         form_section = pn.WidgetBox()
-        form_section.append(dg_planer._form_box)
-        form_section.append(dg_planer._msg_output)
+        form_section.append(task_director._form_box)
+        form_section.append(task_director._msg_output)
         display(form_section)
 
     def get_disable_task_ids_on_phase(self)->dict[str, list[str]]:
@@ -197,16 +197,16 @@ class DGPlaner(TaskInterface):
 
     @classmethod
     def customize_research_flow(cls, working_path:str):
-        dg_planer = DGPlaner(working_path)
+        task_director = DGPlaner(working_path)
         # タスクの無効化処理
-        dg_planer.disable_task_by_phase()
+        task_director.disable_task_by_phase()
 
     @classmethod
     def completed_task(cls, working_path:str):
 
-        dg_planer = DGPlaner(working_path)
+        task_director = DGPlaner(working_path)
         # タスク実行の完了情報を研究準備のサブフローステータス管理JSONに書き込む
-        dg_planer.done_task(script_file_name)
+        task_director.done_task(script_file_name)
 
     @classmethod
     def return_subflow_menu(cls, working_path:str):

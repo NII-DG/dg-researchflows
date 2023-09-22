@@ -1,13 +1,20 @@
 from .utils.config import path_config, message as msg_config
 from .subflow.subflow import get_return_sub_flow_menu_relative_url_path, get_subflow_type_and_id
 import os
-from .subflow.status import StatusFile, SubflowStatus, TaskStatus
+from .subflow.status import StatusFile, SubflowStatus
 import panel as pn
 from .utils.html.button import create_button
 
-class TaskInterface():
+class TaskDirector():
 
     def __init__(self, working_path:str) -> None:
+        """TaskInterface コンストラクタ
+
+        Notebookファイルのオペレーションするための共通クラス
+
+        Args:
+            working_path (str): [実行Notebookのファイルパス]
+        """
         # 実行Notebookのファイルパス
         self.working_path = working_path
         # 絶対rootディレクトリを取得・設定する

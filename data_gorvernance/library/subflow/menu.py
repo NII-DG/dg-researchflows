@@ -16,10 +16,11 @@ def access_main_menu(working_file: str):
         path_config.get_abs_root_form_working_dg_file_path(working_file)
     )
     main_menu = str(root_folder / path_config.MAIN_MENU_PATH)
-    file.relative_path(main_menu, os.path.dirname(working_file))
+
+    link = file.relative_path(main_menu, os.path.dirname(working_file))
     display(HTML(
         html_button.create_button(
-            url=main_menu,
+            url=f'{link}?init_nb=true',
             msg=message.get('subflow_menu', 'access_main_menu'),
         )
     ))

@@ -47,7 +47,8 @@ class DGPlaner(TaskDirector):
         for id in self.get_data_governance_customize_ids():
             check_book = pn.widgets.Checkbox(name=msg_config.get('data_governance_customize_property', id))
             self._checkbox_list.append(check_book)
-        self.submit_button = pn.widgets.Button(name=msg_config.get('form', 'submit_button'))
+        self.submit_button = pn.widgets.Button()
+        self.change_submit_button_init(name=msg_config.get('form', 'submit_select'))
         self.submit_button.on_click(self.callback_submit_input)
         # フォームボックスを更新
         self.update_form_box(
@@ -88,8 +89,6 @@ class DGPlaner(TaskDirector):
             self.update_plan_data(plan_data)
 
             # 登録内容を出力する
-            registration_msg = f'## {msg_config.get("form", "registration_content")}'
-
             registration_msg = f"""### {msg_config.get("form", "registration_content")}
 
 <hr>
@@ -99,6 +98,7 @@ class DGPlaner(TaskDirector):
             self._msg_output.clear()
             alert = pn.pane.Alert(registration_msg, sizing_mode="stretch_width",alert_type='info')
             self._msg_output.append(alert)
+            self.change_submit_button_success(msg_config.get('form', 'accepted'))
 
         except Exception as e:
             self._msg_output.clear()
@@ -107,7 +107,7 @@ class DGPlaner(TaskDirector):
 
     def get_msg_disable_or_able(self, b:bool)->str:
         if b:
-            return msg_config.get('DEFAULT', 'able')
+            return f'<span style="color: red; ">**{msg_config.get("DEFAULT", "able")}**</span>'
         else:
             return msg_config.get('DEFAULT', 'disable')
 
@@ -168,6 +168,31 @@ class DGPlaner(TaskDirector):
                     task.disable = True
             sf.write(sub_flow_status)
 
+    def change_submit_button_init(self, name):
+        self.submit_button.name = name
+        self.submit_button.button_type = 'primary'
+        self.submit_button.button_style = 'solid'
+        self.submit_button.icon = 'settings-plus'
+
+    def change_submit_button_processing(self, name):
+        self.submit_button.name = name
+        self.submit_button.button_type = 'primary'
+        self.submit_button.button_style = 'outline'
+
+    def change_submit_button_success(self, name):
+        self.submit_button.name = name
+        self.submit_button.button_type = 'success'
+        self.submit_button.button_style = 'solid'
+
+    def change_submit_button_warning(self, name):
+        self.submit_button.name = name
+        self.submit_button.button_type = 'warning'
+        self.submit_button.button_style = 'solid'
+
+    def change_submit_button_error(self, name):
+        self.submit_button.name = name
+        self.submit_button.button_type = 'danger'
+        self.submit_button.button_style = 'solid'
 
     @classmethod
     def generateFormScetion(cls, working_path:str):
@@ -204,13 +229,8 @@ class DGPlaner(TaskDirector):
 
     @classmethod
     def return_subflow_menu(cls, working_path:str):
-        sub_flow_menu_relative_url = get_return_sub_flow_menu_relative_url_path(working_path)
-        sub_flow_menu_link_button = pn.pane.HTML()
-        sub_flow_menu_link_button.object = create_button(
-            url=sub_flow_menu_relative_url,
-            msg=msg_config.get('task', 'retun_sub_flow_menu'),
-            button_width='500px'
-        )
-        sub_flow_menu_link_button.width = 500
+        pn.extension()
+        task_director = DGPlaner(working_path)
+        sub_flow_menu_link_button  = task_director.get_subflow_menu_button_object()
         display(sub_flow_menu_link_button)
         display(Javascript('IPython.notebook.save_checkpoint();'))

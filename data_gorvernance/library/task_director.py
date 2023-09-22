@@ -65,7 +65,7 @@ class TaskDirector():
         sub_flow_menu_relative_url = get_return_sub_flow_menu_relative_url_path(self.nb_working_file_path)
         sub_flow_menu_link_button = pn.pane.HTML()
         sub_flow_menu_link_button.object = create_button(
-            url=sub_flow_menu_relative_url,
+            url=f'{sub_flow_menu_relative_url}?init_nb=true',
             msg=msg_config.get('task', 'retun_sub_flow_menu'),
             button_width=f'{button_width}px'
         )

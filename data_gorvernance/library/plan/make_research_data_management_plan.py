@@ -153,46 +153,6 @@ class DGPlaner(TaskDirector):
 
         return disable_task_ids_on_phase
 
-    # def get_disable_task_ids_on_phase(self)->dict[str, list[str]]:
-    #     """無効化（非表示：任意タスク）のタスクIDをフェーズごとに集計する"""
-
-    #     # α設定JSON定義書の設定値を取得
-    #     plan_data:dict[str, list[dict]] = self.get_plan_data()
-
-    #     # DGカスタマイズJSONデータを取得する
-    #     data_governance_customize_data = self.get_data_governance_customize_data()
-
-
-    #     # 無効化タスクIDデータ
-    #     disable_task_ids_on_phase:dict[str, list[str]] = {}
-    #     # 無効化タスクIDデータの初期化
-    #     for phase in data_governance_customize_data[0]['customize'].keys():
-    #         if phase != 'plan':
-    #             disable_task_ids_on_phase[phase] = []
-    #         else:
-    #             continue
-
-
-    #     # DGカスタマイズプロパティの設定値とDGカスタマイズJSONデータから無効にするタスクIDを取得する
-    #     for plan_property in plan_data['governance_plan']:
-    #         if plan_property['is_enabled'] == False:
-    #             # 無効なDGカスタマイズプロパティ（α項目）のIDを取得する
-    #             alpha_id = plan_property['id']
-    #             for customize_rule_set in data_governance_customize_data:
-    #                 if customize_rule_set['id'] == alpha_id:
-    #                     customize_rule:dict = customize_rule_set['customize']
-    #                     for phase, rule in customize_rule.items():
-    #                         if phase != 'plan':
-    #                             disable_task_ids_on_phase[phase].extend(rule['task_ids'])
-    #                         else:
-    #                             continue
-    #                 else:
-    #                     continue
-    #         else:
-    #             continue
-
-    #     return disable_task_ids_on_phase
-
     def disable_task_by_phase(self):
         disable_task_ids_data = self.get_disable_task_ids_on_phase()
         for phase, disable_task_ids in disable_task_ids_data.items():

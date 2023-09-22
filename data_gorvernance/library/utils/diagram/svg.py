@@ -67,9 +67,9 @@ def _find_matching_notebook(notebooks, title, task_dict):
     Returns:
         str: ノートブック名
     """
-    # IDをノートブック名(拡張子無し)に変換
+    # IDからノートブック名(拡張子無し)を取得
     title = task_dict[title]
-    # titleと一致するものがあれば返す
+    # ノートブック名が一致するものがあれば返す
     for nb in notebooks:
         if nb.startswith(title):
             return nb
@@ -93,7 +93,7 @@ def parse_headers(nb_path: Path):
         (' '.join(line0.split()[1:]),
             line1.split("。")[0] if line1 is not None else '')
         for (line0, line1) in zip_longest(lines, lines[1:])
-        if line0.startswith('# ') or line0.startswith('## ') and ("## 共通メニュー" not in line0)
+        if line0.startswith('# ') or line0.startswith('## ')
     ]
     # 最初の見出しはtitle, 残りはheadersとして返す
     return {
@@ -103,12 +103,13 @@ def parse_headers(nb_path: Path):
             'summary': headers[0][1],
         },
         'headers': [
-            {
+            ({
                 'text': text,
                 'summary': (
                     summary if not re.match(r'(?:#|!\[)', summary) else ''),
             }
             for (text, summary) in headers[1:]
+            if text[0].isdigit())
         ],
     }
 

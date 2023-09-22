@@ -85,8 +85,6 @@ class TaskStatus:
     def execution_environments(self):
         return self._execution_environments
 
-
-
     def to_dict(self):
         return {
             self.__ID: self._id,
@@ -119,16 +117,6 @@ class SubflowStatus:
     def is_completed(self, is_completed: bool):
         self._is_completed = is_completed
 
-    def update_task_enabled(self):
-        """タスクの利用可能状態を更新する"""
-        count_dict = {con.id: con.completed_count for con in self.tasks}
-        for con in self.tasks:
-            if con.status != con.STATUS_UNFEASIBLE:
-                continue
-            is_all_completed = all(count_dict.get(id, 0) >= 1 for id in con.dependent_task_ids)
-            if is_all_completed:
-                con.status = con.STATUS_UNEXECUTED
-
     def to_dict(self):
         return {
             _IS_COMPLETED : self.is_completed,
@@ -149,7 +137,6 @@ class SubflowStatus:
                 ## status を実行中ステータスへ更新
                 task.status = TaskStatus.STATUS_DOING
                 task.add_execution_environments(environment_id)
-
 
     def completed_task_by_task_name(self, task_name:str, environment_id:str):
         # 対象タスクのステータスを完了に更新する。
@@ -181,9 +168,6 @@ class SubflowStatus:
                     task.status = TaskStatus.STATUS_UNEXECUTED
             else:
                 continue
-
-
-
 
 
 class StatusFile(JsonFile):

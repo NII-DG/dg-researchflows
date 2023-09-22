@@ -4,7 +4,8 @@ import xml.etree.ElementTree as ET
 from tempfile import TemporaryDirectory
 
 import panel as pn
-from IPython.display import display, Javascript, HTML
+from IPython.display import display
+from IPython.core.display import Javascript, HTML
 
 from .subflow import SubFlow, get_subflow_type_and_id
 from ..utils.config import path_config, message

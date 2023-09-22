@@ -2,7 +2,8 @@ import shutil
 from typing import Dict, List
 from ..utils.config import path_config, message as msg_config
 from ..utils.html import button as html_button
-from IPython.display import display, Javascript
+from IPython.display import display
+from IPython.core.display import Javascript
 from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus
 from ..main_menu.research_flow_status import ResearchFlowStatusOperater
 import traceback

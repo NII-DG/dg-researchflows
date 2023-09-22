@@ -3,7 +3,7 @@ import traceback
 from typing import Any, List
 import panel as pn
 from panel.widgets import Checkbox
-from IPython.display import display, Javascript
+from IPython.display import display
 from pathlib import Path
 import json
 

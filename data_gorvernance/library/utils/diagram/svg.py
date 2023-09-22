@@ -146,7 +146,7 @@ def notebooks_toc(nb_dir):
 def _embed_info_in_one_rect(elem, nb_headers, nb_name, current_dir):
     headers = nb_headers[nb_name]
     nb_file = nb_headers[nb_name]['path']
-    nb_file = file.relative_path(nb_file, current_dir)
+    nb_file = file.relative_path(nb_file, current_dir).replace("../", "./../")
     rect_elem = elem.getprevious()
     rect = (
         (int(rect_elem.attrib['x']), int(rect_elem.attrib['y'])),

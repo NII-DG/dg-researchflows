@@ -9,6 +9,7 @@ from IPython.display import display, Javascript, HTML
 from .subflow import SubFlow, get_subflow_type_and_id
 from ..utils.config import path_config, message
 from ..utils.html import button as html_button
+from ..utils.file import File
 
 
 def access_main_menu(working_path: str):
@@ -28,7 +29,7 @@ class SubflowMenu:
 
     def __init__(self) -> None:
         # サブフロー図
-        self.diagram = pn.pane.SVG()
+        self.diagram = pn.pane.HTML()
         # ラジオボタン
         self.selector = pn.widgets.RadioBoxGroup()
         options = [
@@ -49,6 +50,10 @@ class SubflowMenu:
 
     def select_flow(self, event):
         pass
+
+    def get_contents(self, svg_file_path: str):
+        return File(svg_file_path).read()
+
 
     def get_svg_size(self, svg_file_path: str):
         """svgの画像の横幅を返す
@@ -124,7 +129,7 @@ class SubflowMenu:
                 tmp_diag=str(tmp_diag),
                 font=str(root_folder / '.fonts/ipag.ttf')
             )
-            subflow_menu.diagram.object = skeleton
+            subflow_menu.diagram.object = subflow_menu.get_contents(str(skeleton))
             subflow_menu.diagram.width = subflow_menu.get_svg_size(str(skeleton))
             display(subflow_menu.diagram)
         display(Javascript('IPython.notebook.save_checkpoint();'))

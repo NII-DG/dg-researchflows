@@ -4,6 +4,7 @@
             "id": "A001",
             "customize": {
                 "plan": {
+                    "task_ids": [],
                     "verification_ids": []
                 },
                 "experiment": {
@@ -38,6 +39,7 @@
             "id": "A002",
             "customize": {
                 "plan": {
+                    "task_ids": [],
                     "verification_ids": []
                 },
                 "experiment": {
@@ -76,6 +78,7 @@
             "id": "A003",
             "customize": {
                 "plan": {
+                    "task_ids": [],
                     "verification_ids": []
                 },
                 "experiment": {
@@ -108,6 +111,7 @@
             "id": "A004",
             "customize": {
                 "plan": {
+                    "task_ids": [],
                     "verification_ids": [
                         "V012001"
                     ]
@@ -148,6 +152,7 @@
             "id": "A005",
             "customize": {
                 "plan": {
+                    "task_ids": [],
                     "verification_ids": []
                 },
                 "experiment": {

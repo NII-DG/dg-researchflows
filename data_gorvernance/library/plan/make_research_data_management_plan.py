@@ -9,9 +9,10 @@ import json
 
 from ..utils.config import path_config, message as msg_config
 from ..subflow.status import StatusFile, SubflowStatus, TaskStatus
-from ..subflow.subflow import get_return_sub_flow_menu_relative_url_path, get_subflow_type_and_id
+from ..subflow.subflow import get_return_sub_flow_menu_relative_url_path
 from ..utils.html.button import create_button
 from ..task_director import TaskDirector
+from ..utils.dg_customize_config import get_dg_customize_config
 
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
 script_dir_path = os.path.dirname(__file__)
@@ -122,6 +123,51 @@ class DGPlaner(TaskDirector):
     def get_data_governance_customize_ids(self)->List:
         return [p['id'] for p in self.get_data_governance_customize_data()]
 
+    def get_disable_task_ids_on_phase(self)->dict[str, list[str]]:
+        """無効化（非表示：任意タスク）のタスクIDをフェーズごとに集計する"""
+        # α設定JSON定義書の設定値を取得
+        plan_data = self.get_plan_data()
+        # DGカスタマイズ定義データを取得する
+        dg_customize_config = get_dg_customize_config()
+
+        # 無効化タスクIDデータ
+        disable_task_ids_on_phase:dict[str, list[str]] = {}
+        # 無効化タスクIDデータの初期化
+        for phase in dg_customize_config[0]._customize:
+            if phase._subflow_type_name != 'plan':
+                disable_task_ids_on_phase[phase._subflow_type_name] = []
+            else:
+                continue
+
+        # DGカスタマイズプロパティの設定値とDGカスタマイズJSONデータから無効にするタスクIDを取得する
+        for plan_property in plan_data['governance_plan']:
+            if plan_property['is_enabled'] == False:
+                # 無効なDGカスタマイズプロパティ（α項目）のIDを取得する
+                alpha_id = plan_property['id']
+                for alpha_config in dg_customize_config:
+                    if alpha_config._id == alpha_id:
+                        # DGカスタマイズプロパティ（α項目）のIDとDGカスタマイズ定義データIDが一致しているのみ処理
+                        for subflow_rule in alpha_config._customize:
+                            if subflow_rule._subflow_type_name != 'plan':
+                                disable_task_ids_on_phase[subflow_rule._subflow_type_name].extend(subflow_rule._task_ids)
+
+        return disable_task_ids_on_phase
+
+    def disable_task_by_phase(self):
+        """各サブフローの各タスクステータスのdisabledを更新"""
+        disable_task_ids_data = self.get_disable_task_ids_on_phase()
+        for phase, disable_task_ids in disable_task_ids_data.items():
+            # data_gorvernance\base\subflow\<フェーズ>\status.jsonを更新する。
+            status_path = os.path.join(self._abs_root_path, path_config.get_base_subflow_pahse_status_file_path(phase))
+
+            sf = StatusFile(status_path)
+            sub_flow_status:SubflowStatus = sf.read()
+            for task in sub_flow_status._tasks:
+                if task.id in disable_task_ids and not task.is_required:
+                    # 無効化タスクIDリストに標的タスクIDが含まれ、かつ必須タスクではない場合、disabledを真にする
+                    task.disable = True
+            sf.write(sub_flow_status)
+
 
     @classmethod
     def generateFormScetion(cls, working_path:str):
@@ -141,59 +187,7 @@ class DGPlaner(TaskDirector):
         form_section.append(task_director._msg_output)
         display(form_section)
 
-    def get_disable_task_ids_on_phase(self)->dict[str, list[str]]:
-        """無効化（非表示：任意タスク）のタスクIDをフェーズごとに集計する"""
 
-        # α設定JSON定義書の設定値を取得
-        plan_data = self.get_plan_data()
-
-        # DGカスタマイズJSONデータを取得する
-        data_governance_customize_data = self.get_data_governance_customize_data()
-
-
-        # 無効化タスクIDデータ
-        disable_task_ids_on_phase:dict[str, list[str]] = {}
-        # 無効化タスクIDデータの初期化
-        for phase in data_governance_customize_data[0]['customize'].keys():
-            if phase != 'plan':
-                disable_task_ids_on_phase[phase] = []
-            else:
-                continue
-
-
-        # DGカスタマイズプロパティの設定値とDGカスタマイズJSONデータから無効にするタスクIDを取得する
-        for plan_property in plan_data['governance_plan']:
-            if plan_property['is_enabled'] == False:
-                # 無効なDGカスタマイズプロパティ（α項目）のIDを取得する
-                alpha_id = plan_property['id']
-                for customize_rule_set in data_governance_customize_data:
-                    if customize_rule_set['id'] == alpha_id:
-                        customize_rule:dict = customize_rule_set['customize']
-                        for phase, rule in customize_rule.items():
-                            if phase != 'plan':
-                                disable_task_ids_on_phase[phase].extend(rule['task_ids'])
-                            else:
-                                continue
-                    else:
-                        continue
-            else:
-                continue
-
-        return disable_task_ids_on_phase
-
-    def disable_task_by_phase(self):
-        disable_task_ids_data = self.get_disable_task_ids_on_phase()
-        for phase, disable_task_ids in disable_task_ids_data.items():
-            # data_gorvernance\base\subflow\<フェーズ>\status.jsonを更新する。
-            status_path = os.path.join(self._abs_root_path, path_config.get_base_subflow_pahse_status_file_path(phase))
-
-            sf = StatusFile(status_path)
-            sub_flow_status:SubflowStatus = sf.read()
-            for task in sub_flow_status._tasks:
-                if task.id in disable_task_ids and not task.is_required:
-                    # 無効化タスクIDリストに標的タスクIDが含まれ、かつ必須タスクではない場合、disabledを真にする
-                    task.disable = True
-            sf.write(sub_flow_status)
 
     @classmethod
     def customize_research_flow(cls, working_path:str):

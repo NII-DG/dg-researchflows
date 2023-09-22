@@ -12,9 +12,9 @@ from ..utils.html import button as html_button
 from ..utils.file import File
 
 
-def access_main_menu(working_path: str):
+def access_main_menu(working_file: str):
     root_folder = Path(
-        path_config.get_abs_root_form_working_dg_file_path(working_path)
+        path_config.get_abs_root_form_working_dg_file_path(working_file)
     )
     main_menu = root_folder / path_config.MAIN_MENU_PATH
     return display(HTML(

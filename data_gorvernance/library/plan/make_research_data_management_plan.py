@@ -226,11 +226,3 @@ class DGPlaner(TaskDirector):
         task_director = DGPlaner(working_path)
         # タスク実行の完了情報を研究準備のサブフローステータス管理JSONに書き込む
         task_director.done_task(script_file_name)
-
-    # @classmethod
-    # def return_subflow_menu(cls, working_path:str):
-    #     pn.extension()
-    #     task_director = DGPlaner(working_path)
-    #     sub_flow_menu_link_button  = task_director.get_subflow_menu_button_object()
-    #     display(sub_flow_menu_link_button)
-    #     display(Javascript('IPython.notebook.save_checkpoint();'))

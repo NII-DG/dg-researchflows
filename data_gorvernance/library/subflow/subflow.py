@@ -59,8 +59,8 @@ def get_return_sub_flow_menu_relative_url_path(working_file_path: str)->str:
 
 class SubFlow:
 
-    def __init__(self, current_path: str, status_file :str, diag_file :str, using_task_dir: str) -> None:
-        self.current_path = current_path
+    def __init__(self, current_dir: str, status_file :str, diag_file :str, using_task_dir: str) -> None:
+        self.current_dir = current_dir
         self.tasks = StatusFile(status_file).read().tasks
         self.diag = DiagManager(diag_file)
         self.task_dir = using_task_dir
@@ -75,7 +75,7 @@ class SubFlow:
             for filename in files:
                 if filename.startswith(target_file):
                     source_path = os.path.join(root, filename)
-                    relative_path = os.path.relpath(root, start=search_directory)
+                    relative_path = file.relative_path(root, search_directory)
                     destination_path = os.path.join(destination_directory, relative_path, filename)
                     if not os.path.isfile(destination_path):
                         file.copy_file(source_path, destination_path)
@@ -85,7 +85,7 @@ class SubFlow:
         self._update_diag(display_all)
         self.diag.generate_svg(tmp_diag, svg_path, font)
         task_dict = {task.id: task.name for task in self.tasks}
-        add_link(svg_path, self.current_path, self.task_dir, task_dict)
+        add_link(svg_path, self.current_dir, self.task_dir, task_dict)
 
     def _update_diag(self, display_all=True):
         for task in self.tasks:

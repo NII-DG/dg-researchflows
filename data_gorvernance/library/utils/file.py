@@ -14,11 +14,19 @@ def copy_file(source_path, destination_path):
     shutil.copyfile(source_path, destination_path)
 
 
-def relative_path(target_path, current_path):
-    """crrent_pathからtarget_pathまでの相対パスを生成する"""
+def relative_path(target_path, start_dir):
+    """target_pathをstart_dirからの相対パスに変換する
+
+    Args:
+        target_path (_type_): 変換したいパス
+        start_dir (_type_): 基準となるディレクトリのパス
+
+    Returns:
+        str: start_dirからtarget_pathまでの相対パス
+    """
     return os.path.relpath(
                 path=os.path.normpath(target_path),
-                start=os.path.normpath(current_path)
+                start=os.path.normpath(start_dir)
             )
 
 

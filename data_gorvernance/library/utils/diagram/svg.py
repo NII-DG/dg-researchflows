@@ -8,6 +8,8 @@ from itertools import chain, zip_longest
 from lxml import etree
 from nbformat import read, NO_CONVERT
 
+from .. import file
+
 
 title_font_size = 10
 item_font_size = 7
@@ -20,8 +22,8 @@ SVG_TEXT = '{http://www.w3.org/2000/svg}text'
 SVG_RECT = '{http://www.w3.org/2000/svg}rect'
 
 
-def add_link(output: str, current_file:str, notebook_dir:str, task_dict):
-        _embed_detail_information(current_file, Path(output), Path(notebook_dir), task_dict)
+def add_link(output: str, current_dir:str, notebook_dir:str, task_dict):
+        _embed_detail_information(current_dir, Path(output), Path(notebook_dir), task_dict)
 
 def setup_python_path():
     ver = sys.version_info
@@ -30,7 +32,7 @@ def setup_python_path():
     if lib_path not in sys.path:
         sys.path.append(lib_path)
 
-def _embed_detail_information(abs_current, skeleton, dir_util, task_dict):
+def _embed_detail_information(current_dir, skeleton, dir_util, task_dict):
     # Notebookのヘッダ取得
     nb_headers = _get_notebook_headers(dir_util)
 
@@ -41,7 +43,7 @@ def _embed_detail_information(abs_current, skeleton, dir_util, task_dict):
     for elem in list(tree.findall(SVG_TEXT)):
         if _is_target_rect(elem, nb_headers.keys(), task_dict):
             nb_name = _find_matching_notebook(nb_headers.keys(), elem.text, task_dict)
-            _embed_info_in_one_rect(elem, nb_headers, nb_name, abs_current)
+            _embed_info_in_one_rect(elem, nb_headers, nb_name, current_dir)
 
     # svgファイルを上書き
     with skeleton.open(mode='wb') as f:
@@ -141,10 +143,10 @@ def notebooks_toc(nb_dir):
     ]))
 
 
-def _embed_info_in_one_rect(elem, nb_headers, nb_name, current_file):
+def _embed_info_in_one_rect(elem, nb_headers, nb_name, current_dir):
     headers = nb_headers[nb_name]
     nb_file = nb_headers[nb_name]['path']
-    nb_file = os.path.relpath(nb_file, current_file)
+    nb_file = file.relative_path(nb_file, current_dir)
     rect_elem = elem.getprevious()
     rect = (
         (int(rect_elem.attrib['x']), int(rect_elem.attrib['y'])),

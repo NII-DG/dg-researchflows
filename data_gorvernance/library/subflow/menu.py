@@ -81,14 +81,14 @@ class SubflowMenu:
         return viewbox_width
 
     @classmethod
-    def render(cls, working_path: str, is_selected=False):
-        parent = Path(os.path.dirname(working_path))
+    def render(cls, working_file: str, is_selected=False):
+        parent = Path(os.path.dirname(working_file))
         root_folder = Path(
-            path_config.get_abs_root_form_working_dg_file_path(working_path)
+            path_config.get_abs_root_form_working_dg_file_path(working_file)
         )
 
         # get subflow type and id from path
-        subflow_type, subflow_id = get_subflow_type_and_id(working_path)
+        subflow_type, subflow_id = get_subflow_type_and_id(working_file)
         subflow_rel_path = Path(subflow_type)
         if subflow_id:
             subflow_rel_path = subflow_rel_path / subflow_id
@@ -107,7 +107,7 @@ class SubflowMenu:
 
         # setup
         subflow = SubFlow(
-            working_path, str(status_file), str(diag_file), str(using_task_dir)
+            str(parent), str(status_file), str(diag_file), str(using_task_dir)
         )
         subflow.setup_tasks(str(souce_task_dir))
 

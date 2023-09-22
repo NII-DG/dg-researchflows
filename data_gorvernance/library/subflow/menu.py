@@ -65,18 +65,18 @@ class SubflowMenu:
         # <svg>要素からviewBox属性を取得
         viewbox_value = root.get('viewBox')
 
-        viewbox_width = 0.0
+        viewbox_width = 0
         # viewbox_valueを解析して幅と高さを取得
         if viewbox_value:
             viewbox_parts = viewbox_value.split()
             if len(viewbox_parts) == 4:
-                viewbox_width = float(viewbox_parts[2])
-                viewbox_height = float(viewbox_parts[3])
+                viewbox_width = int(viewbox_parts[2])
+                viewbox_height = int(viewbox_parts[3])
 
-        if 900.0 < viewbox_width:
-            viewbox_width = 900.0
-        elif viewbox_width < 200.0:
-            viewbox_width = 200.0
+        if 900 < viewbox_width:
+            viewbox_width = 900
+        elif viewbox_width < 200:
+            viewbox_width = 200
 
         return viewbox_width
 

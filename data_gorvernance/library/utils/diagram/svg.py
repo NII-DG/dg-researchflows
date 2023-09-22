@@ -215,7 +215,7 @@ def insert_headers(parent_elem, childpos, rect, headers, title_lines):
         parent_elem.insert(childpos, text_elem)
 
 def split_title(title):
-    """titleがコロンを含むか15文字以上の場合に分割する"""
+    """titleが特定の区切り文字を含む場合に分割する"""
     if u'：' in title:
         return [title[:title.index(u'：') + 1], title[title.index(u'：') + 1:]]
     elif len(title) >= 15:

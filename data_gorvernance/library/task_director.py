@@ -8,23 +8,23 @@ from .utils.html.button import create_button
 
 class TaskDirector():
 
-    def __init__(self, working_path:str) -> None:
+    def __init__(self, nb_working_file_path:str) -> None:
         """TaskInterface コンストラクタ
 
         Notebookファイルのオペレーションするための共通クラス
 
         Args:
-            working_path (str): [実行Notebookのファイルパス]
+            nb_working_file_path (str): [実行Notebookのファイルパス]
         """
         # 実行Notebookのファイルパス
-        self.working_path = working_path
+        self.nb_working_file_path = nb_working_file_path
         # 絶対rootディレクトリを取得・設定する
-        self._abs_root_path = path_config.get_abs_root_form_working_dg_file_path(working_path)
+        self._abs_root_path = path_config.get_abs_root_form_working_dg_file_path(nb_working_file_path)
 
         # サブフローステータス管理JSONパス
         # 想定値：data_gorvernance\researchflow\plan\status.json
         # 想定値：data_gorvernance\researchflow\サブフロー種別\サブフローID\status.json
-        subflow_type, subflow_id = get_subflow_type_and_id(working_path)
+        subflow_type, subflow_id = get_subflow_type_and_id(nb_working_file_path)
         if subflow_id is None:
             # 研究準備の場合
             self._sub_flow_status_file_path = os.path.join(self._abs_root_path, path_config.get_sub_flow_status_file_path(subflow_type))
@@ -62,7 +62,7 @@ class TaskDirector():
             [panel.pane.HTML]: [HTMLオブジェクト]
         """
         button_width = 500
-        sub_flow_menu_relative_url = get_return_sub_flow_menu_relative_url_path(self.working_path)
+        sub_flow_menu_relative_url = get_return_sub_flow_menu_relative_url_path(self.nb_working_file_path)
         sub_flow_menu_link_button = pn.pane.HTML()
         sub_flow_menu_link_button.object = create_button(
             url=sub_flow_menu_relative_url,

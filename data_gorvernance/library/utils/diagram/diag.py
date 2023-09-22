@@ -18,11 +18,11 @@ class DiagManager:
     def change_node_property(self, node_id: str, key:str, value: str):
         find = f'{node_id}['
         replace = f'{node_id}[{key} = {value}, '
-        update_content = self.content.replace(find, replace)
+        update_content = self.content.replace(find, replace, 1)
         if update_content == self.content:
             find = f'{node_id}'
             replace = f'{node_id}[{key} = {value}] '
-            update_content = self.content.replace(find, replace)
+            update_content = self.content.replace(find, replace, 1)
         self.content = update_content
 
     def update_node_color(self, node_id: str, color: str):

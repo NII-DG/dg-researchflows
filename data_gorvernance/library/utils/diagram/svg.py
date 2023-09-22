@@ -52,7 +52,7 @@ def _embed_detail_information(current_dir, skeleton, dir_util, task_dict):
 def _is_target_rect(elem, notebooks, task_dict):
     return (
         elem.getprevious() is not None and
-        elem.getprevious().tag == SVG_RECT and
+        #elem.getprevious().tag == SVG_RECT and
         len(elem.text) > 0 and
         _find_matching_notebook(notebooks, elem.text, task_dict) is not None)
 

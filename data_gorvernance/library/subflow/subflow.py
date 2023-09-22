@@ -109,7 +109,9 @@ class SubFlow:
 
         icon_dir = "../data/icon"
         icon_dir = os.path.abspath(os.path.join(script_dir, icon_dir))
+        icon_dir = file.relative_path(icon_dir, self.current_dir)
         if task.status == task.STATUS_DONE:
-            self.diag.update_node_icon(task.id, "loading.png")
+            self.diag.update_node_icon(task.id, icon_dir + "/check_mark.png")
         elif task.status == task.STATUS_DOING:
-            self.diag.update_node_icon(task.id, "check_mark.png")
+            self.diag.update_node_icon(task.id, icon_dir + "/loading.png")
+

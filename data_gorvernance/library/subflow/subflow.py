@@ -1,10 +1,13 @@
 import os
+from pathlib import Path
 
 from .status import StatusFile, TaskStatus
 from ..utils import file
 from ..utils.diagram import DiagManager, add_link
 from ..utils.config import path_config
 from ..main_menu.research_flow_status import ResearchFlowStatusOperater
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 def get_subflow_type_and_id(working_file_path: str):
@@ -102,7 +105,11 @@ class SubFlow:
     def _adjust_by_status(self, task: TaskStatus):
         if task.status == task.STATUS_UNFEASIBLE:
             self.diag.update_node_color(task.id, "#77787B")
-        elif task.status == task.STATUS_DONE:
-            self.diag.update_node_icon(task.id, "../data/icon/loading.png")
+            return
+
+        icon_dir = "../data/icon"
+        icon_dir = os.path.abspath(os.path.join(script_dir, icon_dir))
+        if task.status == task.STATUS_DONE:
+            self.diag.update_node_icon(task.id, "loading.png")
         elif task.status == task.STATUS_DOING:
-            self.diag.update_node_icon(task.id, "../data/icon/check_mark.png")
+            self.diag.update_node_icon(task.id, "check_mark.png")

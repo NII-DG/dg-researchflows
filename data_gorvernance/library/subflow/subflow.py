@@ -95,14 +95,14 @@ class SubFlow:
     def _adjust_by_optional(self, task: TaskStatus, display_all=True):
         if task.disable:
             if display_all:
-                self.diag.change_node_style(task.id, 'dotted')
+                self.diag.update_node_style(task.id, 'dotted')
             else:
                 self.diag.delete_node(task.id)
 
     def _adjust_by_status(self, task: TaskStatus):
         if task.status == task.STATUS_UNFEASIBLE:
-            self.diag.change_group_color(task.id, "#77787B")
+            self.diag.update_node_color(task.id, "#77787B")
         elif task.status == task.STATUS_DONE:
-            self.diag.update_mark(task.id, "実行中")
+            self.diag.update_node_icon(task.id, "実行中")
         elif task.status == task.STATUS_DOING:
-            self.diag.update_mark(task.id, "実行完了")
+            self.diag.update_node_icon(task.id, "実行完了")

@@ -15,14 +15,24 @@ class DiagManager:
         # 以下暫定措置としてファイル書き変えのために用いる
         self.content = File(str(self.path)).read()
 
-    def change_group_color(self, group_id: str, color: str):
-        pass
+    def change_node_property(self, node_id: str, key:str, value: str):
+        find = f'{node_id}['
+        replace = f'{node_id}[{key} = {value}, '
+        update_content = self.content.replace(find, replace)
+        if update_content == self.content:
+            find = f'{node_id}'
+            replace = f'{node_id}[{key} = {value}] '
+            update_content = self.content.replace(find, replace)
+        self.content = update_content
 
-    def update_mark(self, node_id: str, value: str):
-        pass
+    def update_node_color(self, node_id: str, color: str):
+        self.change_node_property(node_id, "color", color)
 
-    def change_node_style(self, node_id, style):
-        pass
+    def update_node_icon(self, node_id: str, path: str):
+        self.change_node_property(node_id, "icon", path)
+
+    def update_node_style(self, node_id, style):
+        self.change_node_property(node_id, "style", style)
 
     def delete_node(self, node_id):
         pass

@@ -61,32 +61,34 @@ class SubFlow:
 
     def __init__(self, current_path: str, status_file :str, diag_file :str, using_task_dir: str) -> None:
         self.current_path = current_path
-        self.subflow_status = StatusFile(status_file).read()
+        self.tasks = StatusFile(status_file).read().tasks
         self.diag = DiagManager(diag_file)
         self.task_dir = using_task_dir
 
     def setup_tasks(self, souce_task_dir: str):
         if os.path.isdir(souce_task_dir):
-            for task in self.subflow_status.tasks:
-                self._copy_file_by_name(task.name + '.ipynb', souce_task_dir, self.task_dir)
+            for task in self.tasks:
+                self._copy_file_by_name(task.name, souce_task_dir, self.task_dir)
 
-    def _copy_file_by_name(self, target_filename: str, search_directory :str, destination_directory: str):
+    def _copy_file_by_name(self, target_file: str, search_directory :str, destination_directory: str):
         for root, dirs, files in os.walk(search_directory):
-            if target_filename in files:
-                source_path = os.path.join(root, target_filename)
-                relative_path = os.path.relpath(root, start=search_directory)
-                destination_path = os.path.join(destination_directory, relative_path, target_filename)
-                if not os.path.isfile(destination_path):
-                    file.copy_file(source_path, destination_path)
+            for filename in files:
+                if filename.startswith(target_file):
+                    source_path = os.path.join(root, filename)
+                    relative_path = os.path.relpath(root, start=search_directory)
+                    destination_path = os.path.join(destination_directory, relative_path, filename)
+                    if not os.path.isfile(destination_path):
+                        file.copy_file(source_path, destination_path)
 
     def generate(self, svg_path: str, tmp_diag: str, font: str, display_all=True):
         # tmp_diagは暫定的なもの。将来的にはself.diagを利用できるようにする
         self._update_diag(display_all)
         self.diag.generate_svg(tmp_diag, svg_path, font)
-        add_link(svg_path, self.current_path, self.task_dir)
+        task_dict = {task.id: task.name for task in self.tasks}
+        add_link(svg_path, self.current_path, self.task_dir, task_dict)
 
     def _update_diag(self, display_all=True):
-        for task in self.subflow_status.tasks:
+        for task in self.tasks:
             self._adjust_by_status(task)
             self._adjust_by_optional(task, display_all)
 

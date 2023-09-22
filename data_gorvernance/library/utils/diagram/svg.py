@@ -20,8 +20,8 @@ SVG_TEXT = '{http://www.w3.org/2000/svg}text'
 SVG_RECT = '{http://www.w3.org/2000/svg}rect'
 
 
-def add_link(output: str, current_file:str, notebook_dir:str):
-        _embed_detail_information(current_file, Path(output), Path(notebook_dir))
+def add_link(output: str, current_file:str, notebook_dir:str, task_dict):
+        _embed_detail_information(current_file, Path(output), Path(notebook_dir), task_dict)
 
 def setup_python_path():
     ver = sys.version_info
@@ -30,7 +30,7 @@ def setup_python_path():
     if lib_path not in sys.path:
         sys.path.append(lib_path)
 
-def _embed_detail_information(abs_current, skeleton, dir_util):
+def _embed_detail_information(abs_current, skeleton, dir_util, task_dict):
     # Notebookのヘッダ取得
     nb_headers = _get_notebook_headers(dir_util)
 
@@ -39,21 +39,42 @@ def _embed_detail_information(abs_current, skeleton, dir_util):
 
     # 雛形をNotebook情報で置き換え
     for elem in list(tree.findall(SVG_TEXT)):
-        if _is_target_rect(elem, nb_headers.keys()):
-            nb_name = _find_matching_notebook(nb_headers.keys(), elem.text)
+        if _is_target_rect(elem, nb_headers.keys(), task_dict):
+            nb_name = _find_matching_notebook(nb_headers.keys(), elem.text, task_dict)
             _embed_info_in_one_rect(elem, nb_headers, nb_name, abs_current)
 
-def _is_target_rect(elem, notebooks):
+def _is_target_rect(elem, notebooks, task_dict):
     return (
         elem.getprevious() is not None and
         elem.getprevious().tag == SVG_RECT and
         len(elem.text) > 0 and
-        _find_matching_notebook(notebooks, elem.text) is not None)
+        _find_matching_notebook(notebooks, elem.text, task_dict) is not None)
 
-def _find_matching_notebook(notebooks, title):
+def _find_matching_notebook(notebooks, title, task_dict):
+    """_summary_
+
+    Args:
+        notebooks (List[str]): ノートブック名のリスト
+        title (str): タスクの機能ID
+        task_dict (dict[str, str]): {id: name}
+
+    Returns:
+        str: ノートブック名
+    """
+    # IDをノートブック名(拡張子無し)に変換
+    title = task_dict[title]
+    # titleと一致するものがあれば返す
     for nb in notebooks:
         if nb.startswith(title):
             return nb
+
+
+# TODO: 上手くいったら消す
+#def _find_matching_notebook(notebooks, title):
+#    for nb in notebooks:
+#        if nb.startswith(title):
+#            return nb
+#
 
 def parse_headers(nb_path: Path):
     nb = read(str(nb_path), as_version=NO_CONVERT)
@@ -136,6 +157,7 @@ def _embed_info_in_one_rect(elem, nb_headers, nb_name, current_file):
     parent_elem = elem.getparent()
     remove_texts(elem)
     title = headers['title']['text']
+    # NOTE: textをremoveした後にこれを行う理由は？
     if elem.text.find(':') >= 0:
         title = title + ' - ' + elem.text.split(':')[1]
     line_num = insert_title(parent_elem, childpos, rect, title, str(nb_file))
@@ -157,6 +179,7 @@ def insert_title(parent_elem, childpos, rect, title, link):
         text_margin + (title_font_size + text_margin) * 2 + head_margin * 2)
     lines = split_title(title)
     if len(lines) == 2:
+        # 分割された場合
         text_elem = create_text(rect, title_font_size, font_weight='bold', font_color=title_font_color)
         text_elem.text = lines[0]
         text_elem.attrib['y'] = str(
@@ -192,6 +215,7 @@ def insert_headers(parent_elem, childpos, rect, headers, title_lines):
         parent_elem.insert(childpos, text_elem)
 
 def split_title(title):
+    """titleがコロンを含むか15文字以上の場合に分割する"""
     if u'：' in title:
         return [title[:title.index(u'：') + 1], title[title.index(u'：') + 1:]]
     elif len(title) >= 15:

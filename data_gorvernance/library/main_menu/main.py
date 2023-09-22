@@ -382,6 +382,7 @@ class MainMenu():
 
             # サブフロー関係図を更新
             self.update_research_flow_image()
+            display(Javascript('IPython.notebook.save_checkpoint();'))
         except  Exception as e:
             self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             self._err_output.clear()
@@ -616,4 +617,5 @@ class MainMenu():
             initial_setup_link_button.width = 500
             display(alert)
             display(initial_setup_link_button)
-            display(Javascript('IPython.notebook.save_checkpoint();'))
+
+        display(Javascript('IPython.notebook.save_checkpoint();'))

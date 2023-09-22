@@ -204,13 +204,8 @@ class DGPlaner(TaskDirector):
 
     @classmethod
     def return_subflow_menu(cls, working_path:str):
-        sub_flow_menu_relative_url = get_return_sub_flow_menu_relative_url_path(working_path)
-        sub_flow_menu_link_button = pn.pane.HTML()
-        sub_flow_menu_link_button.object = create_button(
-            url=sub_flow_menu_relative_url,
-            msg=msg_config.get('task', 'retun_sub_flow_menu'),
-            button_width='500px'
-        )
-        sub_flow_menu_link_button.width = 500
+        pn.extension()
+        task_director = DGPlaner(working_path)
+        sub_flow_menu_link_button  = task_director.get_subflow_menu_button_object()
         display(sub_flow_menu_link_button)
         display(Javascript('IPython.notebook.save_checkpoint();'))

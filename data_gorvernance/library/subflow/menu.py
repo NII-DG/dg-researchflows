@@ -29,6 +29,7 @@ class SubflowMenu:
 
     def __init__(self) -> None:
         # サブフロー図
+        # SVGにするとファイルとして出してしまうのでHTMLとして埋め込む
         self.diagram = pn.pane.HTML()
         # ラジオボタン
         self.selector = pn.widgets.RadioBoxGroup()

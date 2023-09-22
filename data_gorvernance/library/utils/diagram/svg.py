@@ -43,6 +43,10 @@ def _embed_detail_information(abs_current, skeleton, dir_util, task_dict):
             nb_name = _find_matching_notebook(nb_headers.keys(), elem.text, task_dict)
             _embed_info_in_one_rect(elem, nb_headers, nb_name, abs_current)
 
+    # svgファイルを上書き
+    with skeleton.open(mode='wb') as f:
+        f.write(etree.tostring(tree, method='xml', pretty_print=True))
+
 def _is_target_rect(elem, notebooks, task_dict):
     return (
         elem.getprevious() is not None and
@@ -51,7 +55,7 @@ def _is_target_rect(elem, notebooks, task_dict):
         _find_matching_notebook(notebooks, elem.text, task_dict) is not None)
 
 def _find_matching_notebook(notebooks, title, task_dict):
-    """_summary_
+    """ノードの表示名に対応したノートブックを探す
 
     Args:
         notebooks (List[str]): ノートブック名のリスト
@@ -67,14 +71,6 @@ def _find_matching_notebook(notebooks, title, task_dict):
     for nb in notebooks:
         if nb.startswith(title):
             return nb
-
-
-# TODO: 上手くいったら消す
-#def _find_matching_notebook(notebooks, title):
-#    for nb in notebooks:
-#        if nb.startswith(title):
-#            return nb
-#
 
 def parse_headers(nb_path: Path):
     nb = read(str(nb_path), as_version=NO_CONVERT)
@@ -122,7 +118,7 @@ def _to_title_text(nb_path, text):
 def _get_notebook_headers(nb_dir: Path):
     return dict([
         (nb.name, parse_headers(nb))
-        for nb in nb_dir.glob("*.ipynb")
+        for nb in nb_dir.glob("**/*.ipynb")
     ])
 
 def notebooks_toc(nb_dir):

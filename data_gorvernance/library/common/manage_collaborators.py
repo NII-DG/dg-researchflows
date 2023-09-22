@@ -1,6 +1,5 @@
-import panel as pn
+
 import os
-from IPython.display import display, Javascript
 from ..task_director import TaskDirector
 
 # 本ファイルのファイル名

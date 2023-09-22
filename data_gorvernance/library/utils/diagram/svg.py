@@ -2,7 +2,6 @@
 import os
 import re
 import sys
-from subprocess import run
 from pathlib import Path
 from itertools import chain, zip_longest
 
@@ -56,7 +55,7 @@ def _find_matching_notebook(notebooks, title):
         if nb.startswith(title):
             return nb
 
-def parse_headers(nb_path):
+def parse_headers(nb_path: Path):
     nb = read(str(nb_path), as_version=NO_CONVERT)
 
     # Notebookのセルからmarkdownの部分を取り出し、行ごとのリストにする
@@ -79,7 +78,7 @@ def parse_headers(nb_path):
     ]
     # 最初の見出しはtitle, 残りはheadersとして返す
     return {
-        'path': nb_path.as_posix(),
+        'path': str(nb_path),
         'title': {
             'text': _to_title_text(nb_path, headers[0][0]),
             'summary': headers[0][1],
@@ -99,7 +98,7 @@ def _to_title_text(nb_path, text):
     title = text if not text.startswith('About:') else text[6:]
     return f'{title}'
 
-def _get_notebook_headers(nb_dir):
+def _get_notebook_headers(nb_dir: Path):
     return dict([
         (nb.name, parse_headers(nb))
         for nb in nb_dir.glob("*.ipynb")

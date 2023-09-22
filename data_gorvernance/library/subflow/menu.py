@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import xml.etree.ElementTree as ET
 from tempfile import TemporaryDirectory
 
 import panel as pn
@@ -28,7 +29,6 @@ class SubflowMenu:
     def __init__(self) -> None:
         # サブフロー図
         self.diagram = pn.pane.SVG()
-        self.diagram.width = 1000
         # ラジオボタン
         self.selector = pn.widgets.RadioBoxGroup()
         options = [
@@ -50,6 +50,36 @@ class SubflowMenu:
     def select_flow(self, event):
         pass
 
+    def get_svg_size(self, svg_file_path: str):
+        """svgの画像の横幅を返す
+
+        Args:
+            svg_file_path (str): svgファイルのパス
+
+        Returns:
+            _type_: _description_
+        """
+        # SVGファイルをパース
+        tree = ET.parse(svg_file_path)
+        root = tree.getroot()
+        # <svg>要素からviewBox属性を取得
+        viewbox_value = root.get('viewBox')
+
+        viewbox_width = 0.0
+        # viewbox_valueを解析して幅と高さを取得
+        if viewbox_value:
+            viewbox_parts = viewbox_value.split()
+            if len(viewbox_parts) == 4:
+                viewbox_width = float(viewbox_parts[2])
+                viewbox_height = float(viewbox_parts[3])
+
+        if 900.0 < viewbox_width:
+            viewbox_width = 900.0
+        elif viewbox_width < 200.0:
+            viewbox_width = 200.0
+
+        return viewbox_width
+
     @classmethod
     def render(cls, working_path: str, is_selected=False):
         parent = Path(os.path.dirname(working_path))
@@ -70,7 +100,7 @@ class SubflowMenu:
             / subflow_type / path_config.FLOW_DIAG
         )
         using_task_dir = (
-            root_folder / path_config.DG_WORKING_FOLDER
+            root_folder / path_config.DG_WORKING_RESEARCHFLOW_FOLDER
             / subflow_rel_path / path_config.TASK
         )
         souce_task_dir = root_folder / path_config.DG_TASK_BASE_DATA_FOLDER
@@ -95,5 +125,6 @@ class SubflowMenu:
                 font=str(root_folder / '.fonts/ipag.ttf')
             )
             subflow_menu.diagram.object = skeleton
+            subflow_menu.diagram.width = subflow_menu.get_svg_size(str(skeleton))
             display(subflow_menu.diagram)
         display(Javascript('IPython.notebook.save_checkpoint();'))

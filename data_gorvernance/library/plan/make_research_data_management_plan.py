@@ -47,7 +47,8 @@ class DGPlaner(TaskDirector):
         for id in self.get_data_governance_customize_ids():
             check_book = pn.widgets.Checkbox(name=msg_config.get('data_governance_customize_property', id))
             self._checkbox_list.append(check_book)
-        self.submit_button = pn.widgets.Button(name=msg_config.get('form', 'submit_button'))
+        self.submit_button = pn.widgets.Button()
+        self.change_submit_button_init(name=msg_config.get('form', 'submit_select'))
         self.submit_button.on_click(self.callback_submit_input)
         # フォームボックスを更新
         self.update_form_box(
@@ -99,6 +100,7 @@ class DGPlaner(TaskDirector):
             self._msg_output.clear()
             alert = pn.pane.Alert(registration_msg, sizing_mode="stretch_width",alert_type='info')
             self._msg_output.append(alert)
+            self.change_submit_button_success(msg_config.get('form', 'accepted'))
 
         except Exception as e:
             self._msg_output.clear()
@@ -168,6 +170,31 @@ class DGPlaner(TaskDirector):
                     task.disable = True
             sf.write(sub_flow_status)
 
+    def change_submit_button_init(self, name):
+        self.submit_button.name = name
+        self.submit_button.button_type = 'primary'
+        self.submit_button.button_style = 'solid'
+        self.submit_button.icon = 'settings-plus'
+
+    def change_submit_button_processing(self, name):
+        self.submit_button.name = name
+        self.submit_button.button_type = 'primary'
+        self.submit_button.button_style = 'outline'
+
+    def change_submit_button_success(self, name):
+        self.submit_button.name = name
+        self.submit_button.button_type = 'success'
+        self.submit_button.button_style = 'solid'
+
+    def change_submit_button_warning(self, name):
+        self.submit_button.name = name
+        self.submit_button.button_type = 'warning'
+        self.submit_button.button_style = 'solid'
+
+    def change_submit_button_error(self, name):
+        self.submit_button.name = name
+        self.submit_button.button_type = 'danger'
+        self.submit_button.button_style = 'solid'
 
     @classmethod
     def generateFormScetion(cls, working_path:str):

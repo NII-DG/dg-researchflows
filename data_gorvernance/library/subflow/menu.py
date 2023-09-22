@@ -20,7 +20,7 @@ def access_main_menu(working_file: str):
     link = file.relative_path(main_menu, os.path.dirname(working_file))
     display(HTML(
         html_button.create_button(
-            url=link,
+            url=f'{link}?init_nb=true',
             msg=message.get('subflow_menu', 'access_main_menu'),
         )
     ))

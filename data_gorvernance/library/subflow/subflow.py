@@ -103,6 +103,6 @@ class SubFlow:
         if task.status == task.STATUS_UNFEASIBLE:
             self.diag.update_node_color(task.id, "#77787B")
         elif task.status == task.STATUS_DONE:
-            self.diag.update_node_icon(task.id, "実行中")
+            self.diag.update_node_icon(task.id, "../data/icon/loading.png")
         elif task.status == task.STATUS_DOING:
-            self.diag.update_node_icon(task.id, "実行完了")
+            self.diag.update_node_icon(task.id, "../data/icon/check_mark.png")

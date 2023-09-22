@@ -9,8 +9,9 @@ import json
 
 from ..utils.config import path_config, message as msg_config
 from ..subflow.status import StatusFile, SubflowStatus, TaskStatus
-from ..subflow.subflow import get_return_sub_flow_menu_relative_url_path
+from ..subflow.subflow import get_return_sub_flow_menu_relative_url_path, get_subflow_type_and_id
 from ..utils.html.button import create_button
+from ..task_interface import TaskInterface
 
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
 script_dir_path = os.path.dirname(__file__)
@@ -20,18 +21,12 @@ data_governance_customize_file = p.joinpath('..', 'data/data_governance_customiz
 
 
 
-class DGPlaner():
+class DGPlaner(TaskInterface):
     """フェーズ：研究準備、タスク：研究データ管理計画を立てるのコントローラークラス"""
 
     def __init__(self, working_path:str) -> None:
         # working_path = .data_gorvernance/researchflow/plan/task/plan/make_research_data_management_plan.ipynbが想定値
-
-        # 絶対rootディレクトリを取得する
-        self._abs_root_path = path_config.get_abs_root_form_working_dg_file_path(working_path)
-
-        # 研究準備のサブフローステータス管理JSONパス
-        # 想定値：data_gorvernance\researchflow\plan\status.json
-        self._plan_sub_flow_status_file_path = os.path.join(self._abs_root_path, path_config.PLAN_TASK_STATUS_FILE_PATH)
+        super().__init__(working_path)
 
         # α設定JSON定義書(plan.json)
         # 想定値：data_gorvernance\researchflow\plan\plan.json
@@ -134,7 +129,7 @@ class DGPlaner():
 
         dg_planer = DGPlaner(working_path)
         # 研究準備のサブフローステータス管理JSONの更新
-        sf = StatusFile(dg_planer._plan_sub_flow_status_file_path)
+        sf = StatusFile(dg_planer._sub_flow_status_file_path)
         plan_status: SubflowStatus = sf.read()
         # 実行ステータスを記録する。
         plan_status.doing_task_by_task_name(script_file_name, os.environ["JUPYTERHUB_SERVER_NAME"])
@@ -216,7 +211,7 @@ class DGPlaner():
         # タスク実行の完了情報を研究準備のサブフローステータス管理JSONに書き込む
         dg_planer = DGPlaner(working_path)
 
-        sf = StatusFile(dg_planer._plan_sub_flow_status_file_path)
+        sf = StatusFile(dg_planer._sub_flow_status_file_path)
         plan_status: SubflowStatus = sf.read()
         plan_status.completed_task_by_task_name(script_file_name, os.environ["JUPYTERHUB_SERVER_NAME"])
         # 更新内容を記録する。

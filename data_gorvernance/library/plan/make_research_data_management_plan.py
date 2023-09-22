@@ -128,13 +128,8 @@ class DGPlaner(TaskInterface):
         """フォームセクション用"""
 
         dg_planer = DGPlaner(working_path)
-        # 研究準備のサブフローステータス管理JSONの更新
-        sf = StatusFile(dg_planer._sub_flow_status_file_path)
-        plan_status: SubflowStatus = sf.read()
-        # 実行ステータスを記録する。
-        plan_status.doing_task_by_task_name(script_file_name, os.environ["JUPYTERHUB_SERVER_NAME"])
-        # 更新内容を記録する。
-        sf.write(plan_status)
+        # タスク開始による研究準備のサブフローステータス管理JSONの更新
+        dg_planer.doing_task(script_file_name)
 
         # フォーム定義
         dg_planer.define_form()
@@ -208,14 +203,10 @@ class DGPlaner(TaskInterface):
 
     @classmethod
     def completed_task(cls, working_path:str):
-        # タスク実行の完了情報を研究準備のサブフローステータス管理JSONに書き込む
-        dg_planer = DGPlaner(working_path)
 
-        sf = StatusFile(dg_planer._sub_flow_status_file_path)
-        plan_status: SubflowStatus = sf.read()
-        plan_status.completed_task_by_task_name(script_file_name, os.environ["JUPYTERHUB_SERVER_NAME"])
-        # 更新内容を記録する。
-        sf.write(plan_status)
+        dg_planer = DGPlaner(working_path)
+        # タスク実行の完了情報を研究準備のサブフローステータス管理JSONに書き込む
+        dg_planer.done_task(script_file_name)
 
     @classmethod
     def return_subflow_menu(cls, working_path:str):

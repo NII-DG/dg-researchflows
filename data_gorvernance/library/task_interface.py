@@ -24,10 +24,28 @@ class TaskInterface():
             # 研究準備以外の場合
             self._sub_flow_status_file_path = os.path.join(self._abs_root_path, path_config.get_sub_flow_status_file_path(subflow_type, subflow_id))
 
-    def completed_task(self, script_file_name):
+    def doing_task(self, task_name:str):
+        """タスク開始によるサブフローステータス管理JSONの更新
+
+        Args:
+            task_name (str): [タスク名]
+        """
+        # タスク開始によるサブフローステータス管理JSONの更新
         sf = StatusFile(self._sub_flow_status_file_path)
         sf_status: SubflowStatus = sf.read()
-        sf_status.completed_task_by_task_name(script_file_name, os.environ["JUPYTERHUB_SERVER_NAME"])
+        sf_status.doing_task_by_task_name(task_name, os.environ["JUPYTERHUB_SERVER_NAME"])
+        # 更新内容を記録する。
+        sf.write(sf_status)
+
+    def done_task(self, task_name:str):
+        """タスク完了によるサブフローステータス管理JSONの更新
+
+        Args:
+            script_file_name (str): [タスク名]
+        """
+        sf = StatusFile(self._sub_flow_status_file_path)
+        sf_status: SubflowStatus = sf.read()
+        sf_status.completed_task_by_task_name(task_name, os.environ["JUPYTERHUB_SERVER_NAME"])
         sf.write(sf_status)
 
     def return_subflow_menu_button_object(self):

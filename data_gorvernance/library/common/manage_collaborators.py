@@ -18,12 +18,8 @@ class CollaboratorManager(TaskInterface):
     @classmethod
     def generateFormScetion(cls, working_path:str):
         col_mng = CollaboratorManager(working_path)
-        # サブフローステータス管理JSONの更新
-        sf = StatusFile(col_mng._sub_flow_status_file_path)
-        sf_status: SubflowStatus = sf.read()
-        sf_status.doing_task_by_task_name(script_file_name, os.environ["JUPYTERHUB_SERVER_NAME"])
-        # 更新内容を記録する。
-        sf.write(sf_status)
+        # タスク開始によるサブフローステータス管理JSONの更新
+        col_mng.doing_task(script_file_name)
 
         # フォーム定義
         # フォーム表示
@@ -33,7 +29,7 @@ class CollaboratorManager(TaskInterface):
     def completed_task(cls, working_path:str):
         # タスク実行の完了情報を該当サブフローステータス管理JSONに書き込む
         col_mng = CollaboratorManager(working_path)
-        col_mng.completed_task(script_file_name)
+        col_mng.done_task(script_file_name)
         # sf = StatusFile(col_mng._sub_flow_status_file_path)
         # sf_status: SubflowStatus = sf.read()
         # sf_status.completed_task_by_task_name(script_file_name, os.environ["JUPYTERHUB_SERVER_NAME"])

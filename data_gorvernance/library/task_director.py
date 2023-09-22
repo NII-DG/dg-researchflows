@@ -3,6 +3,7 @@ from .subflow.subflow import get_return_sub_flow_menu_relative_url_path, get_sub
 import os
 from .subflow.status import StatusFile, SubflowStatus
 import panel as pn
+from panel.pane import HTML
 from .utils.html.button import create_button
 
 class TaskDirector():
@@ -55,7 +56,11 @@ class TaskDirector():
         sf_status.completed_task_by_task_name(task_name, os.environ["JUPYTERHUB_SERVER_NAME"])
         sf.write(sf_status)
 
-    def return_subflow_menu_button_object(self):
+    def get_subflow_menu_button_object(self)-> HTML:
+        """サブフローメニューへのボタンpanel.HTMLオブジェクトの取得
+        Returns:
+            [panel.pane.HTML]: [HTMLオブジェクト]
+        """
         button_width = 500
         sub_flow_menu_relative_url = get_return_sub_flow_menu_relative_url_path(self.working_path)
         sub_flow_menu_link_button = pn.pane.HTML()

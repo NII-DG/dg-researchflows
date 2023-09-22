@@ -38,6 +38,6 @@ class ExperimentPackageMaker(TaskDirector):
     def return_subflow_menu(cls, working_path:str):
         pn.extension()
         task_director = ExperimentPackageMaker(working_path)
-        sub_flow_menu_link_button  = task_director.return_subflow_menu_button_object()
+        sub_flow_menu_link_button  = task_director.get_subflow_menu_button_object()
         display(sub_flow_menu_link_button)
         display(Javascript('IPython.notebook.save_checkpoint();'))

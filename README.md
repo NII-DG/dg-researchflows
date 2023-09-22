@@ -17,7 +17,8 @@ Specifying this repository as the base data for generating a JupyterNotebook env
 1. Create a JupyterNotebook environment with DG-Researchflow installed by Binder
 
     Click the link below to launch JupyterNotebook with DG-Researchflow installed.<br>
-    <<[Launch JupyterNotebook](https://binder.cs.rcos.nii.ac.jp/v2/gh/NII-DG/dg-researchflows.git/feature/main_menu_v2?filepath=data_gorvernance/researchflow/main.ipynb)>>
+
+    <<[Launch JupyterNotebook](https://binder.cs.rcos.nii.ac.jp/v2/gh/NII-DG/dg-researchflows.git/develop/Rel_20230927?filepath=data_gorvernance/researchflow/main.ipynb)>>
 
 2. Experience DG-Researchflow in the JupyterNotebook environment you have set up!
 

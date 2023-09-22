@@ -51,10 +51,10 @@ def get_return_sub_flow_menu_relative_url_path(working_file_path: str)->str:
     subflow_type, subflow_id = get_subflow_type_and_id(working_file_path)
     if subflow_id is None:
         menu_path = path_config.get_sub_flow_menu_path(subflow_type)
-        return os.path.join('../../../../../..', menu_path)
+        return os.path.join('../../../../..', menu_path)
     else:
         menu_path = path_config.get_sub_flow_menu_path(subflow_type, subflow_id)
-        return os.path.join('../../../../../../..', menu_path)
+        return os.path.join('../../../../../..', menu_path)
 
 
 class SubFlow:

@@ -72,6 +72,12 @@ def get_sub_flow_menu_path(phase:str, subflow_id:str='')->str:
     else:
         return os.path.join(RESEARCHFLOW, phase, MENU_NOTEBOOK)
 
+def get_sub_flow_status_file_path(phase:str, subflow_id:str='')->str:
+
+    if len(subflow_id)>0:
+        return os.path.join(DG_RESEARCHFLOW_FOLDER, phase, subflow_id, STATUS_JSON)
+    else:
+        return os.path.join(DG_RESEARCHFLOW_FOLDER, phase, STATUS_JSON)
 
 # other method
 def get_prepare_file_name_list_for_subflow()->List[str]:

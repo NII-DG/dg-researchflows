@@ -9,36 +9,38 @@ from IPython.display import display, Javascript, HTML
 from .subflow import SubFlow, get_subflow_type_and_id
 from ..utils.config import path_config, message
 from ..utils.html import button as html_button
-from ..utils.file import File
-
+from ..utils import file
 
 def access_main_menu(working_file: str):
     root_folder = Path(
         path_config.get_abs_root_form_working_dg_file_path(working_file)
     )
-    main_menu = root_folder / path_config.MAIN_MENU_PATH
-    return display(HTML(
-            html_button.create_button(
-                url=str(main_menu),
-                msg=message.get('subflow_menu', 'access_main_menu'),
-            )
-        ))
+    main_menu = str(root_folder / path_config.MAIN_MENU_PATH)
+    file.relative_path(main_menu, os.path.dirname(working_file))
+    display(HTML(
+        html_button.create_button(
+            url=main_menu,
+            msg=message.get('subflow_menu', 'access_main_menu'),
+        )
+    ))
+    display(Javascript('IPython.notebook.save_checkpoint();'))
 
 
 class SubflowMenu:
 
     def __init__(self) -> None:
+
         # サブフロー図
         # SVGにするとファイルとして出してしまうのでHTMLとして埋め込む
         self.diagram = pn.pane.HTML()
         # ラジオボタン
         self.selector = pn.widgets.RadioBoxGroup()
-        options = [
+        self.selector_options = [
             message.get('subflow_menu', 'select_abled_task'),
             message.get('subflow_menu', 'select_all_task')
         ]
-        self.selector.options = options
-        self.selector.value = options[0]
+        self.selector.options = self.selector_options
+        self.selector.value = self.selector_options[0]
         # ボタン
         self.button = pn.widgets.Button(
             name=message.get('subflow_menu', 'select_button_name'),
@@ -53,8 +55,7 @@ class SubflowMenu:
         pass
 
     def get_contents(self, svg_file_path: str):
-        return File(svg_file_path).read()
-
+        return file.File(svg_file_path).read()
 
     def get_svg_size(self, svg_file_path: str):
         """svgの画像の横幅を返す
@@ -85,6 +86,19 @@ class SubflowMenu:
             viewbox_width = 200
 
         return viewbox_width
+
+    def set_diagram(self, subflow: SubFlow, root_folder: Path, display_all=False):
+        with TemporaryDirectory() as workdir:
+            tmp_diag = Path(workdir) / 'skeleton.diag'
+            skeleton = Path(workdir) / 'skeleton.svg'
+            subflow.generate(
+                svg_path=str(skeleton),
+                tmp_diag=str(tmp_diag),
+                font=str(root_folder / '.fonts/ipag.ttf'),
+                display_all=display_all
+            )
+            self.diagram.object = self.get_contents(str(skeleton))
+            self.diagram.width = self.get_svg_size(str(skeleton))
 
     @classmethod
     def render(cls, working_file: str, is_selected=False):
@@ -122,15 +136,6 @@ class SubflowMenu:
         subflow_menu = cls()
         if is_selected:
             display(pn.Row(subflow_menu.selector, subflow_menu.button))
-        with TemporaryDirectory() as workdir:
-            tmp_diag = Path(workdir) / 'skeleton.diag'
-            skeleton = Path(workdir) / 'skeleton.svg'
-            subflow.generate(
-                svg_path=str(skeleton),
-                tmp_diag=str(tmp_diag),
-                font=str(root_folder / '.fonts/ipag.ttf')
-            )
-            subflow_menu.diagram.object = subflow_menu.get_contents(str(skeleton))
-            subflow_menu.diagram.width = subflow_menu.get_svg_size(str(skeleton))
-            display(subflow_menu.diagram)
+        subflow_menu.set_diagram(subflow, root_folder)
+        display(subflow_menu.diagram)
         display(Javascript('IPython.notebook.save_checkpoint();'))

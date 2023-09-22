@@ -103,13 +103,13 @@ def parse_headers(nb_path: Path):
             'summary': headers[0][1],
         },
         'headers': [
-            ({
+            {
                 'text': text,
                 'summary': (
                     summary if not re.match(r'(?:#|!\[)', summary) else ''),
             }
             for (text, summary) in headers[1:]
-            if text[0].isdigit())
+            if text[0].isdigit()
         ],
     }
 

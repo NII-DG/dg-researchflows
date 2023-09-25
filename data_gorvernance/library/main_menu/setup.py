@@ -48,10 +48,9 @@ class ContainerSetter():
         self._err_output = pn.WidgetBox()
         self._err_output.width = 900
 
-
-
-
-
+    def already_setup(self):
+        alert = pn.pane.Alert(msg_config.get('setup', 'setup_completed'),sizing_mode="stretch_width",alert_type='warning')
+        display(alert)
 
     @classmethod
     def setup_form(cls,nb_working_file_path:str):
@@ -62,8 +61,7 @@ class ContainerSetter():
         if os.path.exists(cs.setup_completed_file_path):
             # 存在する場合
             # 初期セットアップ済みとして、メインメニューへのボタンを表示する。
-            alert = pn.pane.Alert(msg_config.get('setup', 'setup_completed'),sizing_mode="stretch_width",alert_type='warning')
-            display(alert)
+            cs.already_setup()
             cs.display_main_menu(nb_working_file_path)
         else:
             # 存在しない場合

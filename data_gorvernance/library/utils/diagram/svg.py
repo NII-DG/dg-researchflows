@@ -228,8 +228,10 @@ def insert_title(parent_elem, childpos, rect, title, link):
 
     if link:
         text_elems = create_anchor(text_elems, link)
-
-    parent_elem.insert(childpos, text_elems)
+        parent_elem.insert(childpos, text_elems)
+    else:
+        for text_elem in text_elems:
+            parent_elem.insert(childpos, text_elem)
     return len(lines)
 
 def insert_headers(parent_elem, childpos, rect, headers, title_lines):

@@ -21,8 +21,18 @@ SVG_TEXT = '{http://www.w3.org/2000/svg}text'
 SVG_RECT = '{http://www.w3.org/2000/svg}rect'
 
 
-def update_svg(output: str, current_dir:str, notebook_dir:str, task_dict):
-        _embed_detail_information(current_dir, Path(output), Path(notebook_dir), task_dict)
+def init_config(id, name):
+    return {
+        id : {
+            'name': name,
+            'is_link': True,
+            'init_nb': True
+        }
+    }
+
+
+def update_svg(output: str, current_dir:str, notebook_dir:str, config):
+        _embed_detail_information(current_dir, Path(output), Path(notebook_dir), config)
 
 def setup_python_path():
     ver = sys.version_info
@@ -31,7 +41,7 @@ def setup_python_path():
     if lib_path not in sys.path:
         sys.path.append(lib_path)
 
-def _embed_detail_information(current_dir, skeleton, dir_util, task_dict):
+def _embed_detail_information(current_dir, skeleton, dir_util, config):
     # Notebookのヘッダ取得
     nb_headers = _get_notebook_headers(dir_util)
 
@@ -40,40 +50,52 @@ def _embed_detail_information(current_dir, skeleton, dir_util, task_dict):
 
     # 雛形をNotebook情報で置き換え
     for elem in list(tree.findall(SVG_TEXT)):
-        if _is_target_rect(elem, nb_headers.keys(), task_dict):
-            nb_name = _find_matching_notebook(nb_headers.keys(), elem.text, task_dict)
+        if _is_target_rect(elem, nb_headers.keys(), config):
+            nb_name = _find_matching_notebook(nb_headers.keys(), elem.text, config)
+            nb_headers = _update_notebook_link(nb_headers, config[elem.text])
             _embed_info_in_one_rect(elem, nb_headers, nb_name, current_dir)
 
     # svgファイルを上書き
     with skeleton.open(mode='wb') as f:
         f.write(etree.tostring(tree, method='xml', pretty_print=True))
 
-def _is_target_rect(elem, notebooks, task_dict):
+def _is_target_rect(elem, notebooks, config):
     return (
         elem.getprevious() is not None and
         #elem.getprevious().tag == SVG_RECT and
         len(elem.text) > 0 and
-        _find_matching_notebook(notebooks, elem.text, task_dict) is not None)
+        _find_matching_notebook(notebooks, elem.text, config) is not None)
 
-def _find_matching_notebook(notebooks, title, task_dict):
+def _find_matching_notebook(notebooks, id, config):
     """ノードの表示名に対応したノートブックを探す
 
     Args:
         notebooks (List[str]): ノートブック名のリスト
         title (str): タスクの機能ID
-        task_dict (dict[str, str]): {id: name}
+        config (dict[str, str]): {id: name}
 
     Returns:
         str: ノートブック名
     """
     # IDからノートブック名(拡張子無し)を取得
-    title = task_dict.get(title, "")
-    # ノートブック名が一致するものがあれば返す
-    if not title:
+    title = config.get(id, "")
+    if title:
+        title = title['name']
+    else:
         return
+    # 対応したノートブックを探す
     for nb in notebooks:
         if nb.startswith(title):
             return nb
+
+def _update_notebook_link(nb_headers, value):
+
+    if not value['is_link']:
+        nb_headers[value['name']]['path'] = ""
+    if value['init_nb']:
+        link = nb_headers[value['name']]['path']
+        nb_headers[value['name']]['path'] = link + "?init_nb=true"
+    return nb_headers
 
 def parse_headers(nb_path: Path):
     nb = read(str(nb_path), as_version=NO_CONVERT)
@@ -148,7 +170,8 @@ def notebooks_toc(nb_dir):
 def _embed_info_in_one_rect(elem, nb_headers, nb_name, current_dir):
     headers = nb_headers[nb_name]
     nb_file = nb_headers[nb_name]['path']
-    nb_file = file.relative_path(nb_file, current_dir).replace("../", "./../")
+    if nb_file:
+        nb_file = file.relative_path(nb_file, current_dir).replace("../", "./../")
     rect_elem = elem.getprevious()
     rect = (
         (int(rect_elem.attrib['x']), int(rect_elem.attrib['y'])),
@@ -175,30 +198,38 @@ def remove_texts(elem):
         old_text = next_text
 
 def insert_title(parent_elem, childpos, rect, title, link):
+    if link:
+        font_color = title_font_color
+    else:
+        font_color = text_font_color
+
     height_title = (
         text_margin + (title_font_size + text_margin) * 2 + head_margin * 2)
     lines = split_title(title)
     if len(lines) == 2:
         # 分割された場合
-        text_elem = create_text(rect, title_font_size, font_weight='bold', font_color=title_font_color)
+        text_elem = create_text(rect, title_font_size, font_weight='bold', font_color=font_color)
         text_elem.text = lines[0]
         text_elem.attrib['y'] = str(
                 rect[0][1] + head_margin + text_margin + title_font_size)
         text_elems = [text_elem]
 
-        text_elem = create_text(rect, title_font_size, font_weight='bold', font_color=title_font_color)
+        text_elem = create_text(rect, title_font_size, font_weight='bold', font_color=font_color)
         text_elem.text = lines[1]
         text_elem.attrib['y'] = str(
                 rect[0][1] + height_title - text_margin - head_margin)
         text_elems.append(text_elem)
     else:
-        text_elem = create_text(rect, title_font_size, font_weight='bold', font_color=title_font_color)
+        text_elem = create_text(rect, title_font_size, font_weight='bold', font_color=font_color)
         text_elem.text = title
         text_elem.attrib['y'] = str(
                 rect[0][1] + height_title // 2 + title_font_size // 2)
         text_elems = [text_elem]
 
-    parent_elem.insert(childpos, create_anchor(text_elems, link))
+    if link:
+        text_elems = create_anchor(text_elems, link)
+
+    parent_elem.insert(childpos, text_elems)
     return len(lines)
 
 def insert_headers(parent_elem, childpos, rect, headers, title_lines):

@@ -24,10 +24,13 @@ def relative_path(target_path, start_dir):
     Returns:
         str: start_dirからtarget_pathまでの相対パス
     """
-    return os.path.relpath(
-                path=os.path.normpath(target_path),
-                start=os.path.normpath(start_dir)
-            )
+    if target_path and start_dir:
+        return os.path.relpath(
+                    path=os.path.normpath(target_path),
+                    start=os.path.normpath(start_dir)
+                )
+    else:
+        return ""
 
 
 class File:

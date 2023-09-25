@@ -1,2 +1,2 @@
 from .diag import DiagManager
-from .svg import add_link
+from .svg import init_config, update_svg

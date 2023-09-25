@@ -1,0 +1,57 @@
+blockdiag {
+    node_width = 200;
+    node_height = 130;
+    span_width = 10;
+    span_height = 30;
+    default_fontsize = 10;
+    orientation = portrait;
+
+    group {
+        shape = line;
+        style = none;
+
+        group {
+            shape = line;
+            style = none;
+            orientation = portrait;
+            label = "実験のセットアップ"
+            group {
+                orientation = portrait;
+                color = "#FFFFCC";
+                RF003001;
+                RF003002[stacked];
+            }
+        }
+
+        group {
+            shape = line;
+            style = none;
+            orientation = portrait;
+            group {
+                orientation = portrait;
+                color = "#FFFFCC";
+                RF003003[stacked];
+                RF009002[stacked];
+                RF003007;
+            }
+        }
+        group{
+            shape = line;
+            style = none;
+            label = "解析"
+            orientation = portrait;
+            group {
+                orientation = portrait;
+                color = "#FFFFCC";
+                RF003013[stacked];
+            }
+        }
+    }
+
+    RF003001 -> RF003002
+    RF003003 -> RF003013
+
+    RF003002 -> RF003003
+    RF003002 -> RF009002
+    RF003002 -> RF003007
+}

@@ -5,18 +5,17 @@ blockdiag {
     span_height = 30;
     default_fontsize = 10;
     orientation = portrait;
+    default_group_color = "#FFFFCC";
 
     group {
         shape = line;
         style = none;
 
         group {
-            color = "#FFFFCC";
             RF002001;
         }
 
         group {
-            color = "#FFFFCC";
             RF009002[stacked];
         }
     }

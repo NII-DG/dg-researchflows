@@ -1,10 +1,17 @@
 import os
+import re
 from ..utils.config import path_config, message as msg_config
+from ..utils.storage_provider.gin import gin
 from ..subflow.menu import access_main_menu
 from pathlib import Path
 import panel as pn
 from IPython.display import display
 from IPython.core.display import Javascript, HTML
+import traceback
+from ..utils.error import Unauthorized
+import requests
+
+
 
 DEFAULT_WIDTH = 600
 SELECT_DEFAULT_VALUE = '--'
@@ -38,19 +45,105 @@ class ContainerSetter():
 
     def define_setup_form(self):
         # ユーザ名
-        self.user_name_form = pn.widgets.TextInput(name=msg_config.get('user_auth','username_title'), placeholder=msg_config.get('user_auth','username_help'), width=DEFAULT_WIDTH)
+        self._user_name_form = pn.widgets.TextInput(name=msg_config.get('user_auth','username_title'), placeholder=msg_config.get('user_auth','username_help'), width=DEFAULT_WIDTH)
         # パスワード
-        self.password_form = pn.widgets.PasswordInput(name=msg_config.get('user_auth','password_title'), placeholder=msg_config.get('user_auth','password_help'), width=DEFAULT_WIDTH)
+        self._password_form = pn.widgets.PasswordInput(name=msg_config.get('user_auth','password_title'), placeholder=msg_config.get('user_auth','password_help'), width=DEFAULT_WIDTH)
         # 送信ボタン
-        self.submit_button = pn.widgets.Button(name=msg_config.get('form','submit_button'), button_type= "default", width=DEFAULT_WIDTH)
+        self._submit_button = pn.widgets.Button()
+        self.change_submit_button_init(msg_config.get('form','submit_button'))
+        self._submit_button.on_click(self.callback_submit_user_auth)
 
         # システムエラーメッセージオブジェクトの定義
-        self._err_output = pn.WidgetBox()
-        self._err_output.width = 900
+        self._msg_output = pn.WidgetBox()
+        self._msg_output.width = 900
+
+    def callback_submit_user_auth(self, event):
+        # 入力値を取得する
+        user_name = self._user_name_form.value
+        password = self._password_form.value
+
+        # 入力値のバリエーション
+        ## user_name
+        if user_name is None or len(user_name)<= 0:
+            self.change_submit_button_warning(name=msg_config.get('form', 'none_input_value').format(msg_config.get('form', 'user_name')))
+            return
+
+        if not self.validate_format_username(user_name):
+            self.change_submit_button_warning(name=msg_config.get('form', 'invali_input_value').format(msg_config.get('form', 'user_name')))
+            self._msg_output.clear()
+            alert = pn.pane.Alert(msg_config.get('form', 'username_pattern_error'), sizing_mode="stretch_width",alert_type='warning')
+            self._msg_output.append(alert)
+            return
+
+        ## password
+        if password is None or len(password) <= 0:
+            self.change_submit_button_warning(name=msg_config.get('form', 'none_input_value').format(msg_config.get('form', 'password')))
+            return
+
+        #認証検証準備（GIN-forkのドメインをparam.jsonに用意する）
+        try:
+            gin.init_param_url()
+        except:
+            self.change_submit_button_error(name=msg_config.get('DEFAULT', 'unexpected_error'))
+            self._msg_output.clear()
+            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
+            self._msg_output.append(alert)
+            return
+
+        # 認証検証
+        try:
+            gin.setup_local(user_name, password)
+        except Unauthorized:
+            self.change_submit_button_warning(name=msg_config.get('form', 'invali_input_value').format(msg_config.get('form', 'user_name')+'/'+ msg_config.get('form', 'password')))
+            self._msg_output.clear()
+            alert = pn.pane.Alert(msg_config.get('user_auth','unauthorized'), sizing_mode="stretch_width",alert_type='warning')
+            self._msg_output.append(alert)
+            return
+        except Exception as e:
+            self.change_submit_button_error(name=msg_config.get('DEFAULT', 'unexpected_error'))
+            self._msg_output.clear()
+            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
+            self._msg_output.append(alert)
+            return
+        else:
+            self.change_submit_button_success(msg_config.get('user_auth','success'))
+            return
+
+
+
+    def validate_format_username(self, user_name:str):
+        validation = re.compile(r'^[a-zA-Z0-9\-_.]+$')
+        return validation.fullmatch(user_name)
+
 
     def already_setup(self):
         alert = pn.pane.Alert(msg_config.get('setup', 'setup_completed'),sizing_mode="stretch_width",alert_type='warning')
         display(alert)
+
+    def change_submit_button_init(self, name):
+        self._submit_button.name = name
+        self._submit_button.button_type = 'primary'
+        self._submit_button.button_style = 'solid'
+
+    def change_submit_button_processing(self, name):
+        self._submit_button.name = name
+        self._submit_button.button_type = 'primary'
+        self._submit_button.button_style = 'outline'
+
+    def change_submit_button_success(self, name):
+        self._submit_button.name = name
+        self._submit_button.button_type = 'success'
+        self._submit_button.button_style = 'solid'
+
+    def change_submit_button_warning(self, name):
+        self._submit_button.name = name
+        self._submit_button.button_type = 'warning'
+        self._submit_button.button_style = 'solid'
+
+    def change_submit_button_error(self, name):
+        self._submit_button.name = name
+        self._submit_button.button_type = 'danger'
+        self._submit_button.button_style = 'solid'
 
     @classmethod
     def setup_form(cls,nb_working_file_path:str):
@@ -70,9 +163,129 @@ class ContainerSetter():
             ## フォームを定義する
             cs.define_setup_form()
             ## フォームを表示する。
+            form_section = pn.WidgetBox()
+            form_section.append(cs._user_name_form)
+            form_section.append(cs._password_form)
+            form_section.append(cs._submit_button)
+            form_section.append(cs._msg_output)
+            display(form_section)
 
-            pass
+    @classmethod
+    def delete_build_token(cls):
+        cls.check_imcomplete_auth()
 
+        ok, msg =gin.del_build_token()
+        if ok and msg is None:
+            # パブリックのためのリクエストしなかった
+            alert = pn.pane.Alert(msg_config.get('build_token', 'not_need_del'),sizing_mode="stretch_width",alert_type='info')
+            display(alert)
+        elif ok and msg is not None and msg == '':
+            # 削除成功
+            alert = pn.pane.Alert(msg_config.get('build_token', 'success'),sizing_mode="stretch_width",alert_type='success')
+            display(alert)
+        elif ok and msg is not None and len(msg) > 0:
+            # リクエストしたが削除しなかった
+            alert = pn.pane.Alert(msg,sizing_mode="stretch_width",alert_type='info')
+            display(alert)
+        elif not ok:
+            alert = pn.pane.Alert(msg_config.get('build_token', 'error'),sizing_mode="stretch_width",alert_type='danger')
+            display(alert)
+            raise Exception('Failed to delete token.')
+
+    @classmethod
+    def datalad_create(cls, nb_working_file_path:str):
+        cls.check_imcomplete_auth()
+        cs = ContainerSetter(nb_working_file_path)
+
+        try:
+            ok = gin.datalad_create(cs._abs_root_path)
+            if ok:
+                alert = pn.pane.Alert(msg_config.get('setup','datalad_create_success'),sizing_mode="stretch_width",alert_type='info')
+                display(alert)
+            else:
+                alert = pn.pane.Alert(msg_config.get('setup','datalad_create_already'),sizing_mode="stretch_width",alert_type='info')
+                display(alert)
+
+        except Exception as e:
+            alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),sizing_mode="stretch_width",alert_type='danger')
+            display(alert)
+            raise e
+
+    @classmethod
+    def ssh_create_key(cls, nb_working_file_path:str):
+        cls.check_imcomplete_auth()
+        cs = ContainerSetter(nb_working_file_path)
+
+        try:
+            if gin.create_key(cs._abs_root_path):
+                alert = pn.pane.Alert(msg_config.get('setup','ssh_create_success'),sizing_mode="stretch_width",alert_type='info')
+            else:
+                alert = pn.pane.Alert(msg_config.get('setup','ssh_already_create'),sizing_mode="stretch_width",alert_type='info')
+            display(alert)
+        except Exception as e:
+            alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),sizing_mode="stretch_width",alert_type='danger')
+            display(alert)
+            raise e
+
+    @classmethod
+    def upload_ssh_key(cls, nb_working_file_path:str):
+        cls.check_imcomplete_auth()
+        cs = ContainerSetter(nb_working_file_path)
+
+        try:
+            msg = gin.upload_ssh_key(cs._abs_root_path)
+            alert = pn.pane.Alert(msg ,sizing_mode="stretch_width",alert_type='info')
+            display(alert)
+        except Exception as e:
+            alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),sizing_mode="stretch_width",alert_type='danger')
+            display(alert)
+            raise e
+
+    @classmethod
+    def ssh_trust_gin(cls, nb_working_file_path:str):
+        cls.check_imcomplete_auth()
+        cs = ContainerSetter(nb_working_file_path)
+
+        try:
+            gin.trust_gin(cs._abs_root_path)
+            alert = pn.pane.Alert(msg_config.get('setup','trust_gin') ,sizing_mode="stretch_width",alert_type='info')
+            display(alert)
+        except Exception as e:
+            alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),sizing_mode="stretch_width",alert_type='danger')
+            display(alert)
+            raise e
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    @classmethod
+    def check_imcomplete_auth(cls):
+        if gin.exist_user_info():
+            alert = pn.pane.Alert(msg_config.get('user_auth', 'imcomplete_auth'),sizing_mode="stretch_width",alert_type='warning')
+            display(alert)
+            raise Exception('Authentication not completed')
 
     @classmethod
     def completed_setup(cls,nb_working_file_path:str):

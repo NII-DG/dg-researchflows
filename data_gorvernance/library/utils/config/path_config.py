@@ -37,9 +37,13 @@ STATUS_JSON = 'status.json'
 PROPERTY_JSON = 'property.json'
 PLAN_JSON = 'plan.json'
 FLOW_DIAG = 'flow.diag'
+TOKEN = 'token.json'
+USER_INFO = 'user_info.json'
 
 # File Path
 SETUP_COMPLETED_TEXT_PATH = os.path.join(DG_WORKING_FOLDER, 'setup_completed.txt')
+TOKEN_JSON_PAHT = os.path.join(DG_WORKING_FOLDER, TOKEN)
+USER_INFO_PATH = os.path.join(DG_WORKING_FOLDER, USER_INFO)
 MAIN_MENU_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, 'main.ipynb')
 # data_gorvernance/researchflow/plan/status.json
 PLAN_TASK_STATUS_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, STATUS_JSON)

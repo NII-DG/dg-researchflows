@@ -48,12 +48,16 @@ class SubflowMenu:
             button_type= "default",
             align= 'end'
         )
-        self.button.on_click(self.select_flow)
         # エラー出力
         self.error_output = pn.WidgetBox()
 
-    def select_flow(self, event):
-        pass
+    def select_flow(self, subflow: SubFlow, root_folder: Path):
+        def callback(event):
+            display_all = True
+            if self.selector.value == self.selector_options[0]:
+                display_all = False
+            self.set_diagram(subflow, root_folder, display_all)
+        return callback
 
     def get_contents(self, svg_file_path: str):
         return file.File(svg_file_path).read()
@@ -136,6 +140,7 @@ class SubflowMenu:
         pn.extension()
         subflow_menu = cls()
         if is_selected:
+            subflow_menu.button.on_click(subflow_menu.select_flow(subflow, root_folder))
             display(pn.Row(subflow_menu.selector, subflow_menu.button))
         subflow_menu.set_diagram(subflow, root_folder, not is_selected)
         display(subflow_menu.diagram)

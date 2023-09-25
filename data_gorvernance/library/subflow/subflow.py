@@ -99,13 +99,17 @@ class SubFlow:
     def _adjust_by_optional(self, task: TaskStatus, display_all=True):
         if task.disable:
             if display_all:
-                self.diag.update_node_style(task.id, 'dotted')
+                #self.diag.update_node_style(task.id, 'dotted')
+                pass
             else:
-                self.diag.delete_node(task.id)
+                # self.diag.delete_node(task.id)
+                # 以下暫定処理
+                self.diag.update_node_color(task.id, "#77787B")
+                self.svg_config[task.id]['is_link'] = False
 
     def _adjust_by_status(self, task: TaskStatus):
         if task.status == task.STATUS_UNFEASIBLE:
-            self.diag.update_node_color(task.id, "#77787B")
+            self.diag.update_node_color(task.id, "#e6e5e3")
             self.svg_config[task.id]['is_link'] = False
             return
 

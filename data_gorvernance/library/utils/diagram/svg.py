@@ -52,7 +52,7 @@ def _embed_detail_information(current_dir, skeleton, dir_util, config):
     for elem in list(tree.findall(SVG_TEXT)):
         if _is_target_rect(elem, nb_headers.keys(), config):
             nb_name = _find_matching_notebook(nb_headers.keys(), elem.text, config)
-            nb_headers = _update_notebook_link(nb_headers, config[elem.text])
+            nb_headers = _update_notebook_link(nb_headers, nb_name, config[elem.text])
             _embed_info_in_one_rect(elem, nb_headers, nb_name, current_dir)
 
     # svgファイルを上書き
@@ -88,13 +88,13 @@ def _find_matching_notebook(notebooks, id, config):
         if nb.startswith(title):
             return nb
 
-def _update_notebook_link(nb_headers, value):
+def _update_notebook_link(nb_headers, nb_name, value):
 
     if not value['is_link']:
-        nb_headers[value['name']]['path'] = ""
-    if value['init_nb']:
+        nb_headers[nb_name]['path'] = ""
+    elif value['init_nb']:
         link = nb_headers[value['name']]['path']
-        nb_headers[value['name']]['path'] = link + "?init_nb=true"
+        nb_headers[nb_name]['path'] = link + "?init_nb=true"
     return nb_headers
 
 def parse_headers(nb_path: Path):

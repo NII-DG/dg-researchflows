@@ -1,7 +1,7 @@
 blockdiag {
     node_width = 200;
     node_height = 130;
-    span_width = 10;
+    span_width = 20;
     span_height = 30;
     default_fontsize = 10;
     orientation = portrait;

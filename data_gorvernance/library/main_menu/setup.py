@@ -42,7 +42,7 @@ class ContainerSetter():
         # パスワード
         self.password_form = pn.widgets.PasswordInput(name=msg_config.get('user_auth','password_title'), placeholder=msg_config.get('user_auth','password_help'), width=DEFAULT_WIDTH)
         # 送信ボタン
-        self.submit_button = pn.widgets.Button(name=msg_config.get('user_auth','end_input'), button_type= "default", width=DEFAULT_WIDTH)
+        self.submit_button = pn.widgets.Button(name=msg_config.get('form','submit_button'), button_type= "default", width=DEFAULT_WIDTH)
 
         # システムエラーメッセージオブジェクトの定義
         self._err_output = pn.WidgetBox()

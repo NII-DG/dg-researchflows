@@ -21,7 +21,7 @@ SVG_TEXT = '{http://www.w3.org/2000/svg}text'
 SVG_RECT = '{http://www.w3.org/2000/svg}rect'
 
 
-def add_link(output: str, current_dir:str, notebook_dir:str, task_dict):
+def update_svg(output: str, current_dir:str, notebook_dir:str, task_dict):
         _embed_detail_information(current_dir, Path(output), Path(notebook_dir), task_dict)
 
 def setup_python_path():

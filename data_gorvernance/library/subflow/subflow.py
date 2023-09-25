@@ -2,7 +2,7 @@ import os
 
 from .status import StatusFile, TaskStatus
 from ..utils import file
-from ..utils.diagram import DiagManager, add_link
+from ..utils.diagram import DiagManager, update_svg
 from ..utils.config import path_config
 from ..main_menu.research_flow_status import ResearchFlowStatusOperater
 
@@ -84,12 +84,12 @@ class SubFlow:
 
     def generate(self, svg_path: str, tmp_diag: str, font: str, display_all=True):
         # tmp_diagは暫定的なもの。将来的にはself.diagを利用できるようにする
-        self._update_diag(display_all)
+        self._update(display_all)
         self.diag.generate_svg(tmp_diag, svg_path, font)
         task_dict = {task.id: task.name for task in self.tasks}
-        add_link(svg_path, self.current_dir, self.task_dir, task_dict)
+        update_svg(svg_path, self.current_dir, self.task_dir, task_dict)
 
-    def _update_diag(self, display_all=True):
+    def _update(self, display_all=True):
         for task in self.tasks:
             self._adjust_by_status(task)
             self._adjust_by_optional(task, display_all)

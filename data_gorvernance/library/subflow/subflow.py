@@ -108,6 +108,8 @@ class SubFlow:
                 self.svg_config[task.id]['is_link'] = False
 
     def _adjust_by_status(self, task: TaskStatus):
+        if task.disable:
+            return
         if task.status == task.STATUS_UNFEASIBLE:
             self.diag.update_node_color(task.id, "#e6e5e3")
             self.svg_config[task.id]['is_link'] = False

@@ -93,7 +93,7 @@ def _update_notebook_link(nb_headers, nb_name, value):
     if not value['is_link']:
         nb_headers[nb_name]['path'] = ""
     elif value['init_nb']:
-        link = nb_headers[value['name']]['path']
+        link = nb_headers[nb_name]['path']
         nb_headers[nb_name]['path'] = link + "?init_nb=true"
     return nb_headers
 

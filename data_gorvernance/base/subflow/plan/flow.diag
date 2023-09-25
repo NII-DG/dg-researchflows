@@ -1,22 +1,21 @@
 blockdiag {
     node_width = 200;
     node_height = 130;
-    span_width = 10;
+    span_width = 20;
     span_height = 30;
     default_fontsize = 10;
     orientation = portrait;
+    default_group_color = "#FFFFCC";
 
     group {
         shape = line;
         style = none;
 
         group {
-            color = "#FFFFCC";
             RF002001;
         }
 
         group {
-            color = "#FFFFCC";
             RF009002[stacked];
         }
     }

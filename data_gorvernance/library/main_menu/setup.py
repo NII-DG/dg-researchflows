@@ -255,6 +255,18 @@ class ContainerSetter():
             display(alert)
             raise e
 
+    @classmethod
+    def prepare_sync(cls, nb_working_file_path:str):
+        pass
+
+    @classmethod
+    def setup_sibling(cls, nb_working_file_path:str):
+        pass
+
+    @classmethod
+    def syncs_config(cls, nb_working_file_path:str):
+        pass
+
 
 
 

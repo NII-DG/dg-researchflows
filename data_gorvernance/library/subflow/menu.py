@@ -88,7 +88,7 @@ class SubflowMenu:
 
         return viewbox_width
 
-    def set_diagram(self, subflow: SubFlow, root_folder: Path, display_all=False):
+    def set_diagram(self, subflow: SubFlow, root_folder: Path, display_all=True):
         with TemporaryDirectory() as workdir:
             tmp_diag = Path(workdir) / 'skeleton.diag'
             skeleton = Path(workdir) / 'skeleton.svg'
@@ -137,6 +137,6 @@ class SubflowMenu:
         subflow_menu = cls()
         if is_selected:
             display(pn.Row(subflow_menu.selector, subflow_menu.button))
-        subflow_menu.set_diagram(subflow, root_folder)
+        subflow_menu.set_diagram(subflow, root_folder, not is_selected)
         display(subflow_menu.diagram)
         display(Javascript('IPython.notebook.save_checkpoint();'))

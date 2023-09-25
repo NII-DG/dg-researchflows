@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 from .status import StatusFile, TaskStatus
 from ..utils import file

@@ -4,6 +4,7 @@
 import os
 from typing import List
 
+
 # Folder
 ### 1階層目
 DATA_GOVERNANCE = 'data_gorvernance'

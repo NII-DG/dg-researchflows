@@ -15,22 +15,36 @@ blockdiag {
             style = none;
             orientation = portrait;
             label = "実験のセットアップ"
-            color = "#FFFFCC";
-
-            RF003001;
-            RF003002[stacked];
+            group {
+                orientation = portrait;
+                color = "#FFFFCC";
+                RF003001;
+                RF003002[stacked];
+            }
         }
 
         group {
-            RF003003[stacked];
-            RF009002[stacked];
-            RF003007;
+            shape = line;
+            style = none;
+            orientation = portrait;
+            group {
+                orientation = portrait;
+                color = "#FFFFCC";
+                RF003003[stacked];
+                RF009002[stacked];
+                RF003007;
+            }
         }
-
-        group {
+        group{
+            shape = line;
+            style = none;
             label = "解析"
-            color = "#FFFFCC";
-            RF003013[stacked];
+            orientation = portrait;
+            group {
+                orientation = portrait;
+                color = "#FFFFCC";
+                RF003013[stacked];
+            }
         }
     }
 

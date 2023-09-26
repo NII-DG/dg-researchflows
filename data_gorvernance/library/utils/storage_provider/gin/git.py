@@ -34,6 +34,31 @@ def git_commmit(msg:str, cwd):
     result = stdout.decode('utf-8')
     return result
 
+def git_pull(cwd):
+    stdout, stderr, rt = Cmd.exec_subprocess('git pull', cwd=cwd, raise_error=False)
+    result = stdout.decode('utf-8')
+    return result
+
+
+def git_branch(cwd, option=''):
+    if len(option) > 0:
+        stdout, stderr, rt = Cmd.exec_subprocess(f'git branch {option}', cwd=cwd,raise_error=False)
+    else:
+        stdout, stderr, rt = Cmd.exec_subprocess(f'git branch', cwd=cwd,raise_error=False)
+    result = stdout.decode('utf-8')
+    return result
+
+def git_branch_for_remote(cwd):
+    return git_branch(cwd, '-r')
+
+def is_annex_branch_in_repote(cwd):
+    result = git_branch_for_remote(cwd)
+    if 'origin/git-annex' in result:
+        return True
+    else:
+        return False
+
+
 def exec_git_status(cwd):
     """execute 'git status' commands
 

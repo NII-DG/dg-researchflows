@@ -335,7 +335,7 @@ class ContainerSetter():
         candidate_paths = [path_config.DOT_GITIGNORE, path_config.DATA_GOVERNANCE]
         git_path = []
         path_msg = ''
-        for index, path in enumerate(candidate_paths):
+        for path in candidate_paths:
             git_path.append(os.path.join(cs._abs_root_path, path))
             path_msg += f'・ {path}<br>'
         commit_message = msg_config.get('commit_message', 'setup')
@@ -345,7 +345,7 @@ class ContainerSetter():
 {path_msg}
 
 コミットメッセージ<br>
-{commit_message}
+・{commit_message}
 """
 
         alert = pn.pane.Alert(msg ,sizing_mode="stretch_width",alert_type='info')

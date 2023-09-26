@@ -45,7 +45,7 @@ class SubflowMenu:
         # ボタン
         self.button = pn.widgets.Button(
             name=message.get('subflow_menu', 'select_button_name'),
-            button_type= "'primary'",
+            button_type= "primary",
             align= 'end'
         )
         # エラー出力

@@ -84,6 +84,7 @@ class SubFlow:
                         file.copy_file(source_path, destination_path)
 
     def generate(self, svg_path: str, tmp_diag: str, font: str, display_all=True):
+        # 毎回元ファイルを読み込む
         self.diag = DiagManager(self.diag_file)
         # tmp_diagは暫定的なもの。将来的にはself.diagを利用できるようにする
         self.svg_config = {}
@@ -101,7 +102,7 @@ class SubFlow:
     def _adjust_by_optional(self, task: TaskStatus, display_all=True):
         if task.disable:
             if display_all:
-                self.diag.update_node_style(task.id, 'dotted')
+                #self.diag.update_node_style(task.id, 'dotted')
                 pass
             else:
                 # self.diag.delete_node(task.id)

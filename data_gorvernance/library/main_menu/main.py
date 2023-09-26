@@ -611,7 +611,7 @@ class MainMenu():
             # display initial setup link button
             initial_setup_link_button = pn.pane.HTML()
             initial_setup_link_button.object = html_button.create_button(
-                url = './setup.ipynb',
+                url = './setup.ipynb?init_nb=true',
                 msg=msg_config.get('main_menu', 'access_initial_setup'),
                 button_width='500px'
             )

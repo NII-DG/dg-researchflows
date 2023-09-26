@@ -35,7 +35,13 @@ class DiagManager:
         self.change_node_property(node_id, "style", style)
 
     def delete_node(self, node_id):
-        pass
+        find = f'{node_id}['
+        replace = ''
+        update_content = self.content.replace(find, replace, 1)
+        if update_content == self.content:
+            find = f'{node_id}'
+            update_content = self.content.replace(find, replace, 1)
+        self.content = update_content
 
     def generate_svg(self, tmp_diag: str, output: str, font: str):
         File(str(tmp_diag)).write(self.content)

@@ -7,31 +7,75 @@ blockdiag {
     orientation = portrait;
     default_group_color = "#FFFFCC";
 
+    class disable [shape=none, width=1];
+
     group {
         shape = line;
         style = none;
 
         group {
+            shape = line;
+            style = none;
             label = "実験のセットアップ"
-            RF003001;
-            RF003002[stacked];
+            fontsize = 20;
+            group {
+                shape = line;
+                style = none;
+                dummy-1-1[class="disable"];
+                dummy-2-1[class="disable"];
+            }
+            group {
+                RF003001;
+                RF003002[stacked];
+            }
         }
 
         group {
-            RF003003[stacked];
-            RF009002[stacked];
-            RF003007;
+            shape = line;
+            style = none;
+            group {
+                color = "#ffffff"
+                dummy-3-1[class="disable", height=1];
+                dummy-3-2[class="disable", height=1];
+                dummy-3-3[class="disable", height=1];
+            }
+
+            group {
+                shape = line;
+                color = "#000000"
+                dummy-4-1[class="disable", height=160];
+                RF003003[stacked];
+                RF009002[stacked];
+                RF003007;
+                dummy-4-5[class="disable", height=160];
+            }
         }
+
         group{
-            label = "解析"
-            RF003013[stacked];
-        }
+            shape = line;
+            style = none;
+            group {
+                shape = line;
+                style = none;
+                dummy-5-1[class="disable", height=1];
+                dummy-5-2[class="disable", height=1];
+            }
+            group{
+                shape = line;
+                style = none;
+                dummy-6-1[class="disable"];
+                group {
+                    label = "解析"
+                    fontsize = 16;
+                    RF003013[stacked];
+                }
+            }
+       }
     }
 
-    RF003001 -> RF003002
-    RF003003 -> RF003013
+    RF003001 -> RF003002;
+    RF003002 -> dummy-3-2;
+    RF003003 -> dummy-5-2;
 
-    RF003002 -> RF003003
-    RF003002 -> RF009002
-    RF003002 -> RF003007
+    dummy-1-1 -> dummy-2-1 -> dummy-3-1 -> dummy-4-1 -> dummy-5-1 -> dummy-6-1[style=none];
 }

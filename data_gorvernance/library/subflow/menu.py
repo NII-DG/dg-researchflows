@@ -32,9 +32,14 @@ class SubflowMenu:
 
     def __init__(self) -> None:
 
+        # 表示するウィジェットを格納する
+        self.menu_widgetbox = pn.WidgetBox()
         # サブフロー図
         # SVGにするとファイルとして出してしまうのでHTMLとして埋め込む
         self.diagram = pn.pane.HTML()
+        # フロー図の配置
+        self.title = pn.pane.Markdown()
+        self.diagram_widgetbox = pn.WidgetBox(self.title, self.diagram)
         # ラジオボタン
         self.selector = pn.widgets.RadioBoxGroup()
         self.selector_options = [
@@ -46,15 +51,34 @@ class SubflowMenu:
 
         self.button = pn.widgets.Button(
             name=message.get('subflow_menu', 'select_button_name'),
-            button_type= "default",
+            button_type= "primary",
             align= 'end'
         )
-        self.button.on_click(self.select_flow)
-        # エラー出力
-        self.error_output = pn.WidgetBox()
+        # ボタンの配置
+        self.select_widgetbox = pn.WidgetBox()
+        self.select_widgetbox.append(
+            pn.Row(self.selector, self.button, margin=(10,10,10,25))
+        )
 
-    def select_flow(self, event):
-        pass
+    def select_flow(self, subflow: SubFlow, root_folder: Path):
+        def callback(event):
+            self.diagram_widgetbox.disabled = True
+            self.set_title()
+            self.set_diagram(subflow, root_folder, self.is_display_all())
+            self.diagram_widgetbox.disabled = False
+        return callback
+
+    def is_display_all(self):
+        display_all = True
+        if self.selector.value == self.selector_options[0]:
+            display_all = False
+        return display_all
+
+    def set_title(self):
+        if self.is_display_all():
+            self.title.object = f'### {message.get("subflow_menu", "title_all_task")}'
+        else:
+            self.title.object = f'### {message.get("subflow_menu", "title_abled_task")}'
 
     def get_contents(self, svg_file_path: str):
         return file.File(svg_file_path).read()
@@ -73,21 +97,26 @@ class SubflowMenu:
         root = tree.getroot()
         # <svg>要素からviewBox属性を取得
         viewbox_value = root.get('viewBox')
-
-        viewbox_width = 0
         # viewbox_valueを解析して幅と高さを取得
+        viewbox_width = 0
         if viewbox_value:
             viewbox_parts = viewbox_value.split()
             if len(viewbox_parts) == 4:
                 viewbox_width = int(viewbox_parts[2])
                 viewbox_height = int(viewbox_parts[3])
-
-        if 900 < viewbox_width:
-            viewbox_width = 900
+        # 大きさを調節
+        if 800 < viewbox_width:
+            viewbox_width = 800
         elif viewbox_width < 200:
             viewbox_width = 200
-
         return viewbox_width
+
+    def _set_width(self):
+        """フロー図の大きさをもとにwidgetboxの大きさを統一"""
+        d = self.diagram.width + 20
+        self.menu_widgetbox.width = d
+        self.diagram_widgetbox.width = d
+        self.select_widgetbox.width = d
 
     def set_diagram(self, subflow: SubFlow, root_folder: Path, display_all=True):
         with TemporaryDirectory() as workdir:
@@ -101,6 +130,7 @@ class SubflowMenu:
             )
             self.diagram.object = self.get_contents(str(skeleton))
             self.diagram.width = self.get_svg_size(str(skeleton))
+            self._set_width()
 
     @classmethod
     def render(cls, working_file: str, is_selected=False):
@@ -137,7 +167,16 @@ class SubflowMenu:
         pn.extension()
         subflow_menu = cls()
         if is_selected:
-            display(pn.Row(subflow_menu.selector, subflow_menu.button))
-        subflow_menu.set_diagram(subflow, root_folder, not is_selected)
-        display(subflow_menu.diagram)
+            subflow_menu.set_title()
+            subflow_menu.set_diagram(
+                subflow, root_folder, subflow_menu.is_display_all()
+            )
+            subflow_menu.button.on_click(
+                subflow_menu.select_flow(subflow, root_folder)
+            )
+            subflow_menu.menu_widgetbox.append(subflow_menu.select_widgetbox)
+        else:
+            subflow_menu.set_diagram(subflow, root_folder, True)
+        subflow_menu.menu_widgetbox.append(subflow_menu.diagram_widgetbox)
+        display(subflow_menu.menu_widgetbox)
         display(Javascript('IPython.notebook.save_checkpoint();'))

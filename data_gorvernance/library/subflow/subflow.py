@@ -64,7 +64,7 @@ class SubFlow:
     def __init__(self, current_dir: str, status_file :str, diag_file :str, using_task_dir: str) -> None:
         self.current_dir = current_dir
         self.tasks = StatusFile(status_file).read().tasks
-        self.diag = DiagManager(diag_file)
+        self.diag_file = diag_file
         self.task_dir = using_task_dir
 
     def setup_tasks(self, souce_task_dir: str):
@@ -83,6 +83,8 @@ class SubFlow:
                         file.copy_file(source_path, destination_path)
 
     def generate(self, svg_path: str, tmp_diag: str, font: str, display_all=True):
+        # 毎回元ファイルを読み込む
+        self.diag = DiagManager(self.diag_file)
         # tmp_diagは暫定的なもの。将来的にはself.diagを利用できるようにする
         self.svg_config = {}
         for task in self.tasks:
@@ -93,19 +95,25 @@ class SubFlow:
 
     def _update(self, display_all=True):
         for task in self.tasks:
-            self._adjust_by_status(task)
+            self._adjust_by_status(task, display_all)
             self._adjust_by_optional(task, display_all)
 
     def _adjust_by_optional(self, task: TaskStatus, display_all=True):
         if task.disable:
             if display_all:
-                self.diag.update_node_style(task.id, 'dotted')
+                #self.diag.update_node_style(task.id, 'dotted')
+                pass
             else:
-                self.diag.delete_node(task.id)
+                # self.diag.delete_node(task.id)
+                # 以下暫定処理
+                self.diag.update_node_color(task.id, "#77787B")
+                self.svg_config[task.id]['is_link'] = False
 
-    def _adjust_by_status(self, task: TaskStatus):
+    def _adjust_by_status(self, task: TaskStatus, display_all=True):
+        if task.disable and not display_all:
+            return
         if task.status == task.STATUS_UNFEASIBLE:
-            self.diag.update_node_color(task.id, "#77787B")
+            self.diag.update_node_color(task.id, "#e6e5e3")
             self.svg_config[task.id]['is_link'] = False
             return
 

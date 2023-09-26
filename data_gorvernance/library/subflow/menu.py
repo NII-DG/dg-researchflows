@@ -33,12 +33,14 @@ class SubflowMenu:
 
         # 表示するウィジェットを格納する
         self.menu_widgetbox = pn.WidgetBox()
+
         # サブフロー図
         # SVGにするとファイルとして出してしまうのでHTMLとして埋め込む
         self.diagram = pn.pane.HTML()
         # フロー図の配置
         self.title = pn.pane.Markdown()
         self.diagram_widgetbox = pn.WidgetBox(self.title, self.diagram)
+
         # ラジオボタン
         self.selector = pn.widgets.RadioBoxGroup()
         self.selector_options = [
@@ -59,6 +61,7 @@ class SubflowMenu:
             pn.Row(self.selector, self.button, margin=(10,10,10,25))
         )
 
+    # イベント
     def select_flow(self, subflow: SubFlow, root_folder: Path):
         def callback(event):
             self.diagram_widgetbox.disabled = True
@@ -67,30 +70,47 @@ class SubflowMenu:
             self.diagram_widgetbox.disabled = False
         return callback
 
-    def is_display_all(self):
-        display_all = True
-        if self.selector.value == self.selector_options[0]:
-            display_all = False
-        return display_all
-
+    # 各要素の設定
     def set_title(self):
         if self.is_display_all():
             self.title.object = f'### {message.get("subflow_menu", "title_all_task")}'
         else:
             self.title.object = f'### {message.get("subflow_menu", "title_abled_task")}'
 
-    def get_contents(self, svg_file_path: str):
+    def _set_width(self):
+        """フロー図の大きさをもとにwidgetboxの大きさを統一"""
+        d = self.diagram.width + 20
+        self.menu_widgetbox.width = d
+        self.diagram_widgetbox.width = d
+        self.select_widgetbox.width = d
+
+    def set_diagram(self, subflow: SubFlow, root_folder: Path, display_all=True):
+        """フロー図の生成と表示設定"""
+        with TemporaryDirectory() as workdir:
+            tmp_diag = Path(workdir) / 'skeleton.diag'
+            skeleton = Path(workdir) / 'skeleton.svg'
+            subflow.generate(
+                svg_path=str(skeleton),
+                tmp_diag=str(tmp_diag),
+                font=str(root_folder / '.fonts/ipag.ttf'),
+                display_all=display_all
+            )
+            self.diagram.object = self._get_contents(str(skeleton))
+            self.diagram.width = self._get_svg_size(str(skeleton))
+            self._set_width()
+
+    # その他
+    def is_display_all(self):
+        display_all = True
+        if self.selector.value == self.selector_options[0]:
+            display_all = False
+        return display_all
+
+    def _get_contents(self, svg_file_path: str):
         return file.File(svg_file_path).read()
 
-    def get_svg_size(self, svg_file_path: str):
-        """svgの画像の横幅を返す
-
-        Args:
-            svg_file_path (str): svgファイルのパス
-
-        Returns:
-            _type_: _description_
-        """
+    def _get_svg_size(self, svg_file_path: str):
+        """svgの画像の横幅を返す"""
         # SVGファイルをパース
         tree = ET.parse(svg_file_path)
         root = tree.getroot()
@@ -109,27 +129,6 @@ class SubflowMenu:
         elif viewbox_width < 200:
             viewbox_width = 200
         return viewbox_width
-
-    def _set_width(self):
-        """フロー図の大きさをもとにwidgetboxの大きさを統一"""
-        d = self.diagram.width + 20
-        self.menu_widgetbox.width = d
-        self.diagram_widgetbox.width = d
-        self.select_widgetbox.width = d
-
-    def set_diagram(self, subflow: SubFlow, root_folder: Path, display_all=True):
-        with TemporaryDirectory() as workdir:
-            tmp_diag = Path(workdir) / 'skeleton.diag'
-            skeleton = Path(workdir) / 'skeleton.svg'
-            subflow.generate(
-                svg_path=str(skeleton),
-                tmp_diag=str(tmp_diag),
-                font=str(root_folder / '.fonts/ipag.ttf'),
-                display_all=display_all
-            )
-            self.diagram.object = self.get_contents(str(skeleton))
-            self.diagram.width = self.get_svg_size(str(skeleton))
-            self._set_width()
 
     @classmethod
     def render(cls, working_file: str, is_selected=False):

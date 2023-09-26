@@ -337,14 +337,14 @@ class ContainerSetter():
         path_msg = ''
         for index, path in enumerate(candidate_paths):
             git_path.append(os.path.join(cs._abs_root_path, path))
-            path_msg += f'{index+1}. {path}<br>'
+            path_msg += f'・ {path}<br>'
         commit_message = msg_config.get('commit_message', 'setup')
         msg = f"""### 以下の内容で同期します
 <hr>
-* 同期対象のパス
+同期対象のパス<br>
 {path_msg}
 
-* コミットメッセージ
+コミットメッセージ<br>
 {commit_message}
 """
 

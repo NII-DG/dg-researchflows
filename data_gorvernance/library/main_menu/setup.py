@@ -5,7 +5,7 @@ from ..utils.storage_provider.gin import gin
 from ..subflow.menu import access_main_menu
 from pathlib import Path
 import panel as pn
-from IPython.display import display
+from IPython.display import display, clear_output
 from IPython.core.display import Javascript, HTML
 import traceback
 from ..utils.error import Unauthorized
@@ -181,14 +181,17 @@ class ContainerSetter():
             # パブリックのためのリクエストしなかった
             alert = pn.pane.Alert(msg_config.get('build_token', 'not_need_del'),sizing_mode="stretch_width",alert_type='info')
             display(alert)
+            return
         elif ok and msg is not None and msg == '':
             # 削除成功
             alert = pn.pane.Alert(msg_config.get('build_token', 'success'),sizing_mode="stretch_width",alert_type='success')
             display(alert)
+            return
         elif ok and msg is not None and len(msg) > 0:
             # リクエストしたが削除しなかった
             alert = pn.pane.Alert(msg,sizing_mode="stretch_width",alert_type='info')
             display(alert)
+            return
         elif not ok:
             alert = pn.pane.Alert(msg_config.get('build_token', 'error'),sizing_mode="stretch_width",alert_type='danger')
             display(alert)
@@ -202,6 +205,7 @@ class ContainerSetter():
 
         try:
             ok = gin.datalad_create(cs._abs_root_path)
+            clear_output()
             if ok:
                 alert = pn.pane.Alert(msg_config.get('setup','datalad_create_success'),sizing_mode="stretch_width",alert_type='info')
                 display(alert)
@@ -288,6 +292,9 @@ class ContainerSetter():
             gin.setup_sibling_to_local()
             # annexブランチの作成とプッシュ
             gin.push_annex_branch(cs._abs_root_path)
+            clear_output()
+            alert = pn.pane.Alert(msg_config.get('setup','setup_sibling') ,sizing_mode="stretch_width",alert_type='info')
+            display(alert)
 
         except Exception as e:
             alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),sizing_mode="stretch_width",alert_type='danger')
@@ -314,6 +321,8 @@ class ContainerSetter():
             # 初期セットアップ完了ステータスファイルを作成する
             setup_flag_file = Path(cs.setup_completed_file_path)
             setup_flag_file.touch()
+            alert = pn.pane.Alert(msg_config.get('setup','recoed_setup_completed') ,sizing_mode="stretch_width",alert_type='info')
+            display(alert)
 
     @classmethod
     def syncs_config(cls, nb_working_file_path:str):
@@ -325,9 +334,24 @@ class ContainerSetter():
 
         candidate_paths = [path_config.DOT_GITIGNORE, path_config.DATA_GOVERNANCE]
         git_path = []
-        for path in candidate_paths:
+        path_msg = ''
+        for index, path in enumerate(candidate_paths):
             git_path.append(os.path.join(cs._abs_root_path, path))
+            path_msg += f'{index+1}. {path}<br>'
         commit_message = msg_config.get('commit_message', 'setup')
+        msg = f"""### 以下の内容で同期します
+
+        <hr>
+        #### 同期対象のパス
+        {path_msg}
+
+
+        #### コミットメッセージ
+        {commit_message}
+        """
+
+        alert = pn.pane.Alert(msg_config.get('setup','recoed_setup_completed') ,sizing_mode="stretch_width",alert_type='info')
+        display(alert)
         return git_path, commit_message
 
     @classmethod

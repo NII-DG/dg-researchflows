@@ -194,7 +194,7 @@ def exist_user_info()->bool:
 
 def del_build_token():
     gin_base_url, username, token = get_gin_base_url_and_auth_info_from_git_config()
-    if len(token) >= 0:
+    if len(token) > 0:
         # プライベート
         pr = parse.urlparse(gin_base_url)
         response = gin_api.delete_access_token(pr.scheme, pr.netloc, token=token)
@@ -225,7 +225,7 @@ def create_key(root_path):
     """SSHキーを作成"""
     ssh_key_path = os.path.join(root_path, __SSH_KEY_PATH)
     if not os.path.isfile(ssh_key_path):
-        Cmd.exec_subprocess(f'ssh-keygen -t ed25519 -N "" -f {__SSH_KEY_PATH}')
+        Cmd.exec_subprocess(f'ssh-keygen -t ed25519 -N "" -f {ssh_key_path}')
         return True
     else:
         return False

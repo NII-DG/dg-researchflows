@@ -340,15 +340,13 @@ class ContainerSetter():
             path_msg += f'{index+1}. {path}<br>'
         commit_message = msg_config.get('commit_message', 'setup')
         msg = f"""### 以下の内容で同期します
+<hr>
+* 同期対象のパス
+{path_msg}
 
-        <hr>
-        #### 同期対象のパス
-        {path_msg}
-
-
-        #### コミットメッセージ
-        {commit_message}
-        """
+* コミットメッセージ
+{commit_message}
+"""
 
         alert = pn.pane.Alert(msg ,sizing_mode="stretch_width",alert_type='info')
         display(alert)

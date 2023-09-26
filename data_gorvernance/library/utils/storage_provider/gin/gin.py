@@ -317,7 +317,6 @@ def setup_sibling_to_local():
     #   action='add'では既に存在する場合にIncompleteResultsErrorになる
     #   action='config'では無ければ追加、あれば上書き
     #   refs: https://docs.datalad.org/en/stable/generated/datalad.api.siblings.html
-    ds = Dataset('d')
     datalad_api.siblings(action='configure', name='origin', url=http_url)
     datalad_api.siblings(action='configure', name=SIBLING, url=ssh_url)
 

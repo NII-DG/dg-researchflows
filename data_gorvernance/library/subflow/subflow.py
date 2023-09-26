@@ -65,7 +65,6 @@ class SubFlow:
         self.current_dir = current_dir
         self.tasks = StatusFile(status_file).read().tasks
         self.diag_file = diag_file
-        self.diag = DiagManager(self.diag_file)
         self.task_dir = using_task_dir
 
     def setup_tasks(self, souce_task_dir: str):

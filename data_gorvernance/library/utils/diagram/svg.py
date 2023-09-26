@@ -72,7 +72,7 @@ def _find_matching_notebook(notebooks, id, config):
     Args:
         notebooks (List[str]): ノートブック名のリスト
         title (str): タスクの機能ID
-        config (dict[str, str]): {id: name}
+        config (dict[str, dict]): IDをキーとした辞書
 
     Returns:
         str: ノートブック名

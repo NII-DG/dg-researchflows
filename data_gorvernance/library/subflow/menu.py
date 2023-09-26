@@ -37,7 +37,8 @@ class SubflowMenu:
         # SVGにするとファイルとして出してしまうのでHTMLとして埋め込む
         self.diagram = pn.pane.HTML()
         # フロー図の配置
-        self.diagram_widgetbox = pn.WidgetBox(self.diagram)
+        self.title = pn.pane.Markdown()
+        self.diagram_widgetbox = pn.WidgetBox(self.title, self.diagram)
         # ラジオボタン
         self.selector = pn.widgets.RadioBoxGroup()
         self.selector_options = [
@@ -60,7 +61,10 @@ class SubflowMenu:
 
     def select_flow(self, subflow: SubFlow, root_folder: Path):
         def callback(event):
+            self.diagram_widgetbox.disabled = True
+            self.set_title()
             self.set_diagram(subflow, root_folder, self.is_display_all())
+            self.diagram_widgetbox.disabled = False
         return callback
 
     def is_display_all(self):
@@ -68,6 +72,12 @@ class SubflowMenu:
         if self.selector.value == self.selector_options[0]:
             display_all = False
         return display_all
+
+    def set_title(self):
+        if self.is_display_all():
+            self.title.object = f'### {message.get("subflow_menu", "title_all_task")}'
+        else:
+            self.title.object = f'### {message.get("subflow_menu", "title_abled_task")}'
 
     def get_contents(self, svg_file_path: str):
         return file.File(svg_file_path).read()
@@ -156,6 +166,7 @@ class SubflowMenu:
         pn.extension()
         subflow_menu = cls()
         if is_selected:
+            subflow_menu.set_title()
             subflow_menu.set_diagram(
                 subflow, root_folder, subflow_menu.is_display_all()
             )

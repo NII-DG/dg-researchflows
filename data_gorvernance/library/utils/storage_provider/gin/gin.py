@@ -2,13 +2,12 @@ import re
 import shutil
 import subprocess
 import traceback
-import git
 import os
 import json
 from urllib import parse
 from pathlib import Path
 from http import HTTPStatus
-import api as gin_api
+from ..gin import api as gin_api, git
 from ....utils.config.param import ParamConfig
 from ...error import Unauthorized, RepositoryNotExist, UrlUpdateError, NoValueInDgFileError
 from ...config import path_config, message as msg_config
@@ -20,6 +19,7 @@ import hashlib
 import magic
 from IPython.display import clear_output, display
 from IPython.core.display import HTML
+clear_output()
 
 SIBLING = 'gin'
 
@@ -34,11 +34,11 @@ REPOSITORY_ID_FILE_PATH = srp_path.joinpath('../../../../..', '.repository_id').
 
 # token.jsonのファイルパス
 srp_path = Path(script_dir_path)
-TOKEN_FILE_PATH = srp_path.joinpath('../../../..', path_config.TOKEN_JSON_PAHT).resolve()
+TOKEN_FILE_PATH = srp_path.joinpath('../../../../..', path_config.TOKEN_JSON_PAHT).resolve()
 
 # user_info.jsonのファイルパス
 srp_path = Path(script_dir_path)
-TOKEN_FILE_PATH = srp_path.joinpath('../../../..', path_config.USER_INFO_PATH).resolve()
+USER_INFO_PATH = srp_path.joinpath('../../../../..', path_config.USER_INFO_PATH).resolve()
 
 SSH_DIR_PATH = ".ssh"
 __SSH_KEY_PATH = os.path.join(SSH_DIR_PATH, "id_ed25519")
@@ -70,14 +70,14 @@ def get_gin_base_url_from_git_config()->str:
     git_url = git.get_remote_url()
     url, username, password = extract_url_and_auth_info_from_git_url(git_url)
     pr = parse.urlparse(url)
-    gin_base_url = parse.urlunparse((pr.scheme, pr.scheme))
+    gin_base_url = parse.urlunparse((pr.scheme, pr.netloc, "", "", "", ""))
     return gin_base_url
 
 def get_gin_base_url_and_auth_info_from_git_config():
     git_url = git.get_remote_url()
     url, username, password = extract_url_and_auth_info_from_git_url(git_url)
     pr = parse.urlparse(url)
-    gin_base_url = parse.urlunparse((pr.scheme, pr.scheme))
+    gin_base_url = parse.urlunparse((pr.scheme, pr.netloc, "", "", "", ""))
     return gin_base_url, username, password
 
 
@@ -97,7 +97,9 @@ def init_param_url():
         From : 下位モジュール
 
     """
+
     gin_base_url = get_gin_base_url_from_git_config()
+
 
     pr = parse.urlparse(gin_base_url)
     retry_num = 6
@@ -106,9 +108,6 @@ def init_param_url():
         response = gin_api.get_server_info(pr.scheme, pr.netloc)
         if response.status_code == HTTPStatus.OK:
             flg = False
-
-            # with open(PARAM_FILE_PATH, 'r') as file:
-            #     df = json.load(file)
 
             pc = ParamConfig.get_param_data()
 
@@ -121,18 +120,11 @@ def init_param_url():
             pc._siblings._ginHttp = http_url
             pc._siblings._ginSsh = response_data["ssh"]
 
-            # df["siblings"]["ginHttp"] = http_url
-            # df["siblings"]["ginSsh"] = response_data["ssh"]
 
             with open(REPOSITORY_ID_FILE_PATH, 'r') as file:
                 repo_id = file.read()
 
-            # df["repository"]["id"] = repo_id
             pc._repository._id = repo_id
-
-
-            # with open(PARAM_FILE_PATH, 'w') as f:
-            #     json.dump(df, f, indent=4)
 
             pc.update()
 
@@ -188,17 +180,17 @@ def get_ginfork_token():
 
 def set_user_info(user_id):
     user_info = {"user_id":user_id}
-    os.makedirs(os.path.dirname(TOKEN_FILE_PATH), exist_ok=True)
-    with TOKEN_FILE_PATH.open( 'w') as f:
+    os.makedirs(os.path.dirname(USER_INFO_PATH), exist_ok=True)
+    with USER_INFO_PATH.open( 'w') as f:
         json.dump(user_info, f, indent=4)
 
 def get_user_id_from_user_info():
-    with TOKEN_FILE_PATH.open('r') as f:
+    with USER_INFO_PATH.open('r') as f:
         data = json.loads(f.read())
     return data['user_id']
 
 def exist_user_info()->bool:
-    return os.path.exists(TOKEN_FILE_PATH)
+    return os.path.exists(USER_INFO_PATH)
 
 def del_build_token():
     gin_base_url, username, token = get_gin_base_url_and_auth_info_from_git_config()

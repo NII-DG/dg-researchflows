@@ -59,8 +59,8 @@ class ContainerSetter():
 
     def callback_submit_user_auth(self, event):
         # 入力値を取得する
-        user_name = self._user_name_form.value
-        password = self._password_form.value
+        user_name = self._user_name_form.value_input
+        password = self._password_form.value_input
 
         # 入力値のバリエーション
         ## user_name
@@ -107,6 +107,7 @@ class ContainerSetter():
             return
         else:
             self.change_submit_button_success(msg_config.get('user_auth','success'))
+            self._msg_output.clear()
             return
 
 
@@ -172,6 +173,7 @@ class ContainerSetter():
 
     @classmethod
     def delete_build_token(cls):
+        pn.extension()
         cls.check_imcomplete_auth()
 
         ok, msg =gin.del_build_token()
@@ -194,6 +196,7 @@ class ContainerSetter():
 
     @classmethod
     def datalad_create(cls, nb_working_file_path:str):
+        pn.extension()
         cls.check_imcomplete_auth()
         cs = ContainerSetter(nb_working_file_path)
 
@@ -213,6 +216,7 @@ class ContainerSetter():
 
     @classmethod
     def ssh_create_key(cls, nb_working_file_path:str):
+        pn.extension()
         cls.check_imcomplete_auth()
         cs = ContainerSetter(nb_working_file_path)
 
@@ -229,6 +233,7 @@ class ContainerSetter():
 
     @classmethod
     def upload_ssh_key(cls, nb_working_file_path:str):
+        pn.extension()
         cls.check_imcomplete_auth()
         cs = ContainerSetter(nb_working_file_path)
 
@@ -243,6 +248,7 @@ class ContainerSetter():
 
     @classmethod
     def ssh_trust_gin(cls, nb_working_file_path:str):
+        pn.extension()
         cls.check_imcomplete_auth()
         cs = ContainerSetter(nb_working_file_path)
 
@@ -257,6 +263,7 @@ class ContainerSetter():
 
     @classmethod
     def prepare_sync(cls, nb_working_file_path:str):
+        pn.extension()
         cls.check_imcomplete_auth()
         cs = ContainerSetter(nb_working_file_path)
 
@@ -271,6 +278,7 @@ class ContainerSetter():
 
     @classmethod
     def setup_sibling(cls, nb_working_file_path:str):
+        pn.extension()
         """siblingの登録"""
         cls.check_imcomplete_auth()
 
@@ -288,6 +296,7 @@ class ContainerSetter():
 
     @classmethod
     def completed_setup(cls,nb_working_file_path:str):
+        pn.extension()
         cls.check_imcomplete_auth()
         # 初期セットアップ完了ステータスファイルを作成する
         cs = ContainerSetter(nb_working_file_path)
@@ -308,6 +317,7 @@ class ContainerSetter():
 
     @classmethod
     def syncs_config(cls, nb_working_file_path:str):
+        pn.extension()
         """同期のためにファイルとメッセージの設定"""
         cls.check_imcomplete_auth()
         display(Javascript('IPython.notebook.save_checkpoint();'))
@@ -322,6 +332,7 @@ class ContainerSetter():
 
     @classmethod
     def sync(cls, nb_working_file_path:str, git_path:list[str], commit_message:str):
+        pn.extension()
         cs = ContainerSetter(nb_working_file_path)
 
         gin.syncs_with_repo(
@@ -338,7 +349,7 @@ class ContainerSetter():
 
     @classmethod
     def check_imcomplete_auth(cls):
-        if gin.exist_user_info():
+        if not gin.exist_user_info():
             alert = pn.pane.Alert(msg_config.get('user_auth', 'imcomplete_auth'),sizing_mode="stretch_width",alert_type='warning')
             display(alert)
             raise Exception('Authentication not completed')

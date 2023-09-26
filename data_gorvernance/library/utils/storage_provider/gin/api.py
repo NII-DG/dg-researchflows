@@ -6,7 +6,11 @@ import os
 def get_server_info(scheme, domain):
     sub_url = "api/v1/gin"
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
-    return requests.get(url=api_url)
+    try:
+        response = requests.get(url=api_url)
+        return response
+    except Exception as e:
+        raise Exception(f'Fail Request to GIN fork url:{api_url}') from e
 
 def get_token_for_auth(scheme, domain, user_name, password):
     sub_url = os.path.join('api/v1/users', user_name, 'tokens')

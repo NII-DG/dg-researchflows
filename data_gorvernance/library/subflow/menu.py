@@ -31,7 +31,7 @@ class SubflowMenu:
 
     def __init__(self) -> None:
 
-        # 全てを格納する
+        # 表示するウィジェットを格納する
         self.menu_widgetbox = pn.WidgetBox()
         # サブフロー図
         # SVGにするとファイルとして出してしまうのでHTMLとして埋め込む
@@ -60,13 +60,14 @@ class SubflowMenu:
 
     def select_flow(self, subflow: SubFlow, root_folder: Path):
         def callback(event):
-            self.diagram_widgetbox.disabled = True
-            display_all = True
-            if self.selector.value == self.selector_options[0]:
-                display_all = False
-            self.set_diagram(subflow, root_folder, display_all)
-            self.diagram_widgetbox.disabled = False
+            self.set_diagram(subflow, root_folder, self.is_display_all())
         return callback
+
+    def is_display_all(self):
+        display_all = True
+        if self.selector.value == self.selector_options[0]:
+            display_all = False
+        return display_all
 
     def get_contents(self, svg_file_path: str):
         return file.File(svg_file_path).read()
@@ -154,12 +155,16 @@ class SubflowMenu:
         # panel activation
         pn.extension()
         subflow_menu = cls()
-        subflow_menu.set_diagram(subflow, root_folder, not is_selected)
         if is_selected:
+            subflow_menu.set_diagram(
+                subflow, root_folder, subflow_menu.is_display_all()
+            )
             subflow_menu.button.on_click(
                 subflow_menu.select_flow(subflow, root_folder)
             )
             subflow_menu.menu_widgetbox.append(subflow_menu.select_widgetbox)
+        else:
+            subflow_menu.set_diagram(subflow, root_folder, True)
         subflow_menu.menu_widgetbox.append(subflow_menu.diagram_widgetbox)
         display(subflow_menu.menu_widgetbox)
         display(Javascript('IPython.notebook.save_checkpoint();'))

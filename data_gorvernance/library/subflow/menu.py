@@ -4,7 +4,8 @@ import xml.etree.ElementTree as ET
 from tempfile import TemporaryDirectory
 
 import panel as pn
-from IPython.display import display, Javascript, HTML
+from IPython.display import display
+from IPython.core.display import Javascript, HTML
 
 from .subflow import SubFlow, get_subflow_type_and_id
 from ..utils.config import path_config, message
@@ -48,8 +49,8 @@ class SubflowMenu:
             message.get('subflow_menu', 'select_all_task')
         ]
         self.selector.options = self.selector_options
-        self.selector.value = self.selector_options[0]
-        # ボタン
+        self.selector.value = self.selector_options[0] # type: ignore
+
         self.button = pn.widgets.Button(
             name=message.get('subflow_menu', 'select_button_name'),
             button_type= "primary",

@@ -5,6 +5,8 @@ from .subflow.status import StatusFile, SubflowStatus
 import panel as pn
 from panel.pane import HTML
 from .utils.html.button import create_button
+from IPython.display import display
+from IPython.core.display import Javascript
 
 class TaskDirector():
 
@@ -71,3 +73,12 @@ class TaskDirector():
         )
         sub_flow_menu_link_button.width = button_width
         return sub_flow_menu_link_button
+
+
+    @classmethod
+    def return_subflow_menu(cls, working_path:str):
+        pn.extension()
+        task_director = TaskDirector(working_path)
+        sub_flow_menu_link_button  = task_director.get_subflow_menu_button_object()
+        display(sub_flow_menu_link_button)
+        display(Javascript('IPython.notebook.save_checkpoint();'))

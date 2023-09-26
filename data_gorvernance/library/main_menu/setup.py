@@ -350,7 +350,7 @@ class ContainerSetter():
         {commit_message}
         """
 
-        alert = pn.pane.Alert(msg_config.get('setup','recoed_setup_completed') ,sizing_mode="stretch_width",alert_type='info')
+        alert = pn.pane.Alert(msg ,sizing_mode="stretch_width",alert_type='info')
         display(alert)
         return git_path, commit_message
 
@@ -367,9 +367,6 @@ class ContainerSetter():
             message=commit_message,
             get_paths=[]
             )
-
-
-
 
     @classmethod
     def check_imcomplete_auth(cls):

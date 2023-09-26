@@ -41,6 +41,11 @@ class ParamConfig():
         pc = ParamConfig()
         return pc._siblings._ginHttp
 
+    @classmethod
+    def get_repo_id(cls):
+        pc = ParamConfig()
+        return pc._repository._id
+
 
 
 class Siblings():

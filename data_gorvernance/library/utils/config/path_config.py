@@ -39,6 +39,7 @@ PLAN_JSON = 'plan.json'
 FLOW_DIAG = 'flow.diag'
 TOKEN = 'token.json'
 USER_INFO = 'user_info.json'
+DOT_GITIGNORE = '.gitignore'
 
 # File Path
 SETUP_COMPLETED_TEXT_PATH = os.path.join(DG_WORKING_FOLDER, 'setup_completed.txt')

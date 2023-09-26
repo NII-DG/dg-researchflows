@@ -257,50 +257,38 @@ class ContainerSetter():
 
     @classmethod
     def prepare_sync(cls, nb_working_file_path:str):
-        pass
+        cls.check_imcomplete_auth()
+        cs = ContainerSetter(nb_working_file_path)
+
+        try:
+            gin.prepare_sync(cs._abs_root_path)
+            alert = pn.pane.Alert(msg_config.get('setup','prepare_sync') ,sizing_mode="stretch_width",alert_type='info')
+            display(alert)
+        except Exception as e:
+            alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),sizing_mode="stretch_width",alert_type='danger')
+            display(alert)
+            raise e
 
     @classmethod
     def setup_sibling(cls, nb_working_file_path:str):
-        pass
+        """siblingの登録"""
+        cls.check_imcomplete_auth()
 
-    @classmethod
-    def syncs_config(cls, nb_working_file_path:str):
-        pass
+        cs = ContainerSetter(nb_working_file_path)
+        try:
+            # ローカルにsiblingの登録(HTTP, SSH)
+            gin.setup_sibling_to_local()
+            # annexブランチの作成とプッシュ
+            gin.push_annex_branch(cs._abs_root_path)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    @classmethod
-    def check_imcomplete_auth(cls):
-        if gin.exist_user_info():
-            alert = pn.pane.Alert(msg_config.get('user_auth', 'imcomplete_auth'),sizing_mode="stretch_width",alert_type='warning')
+        except Exception as e:
+            alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),sizing_mode="stretch_width",alert_type='danger')
             display(alert)
-            raise Exception('Authentication not completed')
+            raise e
 
     @classmethod
     def completed_setup(cls,nb_working_file_path:str):
+        cls.check_imcomplete_auth()
         # 初期セットアップ完了ステータスファイルを作成する
         cs = ContainerSetter(nb_working_file_path)
 
@@ -317,6 +305,44 @@ class ContainerSetter():
             # 初期セットアップ完了ステータスファイルを作成する
             setup_flag_file = Path(cs.setup_completed_file_path)
             setup_flag_file.touch()
+
+    @classmethod
+    def syncs_config(cls, nb_working_file_path:str):
+        """同期のためにファイルとメッセージの設定"""
+        cls.check_imcomplete_auth()
+        display(Javascript('IPython.notebook.save_checkpoint();'))
+        cs = ContainerSetter(nb_working_file_path)
+
+        candidate_paths = [path_config.DOT_GITIGNORE, path_config.DATA_GOVERNANCE]
+        git_path = []
+        for path in candidate_paths:
+            git_path.append(os.path.join(cs._abs_root_path, path))
+        commit_message = msg_config.get('commit_message', 'setup')
+        return git_path, commit_message
+
+    @classmethod
+    def sync(cls, nb_working_file_path:str, git_path:list[str], commit_message:str):
+        cs = ContainerSetter(nb_working_file_path)
+
+        gin.syncs_with_repo(
+            cwd=cs._abs_root_path,
+            git_path=git_path,
+            gitannex_path= [],
+            gitannex_files=[],
+            message=commit_message,
+            get_paths=[]
+            )
+
+
+
+
+    @classmethod
+    def check_imcomplete_auth(cls):
+        if gin.exist_user_info():
+            alert = pn.pane.Alert(msg_config.get('user_auth', 'imcomplete_auth'),sizing_mode="stretch_width",alert_type='warning')
+            display(alert)
+            raise Exception('Authentication not completed')
+
 
 
     @classmethod

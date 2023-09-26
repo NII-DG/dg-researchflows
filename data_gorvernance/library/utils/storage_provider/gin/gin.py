@@ -322,7 +322,11 @@ def setup_sibling_to_local():
 
 def push_annex_branch(cwd):
     """git-annexブランチをpushする"""
-    Cmd.exec_subprocess(cmd=f'git push {SIBLING} git-annex:git-annex', cwd=cwd)
+    git.git_pull(cwd)
+    if git.is_annex_branch_in_repote(cwd):
+        pass
+    else:
+        Cmd.exec_subprocess(cmd=f'git push {SIBLING} git-annex:git-annex', cwd=cwd)
 
 def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str], gitannex_files :list[str], message:str, get_paths:list[str],):
     """synchronize with the repository

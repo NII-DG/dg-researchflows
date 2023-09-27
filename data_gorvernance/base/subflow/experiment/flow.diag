@@ -51,7 +51,7 @@ blockdiag {
             }
         }
 
-        group{
+        group {
             shape = line;
             style = none;
             group {
@@ -60,7 +60,7 @@ blockdiag {
                 dummy-5-1[class="disable", height=1];
                 dummy-5-2[class="disable", height=1];
             }
-            group{
+            group {
                 shape = line;
                 style = none;
                 dummy-6-1[class="disable"];
@@ -71,6 +71,17 @@ blockdiag {
                 }
             }
        }
+
+        group{
+            // 図の大きさを固定するためのダミー
+            shape = line;
+            style = none;
+            sizedummy1[class="disable", height=1];
+            sizedummy2[shape=none, height=1];
+            sizedummy3[shape=none, height=1];
+            sizedummy4[shape=none, height=1];
+            sizedummy5[class="disable", height=1];
+        }
     }
 
     RF003001 -> RF003002;

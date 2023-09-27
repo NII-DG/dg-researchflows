@@ -85,11 +85,11 @@ class SubFlow:
     def generate(self, svg_path: str, tmp_diag: str, font: str, display_all=True):
         # 毎回元ファイルを読み込む
         self.diag = DiagManager(self.diag_file)
-        # tmp_diagは暫定的なもの。将来的にはself.diagを利用できるようにする
         self.svg_config = {}
         for task in self.tasks:
             self.svg_config.update(init_config(task.id, task.name))
         self._update(display_all)
+        # tmp_diagは暫定的なもの。将来的にはself.diagを利用できるようにする
         self.diag.generate_svg(tmp_diag, svg_path, font)
         update_svg(svg_path, self.current_dir, self.task_dir, self.svg_config)
 

@@ -1,12 +1,16 @@
-from .utils.config import path_config, message as msg_config
-from .subflow.subflow import get_return_sub_flow_menu_relative_url_path, get_subflow_type_and_id
 import os
-from .subflow.status import StatusFile, SubflowStatus
+import functools
+
 import panel as pn
 from panel.pane import HTML
-from .utils.html.button import create_button
 from IPython.display import display
 from IPython.core.display import Javascript
+
+from .utils.html.button import create_button
+from .subflow.status import StatusFile, SubflowStatus
+from .utils.config import path_config, message as msg_config
+from .subflow.subflow import get_return_sub_flow_menu_relative_url_path, get_subflow_type_and_id
+
 
 class TaskDirector():
 
@@ -33,6 +37,22 @@ class TaskDirector():
         else:
             # 研究準備以外の場合
             self._sub_flow_status_file_path = os.path.join(self._abs_root_path, path_config.get_sub_flow_status_file_path(subflow_type, subflow_id))
+
+    def task_cell(self, func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            # 最初のログ
+
+            try:
+                result = func(*args, **kwargs)
+                #最後のログ
+                return result
+            # ここでも一応取得するが、本来はタスクのエラー処理の中でlogを吐く
+            except Exception as e:
+                # エラーのログ
+                raise
+
+        return wrapper
 
     def doing_task(self, task_name:str):
         """タスク開始によるサブフローステータス管理JSONの更新

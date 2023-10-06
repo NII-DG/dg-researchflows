@@ -11,9 +11,9 @@ from ..subflow.subflow import get_subflow_type_and_id
 
 class BaseLogger:
 
-    def __init__(self, log_file, backupCount=0):
+    def __init__(self, log_file, backupCount=0, when='midnight'):
         self.logger = logging.getLogger(__name__)
-        self.handler = TimedRotatingFileHandler(log_file, when='midnight', backupCount=backupCount)
+        self.handler = TimedRotatingFileHandler(log_file, when=when, backupCount=backupCount)
         self.logger.addHandler(self.handler)
 
     def set_log_level(self, level):
@@ -35,7 +35,7 @@ class BaseLogger:
 
 class UserActivityLog(BaseLogger):
 
-    def __init__(self, nb_working_file):
+    def __init__(self, nb_working_file, notebook_name):
         # set log config
         log_file = self._get_log_file_path(nb_working_file)
         super().__init__(log_file)
@@ -43,12 +43,12 @@ class UserActivityLog(BaseLogger):
         # set items
         self.username = os.environ['JUPYTERHUB_USER']
         self.ipynb_file = os.path.join(
-            os.path.dirname(nb_working_file), ipyparams.notebook_name
+            os.path.dirname(nb_working_file), notebook_name
         )
         subflow_type, subflow_id = get_subflow_type_and_id(nb_working_file)
         self.subflow_id = subflow_id
         self.subflow_type = subflow_type
-        self.cell_id = self.get_cell_id()
+        self.cell_id = ""
         # set format
         fmt = '%(levelname)s\t%(asctime)s\t%(username)s\t'
         if self.subflow_id:
@@ -66,7 +66,7 @@ class UserActivityLog(BaseLogger):
         os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
         return log_file_path
 
-    def info(self, message=""):
+    def info(self, message):
         self.logger.info(message, extra=self.record())
 
     def warning(self, message):
@@ -76,7 +76,6 @@ class UserActivityLog(BaseLogger):
         self.logger.error(message, extra=self.record())
 
     def record(self):
-
         return {
             'username': self.username,
             'subflow_id': self.subflow_id,
@@ -84,6 +83,3 @@ class UserActivityLog(BaseLogger):
             'ipynb_name': self.ipynb_file,
             'cell_id': self.cell_id
         }
-
-    def get_cell_id(self):
-        pass

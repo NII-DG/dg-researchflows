@@ -10,11 +10,12 @@ from .utils.html.button import create_button
 from .subflow.status import StatusFile, SubflowStatus
 from .utils.config import path_config, message as msg_config
 from .subflow.subflow import get_return_sub_flow_menu_relative_url_path, get_subflow_type_and_id
+from .utils.log import UserActivityLog
 
 
 class TaskDirector():
 
-    def __init__(self, nb_working_file_path:str) -> None:
+    def __init__(self, nb_working_file_path:str, notebook_name:str) -> None:
         """TaskInterface コンストラクタ
 
         Notebookファイルのオペレーションするための共通クラス
@@ -37,21 +38,22 @@ class TaskDirector():
         else:
             # 研究準備以外の場合
             self._sub_flow_status_file_path = os.path.join(self._abs_root_path, path_config.get_sub_flow_status_file_path(subflow_type, subflow_id))
+        # ログ
+        self.log = UserActivityLog(nb_working_file_path, notebook_name)
 
-    def task_cell(self, func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            # 最初のログ
-
-            try:
-                result = func(*args, **kwargs)
-                #最後のログ
+    # 継承したクラスで呼ぶ為のデコレータ
+    @staticmethod
+    def task_cell(cell_id: str, start_message="", finish_message=""):
+        """タスクセルに必須の処理"""
+        def wrapper(func):
+            @functools.wraps(func)
+            def decorate(self, *args, **kwargs):
+                self.log.cell_id = cell_id
+                self.log.info("-- 処理開始 --" + start_message)
+                result = func(self, *args, **kwargs)
+                self.log.info("-- 処理終了 --" + finish_message)
                 return result
-            # ここでも一応取得するが、本来はタスクのエラー処理の中でlogを吐く
-            except Exception as e:
-                # エラーのログ
-                raise
-
+            return decorate
         return wrapper
 
     def doing_task(self, task_name:str):
@@ -94,11 +96,8 @@ class TaskDirector():
         sub_flow_menu_link_button.width = button_width
         return sub_flow_menu_link_button
 
-
-    @classmethod
-    def return_subflow_menu(cls, working_path:str):
+    def return_subflow_menu_button(self):
         pn.extension()
-        task_director = TaskDirector(working_path)
-        sub_flow_menu_link_button  = task_director.get_subflow_menu_button_object()
+        sub_flow_menu_link_button  = self.get_subflow_menu_button_object()
         display(sub_flow_menu_link_button)
         display(Javascript('IPython.notebook.save_checkpoint();'))

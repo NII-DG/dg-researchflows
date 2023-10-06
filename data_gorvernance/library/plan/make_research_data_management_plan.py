@@ -15,6 +15,7 @@ from ..task_director import TaskDirector
 from ..utils.dg_customize_config import get_dg_customize_config
 
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
+notebook_name = script_file_name+'ipynb'
 script_dir_path = os.path.dirname(__file__)
 p = Path(script_dir_path)
 # DGカスタマイズJSON定義書パス(data_gorvernance\library\data\data_governance_customize.json)
@@ -27,7 +28,7 @@ class DGPlaner(TaskDirector):
 
     def __init__(self, working_path:str) -> None:
         # working_path = .data_gorvernance/researchflow/plan/task/plan/make_research_data_management_plan.ipynbが想定値
-        super().__init__(working_path)
+        super().__init__(working_path, notebook_name)
 
         # α設定JSON定義書(plan.json)
         # 想定値：data_gorvernance\researchflow\plan\plan.json

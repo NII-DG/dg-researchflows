@@ -5,6 +5,7 @@ from ..task_director import TaskDirector
 
 # 本ファイルのファイル名
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
+notebook_name = script_file_name+'ipynb'
 
 class ExperimentEnvBuilder(TaskDirector):
 
@@ -14,7 +15,7 @@ class ExperimentEnvBuilder(TaskDirector):
         Args:
             nb_working_file_path (str): [実行Notebookファイルパス]
         """
-        super().__init__(nb_working_file_path)
+        super().__init__(nb_working_file_path, notebook_name)
 
     @classmethod
     def generateFormScetion(cls, working_path:str):

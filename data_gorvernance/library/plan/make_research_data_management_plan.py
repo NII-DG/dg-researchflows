@@ -195,35 +195,33 @@ class DGPlaner(TaskDirector):
         self.submit_button.button_type = 'danger'
         self.submit_button.button_style = 'solid'
 
-    @classmethod
-    def generateFormScetion(cls, working_path:str):
+    @TaskDirector.task_cell(script_file_name + "_1")
+    def generateFormScetion(self):
         """フォームセクション用"""
-
-        task_director = DGPlaner(working_path)
         # タスク開始による研究準備のサブフローステータス管理JSONの更新
-        task_director.doing_task(script_file_name)
+        self.doing_task(script_file_name)
 
         # フォーム定義
-        task_director.define_form()
+        self.define_form()
 
         # フォーム表示
         pn.extension()
         form_section = pn.WidgetBox()
-        form_section.append(task_director._form_box)
-        form_section.append(task_director._msg_output)
+        form_section.append(self._form_box)
+        form_section.append(self._msg_output)
         display(form_section)
 
-
-
-    @classmethod
-    def customize_research_flow(cls, working_path:str):
-        task_director = DGPlaner(working_path)
+    @TaskDirector.task_cell(script_file_name + "_2")
+    def customize_research_flow(self):
         # タスクの無効化処理
-        task_director.disable_task_by_phase()
+        self.disable_task_by_phase()
 
-    @classmethod
-    def completed_task(cls, working_path:str):
-
-        task_director = DGPlaner(working_path)
+    @TaskDirector.task_cell(script_file_name + "_3")
+    def completed_task(self):
         # タスク実行の完了情報を研究準備のサブフローステータス管理JSONに書き込む
-        task_director.done_task(script_file_name)
+        self.done_task(script_file_name)
+
+    @TaskDirector.task_cell(script_file_name + "_4")
+    def return_subflow_menu(self):
+        super().return_subflow_menu()
+

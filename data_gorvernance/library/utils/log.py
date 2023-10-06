@@ -3,8 +3,6 @@ from logging.handlers import TimedRotatingFileHandler
 import os
 from pathlib import Path
 
-import ipyparams
-
 from .config import path_config
 from ..subflow.subflow import get_subflow_type_and_id
 
@@ -83,3 +81,4 @@ class UserActivityLog(BaseLogger):
             'ipynb_name': self.ipynb_file,
             'cell_id': self.cell_id
         }
+

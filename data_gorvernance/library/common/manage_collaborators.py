@@ -20,13 +20,11 @@ class CollaboratorManager(TaskDirector):
         # フォーム表示
 
 
-    @classmethod
-    def completed_task(cls, working_path:str):
+    @TaskDirector.task_cell(script_file_name + "_2")
+    def completed_task(self):
         # タスク実行の完了情報を該当サブフローステータス管理JSONに書き込む
-        task_director = CollaboratorManager(working_path)
-        task_director.done_task(script_file_name)
+        self.done_task(script_file_name)
 
-    @classmethod
-    def return_subflow_menu(cls, working_path:str):
-        task_director = CollaboratorManager(working_path)
-        task_director.return_subflow_menu_button()
+    @TaskDirector.task_cell(script_file_name + "_3")
+    def return_subflow_menu(self):
+        super().return_subflow_menu()

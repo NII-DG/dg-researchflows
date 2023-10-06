@@ -96,7 +96,7 @@ class TaskDirector():
         sub_flow_menu_link_button.width = button_width
         return sub_flow_menu_link_button
 
-    def return_subflow_menu_button(self):
+    def return_subflow_menu(self):
         pn.extension()
         sub_flow_menu_link_button  = self.get_subflow_menu_button_object()
         display(sub_flow_menu_link_button)

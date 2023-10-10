@@ -10,7 +10,7 @@ from ..subflow.subflow import get_subflow_type_and_id
 
 class BaseLogger:
 
-    def __init__(self, log_file):
+    def __init__(self, log_file: str):
         self.logger = logging.getLogger(__name__)
         self.date = datetime.datetime.now().strftime('%Y%m%d')
         self.file_name = log_file
@@ -56,7 +56,7 @@ class UserActivityLog(BaseLogger):
     def __init__(self, nb_working_file, notebook_name):
         # set log config
         log_file = self._get_log_file_path(nb_working_file)
-        super().__init__(log_file)
+        super().__init__(str(log_file))
         self.set_log_level('info')
         # set items
         self.username = os.environ['JUPYTERHUB_USER']

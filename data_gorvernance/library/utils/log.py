@@ -1,7 +1,8 @@
 import logging
-from logging.handlers import TimedRotatingFileHandler
+from logging import FileHandler
 import os
 from pathlib import Path
+import datetime
 
 from .config import path_config
 from ..subflow.subflow import get_subflow_type_and_id
@@ -9,13 +10,29 @@ from ..subflow.subflow import get_subflow_type_and_id
 
 class BaseLogger:
 
-    def __init__(self, log_file, backupCount=0, when='midnight'):
+    def __init__(self, log_file):
         self.logger = logging.getLogger(__name__)
-        if not self.logger.hasHandlers():
-            self.handler = TimedRotatingFileHandler(log_file, when=when, backupCount=backupCount)
-            self.logger.addHandler(self.handler)
-        else:
-            self.handler = self.logger.handlers[0]
+        self.date = datetime.datetime.now().strftime('%Y%m%d')
+        self.file_name = log_file
+        self._remove_handler()
+        self._set_file()
+
+    def reset_file(self):
+        now_date = datetime.datetime.now().strftime('%Y%m%d')
+        if self.date != now_date:
+            self.date = now_date
+            self._remove_handler()
+            self._set_file()
+
+    def _remove_handler(self):
+        if self.logger.hasHandlers():
+            handler = self.logger.handlers[0]
+            self.logger.removeHandler(handler)
+
+    def _set_file(self):
+        log_file = self.file_name + "." + self.date
+        self.handler = FileHandler(log_file)
+        self.logger.addHandler(self.handler)
 
     def set_log_level(self, level):
         if level == 'debug':
@@ -68,12 +85,15 @@ class UserActivityLog(BaseLogger):
         return log_file_path
 
     def info(self, message):
+        self.reset_file()
         self.logger.info(message, extra=self.record())
 
     def warning(self, message):
+        self.reset_file()
         self.logger.warning(message, extra=self.record())
 
     def error(self, message):
+        self.reset_file()
         self.logger.error(message, extra=self.record())
 
     def record(self):

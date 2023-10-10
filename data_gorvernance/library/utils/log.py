@@ -11,8 +11,11 @@ class BaseLogger:
 
     def __init__(self, log_file, backupCount=0, when='midnight'):
         self.logger = logging.getLogger(__name__)
-        self.handler = TimedRotatingFileHandler(log_file, when=when, backupCount=backupCount)
-        self.logger.addHandler(self.handler)
+        if not self.logger.hasHandlers():
+            self.handler = TimedRotatingFileHandler(log_file, when=when, backupCount=backupCount)
+            self.logger.addHandler(self.handler)
+        else:
+            self.handler = self.logger.handlers[0]
 
     def set_log_level(self, level):
         if level == 'debug':

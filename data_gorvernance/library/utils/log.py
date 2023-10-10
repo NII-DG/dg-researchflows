@@ -14,25 +14,25 @@ class BaseLogger:
         self.logger = logging.getLogger(__name__)
         self.date = datetime.datetime.now().strftime('%Y%m%d')
         self.file_name = log_file
-        self._remove_handler()
-        self._set_file()
+        self._update_handler()
 
     def reset_file(self):
         now_date = datetime.datetime.now().strftime('%Y%m%d')
         if self.date != now_date:
             self.date = now_date
-            self._remove_handler()
-            self._set_file()
+            self._update_handler()
 
-    def _remove_handler(self):
+    def _update_handler(self):
         if self.logger.hasHandlers():
             handler = self.logger.handlers[0]
             self.logger.removeHandler(handler)
-
-    def _set_file(self):
         log_file = self.file_name + "." + self.date
         self.handler = FileHandler(log_file)
         self.logger.addHandler(self.handler)
+
+    def set_formatter(self, fmt):
+        formatter = logging.Formatter(fmt)
+        self.handler.setFormatter(formatter)
 
     def set_log_level(self, level):
         if level == 'debug':
@@ -45,11 +45,6 @@ class BaseLogger:
             self.logger.setLevel(logging.ERROR)
         elif level == 'critical':
             self.logger.setLevel(logging.CRITICAL)
-
-    def set_formatter(self, fmt):
-        formatter = logging.Formatter(fmt)
-        self.handler.setFormatter(formatter)
-
 
 class UserActivityLog(BaseLogger):
 

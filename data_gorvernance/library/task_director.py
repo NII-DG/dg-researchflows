@@ -49,9 +49,9 @@ class TaskDirector():
             @functools.wraps(func)
             def decorate(self, *args, **kwargs):
                 self.log.cell_id = cell_id
-                self.log.info("-- 処理開始 --" + start_message)
+                self.log.start_cell(start_message)
                 result = func(self, *args, **kwargs)
-                self.log.info("-- 処理終了 --" + finish_message)
+                self.log.finish_cell(finish_message)
                 return result
             return decorate
         return wrapper

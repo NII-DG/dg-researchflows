@@ -16,11 +16,12 @@ class BaseLogger:
         self.file_name = log_file
         self._update_handler()
 
-    def reset_file(self):
+    def reset_file(self, fmt):
         now_date = datetime.datetime.now().strftime('%Y%m%d')
         if self.date != now_date:
             self.date = now_date
             self._update_handler()
+            self.set_formatter(fmt)
 
     def _update_handler(self):
         if self.logger.hasHandlers():
@@ -30,7 +31,7 @@ class BaseLogger:
         self.handler = FileHandler(log_file)
         self.logger.addHandler(self.handler)
 
-    def set_formatter(self, fmt):
+    def set_formatter(self, fmt:str):
         formatter = logging.Formatter(fmt)
         self.handler.setFormatter(formatter)
 
@@ -62,12 +63,6 @@ class UserActivityLog(BaseLogger):
         self.subflow_id = subflow_id
         self.subflow_type = subflow_type
         self.cell_id = ""
-        # set format
-        fmt = '%(levelname)s\t%(asctime)s\t%(username)s\t'
-        if self.subflow_id:
-            fmt += '%(subflow_id)s\t'
-        fmt += '%(subflow_type)s\t%(ipynb_name)s\t%(cell_id)s\t%(message)s'
-        self.set_formatter(fmt)
 
     def _get_log_file_path(self, nb_working_file):
         root_folder = Path(
@@ -79,19 +74,36 @@ class UserActivityLog(BaseLogger):
         os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
         return log_file_path
 
+    def _get_format(self):
+        fmt = '%(levelname)s\t%(asctime)s\t%(username)s\t'
+        if self.subflow_id:
+            fmt += '%(subflow_id)s\t'
+        fmt += '%(subflow_type)s\t%(ipynb_name)s\t'
+        if self.cell_id:
+            fmt += '%(cell_id)s\t'
+        fmt += '%(message)s'
+        return fmt
+
     def info(self, message):
-        self.reset_file()
+        self.reset_file(self._get_format())
         self.logger.info(message, extra=self.record())
 
     def warning(self, message):
-        self.reset_file()
+        self.reset_file(self._get_format())
         self.logger.warning(message, extra=self.record())
 
     def error(self, message):
-        self.reset_file()
+        self.reset_file(self._get_format())
         self.logger.error(message, extra=self.record())
 
+    def start_cell(self, message=''):
+        self.info("-- 処理開始 --" + message)
+
+    def finish_cell(self, message=''):
+        self.info("-- 処理終了 --" + message)
+
     def record(self):
+
         return {
             'username': self.username,
             'subflow_id': self.subflow_id,

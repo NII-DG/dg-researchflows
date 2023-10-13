@@ -1,5 +1,0 @@
-
-class MainMenu():
-    """MainMenu class
-
-    """

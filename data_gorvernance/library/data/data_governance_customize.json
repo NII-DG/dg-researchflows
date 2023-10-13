@@ -1,0 +1,185 @@
+{
+    "dg_customize": [
+        {
+            "id": "A001",
+            "customize": {
+                "plan": {
+                    "task_ids": [],
+                    "verification_ids": []
+                },
+                "experiment": {
+                    "task_ids": [],
+                    "verification_ids": []
+                },
+                "paper_writing": {
+                    "task_ids": [],
+                    "verification_ids": []
+                },
+                "peer_review": {
+                    "task_ids": [],
+                    "verification_ids": []
+                },
+                "curation": {
+                    "task_ids": [],
+                    "verification_ids": [
+                        "V008001",
+                        "V009001"
+                    ]
+                },
+                "public_preparation": {
+                    "task_ids": [],
+                    "verification_ids": [
+                        "V008001",
+                        "V009001"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "A002",
+            "customize": {
+                "plan": {
+                    "task_ids": [],
+                    "verification_ids": []
+                },
+                "experiment": {
+                    "task_ids": [],
+                    "verification_ids": [
+                        "V010001"
+                    ]
+                },
+                "paper_writing": {
+                    "task_ids": [],
+                    "verification_ids": [
+                        "V010001"
+                    ]
+                },
+                "peer_review": {
+                    "task_ids": [],
+                    "verification_ids": [
+                        "V010002"
+                    ]
+                },
+                "curation": {
+                    "task_ids": [],
+                    "verification_ids": [
+                        "V010003"
+                    ]
+                },
+                "public_preparation": {
+                    "task_ids": [],
+                    "verification_ids": [
+                        "V010003"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "A003",
+            "customize": {
+                "plan": {
+                    "task_ids": [],
+                    "verification_ids": []
+                },
+                "experiment": {
+                    "task_ids": [],
+                    "verification_ids": []
+                },
+                "paper_writing": {
+                    "task_ids": [],
+                    "verification_ids": []
+                },
+                "peer_review": {
+                    "task_ids": [],
+                    "verification_ids": []
+                },
+                "curation": {
+                    "task_ids": [],
+                    "verification_ids": [
+                        "V011001"
+                    ]
+                },
+                "public_preparation": {
+                    "task_ids": [],
+                    "verification_ids": [
+                        "V011001"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "A004",
+            "customize": {
+                "plan": {
+                    "task_ids": [],
+                    "verification_ids": [
+                        "V012001"
+                    ]
+                },
+                "experiment": {
+                    "task_ids": [],
+                    "verification_ids": [
+                        "V012001"
+                    ]
+                },
+                "paper_writing": {
+                    "task_ids": [],
+                    "verification_ids": [
+                        "V012001"
+                    ]
+                },
+                "peer_review": {
+                    "task_ids": [],
+                    "verification_ids": [
+                        "V012001"
+                    ]
+                },
+                "curation": {
+                    "task_ids": [],
+                    "verification_ids": [
+                        "V012001"
+                    ]
+                },
+                "public_preparation": {
+                    "task_ids": [],
+                    "verification_ids": [
+                        "V012001"
+                    ]
+                }
+            }
+        },
+        {
+            "id": "A005",
+            "customize": {
+                "plan": {
+                    "task_ids": [],
+                    "verification_ids": []
+                },
+                "experiment": {
+                    "task_ids": [
+                        "RF003007"
+                    ],
+                    "verification_ids": []
+                },
+                "paper_writing": {
+                    "task_ids": [],
+                    "verification_ids": [
+                        "V012001"
+                    ]
+                },
+                "peer_review": {
+                    "task_ids": [],
+                    "verification_ids": []
+                },
+                "curation": {
+                    "task_ids": [],
+                    "verification_ids": []
+                },
+                "public_preparation": {
+                    "task_ids": [],
+                    "verification_ids": []
+                }
+            }
+        }
+    ]
+}

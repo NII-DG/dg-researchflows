@@ -1,0 +1,37 @@
+blockdiag {
+    node_width = 200;
+    node_height = 130;
+    span_width = 20;
+    span_height = 30;
+    default_fontsize = 10;
+    orientation = portrait;
+    default_group_color = "#FFFFCC";
+
+    group {
+        shape = line;
+        style = none;
+
+        group {
+            label = "実験のセットアップ"
+            RF003001;
+            RF003002[stacked];
+        }
+
+        group {
+            RF003003[stacked];
+            RF009002[stacked];
+            RF003007;
+        }
+        group{
+            label = "解析"
+            RF003013[stacked];
+        }
+    }
+
+    RF003001 -> RF003002
+    RF003003 -> RF003013
+
+    RF003002 -> RF003003
+    RF003002 -> RF009002
+    RF003002 -> RF003007
+}

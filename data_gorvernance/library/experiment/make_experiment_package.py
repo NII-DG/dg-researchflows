@@ -38,6 +38,7 @@ class ExperimentPackageMaker(TaskDirector):
     def set_template_form(self):
         self._form_box.clear()
         self.template_path_form = pn.widgets.TextInput(name="")
+        self._form_box.append(self.template_path_form)
         self.submit_button = Button()
         self.submit_button.set_looks_init()
         self.submit_button.on_click(self.callback_submit_template_form)

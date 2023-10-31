@@ -68,13 +68,12 @@ class ExperimentPackageMaker(TaskDirector):
         self._form_box.append(self.submit_button)
 
     def create_context_form(self, context):
-        self.submit_button.set_looks_processing("処理中")
-        for key, raw in context:
+        for key, raw in context.items():
             title = key
             if isinstance(raw, list):
                 obj = pn.widgets.Select(name=title, options=raw, width=DEFAULT_WIDTH)
             elif isinstance(raw, bool):
-                obj = pn.widgets.RadioBoxGroup(name=title, options=['yes', 'no', ], inline=True, , width=DEFAULT_WIDTH)
+                obj = pn.widgets.RadioBoxGroup(name=title, options=['yes', 'no', ], inline=True, width=DEFAULT_WIDTH)
                 if raw:
                     obj.value = 'yes'
                 else:
@@ -88,8 +87,11 @@ class ExperimentPackageMaker(TaskDirector):
 
 
     def callback_submit_context_form(self, event):
+        self.submit_button.set_looks_processing("処理中")
         context_dict = {}
         for obj in self._form_box.objects:
+            if isinstance(obj, pn.widgets.Button):
+                continue
             if obj.value:
                 context_dict[obj.name] = obj.value
             else:
@@ -105,10 +107,17 @@ class ExperimentPackageMaker(TaskDirector):
             self._msg_output.append(alert)
             return
         output_dir = os.path.join(self._abs_root_path, path_config.DG_RESEARCHFLOW_FOLDER, subflow_type, subflow_id, "data")
-        self.make_package.create_package(
-            context_dict=context_dict,
-            output_dir=output_dir
-        )
+        try:
+            self.make_package.create_package(
+                context_dict=context_dict,
+                output_dir=output_dir
+            )
+        except Exception:
+            self._msg_output.clear()
+            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
+            self._msg_output.append(alert)
+
+        self._form_box.clear()
         self._msg_output.clear()
         alert = pn.pane.Alert(f'実験パッケージを{output_dir}に作成しました。',sizing_mode="stretch_width",alert_type='info')
         self._msg_output.append(alert)

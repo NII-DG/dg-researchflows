@@ -106,7 +106,7 @@ class ExperimentPackageMaker(TaskDirector):
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : don\'t get subflow id',sizing_mode="stretch_width",alert_type='danger')
             self._msg_output.append(alert)
             return
-        output_dir = os.path.join(self._abs_root_path, path_config.DG_RESEARCHFLOW_FOLDER, subflow_type, subflow_id, "data")
+        output_dir = os.path.join(self._abs_root_path, "data", subflow_type, subflow_id)
         try:
             self.make_package.create_package(
                 context_dict=context_dict,

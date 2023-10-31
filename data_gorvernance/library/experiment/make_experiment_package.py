@@ -37,15 +37,15 @@ class ExperimentPackageMaker(TaskDirector):
 
     def set_template_form(self):
         self._form_box.clear()
-        self.template_path_form = pn.widgets.TextInput(name="")
+        self.template_path_form = pn.widgets.TextInput(name="cookiecutter template path", width=DEFAULT_WIDTH)
         self._form_box.append(self.template_path_form)
-        self.submit_button = Button()
+        self.submit_button = Button(width=DEFAULT_WIDTH)
         self.submit_button.set_looks_init()
         self.submit_button.on_click(self.callback_submit_template_form)
         self._form_box.append(self.submit_button)
 
     def callback_submit_template_form(self, event):
-
+        self.submit_button.set_looks_processing("処理中")
         template = self.template_path_form.value_input
 
         try:
@@ -62,18 +62,19 @@ class ExperimentPackageMaker(TaskDirector):
         self._form_box.clear()
         self._msg_output.clear()
         self.create_context_form(context)
-        self.submit_button = Button()
+        self.submit_button = Button(width=DEFAULT_WIDTH)
         self.submit_button.set_looks_init()
         self.submit_button.on_click(self.callback_submit_context_form)
         self._form_box.append(self.submit_button)
 
     def create_context_form(self, context):
+        self.submit_button.set_looks_processing("処理中")
         for key, raw in context:
             title = key
             if isinstance(raw, list):
-                obj = pn.widgets.Select(name=title, options=raw)
+                obj = pn.widgets.Select(name=title, options=raw, width=DEFAULT_WIDTH)
             elif isinstance(raw, bool):
-                obj = pn.widgets.RadioBoxGroup(name=title, options=['yes', 'no', ], inline=True)
+                obj = pn.widgets.RadioBoxGroup(name=title, options=['yes', 'no', ], inline=True, , width=DEFAULT_WIDTH)
                 if raw:
                     obj.value = 'yes'
                 else:
@@ -81,7 +82,7 @@ class ExperimentPackageMaker(TaskDirector):
             elif isinstance(raw, dict):
                 continue
             else:
-                obj = pn.widgets.TextInput(name=title, placeholder=raw)
+                obj = pn.widgets.TextInput(name=title, value=raw, width=DEFAULT_WIDTH)
 
             self._form_box.append(obj)
 
@@ -108,6 +109,9 @@ class ExperimentPackageMaker(TaskDirector):
             context_dict=context_dict,
             output_dir=output_dir
         )
+        self._msg_output.clear()
+        alert = pn.pane.Alert(f'実験パッケージを{output_dir}に作成しました。',sizing_mode="stretch_width",alert_type='info')
+        self._msg_output.append(alert)
 
     @classmethod
     def generateFormScetion(cls, working_path:str):

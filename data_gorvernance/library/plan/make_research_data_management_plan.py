@@ -15,6 +15,7 @@ from ..task_director import TaskDirector
 from ..utils.dg_customize_config import get_dg_customize_config
 
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
+notebook_name = script_file_name+'ipynb'
 script_dir_path = os.path.dirname(__file__)
 p = Path(script_dir_path)
 # DGカスタマイズJSON定義書パス(data_gorvernance\library\data\data_governance_customize.json)
@@ -27,7 +28,7 @@ class DGPlaner(TaskDirector):
 
     def __init__(self, working_path:str) -> None:
         # working_path = .data_gorvernance/researchflow/plan/task/plan/make_research_data_management_plan.ipynbが想定値
-        super().__init__(working_path)
+        super().__init__(working_path, notebook_name)
 
         # α設定JSON定義書(plan.json)
         # 想定値：data_gorvernance\researchflow\plan\plan.json
@@ -194,35 +195,33 @@ class DGPlaner(TaskDirector):
         self.submit_button.button_type = 'danger'
         self.submit_button.button_style = 'solid'
 
-    @classmethod
-    def generateFormScetion(cls, working_path:str):
+    @TaskDirector.task_cell("id_1")
+    def generateFormScetion(self):
         """フォームセクション用"""
-
-        task_director = DGPlaner(working_path)
         # タスク開始による研究準備のサブフローステータス管理JSONの更新
-        task_director.doing_task(script_file_name)
+        self.doing_task(script_file_name)
 
         # フォーム定義
-        task_director.define_form()
+        self.define_form()
 
         # フォーム表示
         pn.extension()
         form_section = pn.WidgetBox()
-        form_section.append(task_director._form_box)
-        form_section.append(task_director._msg_output)
+        form_section.append(self._form_box)
+        form_section.append(self._msg_output)
         display(form_section)
 
-
-
-    @classmethod
-    def customize_research_flow(cls, working_path:str):
-        task_director = DGPlaner(working_path)
+    @TaskDirector.task_cell("id_2")
+    def customize_research_flow(self):
         # タスクの無効化処理
-        task_director.disable_task_by_phase()
+        self.disable_task_by_phase()
 
-    @classmethod
-    def completed_task(cls, working_path:str):
-
-        task_director = DGPlaner(working_path)
+    @TaskDirector.task_cell("id_3")
+    def completed_task(self):
         # タスク実行の完了情報を研究準備のサブフローステータス管理JSONに書き込む
-        task_director.done_task(script_file_name)
+        self.done_task(script_file_name)
+
+    @TaskDirector.task_cell("id_4")
+    def return_subflow_menu(self):
+        super().return_subflow_menu()
+

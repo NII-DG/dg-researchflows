@@ -1,16 +1,21 @@
-from .utils.config import path_config, message as msg_config
-from .subflow.subflow import get_return_sub_flow_menu_relative_url_path, get_subflow_type_and_id
 import os
-from .subflow.status import StatusFile, SubflowStatus
+import functools
+
 import panel as pn
 from panel.pane import HTML
-from .utils.html.button import create_button
 from IPython.display import display
 from IPython.core.display import Javascript
 
+from .utils.html.button import create_button
+from .subflow.status import StatusFile, SubflowStatus
+from .utils.config import path_config, message as msg_config
+from .subflow.subflow import get_return_sub_flow_menu_relative_url_path, get_subflow_type_and_id
+from .utils.log import UserActivityLog
+
+
 class TaskDirector():
 
-    def __init__(self, nb_working_file_path:str) -> None:
+    def __init__(self, nb_working_file_path:str, notebook_name:str) -> None:
         """TaskInterface コンストラクタ
 
         Notebookファイルのオペレーションするための共通クラス
@@ -33,6 +38,23 @@ class TaskDirector():
         else:
             # 研究準備以外の場合
             self._sub_flow_status_file_path = os.path.join(self._abs_root_path, path_config.get_sub_flow_status_file_path(subflow_type, subflow_id))
+        # ログ
+        self.log = UserActivityLog(nb_working_file_path, notebook_name)
+
+    # 継承したクラスで呼ぶ為のデコレータ
+    @staticmethod
+    def task_cell(cell_id: str, start_message="", finish_message=""):
+        """タスクセルに必須の処理"""
+        def wrapper(func):
+            @functools.wraps(func)
+            def decorate(self, *args, **kwargs):
+                self.log.cell_id = cell_id
+                self.log.start_cell(start_message)
+                result = func(self, *args, **kwargs)
+                self.log.finish_cell(finish_message)
+                return result
+            return decorate
+        return wrapper
 
     def doing_task(self, task_name:str):
         """タスク開始によるサブフローステータス管理JSONの更新
@@ -74,11 +96,8 @@ class TaskDirector():
         sub_flow_menu_link_button.width = button_width
         return sub_flow_menu_link_button
 
-
-    @classmethod
-    def return_subflow_menu(cls, working_path:str):
+    def return_subflow_menu(self):
         pn.extension()
-        task_director = TaskDirector(working_path)
-        sub_flow_menu_link_button  = task_director.get_subflow_menu_button_object()
+        sub_flow_menu_link_button  = self.get_subflow_menu_button_object()
         display(sub_flow_menu_link_button)
         display(Javascript('IPython.notebook.save_checkpoint();'))

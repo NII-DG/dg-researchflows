@@ -28,7 +28,10 @@ class DataSaver(TaskDirector):
         self.doing_task(script_file_name)
 
         # フォーム定義
-        source = os.path.join(self._abs_root_path, path_config.DATA_GOVERNANCE)
+        source = [
+            os.path.join(self._abs_root_path, path_config.DATA_GOVERNANCE),
+            os.path.join(self._abs_root_path, path_config.DATA)
+        ]
         self.save_define_form(source, script_file_name)
         # フォーム表示
         pn.extension()

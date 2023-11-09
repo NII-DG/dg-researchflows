@@ -226,7 +226,7 @@ class TaskDirector():
 
         options =  dict()
         options[msg_config.get('form', 'selector_default')] = False
-        for id, name in projects:
+        for id, name in projects.items():
             options[name] = id
 
         self._save_form_box.clear()

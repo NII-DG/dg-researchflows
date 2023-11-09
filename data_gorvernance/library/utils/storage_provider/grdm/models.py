@@ -12,7 +12,7 @@ class UpdateArgs:
         self.destination = destination
         self.recursive = recursive
         self.force = force
-        # NOTE: updateを実装するときはuploadのコードも修正すること
+        self.update = False
 
 
 def upload(token, base_url, args):

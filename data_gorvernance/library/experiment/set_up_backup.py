@@ -5,7 +5,7 @@ from ..task_director import TaskDirector
 
 # 本ファイルのファイル名
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
-notebook_name = script_file_name+'ipynb'
+notebook_name = script_file_name+'.ipynb'
 
 class BackUpSetter(TaskDirector):
 

@@ -15,7 +15,7 @@ from ..task_director import TaskDirector
 from ..utils.dg_customize_config import get_dg_customize_config
 
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
-notebook_name = script_file_name+'ipynb'
+notebook_name = script_file_name+'.ipynb'
 script_dir_path = os.path.dirname(__file__)
 p = Path(script_dir_path)
 # DGカスタマイズJSON定義書パス(data_gorvernance\library\data\data_governance_customize.json)
@@ -37,9 +37,6 @@ class DGPlaner(TaskDirector):
         # フォームボックス
         self._form_box = pn.WidgetBox()
         self._form_box.width = 900
-        # メッセージ用ボックス
-        self._msg_output = pn.WidgetBox()
-        self._msg_output.width = 900
 
     def define_form(self):
         """フォーム定義"""
@@ -220,8 +217,3 @@ class DGPlaner(TaskDirector):
     def completed_task(self):
         # タスク実行の完了情報を研究準備のサブフローステータス管理JSONに書き込む
         self.done_task(script_file_name)
-
-    @TaskDirector.task_cell("4")
-    def return_subflow_menu(self):
-        super().return_subflow_menu()
-

@@ -141,15 +141,18 @@ class TaskSave():
         self.save_form_box.clear()
         self.save_msg_output.update_info("同期中です。しばらくお待ちください。")
         timediff.start()
-        for i, path in enumerate(self._source):
-            count_alert.object = f'実行中 {i}/{size}'
-            grdm.sync(
-                token=self.grdm_token,
-                base_url=grdm.BASE_URL,
-                project_id=self.project_id,
-                abs_source = path,
-                abs_root=self._abs_root_path
-            )
+        try:
+            for i, path in enumerate(self._source):
+                count_alert.object = f'実行中 {i}/{size}'
+                grdm.sync(
+                    token=self.grdm_token,
+                    base_url=grdm.BASE_URL,
+                    project_id=self.project_id,
+                    abs_source = path,
+                    abs_root=self._abs_root_path
+                )
+        except Exception:
+            self.save_msg_output.add_exception()
         # end
         timediff.end()
         minutes, seconds = timediff.get_diff_minute()

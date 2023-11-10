@@ -37,6 +37,9 @@ class DGPlaner(TaskDirector):
         # フォームボックス
         self._form_box = pn.WidgetBox()
         self._form_box.width = 900
+        # メッセージ用ボックス
+        self._msg_output = pn.WidgetBox()
+        self._msg_output.width = 900
 
     def define_form(self):
         """フォーム定義"""

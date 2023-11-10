@@ -1,3 +1,4 @@
+"""GRDMのAPIへの通信"""
 from urllib import parse
 import requests
 from http import HTTPStatus

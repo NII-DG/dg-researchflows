@@ -5,6 +5,8 @@ from IPython.display import display
 
 from ..task_director import TaskDirector
 from ..utils.config import path_config, message as msg_config
+from ..utils.storage_provider import grdm
+from ..utils.save import TaskSave
 
 # 本ファイルのファイル名
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
@@ -28,14 +30,11 @@ class DataSaver(TaskDirector):
         self.doing_task(script_file_name)
 
         # フォーム定義
-        source = [
-            os.path.join(self._abs_root_path, path_config.DATA_GOVERNANCE),
-            os.path.join(self._abs_root_path, path_config.DATA)
-        ]
-        self.save_define_form(source, script_file_name)
+        source = grdm.all_sync_path(self._abs_root_path)
+        self.define_save_form(source, script_file_name)
         # フォーム表示
         pn.extension()
         form_section = pn.WidgetBox()
-        form_section.append(self._save_form_box)
-        form_section.append(self._msg_output)
+        form_section.append(self.save_form_box)
+        form_section.append(self.save_msg_output)
         display(form_section)

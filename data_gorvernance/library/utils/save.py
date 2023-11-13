@@ -143,7 +143,7 @@ class TaskSave():
 
         try:
             for i, path in enumerate(self._source):
-                self.save_msg_output.update_info(f'{msg} {i}/{size}\n{path}')
+                self.save_msg_output.update_info(f'{msg} {i+1}/{size}\n{path}')
                 grdm.sync(
                     token=self.grdm_token,
                     base_url=grdm.BASE_URL,

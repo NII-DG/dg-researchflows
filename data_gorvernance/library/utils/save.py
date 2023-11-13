@@ -1,4 +1,4 @@
-import os
+import traceback
 from requests.exceptions import RequestException
 
 import panel as pn
@@ -133,17 +133,17 @@ class TaskSave():
         self._save()
 
     def _save(self):
-        count_alert = self.save_msg_output.add_info()
         size = len(self._source)
         timediff = TimeDiff()
 
         # start
         self.save_form_box.clear()
-        self.save_msg_output.update_info("同期中です。しばらくお待ちください。")
+        msg = '同期中です。しばらくお待ちください。'
         timediff.start()
+
         try:
             for i, path in enumerate(self._source):
-                count_alert.object = f'実行中 {i}/{size}'
+                self.save_msg_output.update_info(f'{msg} {i}/{size}\n{path}')
                 grdm.sync(
                     token=self.grdm_token,
                     base_url=grdm.BASE_URL,
@@ -153,6 +153,8 @@ class TaskSave():
                 )
         except Exception:
             self.save_msg_output.add_exception()
+            self.log.error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
+            return
         # end
         timediff.end()
         minutes, seconds = timediff.get_diff_minute()

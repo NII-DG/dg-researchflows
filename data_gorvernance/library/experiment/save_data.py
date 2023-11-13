@@ -20,7 +20,7 @@ class DataSaver(TaskDirector):
         """DataSaver コンストラクタ
 
         Args:
-            nb_working_file_path (str): [実行Notebookファイルパス]
+            working_path (str): [実行Notebookファイルパス]
         """
         super().__init__(working_path, notebook_name)
 

@@ -9,17 +9,14 @@ from .config import path_config, message as msg_config
 from .widgets import Button, MessageBox
 from .storage_provider import grdm
 from .time import TimeDiff
-from .log import UserActivityLog
+from .log import TaskLog
 from .error import UnauthorizedError
 
-class TaskSave():
+class TaskSave(TaskLog):
 
     def __init__(self, nb_working_file_path, notebook_name) -> None:
-
+        super().__init__(nb_working_file_path, notebook_name)
         self._abs_root_path = path_config.get_abs_root_form_working_dg_file_path(nb_working_file_path)
-
-        # ログ
-        self.log = UserActivityLog(nb_working_file_path, notebook_name)
 
         # メッセージ出力
         self.save_msg_output = MessageBox()
@@ -50,6 +47,7 @@ class TaskSave():
         # config
         self._script_file_name = script_file_name
 
+    @TaskLog.callback_form("input_token")
     def _token_form_callback(self, event):
         self.save_msg_output.clear()
         self._save_submit_button.set_looks_processing()
@@ -118,6 +116,7 @@ class TaskSave():
         self._save_submit_button.on_click(self._id_form_callback)
         self.save_form_box.append(self._save_submit_button)
 
+    @TaskLog.callback_form("select_grdm_project")
     def _project_select_callback(self, event):
         # NOTE: 一度値を格納してからでないと上手く動かない
         value = self._save_form.value

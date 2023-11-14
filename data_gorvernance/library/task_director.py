@@ -1,5 +1,4 @@
 import os
-import functools
 
 import panel as pn
 from panel.pane import HTML
@@ -10,7 +9,6 @@ from .utils.html.button import create_button
 from .subflow.status import StatusFile, SubflowStatus
 from .utils.config import path_config, message as msg_config
 from .subflow.subflow import get_return_sub_flow_menu_relative_url_path, get_subflow_type_and_id
-from .utils.log import UserActivityLog
 from .utils.save import TaskSave
 
 
@@ -40,23 +38,6 @@ class TaskDirector(TaskSave):
         else:
             # 研究準備以外の場合
             self._sub_flow_status_file_path = os.path.join(self._abs_root_path, path_config.get_sub_flow_status_file_path(subflow_type, subflow_id))
-        # ログ
-        self.log = UserActivityLog(nb_working_file_path, notebook_name)
-
-    # 継承したクラスで呼ぶ為のデコレータ
-    @staticmethod
-    def task_cell(cell_id: str, start_message="", finish_message=""):
-        """タスクセルに必須の処理"""
-        def wrapper(func):
-            @functools.wraps(func)
-            def decorate(self, *args, **kwargs):
-                self.log.cell_id = cell_id
-                self.log.start_cell(start_message)
-                result = func(self, *args, **kwargs)
-                self.log.finish_cell(finish_message)
-                return result
-            return decorate
-        return wrapper
 
     ########################
     #  update task status  #
@@ -111,9 +92,9 @@ class TaskDirector(TaskSave):
         display(sub_flow_menu_link_button)
         display(Javascript('IPython.notebook.save_checkpoint();'))
 
-    ##################
-    #  save(upload)  #
-    ##################
+    ##########
+    #  save  #
+    ##########
 
     # override
     def _save(self):

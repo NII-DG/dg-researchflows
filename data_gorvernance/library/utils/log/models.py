@@ -4,8 +4,8 @@ import os
 from pathlib import Path
 import datetime
 
-from .config import path_config
-from ..subflow.subflow import get_subflow_type_and_id
+from ..config import path_config
+from ...subflow.subflow import get_subflow_type_and_id
 
 
 class BaseLogger:
@@ -73,7 +73,7 @@ class UserActivityLog(BaseLogger):
         )
         log_dir = os.environ['JUPYTERHUB_SERVER_NAME']
         log_dir = (root_folder / path_config.DG_LOG_FOLDER / log_dir)
-        os.makedirs(os.path.dirname(log_dir), exist_ok=True)
+        os.makedirs(log_dir, exist_ok=True)
         return str(log_dir)
 
     def _get_format(self):

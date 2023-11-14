@@ -22,6 +22,8 @@ def all_sync_path(abs_root):
 
     # /home/jovyan/data
     paths.append(os.path.join(abs_root, path_config.DATA))
+    # 暫定処置
+    os.makedirs(os.path.join(abs_root, path_config.DATA), exist_ok=True)
 
     # /home/jovyan/data_gorvernance配下のworking以外
     dg_dir = os.path.join(abs_root, path_config.DATA_GOVERNANCE)

@@ -151,9 +151,13 @@ class TaskSave():
                     abs_source = path,
                     abs_root=self._abs_root_path
                 )
-        except Exception:
-            self.save_msg_output.add_exception()
-            self.log.error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
+        except Exception as e:
+            timediff.end()
+            minutes, seconds = timediff.get_diff_minute()
+            error_summary = traceback.format_exception_only(type(e), e)[0].rstrip('\\n')
+            error_msg = f'## [INTERNAL ERROR] : {error_summary}\n{traceback.format_exc()}'
+            self.save_msg_output.add_error(f'経過時間: {minutes}m {seconds}s\n {error_msg}')
+            self.log.error(error_msg)
             return
         # end
         timediff.end()

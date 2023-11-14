@@ -21,7 +21,7 @@ class BaseLogger:
         if self.date != now_date:
             self.date = now_date
             self._update_handler()
-            self.set_formatter(fmt)
+        self.set_formatter(fmt)
 
     def _update_handler(self):
         if self.logger.hasHandlers():

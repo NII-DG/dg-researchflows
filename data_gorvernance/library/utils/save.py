@@ -139,7 +139,7 @@ class TaskSave(TaskLog):
 
         # start
         self.save_form_box.clear()
-        msg = msg_config.get('form', 'doing')
+        msg = msg_config.get('save', 'doing')
         timediff.start()
 
         try:

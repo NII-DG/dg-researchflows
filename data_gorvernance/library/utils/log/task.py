@@ -6,10 +6,7 @@ from .models import UserActivityLog
 class TaskLog:
 
     def __init__(self, nb_working_file_path, notebook_name) -> None:
-        nb_file = os.path.join(
-            os.path.dirname(nb_working_file_path), notebook_name
-        )
-        self.log = UserActivityLog(nb_file)
+        self.log = UserActivityLog(nb_working_file_path, notebook_name)
 
     ###################################
     # 継承したクラスで呼ぶ為のデコレータ #

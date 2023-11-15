@@ -50,7 +50,7 @@ class BaseLogger:
 
 class UserActivityLog(BaseLogger):
 
-    def __init__(self, nb_working_file):
+    def __init__(self, nb_working_file, notebook_name)
         """
         Args:
             nb_working_file (str): ノートブック名を含む絶対パス
@@ -61,7 +61,9 @@ class UserActivityLog(BaseLogger):
         self.set_log_level('info')
         # set items
         self.username = os.environ['JUPYTERHUB_USER']
-        self.ipynb_file = nb_working_file
+        self.ipynb_file = os.path.join(
+            os.path.dirname(nb_working_file), notebook_name
+        )
         subflow_type, subflow_id = get_subflow_type_and_id(nb_working_file)
         self.subflow_id = subflow_id
         self.subflow_type = subflow_type

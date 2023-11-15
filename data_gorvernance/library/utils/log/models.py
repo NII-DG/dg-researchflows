@@ -10,11 +10,10 @@ from ...subflow.subflow import get_subflow_type_and_id
 
 class BaseLogger:
 
-    def __init__(self, log_file, output_dir="."):
+    def __init__(self, output_dir="."):
         self.logger = logging.getLogger(__name__)
         self.date = datetime.datetime.now().strftime('%Y%m%d')
         self.log_dir = output_dir
-        self.file_name = log_file
         self._update_handler()
 
     def reset_file(self, fmt):
@@ -28,7 +27,7 @@ class BaseLogger:
         if self.logger.hasHandlers():
             handler = self.logger.handlers[0]
             self.logger.removeHandler(handler)
-        log_file = self.file_name + "." + self.date
+        log_file = self.date + ".log"
         log_file = os.path.join(self.log_dir, log_file)
         self.handler = FileHandler(log_file)
         self.logger.addHandler(self.handler)
@@ -51,17 +50,18 @@ class BaseLogger:
 
 class UserActivityLog(BaseLogger):
 
-    def __init__(self, nb_working_file, notebook_name):
+    def __init__(self, nb_working_file):
+        """
+        Args:
+            nb_working_file (str): ノートブック名を含む絶対パス
+        """
         # set log config
         log_dir = self._get_log_dir(nb_working_file)
-        file_name = 'log'
-        super().__init__(file_name, log_dir)
+        super().__init__(log_dir)
         self.set_log_level('info')
         # set items
         self.username = os.environ['JUPYTERHUB_USER']
-        self.ipynb_file = os.path.join(
-            os.path.dirname(nb_working_file), notebook_name
-        )
+        self.ipynb_file = nb_working_file
         subflow_type, subflow_id = get_subflow_type_and_id(nb_working_file)
         self.subflow_id = subflow_id
         self.subflow_type = subflow_type

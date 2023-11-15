@@ -1,3 +1,4 @@
+import os
 import functools
 
 from .models import UserActivityLog
@@ -5,7 +6,10 @@ from .models import UserActivityLog
 class TaskLog:
 
     def __init__(self, nb_working_file_path, notebook_name) -> None:
-        self.log = UserActivityLog(nb_working_file_path, notebook_name)
+        nb_file = os.path.join(
+            os.path.dirname(nb_working_file_path), notebook_name
+        )
+        self.log = UserActivityLog(nb_file)
 
     ###################################
     # 継承したクラスで呼ぶ為のデコレータ #
@@ -26,7 +30,7 @@ class TaskLog:
 
     @staticmethod
     def callback_form(event_name):
-        """フォームの処理を行う際に必要"""
+        """フォームの処理に必須の処理"""
         def wrapper(func):
             @functools.wraps(func)
             def decorate(self, *args, **kwargs):

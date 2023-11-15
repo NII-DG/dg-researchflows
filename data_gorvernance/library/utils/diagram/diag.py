@@ -16,14 +16,25 @@ class DiagManager:
         self.content = File(str(self.path)).read()
 
     def add_node_property(self, node_id: str, custom: str):
-        find = f'{node_id}['
-        replace = f'{node_id}[{custom}, '
-        update_content = self.content.replace(find, replace, 1)
-        if update_content == self.content:
-            find = f'{node_id}'
-            replace = f'{node_id}[{custom}] '
-            update_content = self.content.replace(find, replace, 1)
-        self.content = update_content
+        lines = self.content.splitlines()
+        new_lines = []
+        is_replaced = True
+        for line in lines:
+            if is_replaced and node_id in line:
+                find = f'{node_id}['
+                replace = f'{node_id}[{custom}, '
+                update_content = line.replace(find, replace, 1)
+                if update_content == line:
+                    find = f'{node_id}'
+                    replace = f'{node_id}[{custom}]'
+                    update_content = line.replace(find, replace, 1)
+                new_lines.append(update_content)
+                is_replaced = False
+            else:
+                new_lines.append(line)
+        self.content = '\n'.join(new_lines)
+
+
 
     def update_node_color(self, node_id: str, color: str):
         self.add_node_property(node_id, f'color="{color}"')

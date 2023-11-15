@@ -7,31 +7,77 @@ blockdiag {
     orientation = portrait;
     default_group_color = "#FFFFCC";
 
+    class disable [shape=none, height=1, width=1];
+
     group {
         shape = line;
         style = none;
 
+        dummy[shape=none, height=1];
+
         group {
-            label = "実験のセットアップ"
-            RF003001;
-            RF003002[stacked];
+            shape = line;
+            style = none;
+            RF003003;
+
+            group {
+                shape = line;
+                style = none;
+                orientation = portrait;
+                dummy-1-2[class="disable"];
+                RF003012;
+            }
         }
 
         group {
-            RF003003[stacked];
-            RF009002[stacked];
-            RF003007;
+            shape = line;
+            style = none;
+            RF009002;
+            dummy-2-2[class="disable"];
+            RF003004;
         }
-        group{
-            label = "解析"
-            RF003013[stacked];
+
+        group {
+            shape = line;
+            style = none;
+            RF003001;
+            dummy-3-2[class="disable"];
+            RF003015;
+        }
+
+        group {
+            shape = line;
+            style = none;
+            RF003010;
+            dummy-4-2[class="disable"];
+            RF009001;
+        }
+
+        group {
+            shape = line;
+            style = none;
+            orientation = portrait;
+            RF003011;
+            dummy-5-2[class="disable"];
         }
     }
 
-    RF003001 -> RF003002
-    RF003003 -> RF003013
+    group {
+        orientation = portrait;
+        dummy-1-3[shape=none, height=1, width=250];
+        RF003007;
+        RF003008;
+        RF003013;
+    }
 
-    RF003002 -> RF003003
-    RF003002 -> RF009002
-    RF003002 -> RF003007
+    // メインのフロー
+    RF003003 -> RF009002 -> RF003001 -> RF003010 -> RF003011;
+    RF003012 -> RF003004 -> RF003015 -> RF009001;
+    // 折り返しの矢印
+    RF003011 -- dummy-5-2;
+    dummy-1-2 -> RF003012;
+    dummy-1-2 -- dummy-2-2 -- dummy-3-2 -- dummy-4-2 -- dummy-5-2
+    // 一行目にダミーを置くため
+    dummy -- RF003003[style=none]
+    dummy -- RF003012[style=none]
 }

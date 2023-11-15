@@ -50,7 +50,7 @@ class BaseLogger:
 
 class UserActivityLog(BaseLogger):
 
-    def __init__(self, nb_working_file, notebook_name)
+    def __init__(self, nb_working_file, notebook_name):
         """
         Args:
             nb_working_file (str): ノートブック名を含む絶対パス

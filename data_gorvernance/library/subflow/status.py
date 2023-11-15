@@ -51,6 +51,10 @@ class TaskStatus:
         return self._name
 
     @property
+    def is_multiple(self):
+        return self._is_multiple
+
+    @property
     def is_required(self):
         return self._is_required
 

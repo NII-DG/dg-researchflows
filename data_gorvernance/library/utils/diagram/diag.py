@@ -15,27 +15,28 @@ class DiagManager:
         # 以下暫定措置としてファイル書き変えのために用いる
         self.content = File(str(self.path)).read()
 
-    def change_node_property(self, node_id: str, key:str, value: str):
+    def add_node_property(self, node_id: str, custom: str):
         find = f'{node_id}['
-        replace = f'{node_id}[{key} = {value}, '
+        replace = f'{node_id}[{custom}, '
         update_content = self.content.replace(find, replace, 1)
         if update_content == self.content:
             find = f'{node_id}'
-            replace = f'{node_id}[{key} = {value}] '
+            replace = f'{node_id}[{custom}] '
             update_content = self.content.replace(find, replace, 1)
         self.content = update_content
 
     def update_node_color(self, node_id: str, color: str):
-        self.change_node_property(node_id, "color", f'"{color}"')
+        self.add_node_property(node_id, f'color="{color}"')
 
     def update_node_icon(self, node_id: str, path: str):
-        self.change_node_property(node_id, "icon", f'"{path}"')
+        self.add_node_property(node_id, f'icon="{path}"')
 
     def update_node_style(self, node_id, style):
-        self.change_node_property(node_id, "style", style)
+        self.add_node_property(node_id, f'style={style}')
 
-    def delete_node(self, node_id):
-        pass
+    def update_node_stacked(self, node_id):
+        """ノードの重ね合わせ"""
+        self.add_node_property(node_id, f'stacked')
 
     def generate_svg(self, tmp_diag: str, output: str, font: str):
         File(str(tmp_diag)).write(self.content)

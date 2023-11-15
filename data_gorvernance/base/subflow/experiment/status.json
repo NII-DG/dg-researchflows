@@ -7,10 +7,8 @@
             "is_multiple": false,
             "is_required": false,
             "completed_count": 0,
-            "dependent_task_ids": [
-                "RF009002"
-            ],
-            "status": "unfeasible",
+            "dependent_task_ids": [],
+            "status": "unexecuted",
             "execution_environments": [],
             "disabled": false
         },
@@ -22,17 +20,6 @@
             "completed_count": 0,
             "dependent_task_ids": [],
             "status": "unfeasible",
-            "execution_environments": [],
-            "disabled": false
-        },
-        {
-            "id": "RF003003",
-            "name": "build_experiment_environment",
-            "is_multiple": true,
-            "is_required": false,
-            "completed_count": 0,
-            "dependent_task_ids": [],
-            "status": "unexecuted",
             "execution_environments": [],
             "disabled": false
         },
@@ -52,19 +39,6 @@
         {
             "id": "RF003007",
             "name": "set_up_backup",
-            "is_multiple": true,
-            "is_required": false,
-            "completed_count": 0,
-            "dependent_task_ids": [
-                "RF003002"
-            ],
-            "status": "unexecuted",
-            "execution_environments": [],
-            "disabled": false
-        },
-        {
-            "id": "RF003008",
-            "name": "write_lab_notes",
             "is_multiple": true,
             "is_required": false,
             "completed_count": 0,
@@ -124,19 +98,6 @@
             "disabled": false
         },
         {
-            "id": "RF003015",
-            "name": "delete_experiment_environment",
-            "is_multiple": true,
-            "is_required": false,
-            "completed_count": 0,
-            "dependent_task_ids": [
-                "RF003004"
-            ],
-            "status": "unfeasible",
-            "execution_environments": [],
-            "disabled": false
-        },
-        {
             "id": "RF009001",
             "name": "validate",
             "is_multiple": true,
@@ -145,7 +106,7 @@
             "dependent_task_ids": [
                 "RF003015"
             ],
-            "status": "unfeasible",
+            "status": "unexecuted",
             "execution_environments": [],
             "disabled": false
         },
@@ -155,10 +116,19 @@
             "is_multiple": true,
             "is_required": false,
             "completed_count": 0,
-            "dependent_task_ids": [
-                "RF003003"
-            ],
-            "status": "unfeasible",
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "disabled": false
+        },
+        {
+            "id": "RF009003",
+            "name": "write_lab_notes",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
             "execution_environments": [],
             "disabled": false
         }

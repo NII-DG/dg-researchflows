@@ -1,7 +1,7 @@
 blockdiag {
     node_width = 200;
     node_height = 130;
-    span_width = 5;
+    span_width = 10;
     span_height = 30;
     default_fontsize = 10;
     orientation = portrait;
@@ -10,78 +10,52 @@ blockdiag {
     class disable [shape=none, height=1, width=1];
 
     group {
-
         group {
             dummy-1-1[shape=none, height=1, width=250];
-            dummy-1-2[class="disable"]
-            dummy-1-3[shape=none, height=1, width=250]
+            dummy-1-2[shape=none, height=1, width=20]
         }
-
+        RF003001;
+        RF003010;
         group {
-            shape = line;
-            style = none;
-            RF003003;
-
-            group {
-                shape = line;
-                style = none;
-                orientation = portrait;
-                dummy-2-2[class="disable"];
-                RF003012;
-            }
-        }
-
-        group {
-            shape = line;
-            style = none;
-            RF009002;
-            dummy-3-2[class="disable"];
-            RF003004;
-        }
-
-        group {
-            shape = line;
-            style = none;
-            RF003001;
-            dummy-4-2[class="disable"];
-            RF003015;
-        }
-
-        group {
-            shape = line;
-            style = none;
-            RF003010;
-            dummy-5-2[class="disable"];
-            RF009001;
-        }
-
-        group {
-            shape = line;
-            style = none;
             orientation = portrait;
             RF003011;
-            dummy-6-2[class="disable"];
+            dummy-4-1[shape=none, height=1, width=1];
         }
+        group {
+            orientation = portrait;
+            RF003012;
+            dummy-5-1[shape=none, height=1, width=1];
+        }
+        RF003004;
+        dummy-7-1[shape=none, height=1, width=250]
+
     }
 
     group {
         shape = line;
         style = none;
         orientation = portrait;
-        dummy-1-4[shape=none, height=1, width=250]
-        RF003007;
+        group {
+            orientation = portrait;
+            shape = line;
+            style = none;
+            dummy-1-3[shape=none, height=1, width=250]
+            RF003007;
+        }
         RF003008;
+        RF009002;
         RF003013;
+        RF009001;
     }
 
     // メインのフロー
-    RF003003 -> RF009002 -> RF003001 -> RF003010 -> RF003011;
-    RF003012 -> RF003004 -> RF003015 -> RF009001;
-    // 折り返しの矢印
-    RF003011 -- dummy-6-2;
-    dummy-2-2 -> RF003012;
-    dummy-2-2 -- dummy-3-2 -- dummy-4-2 -- dummy-5-2 -- dummy-6-2;
-    // 横幅の調整用ダミーを一行目に置くため
-    dummy-1-1 -- RF003003[style=none];
-    dummy-1-2 -- RF003012[style=none];
+    RF003001 -> RF003010 -> RF003011 -> RF003012 -> RF003004;
+    // 戻る矢印
+    RF003011 <- dummy-4-1;
+    dummy-5-1 -- dummy-4-1;
+    RF003012 -- dummy-5-1;
+    // 横幅の調整用ダミーを任意の場所に置くため
+    dummy-1-1 -- RF003001[style=none];
+    dummy-1-3 -- RF003007[style=none];
+    RF003004 -- dummy-7-1[style=none];
 }

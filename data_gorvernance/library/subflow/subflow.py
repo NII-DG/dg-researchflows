@@ -112,6 +112,10 @@ class SubFlow:
     def _adjust_by_status(self, task: TaskStatus, display_all=True):
         if task.disable and not display_all:
             return
+
+        if task.is_multiple:
+            self.diag.update_node_stacked(task.id)
+
         if task.status == task.STATUS_UNFEASIBLE:
             self.diag.update_node_color(task.id, "#e6e5e3")
             self.svg_config[task.id]['is_link'] = False

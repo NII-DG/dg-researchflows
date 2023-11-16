@@ -1,37 +1,61 @@
 blockdiag {
     node_width = 200;
     node_height = 130;
-    span_width = 20;
+    span_width = 10;
     span_height = 30;
     default_fontsize = 10;
     orientation = portrait;
     default_group_color = "#FFFFCC";
 
+    class disable [shape=none, height=1, width=1];
+
+    group {
+        group {
+            dummy-1-1[shape=none, height=1, width=250];
+            dummy-1-2[shape=none, height=1, width=20]
+        }
+        RF003001;
+        RF003010;
+        group {
+            orientation = portrait;
+            RF003011;
+            dummy-4-1[shape=none, height=1, width=1];
+        }
+        group {
+            orientation = portrait;
+            RF003012;
+            dummy-5-1[shape=none, height=1, width=1];
+        }
+        RF003004;
+        dummy-7-1[shape=none, height=1, width=250]
+
+    }
+
     group {
         shape = line;
         style = none;
-
+        orientation = portrait;
         group {
-            label = "実験のセットアップ"
-            RF003001;
-            RF003002[stacked];
-        }
-
-        group {
-            RF003003[stacked];
-            RF009002[stacked];
+            orientation = portrait;
+            shape = line;
+            style = none;
+            dummy-1-3[shape=none, height=1, width=250]
             RF003007;
         }
-        group{
-            label = "解析"
-            RF003013[stacked];
-        }
+        RF009003;
+        RF009002;
+        RF003013;
+        RF009001;
     }
 
-    RF003001 -> RF003002
-    RF003003 -> RF003013
-
-    RF003002 -> RF003003
-    RF003002 -> RF009002
-    RF003002 -> RF003007
+    // メインのフロー
+    RF003001 -> RF003010 -> RF003011 -> RF003012 -> RF003004;
+    // 戻る矢印
+    RF003011 <- dummy-4-1;
+    dummy-5-1 -- dummy-4-1;
+    RF003012 -- dummy-5-1;
+    // 横幅の調整用ダミーを任意の場所に置くため
+    dummy-1-1 -- RF003001[style=none];
+    dummy-1-3 -- RF003007[style=none];
+    RF003004 -- dummy-7-1[style=none];
 }

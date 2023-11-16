@@ -12,8 +12,10 @@ DATA_GOVERNANCE = 'data_gorvernance'
 BASE = 'base'
 SUB_FLOW = 'subflow'
 TASK = 'task'
+LOG = 'log'
 RESEARCHFLOW = 'researchflow'
 PLAN = 'plan'
+DATA = 'data'
 WORKING = 'working' ## 同期非対称フォルダ
 
 # Folder Path
@@ -27,6 +29,8 @@ DG_SUB_FLOW_BASE_DATA_FOLDER = os.path.join(DATA_GOVERNANCE, BASE, SUB_FLOW)
 DG_TASK_BASE_DATA_FOLDER = os.path.join(DATA_GOVERNANCE, BASE, TASK)
 # リサーチフローのフォルダパス
 DG_RESEARCHFLOW_FOLDER = os.path.join(DATA_GOVERNANCE, RESEARCHFLOW)
+# ログフォルダ
+DG_LOG_FOLDER = os.path.join(DATA_GOVERNANCE, LOG, RESEARCHFLOW)
 # 非同期フォルダパス
 DG_WORKING_FOLDER = os.path.join(DATA_GOVERNANCE, WORKING)
 DG_WORKING_RESEARCHFLOW_FOLDER = os.path.join(DG_WORKING_FOLDER, RESEARCHFLOW)

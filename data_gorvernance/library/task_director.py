@@ -1,16 +1,20 @@
-from .utils.config import path_config, message as msg_config
-from .subflow.subflow import get_return_sub_flow_menu_relative_url_path, get_subflow_type_and_id
 import os
-from .subflow.status import StatusFile, SubflowStatus
+
 import panel as pn
 from panel.pane import HTML
-from .utils.html.button import create_button
 from IPython.display import display
 from IPython.core.display import Javascript
 
-class TaskDirector():
+from .utils.html.button import create_button
+from .subflow.status import StatusFile, SubflowStatus
+from .utils.config import path_config, message as msg_config
+from .subflow.subflow import get_return_sub_flow_menu_relative_url_path, get_subflow_type_and_id
+from .utils.save import TaskSave
 
-    def __init__(self, nb_working_file_path:str) -> None:
+
+class TaskDirector(TaskSave):
+
+    def __init__(self, nb_working_file_path:str, notebook_name:str) -> None:
         """TaskInterface コンストラクタ
 
         Notebookファイルのオペレーションするための共通クラス
@@ -18,6 +22,7 @@ class TaskDirector():
         Args:
             nb_working_file_path (str): [実行Notebookのファイルパス]
         """
+        super().__init__(nb_working_file_path, notebook_name)
         # 実行Notebookのファイルパス
         self.nb_working_file_path = nb_working_file_path
         # 絶対rootディレクトリを取得・設定する
@@ -34,6 +39,9 @@ class TaskDirector():
             # 研究準備以外の場合
             self._sub_flow_status_file_path = os.path.join(self._abs_root_path, path_config.get_sub_flow_status_file_path(subflow_type, subflow_id))
 
+    ########################
+    #  update task status  #
+    ########################
     def doing_task(self, task_name:str):
         """タスク開始によるサブフローステータス管理JSONの更新
 
@@ -58,6 +66,9 @@ class TaskDirector():
         sf_status.completed_task_by_task_name(task_name, os.environ["JUPYTERHUB_SERVER_NAME"])
         sf.write(sf_status)
 
+    #########################
+    #  return subflow menu  #
+    #########################
     def get_subflow_menu_button_object(self)-> HTML:
         """サブフローメニューへのボタンpanel.HTMLオブジェクトの取得
         Returns:
@@ -74,11 +85,19 @@ class TaskDirector():
         sub_flow_menu_link_button.width = button_width
         return sub_flow_menu_link_button
 
-
-    @classmethod
-    def return_subflow_menu(cls, working_path:str):
+    # ここではログを吐かない
+    def return_subflow_menu(self):
         pn.extension()
-        task_director = TaskDirector(working_path)
-        sub_flow_menu_link_button  = task_director.get_subflow_menu_button_object()
+        sub_flow_menu_link_button  = self.get_subflow_menu_button_object()
         display(sub_flow_menu_link_button)
         display(Javascript('IPython.notebook.save_checkpoint();'))
+
+    ##########
+    #  save  #
+    ##########
+
+    # override
+    def _save(self):
+        # uploadしたときにタスク完了とするため
+        super()._save()
+        self.done_task(self._script_file_name)

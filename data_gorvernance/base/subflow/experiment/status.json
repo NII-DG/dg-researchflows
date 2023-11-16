@@ -18,34 +18,19 @@
             "is_multiple": true,
             "is_required": false,
             "completed_count": 0,
-            "dependent_task_ids": [
-                "RF003001"
-            ],
+            "dependent_task_ids": [],
             "status": "unfeasible",
             "execution_environments": [],
             "disabled": false
         },
         {
-            "id": "RF003003",
-            "name": "build_experiment_environment",
+            "id": "RF003004",
+            "name": "set_experiment_metadata",
             "is_multiple": true,
             "is_required": false,
             "completed_count": 0,
             "dependent_task_ids": [
-                "RF003002"
-            ],
-            "status": "unfeasible",
-            "execution_environments": [],
-            "disabled": false
-        },
-        {
-            "id": "RF009002",
-            "name": "manage_collaborators",
-            "is_multiple": true,
-            "is_required": false,
-            "completed_count": 0,
-            "dependent_task_ids": [
-                "RF003002"
+                "RF003012"
             ],
             "status": "unfeasible",
             "execution_environments": [],
@@ -57,8 +42,45 @@
             "is_multiple": true,
             "is_required": false,
             "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "disabled": false
+        },
+        {
+            "id": "RF003010",
+            "name": "prepare_data",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
             "dependent_task_ids": [
-                "RF003002"
+                "RF003001"
+            ],
+            "status": "unfeasible",
+            "execution_environments": [],
+            "disabled": false
+        },
+        {
+            "id": "RF003011",
+            "name": "perform_experiment_process",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [
+                "RF003010"
+            ],
+            "status": "unfeasible",
+            "execution_environments": [],
+            "disabled": false
+        },
+        {
+            "id": "RF003012",
+            "name": "check_experiment_results",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [
+                "RF003011"
             ],
             "status": "unfeasible",
             "execution_environments": [],
@@ -70,10 +92,43 @@
             "is_multiple": true,
             "is_required": false,
             "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "disabled": false
+        },
+        {
+            "id": "RF009001",
+            "name": "validate",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
             "dependent_task_ids": [
-                "RF003003"
+                "RF003015"
             ],
-            "status": "unfeasible",
+            "status": "unexecuted",
+            "execution_environments": [],
+            "disabled": false
+        },
+        {
+            "id": "RF009002",
+            "name": "manage_collaborators",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "disabled": false
+        },
+        {
+            "id": "RF009003",
+            "name": "write_lab_notes",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
             "execution_environments": [],
             "disabled": false
         }

@@ -16,7 +16,7 @@ blockdiag {
         }
 
         group {
-            RF009002[stacked];
+            RF009002;
         }
     }
 

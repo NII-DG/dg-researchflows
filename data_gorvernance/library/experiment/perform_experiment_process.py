@@ -1,23 +1,15 @@
 import os
-
-import panel as pn
-from IPython.display import display
-
 from ..task_director import TaskDirector
-from ..utils.config import path_config, message as msg_config
-from ..utils.storage_provider import grdm
-from ..utils.save import TaskSave
+
 
 # 本ファイルのファイル名
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
 notebook_name = script_file_name+'.ipynb'
 
-DEFAULT_WIDTH = 600
-
-class DataSaver(TaskDirector):
+class ExperimentProcPerformer(TaskDirector):
 
     def __init__(self, working_path:str) -> None:
-        """DataSaver コンストラクタ
+        """ExperimentEnvBuilder コンストラクタ
 
         Args:
             working_path (str): [実行Notebookファイルパス]
@@ -30,11 +22,10 @@ class DataSaver(TaskDirector):
         self.doing_task(script_file_name)
 
         # フォーム定義
-        source = grdm.all_sync_path(self._abs_root_path)
-        self.define_save_form(source, script_file_name)
         # フォーム表示
-        pn.extension()
-        form_section = pn.WidgetBox()
-        form_section.append(self.save_form_box)
-        form_section.append(self.save_msg_output)
-        display(form_section)
+
+
+    TaskDirector.task_cell("2")
+    def completed_task(self):
+        # タスク実行の完了情報を該当サブフローステータス管理JSONに書き込む
+        self.done_task(script_file_name)

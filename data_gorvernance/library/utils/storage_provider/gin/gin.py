@@ -9,7 +9,7 @@ from pathlib import Path
 from http import HTTPStatus
 from ..gin import api as gin_api, git
 from ....utils.config.param import ParamConfig
-from ...error import Unauthorized, RepositoryNotExist, UrlUpdateError, NoValueInDgFileError
+from ...error import UnauthorizedError, RepositoryNotExist, UrlUpdateError, NoValueInDgFileError
 from ...config import path_config, message as msg_config
 from ....utils.cmd import Cmd
 from datalad import api as datalad_api
@@ -140,7 +140,7 @@ def setup_local(user_name, password):
 
     ## Unauthorized
     if response.status_code == HTTPStatus.UNAUTHORIZED:
-        raise Unauthorized
+        raise UnauthorizedError
     response.raise_for_status()
 
     ## Check to see if there is an existing token

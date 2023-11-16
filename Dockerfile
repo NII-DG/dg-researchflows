@@ -27,10 +27,11 @@ RUN pip install --no-cache black==21.12b0
 RUN pip install --no-cache snakemake
 RUN pip install --no-cache boto3
 RUN pip install --no-cache chardet==4.0.0
-RUN pip install --no-cache panel==1.2.2
+RUN pip install --no-cache panel==1.3.0
 RUN pip install --no-cache python-magic==0.4.27
 RUN pip install --no-cache natsort==8.3.1
 RUN pip install --no-cache git+https://github.com/nbgallery/ipyparams
+RUN pip install --no-cache git+https://github.com/RCOSDP/rdmclient.git
 RUN pip install --no-cache git+https://github.com/NII-DG/nii-dg.git@230419_8c684da
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-packager.git@master
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-drawer.git@Rel20230929

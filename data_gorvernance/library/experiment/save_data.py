@@ -1,34 +1,40 @@
-
 import os
-from ..task_director import TaskDirector
 
+import panel as pn
+from IPython.display import display
+
+from ..task_director import TaskDirector
+from ..utils.config import path_config, message as msg_config
+from ..utils.storage_provider import grdm
+from ..utils.save import TaskSave
 
 # 本ファイルのファイル名
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
-notebook_name = script_file_name+'ipynb'
+notebook_name = script_file_name+'.ipynb'
+
+DEFAULT_WIDTH = 600
 
 class DataSaver(TaskDirector):
 
-    def __init__(self, nb_working_file_path:str) -> None:
+    def __init__(self, working_path:str) -> None:
         """DataSaver コンストラクタ
 
         Args:
-            nb_working_file_path (str): [実行Notebookファイルパス]
+            working_path (str): [実行Notebookファイルパス]
         """
-        super().__init__(nb_working_file_path, notebook_name)
+        super().__init__(working_path, notebook_name)
 
-    @classmethod
-    def generateFormScetion(cls, working_path:str):
-        task_director = DataSaver(working_path)
+    @TaskDirector.task_cell("1")
+    def generateFormScetion(self):
         # タスク開始によるサブフローステータス管理JSONの更新
-        task_director.doing_task(script_file_name)
+        self.doing_task(script_file_name)
 
         # フォーム定義
+        source = grdm.all_sync_path(self._abs_root_path)
+        self.define_save_form(source, script_file_name)
         # フォーム表示
-
-
-    @classmethod
-    def completed_task(cls, working_path:str):
-        # タスク実行の完了情報を該当サブフローステータス管理JSONに書き込む
-        task_director = DataSaver(working_path)
-        task_director.done_task(script_file_name)
+        pn.extension()
+        form_section = pn.WidgetBox()
+        form_section.append(self.save_form_box)
+        form_section.append(self.save_msg_output)
+        display(form_section)

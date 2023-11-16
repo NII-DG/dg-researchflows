@@ -15,7 +15,7 @@ from ..task_director import TaskDirector
 from ..utils.dg_customize_config import get_dg_customize_config
 
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
-notebook_name = script_file_name+'ipynb'
+notebook_name = script_file_name+'.ipynb'
 script_dir_path = os.path.dirname(__file__)
 p = Path(script_dir_path)
 # DGカスタマイズJSON定義書パス(data_gorvernance\library\data\data_governance_customize.json)
@@ -195,7 +195,7 @@ class DGPlaner(TaskDirector):
         self.submit_button.button_type = 'danger'
         self.submit_button.button_style = 'solid'
 
-    @TaskDirector.task_cell("id_1")
+    @TaskDirector.task_cell("1")
     def generateFormScetion(self):
         """フォームセクション用"""
         # タスク開始による研究準備のサブフローステータス管理JSONの更新
@@ -211,17 +211,12 @@ class DGPlaner(TaskDirector):
         form_section.append(self._msg_output)
         display(form_section)
 
-    @TaskDirector.task_cell("id_2")
+    @TaskDirector.task_cell("2")
     def customize_research_flow(self):
         # タスクの無効化処理
         self.disable_task_by_phase()
 
-    @TaskDirector.task_cell("id_3")
+    @TaskDirector.task_cell("3")
     def completed_task(self):
         # タスク実行の完了情報を研究準備のサブフローステータス管理JSONに書き込む
         self.done_task(script_file_name)
-
-    @TaskDirector.task_cell("id_4")
-    def return_subflow_menu(self):
-        super().return_subflow_menu()
-

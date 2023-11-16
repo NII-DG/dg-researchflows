@@ -15,6 +15,7 @@ TASK = 'task'
 LOG = 'log'
 RESEARCHFLOW = 'researchflow'
 PLAN = 'plan'
+DATA = 'data'
 WORKING = 'working' ## 同期非対称フォルダ
 
 # Folder Path

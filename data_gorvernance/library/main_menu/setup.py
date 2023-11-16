@@ -8,7 +8,7 @@ import panel as pn
 from IPython.display import display, clear_output
 from IPython.core.display import Javascript, HTML
 import traceback
-from ..utils.error import Unauthorized
+from ..utils.error import UnauthorizedError
 import requests
 
 
@@ -93,10 +93,10 @@ class ContainerSetter():
         # 認証検証
         try:
             gin.setup_local(user_name, password)
-        except Unauthorized:
+        except UnauthorizedError:
             self.change_submit_button_warning(name=msg_config.get('form', 'invali_input_value').format(msg_config.get('form', 'user_name')+'/'+ msg_config.get('form', 'password')))
             self._msg_output.clear()
-            alert = pn.pane.Alert(msg_config.get('user_auth','unauthorized'), sizing_mode="stretch_width",alert_type='warning')
+            alert = pn.pane.Alert(msg_config.get('user_auth','UnauthorizedError'), sizing_mode="stretch_width",alert_type='warning')
             self._msg_output.append(alert)
             return
         except Exception as e:

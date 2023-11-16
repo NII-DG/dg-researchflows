@@ -4,16 +4,16 @@ import os
 from pathlib import Path
 import datetime
 
-from .config import path_config
-from ..subflow.subflow import get_subflow_type_and_id
+from ..config import path_config
+from ...subflow.subflow import get_subflow_type_and_id
 
 
 class BaseLogger:
 
-    def __init__(self, log_file: str):
+    def __init__(self, output_dir="."):
         self.logger = logging.getLogger(__name__)
         self.date = datetime.datetime.now().strftime('%Y%m%d')
-        self.file_name = log_file
+        self.log_dir = output_dir
         self._update_handler()
 
     def reset_file(self, fmt):
@@ -21,13 +21,14 @@ class BaseLogger:
         if self.date != now_date:
             self.date = now_date
             self._update_handler()
-            self.set_formatter(fmt)
+        self.set_formatter(fmt)
 
     def _update_handler(self):
         if self.logger.hasHandlers():
             handler = self.logger.handlers[0]
             self.logger.removeHandler(handler)
-        log_file = self.file_name + "." + self.date
+        log_file = self.date + ".log"
+        log_file = os.path.join(self.log_dir, log_file)
         self.handler = FileHandler(log_file)
         self.logger.addHandler(self.handler)
 
@@ -50,9 +51,13 @@ class BaseLogger:
 class UserActivityLog(BaseLogger):
 
     def __init__(self, nb_working_file, notebook_name):
+        """
+        Args:
+            nb_working_file (str): ノートブック名を含む絶対パス
+        """
         # set log config
-        log_file = self._get_log_file_path(nb_working_file)
-        super().__init__(str(log_file))
+        log_dir = self._get_log_dir(nb_working_file)
+        super().__init__(log_dir)
         self.set_log_level('info')
         # set items
         self.username = os.environ['JUPYTERHUB_USER']
@@ -64,15 +69,14 @@ class UserActivityLog(BaseLogger):
         self.subflow_type = subflow_type
         self.cell_id = ""
 
-    def _get_log_file_path(self, nb_working_file):
+    def _get_log_dir(self, nb_working_file):
         root_folder = Path(
             path_config.get_abs_root_form_working_dg_file_path(nb_working_file)
         )
         log_dir = os.environ['JUPYTERHUB_SERVER_NAME']
-        log_file_name = 'log'
-        log_file_path = (root_folder / path_config.DG_LOG_FOLDER / log_dir / log_file_name)
-        os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
-        return log_file_path
+        log_dir = (root_folder / path_config.DG_LOG_FOLDER / log_dir)
+        os.makedirs(log_dir, exist_ok=True)
+        return str(log_dir)
 
     def _get_format(self):
         fmt = '%(levelname)s\t%(asctime)s\t%(username)s\t'

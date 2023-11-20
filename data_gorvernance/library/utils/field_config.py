@@ -22,7 +22,7 @@ class Field:
 
     def get_id_and_name(self)->dict[str, str]:
         return {
-                fld[self.__ID]: fld[self.__FIELD_NAME]
+                fld[self.__FIELD_NAME]: fld[self.__ID]
                 for fld in self.field
             }
 
@@ -30,7 +30,7 @@ class Field:
         disabled = []
         for fld in self.field:
             if not fld[self.__IS_ACTIVE]:
-                disabled.append(fld[self.__ID])
+                disabled.append({fld[self.__FIELD_NAME] , fld[self.__ID]})
         return disabled
 
     def get_template_path(self, target_id):

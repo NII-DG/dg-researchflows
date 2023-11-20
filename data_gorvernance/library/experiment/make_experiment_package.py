@@ -42,11 +42,15 @@ class ExperimentPackageMaker(TaskDirector):
 
         self.field = Field()
         options = dict()
-        options[msg_config.get('form', 'selector_default')] = False
+        self.feild_list_default = {
+            msg_config.get('form', 'selector_default'): False
+        }
+        options.update(self.feild_list_default)
         options.update(self.field.get_id_and_name())
         self.feild_list = pn.widgets.Select(
                 options=options,
-                disabled_options=self.field.get_disabled_ids()
+                disabled_options=self.field.get_disabled_ids(),
+                value = False
             )
         self.feild_list.param.watch(self._field_select_callback, 'value')
         self.save_form_box.append(self.feild_list)
@@ -58,7 +62,7 @@ class ExperimentPackageMaker(TaskDirector):
         # デフォルトを選択不可に
         disabled_options = self.feild_list.disabled_options
         if False not in disabled_options:
-            disabled_options.append(False)
+            disabled_options.append(self.feild_list_default)
             self.feild_list.disabled_options = disabled_options
 
         self.set_template_form()

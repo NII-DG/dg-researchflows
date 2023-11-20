@@ -53,7 +53,7 @@ class ExperimentPackageMaker(TaskDirector):
                 value = False
             )
         self.feild_list.param.watch(self._field_select_callback, 'value')
-        self.save_form_box.append(self.feild_list)
+        self._form_box.append(self.feild_list)
 
     def _field_select_callback(self, event):
         self.select_id = self.feild_list.value

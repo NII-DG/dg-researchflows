@@ -56,11 +56,6 @@ class Alert:
     def error(cls, msg=""):
         return pn.pane.Alert(msg, sizing_mode="stretch_width",alert_type='danger')
 
-    @classmethod
-    def exception(cls):
-        return pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
-
-
 class MessageBox(pn.WidgetBox):
 
     def update_info(self, msg=""):
@@ -87,12 +82,6 @@ class MessageBox(pn.WidgetBox):
         self.append(alert)
         return alert
 
-    def update_exception(self):
-        self.clear()
-        alert = Alert.exception()
-        self.append(alert)
-        return alert
-
     def add_info(self, msg=""):
         alert = Alert.info(msg)
         self.append(alert)
@@ -110,10 +99,5 @@ class MessageBox(pn.WidgetBox):
 
     def add_error(self, msg=""):
         alert = Alert.error(msg)
-        self.append(alert)
-        return alert
-
-    def add_exception(self):
-        alert = Alert.exception()
         self.append(alert)
         return alert

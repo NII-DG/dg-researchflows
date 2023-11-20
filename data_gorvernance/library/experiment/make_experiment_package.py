@@ -7,9 +7,10 @@ from IPython.display import display
 
 from ..task_director import TaskDirector
 from ..subflow.subflow import get_subflow_type_and_id
-from ..utils.widgets import Button
+from ..utils.widgets import Button, MessageBox
 from ..utils.package import MakePackage
 from ..utils.config import path_config, message as msg_config
+from ..utils.field_config import Field
 
 
 # 本ファイルのファイル名
@@ -33,28 +34,80 @@ class ExperimentPackageMaker(TaskDirector):
         self._form_box = pn.WidgetBox()
         self._form_box.width = 900
         # メッセージ用ボックス
-        self._msg_output = pn.WidgetBox()
+        self._msg_output = MessageBox()
         self._msg_output.width = 900
 
-    def set_template_form(self):
+    def set_field_selector(self):
         self._form_box.clear()
-        self.template_path_form = pn.widgets.TextInput(name="cookiecutter template path", width=DEFAULT_WIDTH)
+
+        self.field = Field()
+        options = dict()
+        options[msg_config.get('form', 'selector_default')] = False
+        options.update(self.field.get_id_and_name())
+        self.feild_list = pn.widgets.Select(
+                options=options,
+                disabled_options=self.field.get_disabled_ids()
+            )
+        self.feild_list.param.watch(self._field_select_callback, 'value')
+        self.save_form_box.append(self.feild_list)
+
+    def _field_select_callback(self, event):
+        self.select_id = self.feild_list.value
+        if not self.select_id:
+            self.template_path_form.clear()
+        # デフォルトを選択不可に
+        disabled_options = self.feild_list.disabled_options
+        if False not in disabled_options:
+            disabled_options.append(False)
+            self.feild_list.disabled_options = disabled_options
+
+        self.set_template_form()
+
+    def set_template_form(self):
+        # テンプレート利用要否
+        options = {
+            "利用する": True,
+            "利用しない": False
+        }
+        self.radio = pn.widgets.RadioBoxGroup(options=options, value=True,inline=True, name='テンプレートを利用するかどうか')
+        self.radio.param.watch(self._radiobox_callback)
+        self._form_box.append(self.radio)
+        # パス入力欄
+        self.template_path_form = pn.widgets.TextInput(name="cookiecutter template path", width=DEFAULT_WIDTH, disabled=True)
+        self.template_path_form.value_input = self.field.get_template_path(self.select_id)
         self._form_box.append(self.template_path_form)
+        # 実行ボタン
         self.submit_button = Button(width=DEFAULT_WIDTH)
         self.submit_button.set_looks_init()
         self.submit_button.on_click(self.callback_submit_template_form)
+
         self._form_box.append(self.submit_button)
 
+    def _radiobox_callback(self, event):
+        radio_value = self.radio.value
+
+        if radio_value:
+            self.template_path_form.value_input = self.field.get_template_path(self.select_id)
+            self.template_path_form.disabled = True
+        else:
+            self.template_path_form.disabled = False
+            self.template_path_form.value_input = ""
+
+    @TaskDirector.callback_form("get_cookiecutter_template")
     def callback_submit_template_form(self, event):
-        self.submit_button.set_looks_processing("処理中")
+        self.submit_button.set_looks_processing()
         template = self.template_path_form.value_input
+
+        if not template:
+            self.submit_button.set_looks_warning("値が入力されていません")
+            return
 
         try:
             context = self.make_package.get_template(template)
         except Exception:
-            self._msg_output.clear()
-            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
-            self._msg_output.append(alert)
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self._msg_output.update_error(message)
+            self.log.error(message)
             return
         else:
             self.set_context_form(context)
@@ -86,9 +139,9 @@ class ExperimentPackageMaker(TaskDirector):
 
             self._form_box.append(obj)
 
-
+    @TaskDirector.callback_form("create_package")
     def callback_submit_context_form(self, event):
-        self.submit_button.set_looks_processing("処理中")
+        self.submit_button.set_looks_processing()
         context_dict = {}
         for obj in self._form_box.objects:
             if isinstance(obj, pn.widgets.Button):
@@ -96,32 +149,27 @@ class ExperimentPackageMaker(TaskDirector):
             if obj.value:
                 context_dict[obj.name] = obj.value
             else:
-                self._msg_output.clear()
-                alert = pn.pane.Alert(f'{obj.name} is empty.',sizing_mode="stretch_width",alert_type='danger')
-                self._msg_output.append(alert)
+                self._msg_output.update_error(f'{obj.name} is empty.')
                 return
 
         subflow_type, subflow_id = get_subflow_type_and_id(self.nb_working_file_path)
         if subflow_id is None:
-            self._msg_output.clear()
-            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : don\'t get subflow id',sizing_mode="stretch_width",alert_type='danger')
-            self._msg_output.append(alert)
+            self._msg_output.update_error(f'## [INTERNAL ERROR] : don\'t get subflow id')
             return
-        output_dir = os.path.join(self._abs_root_path, "data", subflow_type, subflow_id)
+        self.output_dir = os.path.join(self._abs_root_path, "data", subflow_type, subflow_id)
         try:
             self.make_package.create_package(
                 context_dict=context_dict,
-                output_dir=output_dir
+                output_dir=self.output_dir
             )
         except Exception:
-            self._msg_output.clear()
-            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
-            self._msg_output.append(alert)
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self._msg_output.update_error(message)
+            self.log.error(message)
+            return
 
         self._form_box.clear()
-        self._msg_output.clear()
-        alert = pn.pane.Alert(f'実験パッケージを{output_dir}に作成しました。',sizing_mode="stretch_width",alert_type='info')
-        self._msg_output.append(alert)
+        self._msg_output.update_success(f'実験パッケージを{self.output_dir}に作成しました。')
 
     @TaskDirector.task_cell("1")
     def generateFormScetion(self):
@@ -129,7 +177,7 @@ class ExperimentPackageMaker(TaskDirector):
         self.doing_task(script_file_name)
 
         # フォーム定義
-        self.set_template_form()
+        self.set_field_selector()
 
         # フォーム表示
         pn.extension()
@@ -141,5 +189,12 @@ class ExperimentPackageMaker(TaskDirector):
 
     TaskDirector.task_cell("2")
     def completed_task(self):
-        # タスク実行の完了情報を該当サブフローステータス管理JSONに書き込む
-        self.done_task(script_file_name)
+        # フォーム定義
+        source = self.output_dir
+        self.define_save_form(source, script_file_name)
+        # フォーム表示
+        pn.extension()
+        form_section = pn.WidgetBox()
+        form_section.append(self.save_form_box)
+        form_section.append(self.save_msg_output)
+        display(form_section)

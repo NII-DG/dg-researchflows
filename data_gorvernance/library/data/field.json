@@ -1,0 +1,81 @@
+{
+    "field": [
+        {
+            "id":1,
+            "field_name": "ライフサイエンス",
+            "field_name_en": "Life Science",
+            "experiment_package": "https://github.com/audreyfeldroy/cookiecutter-pypackage.git",
+            "is_active": true
+        },
+        {
+            "id":2,
+            "field_name": "情報通信",
+            "field_name_en": "Informatics",
+            "experiment_package": "",
+            "is_active": true
+        },
+        {
+            "id":3,
+            "field_name": "環境",
+            "field_name_en": "Environmental Science",
+            "experiment_package": "",
+            "is_active": false
+        },
+        {
+            "id":4,
+            "field_name": "ナノテク・材料",
+            "field_name_en": "Nanotechnology/Materials",
+            "experiment_package": "",
+            "is_active": false
+        },
+        {
+            "id":5,
+            "field_name": "エネルギー",
+            "field_name_en": "Energy Engineering",
+            "experiment_package": "",
+            "is_active": false
+        },
+        {
+            "id":6,
+            "field_name": "ものづくり技術",
+            "field_name_en": "Manufacturing Technology",
+            "experiment_package": "",
+            "is_active": false
+        },
+        {
+            "id":7,
+            "field_name": "社会基盤",
+            "field_name_en": "Social Infrastructure",
+            "experiment_package": "",
+            "is_active": false
+        },
+        {
+            "id":8,
+            "field_name": "フロンティア",
+            "field_name_en": "Frontier Technology",
+            "experiment_package": "",
+            "is_active": false
+        },
+        {
+            "id":9,
+            "field_name": "人文・社会",
+            "field_name_en": "Humanities & Social Sciences",
+            "experiment_package": "",
+            "is_active": false
+        },
+        {
+            "id":10,
+            "field_name": "自然科学一般",
+            "field_name_en": "Natural Science",
+            "experiment_package": "",
+            "is_active": false
+        },
+        {
+            "id":11,
+            "field_name": "その他",
+            "field_name_en": "Others",
+            "experiment_package": "",
+            "is_active": false
+        }
+    ]
+}

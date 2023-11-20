@@ -111,10 +111,11 @@ class TaskSave(TaskLog):
         self._save_form.param.watch(self._project_select_callback, 'value')
         self.save_form_box.append(self._save_form)
 
-        self._save_submit_button = Button(width=600, disabled=True)
+        self._save_submit_button = Button(width=600)
         self._save_submit_button.set_looks_init()
         self._save_submit_button.on_click(self._id_form_callback)
         self.save_form_box.append(self._save_submit_button)
+        self._save_submit_button.disabled = True
 
     def _project_select_callback(self, event):
         # NOTE: 一度値を格納してからでないと上手く動かない

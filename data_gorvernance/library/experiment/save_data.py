@@ -6,7 +6,6 @@ from IPython.display import display
 from ..task_director import TaskDirector
 from ..utils.config import path_config, message as msg_config
 from ..utils.storage_provider import grdm
-from ..utils.save import TaskSave
 
 # 本ファイルのファイル名
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]

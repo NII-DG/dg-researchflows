@@ -1,8 +1,6 @@
 import os
-import shutil
 from collections import OrderedDict
 
-import git
 from cookiecutter.main import cookiecutter
 from cookiecutter.generate import generate_context
 from cookiecutter.config import get_user_config

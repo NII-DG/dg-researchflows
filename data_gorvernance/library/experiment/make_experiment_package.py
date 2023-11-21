@@ -60,8 +60,8 @@ class ExperimentPackageMaker(TaskDirector):
         self._form_box.append(self.field_list)
 
     def _field_select_callback(self, event):
-        self.select_id = self.field_list.value
-        if not self.select_id:
+        self.selected = self.field_list.value
+        if not self.selected:
             return
         # デフォルトを選択不可に
         disabled_options = self.field_list.disabled_options
@@ -82,7 +82,7 @@ class ExperimentPackageMaker(TaskDirector):
         self._form_box.append(self.radio)
         # パス入力欄
         self.template_path_form = pn.widgets.TextInput(name="cookiecutter template path", width=DEFAULT_WIDTH, disabled=True)
-        self.template_path_form.value_input = self.field.get_template_path(self.select_id)
+        self.template_path_form.value_input = self.field.get_template_path(self.selected)
         self._form_box.append(self.template_path_form)
         # 実行ボタン
         self.submit_button = Button(width=DEFAULT_WIDTH)
@@ -95,7 +95,7 @@ class ExperimentPackageMaker(TaskDirector):
         radio_value = self.radio.value
 
         if radio_value:
-            self.template_path_form.value_input = self.field.get_template_path(self.select_id)
+            self.template_path_form.value_input = self.field.get_template_path(self.selected)
             self.template_path_form.disabled = True
         else:
             self.template_path_form.disabled = False

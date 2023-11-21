@@ -20,20 +20,17 @@ class Field:
         contents = JsonFile(str(field_json_file)).read()
         self.field = contents[self.__FIELD]
 
-    def get_id_and_name(self)->dict[str, str]:
-        return {
-                fld[self.__FIELD_NAME]: fld[self.__ID]
-                for fld in self.field
-            }
+    def get_name(self):
+        return [fld[self.__FIELD_NAME] for fld in self.field]
 
     def get_disabled_ids(self)->List[str]:
         disabled = []
         for fld in self.field:
             if not fld[self.__IS_ACTIVE]:
-                disabled.append(fld[self.__ID])
+                disabled.append(fld[self.__FIELD_NAME])
         return disabled
 
-    def get_template_path(self, target_id):
+    def get_template_path(self, target_name):
         for fld in self.field:
-            if fld[self.__ID] == target_id:
+            if fld[self.__FIELD_NAME] == target_name:
                 return fld[self.__EXPERIMENT_PACKAGE]

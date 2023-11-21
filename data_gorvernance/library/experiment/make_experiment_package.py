@@ -47,16 +47,14 @@ class ExperimentPackageMaker(TaskDirector):
         self._form_box.clear()
 
         self.field = Field()
-        options = dict()
-        self.field_list_default = {
-            msg_config.get('form', 'selector_default'): False
-        }
-        options.update(self.field_list_default)
-        options.update(self.field.get_id_and_name())
+        options = []
+        self.field_list_default = msg_config.get('form', 'selector_default')
+        options.append(self.field_list_default)
+        options.append(self.field.get_name())
         self.field_list = pn.widgets.Select(
                 options=options,
                 disabled_options=self.field.get_disabled_ids(),
-                value=False
+                value=self.field_list_default
             )
         self.field_list.param.watch(self._field_select_callback, 'value')
         self._form_box.append(self.field_list)

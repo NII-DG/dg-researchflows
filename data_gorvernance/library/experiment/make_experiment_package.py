@@ -29,6 +29,12 @@ class ExperimentPackageMaker(TaskDirector):
         """
         super().__init__(working_path, notebook_name)
         self.make_package = MakePackage()
+        # パッケージ作成場所
+        subflow_type, subflow_id = get_subflow_type_and_id(self.nb_working_file_path)
+        if subflow_id is None:
+            self._msg_output.update_error(f'## [INTERNAL ERROR] : don\'t get subflow id')
+            return
+        self.output_dir = os.path.join(self._abs_root_path, "data", subflow_type, subflow_id)
 
         # フォームボックス
         self._form_box = pn.WidgetBox()
@@ -42,28 +48,28 @@ class ExperimentPackageMaker(TaskDirector):
 
         self.field = Field()
         options = dict()
-        self.feild_list_default = {
+        self.field_list_default = {
             msg_config.get('form', 'selector_default'): False
         }
-        options.update(self.feild_list_default)
+        options.update(self.field_list_default)
         options.update(self.field.get_id_and_name())
-        self.feild_list = pn.widgets.Select(
+        self.field_list = pn.widgets.Select(
                 options=options,
                 disabled_options=self.field.get_disabled_ids(),
-                value = False
+                value=False
             )
-        self.feild_list.param.watch(self._field_select_callback, 'value')
-        self._form_box.append(self.feild_list)
+        self.field_list.param.watch(self._field_select_callback, 'value')
+        self._form_box.append(self.field_list)
 
     def _field_select_callback(self, event):
-        self.select_id = self.feild_list.value
+        self.select_id = self.field_list.value
         if not self.select_id:
-            self.template_path_form.clear()
+            return
         # デフォルトを選択不可に
-        disabled_options = self.feild_list.disabled_options
+        disabled_options = self.field_list.disabled_options
         if False not in disabled_options:
-            disabled_options.append(self.feild_list_default)
-            self.feild_list.disabled_options = disabled_options
+            disabled_options.append(self.field_list_default)
+            self.field_list.disabled_options = disabled_options
 
         self.set_template_form()
 
@@ -74,7 +80,7 @@ class ExperimentPackageMaker(TaskDirector):
             "利用しない": False
         }
         self.radio = pn.widgets.RadioBoxGroup(options=options, value=True,inline=True, name='テンプレートを利用するかどうか')
-        self.radio.param.watch(self._radiobox_callback)
+        self.radio.param.watch(self._radiobox_callback, 'value')
         self._form_box.append(self.radio)
         # パス入力欄
         self.template_path_form = pn.widgets.TextInput(name="cookiecutter template path", width=DEFAULT_WIDTH, disabled=True)
@@ -156,11 +162,6 @@ class ExperimentPackageMaker(TaskDirector):
                 self._msg_output.update_error(f'{obj.name} is empty.')
                 return
 
-        subflow_type, subflow_id = get_subflow_type_and_id(self.nb_working_file_path)
-        if subflow_id is None:
-            self._msg_output.update_error(f'## [INTERNAL ERROR] : don\'t get subflow id')
-            return
-        self.output_dir = os.path.join(self._abs_root_path, "data", subflow_type, subflow_id)
         try:
             self.make_package.create_package(
                 context_dict=context_dict,

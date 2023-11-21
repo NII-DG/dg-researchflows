@@ -39,6 +39,9 @@ class ExperimentPackageMaker(TaskDirector):
         # フォームボックス
         self._form_box = pn.WidgetBox()
         self._form_box.width = 900
+        # 可変フォームボックス
+        self._template_form_box = pn.WidgetBox()
+        self._template_form_box.width = 900
         # メッセージ用ボックス
         self._msg_output = MessageBox()
         self._msg_output.width = 900
@@ -50,8 +53,9 @@ class ExperimentPackageMaker(TaskDirector):
         options = []
         self.field_list_default = msg_config.get('form', 'selector_default')
         options.append(self.field_list_default)
-        options.append(self.field.get_name())
+        options.extend(self.field.get_name())
         self.field_list = pn.widgets.Select(
+                name="研究分野",
                 options=options,
                 disabled_options=self.field.get_disabled_ids(),
                 value=self.field_list_default
@@ -61,50 +65,64 @@ class ExperimentPackageMaker(TaskDirector):
 
     def _field_select_callback(self, event):
         self.selected = self.field_list.value
-        if not self.selected:
-            return
-        # デフォルトを選択不可に
-        disabled_options = self.field_list.disabled_options
-        if False not in disabled_options:
-            disabled_options.append(self.field_list_default)
-            self.field_list.disabled_options = disabled_options
+        self._template_form_box.clear()
+
+        if self.selected == self.field_list_default:
+            self._msg_output.update_info("値を選択してください。")
 
         self.set_template_form()
 
     def set_template_form(self):
         # テンプレート利用要否
+        title_format = """<label>{}</label>"""
+        radio_title = "推奨実験パッケージの利用有無"
+        radio_title = pn.pane.HTML(title_format.format(radio_title))
         options = {
             "利用する": True,
             "利用しない": False
         }
-        self.radio = pn.widgets.RadioBoxGroup(options=options, value=True,inline=True, name='テンプレートを利用するかどうか')
+        self.radio = pn.widgets.RadioBoxGroup(options=options, value=True,inline=True, margin=(0, 0, 0, 20))
         self.radio.param.watch(self._radiobox_callback, 'value')
-        self._form_box.append(self.radio)
+        if  not self.field.get_template_path(self.selected):
+            self.radio.value = False
+        else:
+            self._template_form_box.extend(
+                pn.Column(radio_title, self.radio)
+            )
+
         # パス入力欄
-        self.template_path_form = pn.widgets.TextInput(name="cookiecutter template path", width=DEFAULT_WIDTH, disabled=True)
-        self.template_path_form.value_input = self.field.get_template_path(self.selected)
-        self._form_box.append(self.template_path_form)
+        self.template_path_form = pn.widgets.TextInput(name="cookiecutter template path", width=DEFAULT_WIDTH)
+        self._template_form_box.append(self.template_path_form)
         # 実行ボタン
         self.submit_button = Button(width=DEFAULT_WIDTH)
         self.submit_button.set_looks_init()
         self.submit_button.on_click(self.callback_submit_template_form)
+        self._template_form_box.append(self.submit_button)
 
-        self._form_box.append(self.submit_button)
+        self._form_box.append(self._template_form_box)
+
+        # NOTE: この位置ならば無効化される
+        self.radio.param.trigger('value')
 
     def _radiobox_callback(self, event):
         radio_value = self.radio.value
 
         if radio_value:
-            self.template_path_form.value_input = self.field.get_template_path(self.selected)
+            self.template_path_form.value = self.field.get_template_path(self.selected)
             self.template_path_form.disabled = True
         else:
             self.template_path_form.disabled = False
-            self.template_path_form.value_input = ""
+            self.template_path_form.value = ""
 
     @TaskDirector.callback_form("get_cookiecutter_template")
     def callback_submit_template_form(self, event):
         self.submit_button.set_looks_processing()
-        template = self.template_path_form.value_input
+
+        radio_value = self.radio.value
+        if radio_value:
+            template = self.template_path_form.value
+        else:
+            template = self.template_path_form.value_input
 
         if not template:
             self.submit_button.set_looks_warning("値が入力されていません")

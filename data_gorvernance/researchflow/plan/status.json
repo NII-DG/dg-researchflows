@@ -13,15 +13,57 @@
             "disabled": false
         },
         {
+            "id": "RF002003",
+            "name": "build_experiment_environment",
+            "is_multiple": false,
+            "is_required": true,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unfeasible",
+            "execution_environments": [],
+            "disabled": false
+        },
+        {
+            "id": "RF003007",
+            "name": "set_up_backup",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "disabled": false
+        },
+        {
+            "id": "RF009001",
+            "name": "validate",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "disabled": false
+        },
+        {
             "id": "RF009002",
             "name": "manage_collaborators",
             "is_multiple": true,
             "is_required": false,
             "completed_count": 0,
-            "dependent_task_ids": [
-                "RF002001"
-            ],
-            "status": "unfeasible",
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "disabled": false
+        },
+        {
+            "id": "RF009003",
+            "name": "write_lab_notes",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
             "execution_environments": [],
             "disabled": false
         }

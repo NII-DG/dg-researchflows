@@ -55,7 +55,7 @@ class ExperimentPackageMaker(TaskDirector):
         options.append(self.field_list_default)
         options.extend(self.field.get_name())
         self.field_list = pn.widgets.Select(
-                name="研究分野",
+                name=msg_config.get('make_experiment_package', 'field_title'),
                 options=options,
                 disabled_options=self.field.get_disabled_ids(),
                 value=self.field_list_default
@@ -66,20 +66,21 @@ class ExperimentPackageMaker(TaskDirector):
     def _field_select_callback(self, event):
         self.selected = self.field_list.value
         self._template_form_box.clear()
+        self._msg_output.clear()
 
         if self.selected == self.field_list_default:
-            self._msg_output.update_info("値を選択してください。")
+            self._msg_output.update_warning(msg_config.get('form', 'select_warning'))
 
         self.set_template_form()
 
     def set_template_form(self):
         # テンプレート利用要否
         title_format = """<label>{}</label>"""
-        radio_title = "推奨実験パッケージの利用有無"
+        radio_title = msg_config.get('make_experiment_package', 'recommend_pkg_title')
         radio_title = pn.pane.HTML(title_format.format(radio_title))
         options = {
-            "利用する": True,
-            "利用しない": False
+            msg_config.get('make_experiment_package', 'use'): True,
+            msg_config.get('make_experiment_package', 'not_use'): False
         }
         self.radio = pn.widgets.RadioBoxGroup(options=options, value=True,inline=True, margin=(0, 0, 0, 20))
         self.radio.param.watch(self._radiobox_callback, 'value')
@@ -91,7 +92,10 @@ class ExperimentPackageMaker(TaskDirector):
             )
 
         # パス入力欄
-        self.template_path_form = pn.widgets.TextInput(name="cookiecutter template path", width=DEFAULT_WIDTH)
+        self.template_path_form = pn.widgets.TextInput(
+            name=msg_config.get('make_experiment_package', 'set_cookiecutter_title'),
+            width=DEFAULT_WIDTH
+        )
         self._template_form_box.append(self.template_path_form)
         # 実行ボタン
         self.submit_button = Button(width=DEFAULT_WIDTH)
@@ -125,7 +129,7 @@ class ExperimentPackageMaker(TaskDirector):
             template = self.template_path_form.value_input
 
         if not template:
-            self.submit_button.set_looks_warning("値が入力されていません")
+            self.submit_button.set_looks_warning(msg_config.get('form', 'value_empty_warning'))
             return
 
         try:
@@ -153,7 +157,7 @@ class ExperimentPackageMaker(TaskDirector):
             if isinstance(raw, list):
                 obj = pn.widgets.Select(name=title, options=raw, width=DEFAULT_WIDTH)
             elif isinstance(raw, bool):
-                obj = pn.widgets.RadioBoxGroup(name=title, options=['yes', 'no', ], inline=True, width=DEFAULT_WIDTH)
+                obj = pn.widgets.RadioBoxGroup(name=title, options=['yes', 'no'], inline=True, width=DEFAULT_WIDTH)
                 if raw:
                     obj.value = 'yes'
                 else:
@@ -175,7 +179,8 @@ class ExperimentPackageMaker(TaskDirector):
             if obj.value:
                 context_dict[obj.name] = obj.value
             else:
-                self._msg_output.update_error(f'{obj.name} is empty.')
+                message = msg_config.get('form', 'none_input_value').format(obj.name)
+                self._msg_output.update_error(message)
                 return
 
         try:
@@ -190,7 +195,8 @@ class ExperimentPackageMaker(TaskDirector):
             return
 
         self._form_box.clear()
-        self._msg_output.update_success(f'実験パッケージを{self.output_dir}に作成しました。')
+        message = msg_config.get('make_experiment_package', 'create_success').format(self.output_dir)
+        self._msg_output.update_success(message)
 
     @TaskDirector.task_cell("1")
     def generateFormScetion(self):

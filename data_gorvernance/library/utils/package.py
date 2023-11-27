@@ -1,12 +1,18 @@
 import os
 from collections import OrderedDict
 
-from cookiecutter.main import cookiecutter
-from cookiecutter.generate import generate_context
-from cookiecutter.config import get_user_config
-from cookiecutter.repository import determine_repo_dir
-from cookiecutter.prompt import render_variable
-from cookiecutter.environment import StrictEnvironment
+from cookiecutter.main import (
+    cookiecutter,
+    get_user_config,
+    determine_repo_dir,
+    generate_context
+
+)
+from cookiecutter.prompt import (
+    render_variable,
+    StrictEnvironment
+)
+
 
 class MakePackage:
 

@@ -128,7 +128,7 @@ class TaskSave(TaskLog):
     @TaskLog.callback_form("select_grdm_project")
     def _id_form_callback(self, event):
         if not self._save_form.value:
-            message = msg_config.get('form', 'select_error')
+            message = msg_config.get('form', 'select_warning')
             self._save_submit_button.set_looks_warning("message")
             self.log.warning(message)
         self.project_id = self._save_form.value

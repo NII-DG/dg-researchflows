@@ -18,7 +18,9 @@
             "is_multiple": false,
             "is_required": true,
             "completed_count": 0,
-            "dependent_task_ids": [],
+            "dependent_task_ids": [
+                "RF002001"
+            ],
             "status": "unfeasible",
             "execution_environments": [],
             "disabled": false

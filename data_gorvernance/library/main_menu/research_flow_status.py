@@ -80,6 +80,7 @@ class ResearchFlowStatusOperater(JsonFile):
                 sub_flow_unit_data = {}
                 sub_flow_unit_data['id'] = sub_flow_unit._id
                 sub_flow_unit_data['name'] = sub_flow_unit._name
+                sub_flow_unit_data['data_dir'] = sub_flow_unit._data_dir
                 sub_flow_unit_data['link'] = sub_flow_unit._link
                 sub_flow_unit_data['parent_ids'] = sub_flow_unit._parent_ids
                 sub_flow_unit_data['create_datetime'] = sub_flow_unit._create_datetime
@@ -181,6 +182,24 @@ class ResearchFlowStatusOperater(JsonFile):
                 exist_phase = True
                 for sub_flow_item in phase_status._sub_flow_data:
                     if sub_flow_item._name == sub_flow_name:
+                        return False
+            else:
+                continue
+
+        if not exist_phase:
+            raise Exception(f'Not Found phase. target phase seq_number : {phase_seq_number}')
+
+        return True
+
+    def is_unique_data_dir(self, phase_seq_number, data_dir_name)->bool:
+        """データディレクトリ名のユニークチェック"""
+        exist_phase = False
+        research_flow_status = self.load_research_flow_status()
+        for phase_status in research_flow_status:
+            if phase_status._seq_number == phase_seq_number:
+                exist_phase = True
+                for sub_flow_item in phase_status._sub_flow_data:
+                    if sub_flow_item._data_dir == data_dir_name:
                         return False
             else:
                 continue

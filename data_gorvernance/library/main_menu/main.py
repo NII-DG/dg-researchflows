@@ -1,17 +1,20 @@
 import shutil
 from typing import Dict, List
-from ..utils.config import path_config, message as msg_config
-from ..utils.html import button as html_button
+import os
+import re
+
+import panel as pn
 from IPython.display import display
 from IPython.core.display import Javascript
 from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus
+
 from ..main_menu.research_flow_status import ResearchFlowStatusOperater
 import traceback
 from ..utils.nb_file import NbFile
 from ..subflow.status import StatusFile
+from ..utils.config import path_config, message as msg_config
+from ..utils.html import button as html_button
 
-import panel as pn
-import os
 
 # git clone https://github.com/NII-DG/dg-researchflows.git -b feature/main_menu_v2 ./demo
 # mv ./demo/* ./
@@ -234,7 +237,14 @@ class MainMenu():
             name=msg_config.get('main_menu', 'sub_flow_name'),
             placeholder='Enter a sub flow name here…', max_length=15)
         # サブフロー名称（必須）：テキストフォームのイベントリスナー
-        self._sub_flow_name_form.param.watch(self.callback_sub_flow_name_form, 'value')
+        self._sub_flow_name_form.param.watch(self.callback_input_form, 'value')
+
+        # データディレクトリ名
+        self._data_dir_name_form = pn.widgets.TextInput(
+            name=msg_config.get('main_menu', 'data_dir_name'),
+            placeholder='Enter a data directory name here…', max_length=50)
+        # データディレクトリ名：テキストフォームのイベントリスナー
+        self._data_dir_name_form.param.watch(self.callback_input_form, 'value')
 
         # 親サブフロー種別(フェーズ)オプション
         parent_sub_flow_type_options = self.generate_parent_sub_flow_type_options(sub_flow_type_options[msg_config.get('form', 'selector_default')], research_flow_status)
@@ -268,12 +278,15 @@ class MainMenu():
             f'### {msg_config.get("main_menu", "create_sub_flow_title")}',
             self._sub_flow_type_selector,
             self._sub_flow_name_form,
+            self._data_dir_name_form,
             self._parent_sub_flow_type_selector,
             self._parent_sub_flow_selector,
             self.submit_button
             )
         self._sub_flow_widget_box.clear()
         self._sub_flow_widget_box.append(sub_flow_form_layout)
+        # ボタンの無効化をする（最初の設定が反映されないため）
+        self.submit_button.disabled=True
 
 
     def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus])->Dict[str, int]:
@@ -348,6 +361,7 @@ class MainMenu():
             # 入力情報を取得する。
             creating_phase_seq_number = self._sub_flow_type_selector.value
             sub_flow_name = self._sub_flow_name_form.value_input
+            data_dir_name = self._data_dir_name_form.value_input
             parent_sub_flow_ids = self._parent_sub_flow_selector.value
             # サブフロー名がユニークかどうかチェック
 
@@ -366,13 +380,41 @@ class MainMenu():
                 self.change_submit_button_warning(msg_config.get('main_menu','must_not_only_space'))
                 return
 
+            # データディレクトリ名の検証
+            if data_dir_name is None:
+                # data_dir_nameがNoneの場合、ユーザ警告
+                self.change_submit_button_warning(msg_config.get('main_menu','not_input_data_dir'))
+                return
+            if not re.match(r'^[a-zA-Z0-9]+$', data_dir_name):
+                # data_dir_nameが半角英数のみでない場合、ユーザ警告
+                self.change_submit_button_warning(msg_config.get('main_menu','not_match_data_dir'))
+                return
+            if not self.reserch_flow_status_operater.is_unique_data_dir(creating_phase_seq_number, data_dir_name):
+                # data_dir_nameがユニークでないの場合、ユーザ警告
+                self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_data_dir'))
+                return
+
             # リサーチフローステータス管理JSONの更新
             phase_name, new_sub_flow_id = self.reserch_flow_status_operater.update_research_flow_status(creating_phase_seq_number, sub_flow_name, parent_sub_flow_ids)
+
+            # /data/<phase_name>/<data_dir_name>の作成
+            data_dir_path = ""
+            try:
+                data_dir_path = self.create_data_dir(phase_name, data_dir_name)
+            except Exception:
+                # ディレクトリ名が存在した場合
+                # リサーチフローステータス管理JSONをロールバック
+                self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
+                # ユーザーに再入力を促す
+                self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_data_dir'))
+                return
 
             # 新規サブフローデータの用意
             try:
                 self.prepare_new_subflow_data(phase_name, new_sub_flow_id, sub_flow_name)
             except Exception as e:
+                # 失敗した場合に/data/<phase_name>/<data_dir_name>の削除
+                os.remove(data_dir_path)
                 # 失敗した場合は、リサーチフローステータス管理JSONをロールバック
                 self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
                 # 新規作成ボタンを作成失敗ステータスに更新する
@@ -390,6 +432,12 @@ class MainMenu():
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
 
+    def create_data_dir(self, phase_name:str, data_dir_name:str):
+        path = os.path.join(path_config.DATA, phase_name, data_dir_name)
+        if os.path.exists(path):
+            raise Exception(f'{path} is already exist.')
+        os.makedirs(path)
+        return path
 
     def prepare_new_subflow_data(self, phase_name:str, new_sub_flow_id:str, sub_flow_name):
 
@@ -443,7 +491,7 @@ class MainMenu():
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
 
-    def callback_sub_flow_name_form(self, event):
+    def callback_input_form(self, event):
         # サブフロー名称（必須）：テキストフォームコールバックファンクション
         try:
             # 新規作成ボタンのボタンの有効化チェック
@@ -501,6 +549,13 @@ class MainMenu():
             self.submit_button.disabled = True
             return
 
+        value = self._data_dir_name_form.value_input
+        if value is None:
+            self.submit_button.disabled = True
+            return
+        elif len(value) < 1:
+            self.submit_button.disabled = True
+            return
 
         value = self._parent_sub_flow_type_selector.value
         if value is None:

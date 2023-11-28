@@ -34,7 +34,7 @@ RUN pip install --no-cache git+https://github.com/nbgallery/ipyparams
 RUN pip install --no-cache git+https://github.com/RCOSDP/rdmclient.git
 RUN pip install --no-cache git+https://github.com/NII-DG/nii-dg.git@230419_8c684da
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-packager.git@master
-RUN pip install --no-cache git+https://github.com/NII-DG/dg-drawer.git@Rel20230929
+RUN pip install --no-cache git+https://github.com/NII-DG/dg-drawer.git@feature/add_status
 
 RUN jupyter contrib nbextension install --user
 RUN jupyter nbextensions_configurator enable --user

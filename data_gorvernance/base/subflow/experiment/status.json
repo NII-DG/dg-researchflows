@@ -103,9 +103,7 @@
             "is_multiple": true,
             "is_required": false,
             "completed_count": 0,
-            "dependent_task_ids": [
-                "RF003015"
-            ],
+            "dependent_task_ids": [],
             "status": "unexecuted",
             "execution_environments": [],
             "disabled": false

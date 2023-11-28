@@ -642,36 +642,39 @@ class MainMenu():
         # 初期セットアップ完了フラグファイルパス
         abs_setup_completed_file_path = os.path.join(abs_root, path_config.SETUP_COMPLETED_TEXT_PATH)
 
+        # Hidden Setup
+        #if os.path.isfile(abs_setup_completed_file_path):
 
-        if os.path.isfile(abs_setup_completed_file_path):
-            # Initial setup is complete.
-            # Display the main menu
-            main_menu = MainMenu(abs_root)
-            ## 機能コントローラーを配置
-            main_menu_title = 'メインメニュー'
-            main_menu_box = pn.WidgetBox(f'## {main_menu_title}', main_menu._menu_tabs)
-            display(main_menu_box)
-            ## リサーチフロー図を配置
-            research_flow_image_title = pn.pane.Markdown(f'### {msg_config.get("main_menu", "subflow_relationship_diagram")}')
-            display(research_flow_image_title)
-            display(main_menu._research_flow_image)
-            ## システムエラー表示オブジェクトを配置
-            display(main_menu._err_output)
-        else:
+        # Initial setup is complete.
+        # Display the main menu
+        main_menu = MainMenu(abs_root)
+        ## 機能コントローラーを配置
+        main_menu_title = 'メインメニュー'
+        main_menu_box = pn.WidgetBox(f'## {main_menu_title}', main_menu._menu_tabs)
+        display(main_menu_box)
+        ## リサーチフロー図を配置
+        research_flow_image_title = pn.pane.Markdown(f'### {msg_config.get("main_menu", "subflow_relationship_diagram")}')
+        display(research_flow_image_title)
+        display(main_menu._research_flow_image)
+        ## システムエラー表示オブジェクトを配置
+        display(main_menu._err_output)
+
+        # Hidden Setup
+        #else:
             # Initial setup is incomplete.
             # Leads you to the initial setup
 
             # display message
-            alert = pn.pane.Alert(msg_config.get('main_menu', 'required_initial_setup'),sizing_mode="stretch_width",alert_type='warning')
+        #    alert = pn.pane.Alert(msg_config.get('main_menu', 'required_initial_setup'),sizing_mode="stretch_width",alert_type='warning')
             # display initial setup link button
-            initial_setup_link_button = pn.pane.HTML()
-            initial_setup_link_button.object = html_button.create_button(
-                url = './setup.ipynb?init_nb=true',
-                msg=msg_config.get('main_menu', 'access_initial_setup'),
-                button_width='500px'
-            )
-            initial_setup_link_button.width = 500
-            display(alert)
-            display(initial_setup_link_button)
+        #    initial_setup_link_button = pn.pane.HTML()
+        #    initial_setup_link_button.object = html_button.create_button(
+        #        url = './setup.ipynb?init_nb=true',
+        #        msg=msg_config.get('main_menu', 'access_initial_setup'),
+        #        button_width='500px'
+        #    )
+        #    initial_setup_link_button.width = 500
+        #    display(alert)
+        #    display(initial_setup_link_button)
 
         display(Javascript('IPython.notebook.save_checkpoint();'))

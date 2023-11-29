@@ -88,7 +88,6 @@ class MainMenu():
         self._project_widget_box = pn.WidgetBox()
         self._project_widget_box.width = 900
 
-
         ## サブフロー操作コントローラーの定義
         ### サブフロー操作コントローラーオプション
         sub_flow_menu_title = msg_config.get('main_menu', 'sub_flow_menu_title')
@@ -106,7 +105,6 @@ class MainMenu():
         self._sub_flow_widget_box = pn.WidgetBox()
         self._sub_flow_widget_box.width = 900
         self.update_sub_flow_widget_box_for_init()
-
 
         sub_flow_menu_layout = pn.Column(self._sub_flow_menu, self._sub_flow_widget_box)
         project_menu_layout = pn.Column(pn.Row(self._project_menu, self.button_for_project_menu), self._project_widget_box)
@@ -142,8 +140,6 @@ class MainMenu():
             self._sub_flow_widget_box.append(alert)
 
 
-
-
     ######################################
     # イベントリスナーコールバックメソッド #
     ######################################
@@ -164,8 +160,6 @@ class MainMenu():
             self._err_output.clear()
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
-
-
 
     def callback_project_menu(self, event):
         """遷移ボタン for プロジェクト操作コントローラーの更新"""
@@ -199,7 +193,6 @@ class MainMenu():
             self._err_output.append(alert)
 
 
-
     #########################
     # サブフロー操作フォーム #
     #########################
@@ -210,11 +203,10 @@ class MainMenu():
         alert = pn.pane.Alert(msg_config.get('main_menu','guide_select_action'),sizing_mode="stretch_width",alert_type='info')
         self._sub_flow_widget_box.append(alert)
 
+
     #########################
     # サブフロー新規作成フォーム #
     #########################
-
-
 
     def update_sub_flow_widget_box_for_new_sub_flow(self):
         ### サブフロー新規作成フォーム
@@ -433,7 +425,7 @@ class MainMenu():
             self._err_output.append(alert)
 
     def create_data_dir(self, phase_name:str, data_dir_name:str):
-        path = os.path.join(self.abs_root, path_config.DATA, phase_name, data_dir_name)
+        path = path_config.get_task_data_dir(self.abs_root, phase_name, data_dir_name)
         if os.path.exists(path):
             raise Exception(f'{path} is already exist.')
         os.makedirs(path)
@@ -576,6 +568,7 @@ class MainMenu():
         self.submit_button.disabled = False
         self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
 
+
     #########################
     # サブフロー間接続編集フォーム #
     #########################
@@ -586,6 +579,7 @@ class MainMenu():
         self._sub_flow_widget_box.clear()
         self._sub_flow_widget_box.append(alert)
 
+
     #########################
     # サブフロー名称変更フォーム #
     #########################
@@ -595,7 +589,6 @@ class MainMenu():
         alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
         self._sub_flow_widget_box.clear()
         self._sub_flow_widget_box.append(alert)
-
 
 
     #########################
@@ -617,8 +610,6 @@ class MainMenu():
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
             self._err_output.append(alert)
             raise
-
-
 
 
     #################

@@ -11,6 +11,7 @@ from ..utils.widgets import Button, MessageBox
 from ..utils.package import MakePackage
 from ..utils.config import path_config, message as msg_config
 from ..utils.field_config import Field
+from ..main_menu.research_flow_status import ResearchFlowStatusOperater
 
 
 # 本ファイルのファイル名
@@ -29,12 +30,22 @@ class ExperimentPackageMaker(TaskDirector):
         """
         super().__init__(working_path, notebook_name)
         self.make_package = MakePackage()
+
         # パッケージ作成場所
         subflow_type, subflow_id = get_subflow_type_and_id(self.nb_working_file_path)
         if subflow_id is None:
             self._msg_output.update_error(f'## [INTERNAL ERROR] : don\'t get subflow id')
             return
-        self.output_dir = os.path.join(self._abs_root_path, "data", subflow_type, subflow_id)
+        try:
+            rf_status_file = path_config.get_research_flow_status_file_path(self._abs_root_path)
+            rf_status = ResearchFlowStatusOperater(rf_status_file)
+            data_dir_name = rf_status.get_data_dir(subflow_type, subflow_id)
+            if data_dir_name is None:
+                raise Exception
+        except Exception:
+            self._msg_output.update_error(f'## [INTERNAL ERROR] : don\'t get directory name of data')
+            return
+        self.output_dir = path_config.get_task_data_dir(self._abs_root_path, subflow_type, data_dir_name)
 
         # フォームボックス
         self._form_box = pn.WidgetBox()

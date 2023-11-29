@@ -21,6 +21,15 @@ class ResearchFlowStatusOperater(JsonFile):
     def get_research_flow_status(self):
         return super().read()
 
+    def get_data_dir(self, phase_name, id):
+        """phase nameとidからdata_dirを取得する"""
+        research_flow_status = self.load_research_flow_status()
+        for phase in research_flow_status:
+            if phase._name != phase_name:
+                continue
+            for sb in phase._sub_flow_data:
+                if sb._id == id:
+                    return sb._data_dir
 
     def get_svg_of_research_flow_status(self)->str:
         """Get SVG data of Research Flow Image by file path
@@ -63,7 +72,6 @@ class ResearchFlowStatusOperater(JsonFile):
 
         #リサーチフローステータス管理JSONを更新する。
         self.update_file(research_flow_status)
-
 
 
     def update_file(self, research_flow_status:List[PhaseStatus]):

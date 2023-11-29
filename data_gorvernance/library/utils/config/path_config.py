@@ -6,17 +6,19 @@ from typing import List
 
 
 # Folder
-### 1階層目
 DATA_GOVERNANCE = 'data_gorvernance'
-### 2階層目
+DATA = 'data'
+## data_gorvernance直下
 BASE = 'base'
-SUB_FLOW = 'subflow'
-TASK = 'task'
 LOG = 'log'
 RESEARCHFLOW = 'researchflow'
-PLAN = 'plan'
-DATA = 'data'
 WORKING = 'working' ## 同期非対称フォルダ
+## base直下
+SUB_FLOW = 'subflow'
+TASK = 'task'
+## researchflow直下
+PLAN = 'plan'
+
 
 # Folder Path
 def get_abs_root_form_working_dg_file_path(working_dg_file_path:str)->str:
@@ -35,22 +37,32 @@ DG_LOG_FOLDER = os.path.join(DATA_GOVERNANCE, LOG, RESEARCHFLOW)
 DG_WORKING_FOLDER = os.path.join(DATA_GOVERNANCE, WORKING)
 DG_WORKING_RESEARCHFLOW_FOLDER = os.path.join(DG_WORKING_FOLDER, RESEARCHFLOW)
 
+def get_task_data_dir(abs_root, phase:str, data_dir_name:str):
+    """<root>/data/<phase>/<data_dir_name>"""
+    return os.path.join(abs_root, DATA, phase, data_dir_name)
+
+
 # File
+## subflow
 MENU_NOTEBOOK = 'menu.ipynb'
 STATUS_JSON = 'status.json'
 PROPERTY_JSON = 'property.json'
 PLAN_JSON = 'plan.json'
 FLOW_DIAG = 'flow.diag'
+## config file
 TOKEN = 'token.json'
 USER_INFO = 'user_info.json'
 DOT_GITIGNORE = '.gitignore'
 
+
 # File Path
+## main menu
+MAIN_MENU_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, 'main.ipynb')
 SETUP_COMPLETED_TEXT_PATH = os.path.join(DG_WORKING_FOLDER, 'setup_completed.txt')
+## config file
 TOKEN_JSON_PAHT = os.path.join(DG_WORKING_FOLDER, TOKEN)
 USER_INFO_PATH = os.path.join(DG_WORKING_FOLDER, USER_INFO)
-MAIN_MENU_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, 'main.ipynb')
-# data_gorvernance/researchflow/plan/status.json
+## data_gorvernance/researchflow/plan/status.json
 PLAN_TASK_STATUS_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, STATUS_JSON)
 PLAN_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, PLAN_JSON)
 
@@ -76,7 +88,6 @@ def get_sub_flow_menu_path(phase:str, subflow_id:str='')->str:
 
         phaseのみに意味ある値が与えられた場合、researchflow/{:phase}/menu.ipynbを返却する
     """
-
     if len(subflow_id) > 0:
         return os.path.join(RESEARCHFLOW, phase, subflow_id, MENU_NOTEBOOK)
     else:
@@ -88,6 +99,7 @@ def get_sub_flow_status_file_path(phase:str, subflow_id:str='')->str:
         return os.path.join(DG_RESEARCHFLOW_FOLDER, phase, subflow_id, STATUS_JSON)
     else:
         return os.path.join(DG_RESEARCHFLOW_FOLDER, phase, STATUS_JSON)
+
 
 # other method
 def get_prepare_file_name_list_for_subflow()->List[str]:

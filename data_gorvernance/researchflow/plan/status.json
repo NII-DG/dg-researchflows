@@ -16,7 +16,7 @@
             "id": "RF002003",
             "name": "build_experiment_environment",
             "is_multiple": false,
-            "is_required": true,
+            "is_required": false,
             "completed_count": 0,
             "dependent_task_ids": [
                 "RF002001"

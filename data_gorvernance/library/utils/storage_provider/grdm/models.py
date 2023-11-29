@@ -1,5 +1,4 @@
 import os
-import sys
 
 from osfclient.cli import OSF, split_storage
 
@@ -21,7 +20,7 @@ def upload(token, base_url, args):
 
     osf = OSF(token=token, base_url=base_url)
     if not osf.has_auth:
-        sys.exit('To upload a file you need to provide a username and'
+        raise KeyError('To upload a file you need to provide a username and'
                     ' password or token.')
 
     project = osf.project(args.project)

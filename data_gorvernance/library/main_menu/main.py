@@ -395,7 +395,7 @@ class MainMenu():
                 return
 
             # リサーチフローステータス管理JSONの更新
-            phase_name, new_sub_flow_id = self.reserch_flow_status_operater.update_research_flow_status(creating_phase_seq_number, sub_flow_name, parent_sub_flow_ids)
+            phase_name, new_sub_flow_id = self.reserch_flow_status_operater.update_research_flow_status(creating_phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
 
             # /data/<phase_name>/<data_dir_name>の作成
             data_dir_path = ""

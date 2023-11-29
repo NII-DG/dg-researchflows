@@ -117,7 +117,7 @@ class ResearchFlowStatusOperater(JsonFile):
                 ## ユニークID取得に成功
                 return candidate_id
 
-    def update_research_flow_status(self, creating_phase_seq_number, sub_flow_name, parent_sub_flow_ids):
+    def update_research_flow_status(self, creating_phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids):
         """リサーチフローステータスの更新
 
         Args:
@@ -139,6 +139,7 @@ class ResearchFlowStatusOperater(JsonFile):
                 new_subflow_item = SubFlowStatus(
                     id=new_sub_flow_id,
                     name=sub_flow_name,
+                    data_dir=data_dir_name,
                     link=f'./{phase_name}/{new_sub_flow_id}/{path_config.MENU_NOTEBOOK}',
                     parent_ids=parent_sub_flow_ids,
                     create_datetime=int(current_datetime.timestamp())

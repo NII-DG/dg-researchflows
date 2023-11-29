@@ -34,8 +34,9 @@ RUN pip install --no-cache git+https://github.com/nbgallery/ipyparams
 RUN pip install --no-cache git+https://github.com/RCOSDP/rdmclient.git
 RUN pip install --no-cache git+https://github.com/NII-DG/nii-dg.git@230419_8c684da
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-packager.git@master
-# TODO: リリース時にはブランチを変更する
+# TODO: リリース時にはdg-drawerのブランチを変更する(@Rel20230929のようにする)
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-drawer.git@feature/add_status
+RUN pip install --no-cache cookiecutter==2.5.0
 
 RUN jupyter contrib nbextension install --user
 RUN jupyter nbextensions_configurator enable --user

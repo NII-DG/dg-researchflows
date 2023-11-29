@@ -11,8 +11,6 @@ from ..utils.storage_provider import grdm
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
 notebook_name = script_file_name+'.ipynb'
 
-DEFAULT_WIDTH = 600
-
 class DataSaver(TaskDirector):
 
     def __init__(self, working_path:str) -> None:

@@ -61,11 +61,3 @@ class MakePackage:
 
     def create_package(self, context_dict=None, output_dir='.'):
         cookiecutter(self.template_dir, no_input=True, extra_context=context_dict, output_dir=output_dir)
-
-
-
-
-
-
-
-

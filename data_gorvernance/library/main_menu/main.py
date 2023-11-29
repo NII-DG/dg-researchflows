@@ -377,9 +377,9 @@ class MainMenu():
                 # data_dir_nameがNoneの場合、ユーザ警告
                 self.change_submit_button_warning(msg_config.get('main_menu','not_input_data_dir'))
                 return
-            if not re.match(r'^[a-zA-Z0-9]+$', data_dir_name):
-                # data_dir_nameが半角英数のみでない場合、ユーザ警告
-                self.change_submit_button_warning(msg_config.get('main_menu','not_match_data_dir'))
+            if re.search(r'[\/\0]', data_dir_name):
+                # data_dir_nameに禁止文字列が含まれる時、ユーザ警告
+                self.change_submit_button_warning(msg_config.get('main_menu','data_dir_pattern_error'))
                 return
             if not self.reserch_flow_status_operater.is_unique_data_dir(creating_phase_seq_number, data_dir_name):
                 # data_dir_nameがユニークでないの場合、ユーザ警告

@@ -433,7 +433,7 @@ class MainMenu():
             self._err_output.append(alert)
 
     def create_data_dir(self, phase_name:str, data_dir_name:str):
-        path = os.path.join(path_config.DATA, phase_name, data_dir_name)
+        path = os.path.join(self.abs_root, path_config.DATA, phase_name, data_dir_name)
         if os.path.exists(path):
             raise Exception(f'{path} is already exist.')
         os.makedirs(path)

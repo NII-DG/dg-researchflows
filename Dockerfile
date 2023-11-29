@@ -34,6 +34,7 @@ RUN pip install --no-cache git+https://github.com/nbgallery/ipyparams
 RUN pip install --no-cache git+https://github.com/RCOSDP/rdmclient.git
 RUN pip install --no-cache git+https://github.com/NII-DG/nii-dg.git@230419_8c684da
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-packager.git@master
+# TODO: リリース時にはブランチを変更する
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-drawer.git@feature/add_status
 
 RUN jupyter contrib nbextension install --user

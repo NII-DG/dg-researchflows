@@ -3,60 +3,9 @@ import os
 from .status import StatusFile, TaskStatus
 from ..utils import file
 from ..utils.diagram import DiagManager, init_config, update_svg
-from ..utils.config import path_config
-from ..main_menu.research_flow_status import ResearchFlowStatusOperater
+
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-
-
-def get_subflow_type_and_id(working_file_path: str):
-    """ノートブックのパスを受け取ってsubflowの種別とidを返す
-
-    Args:
-        working_file_path (str): ノートブックのパス
-
-    Raises:
-        ValueError: working_file_pathにsubflow_typeが含まれない場合
-
-    Returns:
-        str: サブフロー種別
-        str: サブフローID（無い場合はNone）
-    """
-    parts = os.path.normpath(working_file_path).split(os.sep)
-    target_directory = path_config.RESEARCHFLOW
-    subflow_type = ""
-    subflow_id = None
-
-    try:
-        index = parts.index(target_directory)
-    except:
-        raise
-
-    if index < len(parts) - 1:
-        subflow_type = parts[index + 1]
-    else:
-        raise ValueError
-
-    if index + 2 < len(parts) - 1:
-        abs_root = path_config.get_abs_root_form_working_dg_file_path(working_file_path)
-        id_list = ResearchFlowStatusOperater(
-                    path_config.get_research_flow_status_file_path(abs_root)
-                ).get_subflow_ids(subflow_type)
-        dir_name = parts[index + 2]
-        if dir_name in id_list:
-            subflow_id = dir_name
-
-    return subflow_type, subflow_id
-
-
-def get_return_sub_flow_menu_relative_url_path(working_file_path: str)->str:
-    subflow_type, subflow_id = get_subflow_type_and_id(working_file_path)
-    if subflow_id is None:
-        menu_path = path_config.get_sub_flow_menu_path(subflow_type)
-        return os.path.join('../../../../..', menu_path)
-    else:
-        menu_path = path_config.get_sub_flow_menu_path(subflow_type, subflow_id)
-        return os.path.join('../../../../../..', menu_path)
 
 
 class SubFlow:

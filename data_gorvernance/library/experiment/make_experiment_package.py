@@ -5,8 +5,7 @@ import traceback
 import panel as pn
 from IPython.display import display
 
-from ..task_director import TaskDirector
-from ..subflow.subflow import get_subflow_type_and_id
+from ..task_director import TaskDirector, get_subflow_type_and_id
 from ..utils.widgets import Button, MessageBox
 from ..utils.package import MakePackage
 from ..utils.config import path_config, message as msg_config

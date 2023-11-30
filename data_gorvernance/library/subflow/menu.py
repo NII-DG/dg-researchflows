@@ -1,5 +1,4 @@
 import os
-import traceback
 from pathlib import Path
 import xml.etree.ElementTree as ET
 from tempfile import TemporaryDirectory
@@ -8,11 +7,12 @@ import panel as pn
 from IPython.display import display
 from IPython.core.display import Javascript, HTML
 
-from .subflow import SubFlow, get_subflow_type_and_id
+from .subflow import SubFlow
 from ..utils.config import path_config, message
 from ..utils.html import button as html_button
 from ..utils import file
 from ..utils.log import TaskLog
+from ..task_director import get_subflow_type_and_id
 
 def access_main_menu(working_file: str):
     root_folder = Path(

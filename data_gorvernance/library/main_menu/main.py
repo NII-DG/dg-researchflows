@@ -14,13 +14,14 @@ from ..utils.nb_file import NbFile
 from ..subflow.status import StatusFile
 from ..utils.config import path_config, message as msg_config
 from ..utils.html import button as html_button
+from ..utils.log import TaskLog
 
 
 # git clone https://github.com/NII-DG/dg-researchflows.git -b feature/main_menu_v2 ./demo
 # mv ./demo/* ./
 # rm -rf ./demo
 
-class MainMenu():
+class MainMenu(TaskLog):
     """MainMenu Class
 
     FUNCTION:
@@ -34,15 +35,16 @@ class MainMenu():
     Called from data_gorvernance/researchflow/main.ipynb
     """
 
-    def __init__(self, abs_root) -> None:
+    def __init__(self, working_file) -> None:
+        super().__init__(working_file, 'main.ipynb')
 
         ##############################
         # リサーチフロー図オブジェクト #
         ##############################
-        self.abs_root = abs_root
+        self.abs_root = path_config.get_abs_root_form_working_dg_file_path(working_file)
         # リサーチフロー図の生成
         ## data_gorvernance\researchflow\research_flow_status.json
-        self._research_flow_status_file_path = path_config.get_research_flow_status_file_path(abs_root)
+        self._research_flow_status_file_path = path_config.get_research_flow_status_file_path(self.abs_root)
 
         self.reserch_flow_status_operater = ResearchFlowStatusOperater(self._research_flow_status_file_path)
         # プロジェクトで初回のリサーチフロー図アクセス時の初期化
@@ -342,6 +344,7 @@ class MainMenu():
         self.submit_button.button_type = 'danger'
         self.submit_button.button_style = 'solid'
 
+    @TaskLog.callback_form('create')
     def callback_create_new_sub_flow(self, event):
         # 新規作成ボタンコールバックファンクション
         # サブフロー作成処理
@@ -376,6 +379,10 @@ class MainMenu():
             if data_dir_name is None:
                 # data_dir_nameがNoneの場合、ユーザ警告
                 self.change_submit_button_warning(msg_config.get('main_menu','not_input_data_dir'))
+                return
+            if re.search(r"[^\x20-\x7E]", data_dir_name):
+                # 半角文字でない時、ユーザ警告
+                self.change_submit_button_warning(msg_config.get('main_menu','data_dir_pattern_error'))
                 return
             if re.search(r'[\/\\0]', data_dir_name):
                 # data_dir_nameに禁止文字列が含まれる時、ユーザ警告
@@ -629,16 +636,19 @@ class MainMenu():
         ## TODO:再調整要
         # https://github.com/NII-DG/dg-researchflowsのデータが配置されているディレクトリ
         # Jupyter環境では/home/jovyan
-        abs_root = path_config.get_abs_root_form_working_dg_file_path(working_path)
+        #abs_root = path_config.get_abs_root_form_working_dg_file_path(working_path)
         # 初期セットアップ完了フラグファイルパス
-        abs_setup_completed_file_path = os.path.join(abs_root, path_config.SETUP_COMPLETED_TEXT_PATH)
+        #abs_setup_completed_file_path = os.path.join(abs_root, path_config.SETUP_COMPLETED_TEXT_PATH)
 
         # Hidden Setup
         #if os.path.isfile(abs_setup_completed_file_path):
 
         # Initial setup is complete.
         # Display the main menu
-        main_menu = MainMenu(abs_root)
+        main_menu = MainMenu(working_path)
+        # log
+        main_menu.log.start_cell()
+
         ## 機能コントローラーを配置
         main_menu_title = 'メインメニュー'
         main_menu_box = pn.WidgetBox(f'## {main_menu_title}', main_menu._menu_tabs)
@@ -669,3 +679,4 @@ class MainMenu():
         #    display(initial_setup_link_button)
 
         display(Javascript('IPython.notebook.save_checkpoint();'))
+        main_menu.log.finish_cell()

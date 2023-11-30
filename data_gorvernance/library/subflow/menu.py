@@ -12,7 +12,7 @@ from .subflow import SubFlow, get_subflow_type_and_id
 from ..utils.config import path_config, message
 from ..utils.html import button as html_button
 from ..utils import file
-from ..utils.log import UserActivityLog
+from ..utils.log import TaskLog
 
 def access_main_menu(working_file: str):
     root_folder = Path(
@@ -30,10 +30,10 @@ def access_main_menu(working_file: str):
     display(Javascript('IPython.notebook.save_checkpoint();'))
 
 
-class SubflowMenu:
+class SubflowMenu(TaskLog):
 
     def __init__(self, working_file) -> None:
-        self.log = UserActivityLog(working_file, "menu.ipynb")
+        super().__init__(working_file, path_config.MENU_NOTEBOOK)
 
         # 表示するウィジェットを格納する
         self.menu_widgetbox = pn.WidgetBox()
@@ -147,7 +147,6 @@ class SubflowMenu:
         subflow_menu = cls(working_file)
         pn.extension()
         # log
-        subflow_menu.log.cell_id = "subflow_cell"
         subflow_menu.log.start_cell()
 
         # base path

@@ -377,7 +377,7 @@ class MainMenu():
                 # data_dir_nameがNoneの場合、ユーザ警告
                 self.change_submit_button_warning(msg_config.get('main_menu','not_input_data_dir'))
                 return
-            if re.search(r'[\/\0]', data_dir_name):
+            if re.search(r'[\/\\0]', data_dir_name):
                 # data_dir_nameに禁止文字列が含まれる時、ユーザ警告
                 self.change_submit_button_warning(msg_config.get('main_menu','data_dir_pattern_error'))
                 return

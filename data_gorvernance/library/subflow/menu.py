@@ -157,6 +157,8 @@ class SubflowMenu(TaskLog):
 
         # get subflow type and id from path
         subflow_type, subflow_id = get_subflow_type_and_id(working_file)
+        if not subflow_type:
+            raise ValueError('don\'t get subflow type.')
         subflow_rel_path = Path(subflow_type)
         if subflow_id:
             subflow_rel_path = subflow_rel_path / subflow_id

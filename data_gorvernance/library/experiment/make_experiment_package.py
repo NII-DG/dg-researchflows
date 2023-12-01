@@ -31,8 +31,8 @@ class ExperimentPackageMaker(TaskDirector):
 
         # パッケージ作成場所
         subflow_type, subflow_id = get_subflow_type_and_id(self.nb_working_file_path)
-        if subflow_id is None:
-            self._msg_output.update_error(f'## [INTERNAL ERROR] : don\'t get subflow id')
+        if not subflow_type or not subflow_id:
+            self._msg_output.update_error(f'## [INTERNAL ERROR] : don\'t get subflow type or id.')
             return
         try:
             rf_status_file = path_config.get_research_flow_status_file_path(self._abs_root_path)

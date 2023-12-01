@@ -15,36 +15,39 @@ def get_subflow_type_and_id(working_file_path: str):
     """ノートブックのパスを受け取ってsubflowの種別とidを返す
 
     Args:
-        working_file_path (str): ノートブックのパス
-
-    Raises:
-        ValueError: working_file_pathにsubflow_typeが含まれない場合
+        working_file_path (str): researchflowディレクトリ配下のノートブックのファイルパス
 
     Returns:
-        str: サブフロー種別
-        str: サブフローID（無い場合はNone）
+        str: サブフロー種別（無い場合は空文字）
+        str: サブフローID（無い場合は空文字）
     """
-    parts = os.path.normpath(working_file_path).split(os.sep)
+    working_file_path = os.path.normpath(working_file_path)
+    parts = os.path.dirname(working_file_path).split(os.sep)
     target_directory = path_config.RESEARCHFLOW
     subflow_type = ""
-    subflow_id = None
+    subflow_id = ""
 
     try:
         index = parts.index(target_directory)
     except:
         raise
 
-    if index < len(parts) - 1:
-        subflow_type = parts[index + 1]
-    else:
-        raise ValueError
-
-    if index + 2 < len(parts) - 1:
-        abs_root = path_config.get_abs_root_form_working_dg_file_path(working_file_path)
-        id_list = ResearchFlowStatusOperater(
+    abs_root = path_config.get_abs_root_form_working_dg_file_path(working_file_path)
+    rf_status = ResearchFlowStatusOperater(
                     path_config.get_research_flow_status_file_path(abs_root)
-                ).get_subflow_ids(subflow_type)
-        dir_name = parts[index + 2]
+                )
+
+    phase_index = index + 1
+    if phase_index < len(parts):
+        phase_list = rf_status.get_subflow_phases()
+        dir_name = parts[phase_index]
+        if dir_name in phase_list:
+            subflow_type = dir_name
+
+    id_index = index + 2
+    if id_index < len(parts):
+        id_list = rf_status.get_subflow_ids(subflow_type)
+        dir_name = parts[id_index]
         if dir_name in id_list:
             subflow_id = dir_name
 
@@ -264,13 +267,21 @@ class ResearchFlowStatusOperater(JsonFile):
         """リサーチフローステータス管理JSONからリサーチフローステータスインスタンスを取得する"""
         return ResearchFlowStatus.load_from_json(str(self.path))
 
+    def get_subflow_phases(self)->List[str]:
+        """全てのphase名を取得する"""
+        research_flow_status = self.load_research_flow_status()
+        phase_list = []
+        for phase_status in research_flow_status:
+            phase_list.append(phase_status._name)
+        return phase_list
+
     def get_subflow_ids(self, phase_name: str)->List[str]:
+        """指定したphaseにあるサブフローのidを全て取得する"""
         research_flow_status = self.load_research_flow_status()
         id_list = []
         for phase_status in research_flow_status:
             if phase_status._name != phase_name:
                 continue
-            # phase_status._name == phase_name
             for subflow_data in phase_status._sub_flow_data:
                 id_list.append(subflow_data._id)
         return id_list

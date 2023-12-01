@@ -13,7 +13,9 @@ from .utils.setting import get_subflow_type_and_id, SubflowStatusFile, SubflowSt
 
 def get_return_sub_flow_menu_relative_url_path(working_file_path: str)->str:
     subflow_type, subflow_id = get_subflow_type_and_id(working_file_path)
-    if subflow_id is None:
+    if not subflow_type:
+            raise ValueError('don\'t get subflow type.')
+    if not subflow_id:
         menu_path = path_config.get_sub_flow_menu_path(subflow_type)
         return os.path.join('../../../../..', menu_path)
     else:
@@ -41,7 +43,9 @@ class TaskDirector(TaskSave):
         # 想定値：data_gorvernance\researchflow\plan\status.json
         # 想定値：data_gorvernance\researchflow\サブフロー種別\サブフローID\status.json
         subflow_type, subflow_id = get_subflow_type_and_id(nb_working_file_path)
-        if subflow_id is None:
+        if not subflow_type:
+            raise ValueError('don\'t get subflow type.')
+        if not subflow_id:
             # 研究準備の場合
             self._sub_flow_status_file_path = os.path.join(self._abs_root_path, path_config.get_sub_flow_status_file_path(subflow_type))
         else:

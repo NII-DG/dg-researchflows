@@ -79,13 +79,15 @@ class UserActivityLog(BaseLogger):
         return str(log_dir)
 
     def _get_format(self):
-        fmt = '%(levelname)s\t%(asctime)s\t%(username)s\t'
+        fmt = '%(levelname)s\t%(asctime)s\t%(username)s'
         if self.subflow_id:
-            fmt += '%(subflow_id)s\t'
-        fmt += '%(subflow_type)s\t%(ipynb_name)s\t'
+            fmt += '\t%(subflow_id)s'
+        if self.subflow_type:
+            fmt += '\t%(subflow_type)s'
+        fmt += '\t%(ipynb_name)s'
         if self.cell_id:
-            fmt += '%(cell_id)s\t'
-        fmt += '%(message)s'
+            fmt += '\t%(cell_id)s'
+        fmt += '\t%(message)s'
         return fmt
 
     def info(self, message):

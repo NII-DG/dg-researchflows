@@ -2,16 +2,15 @@ import shutil
 from typing import Dict, List
 import os
 import re
+import traceback
 
 import panel as pn
 from IPython.display import display
 from IPython.core.display import Javascript
 from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus
 
-from ..main_menu.research_flow_status import ResearchFlowStatusOperater
-import traceback
+from ..utils.setting import ResearchFlowStatusOperater, SubflowStatusFile
 from ..utils.nb_file import NbFile
-from ..subflow.status import StatusFile
 from ..utils.config import path_config, message as msg_config
 from ..utils.html import button as html_button
 from ..utils.log import TaskLog
@@ -124,7 +123,7 @@ class MainMenu(TaskLog):
         self.check_status_research_preparation_flow()
 
     def check_status_research_preparation_flow(self):
-        sf = StatusFile(os.path.join(self.abs_root, path_config.PLAN_TASK_STATUS_FILE_PATH))
+        sf = SubflowStatusFile(os.path.join(self.abs_root, path_config.PLAN_TASK_STATUS_FILE_PATH))
         plan_sub_flow_status = sf.read()
         # 研究準備サブフローの進行状況をチェックする。
         if plan_sub_flow_status.is_completed:

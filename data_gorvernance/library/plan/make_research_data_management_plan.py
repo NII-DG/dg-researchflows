@@ -9,9 +9,8 @@ from panel.widgets import Checkbox
 from IPython.display import display
 
 from ..utils.config import path_config, message as msg_config
-from ..subflow.status import StatusFile, SubflowStatus
 from ..task_director import TaskDirector
-from ..utils.dg_customize_config import get_dg_customize_config
+from ..utils.setting import get_dg_customize_config, SubflowStatusFile, SubflowStatus
 
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
 notebook_name = script_file_name+'.ipynb'
@@ -160,7 +159,7 @@ class DGPlaner(TaskDirector):
             # data_gorvernance\base\subflow\<フェーズ>\status.jsonを更新する。
             status_path = os.path.join(self._abs_root_path, path_config.get_base_subflow_pahse_status_file_path(phase))
 
-            sf = StatusFile(status_path)
+            sf = SubflowStatusFile(status_path)
             sub_flow_status:SubflowStatus = sf.read()
             for task in sub_flow_status._tasks:
                 if task.id in disable_task_ids and not task.is_required:

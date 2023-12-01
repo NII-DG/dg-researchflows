@@ -7,7 +7,7 @@ import panel as pn
 from IPython.display import display
 from IPython.core.display import Javascript, HTML
 
-from .subflow import SubFlow
+from .subflow import SubFlowManager
 from ..utils.config import path_config, message
 from ..utils.html import button as html_button
 from ..utils import file
@@ -68,7 +68,7 @@ class SubflowMenu(TaskLog):
         self.msg_output = pn.WidgetBox()
 
     # イベント
-    def select_flow(self, subflow: SubFlow, font_folder: Path):
+    def select_flow(self, subflow: SubFlowManager, font_folder: Path):
         def callback(event):
             self.diagram_widgetbox.disabled = True
             self.set_title()
@@ -91,7 +91,7 @@ class SubflowMenu(TaskLog):
         self.select_widgetbox.width = d
         self._msg_output = d
 
-    def set_diagram(self, subflow: SubFlow, font_folder: Path, display_all=True):
+    def set_diagram(self, subflow: SubFlowManager, font_folder: Path, display_all=True):
         """フロー図の生成と表示設定"""
         with TemporaryDirectory() as workdir:
             tmp_diag = Path(workdir) / 'skeleton.diag'
@@ -175,7 +175,7 @@ class SubflowMenu(TaskLog):
         font_folder = Path(os.environ['HOME'])
 
         # setup
-        subflow = SubFlow(
+        subflow = SubFlowManager(
             str(parent), str(status_file), str(diag_file), str(using_task_dir)
         )
         subflow.setup_tasks(str(souce_task_dir))

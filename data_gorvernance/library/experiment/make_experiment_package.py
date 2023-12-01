@@ -9,8 +9,7 @@ from ..task_director import TaskDirector, get_subflow_type_and_id
 from ..utils.widgets import Button, MessageBox
 from ..utils.package import MakePackage
 from ..utils.config import path_config, message as msg_config
-from ..utils.field_config import Field
-from ..main_menu.research_flow_status import ResearchFlowStatusOperater
+from ..utils.setting import Field, ResearchFlowStatusOperater
 
 
 # 本ファイルのファイル名

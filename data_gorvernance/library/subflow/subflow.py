@@ -1,6 +1,6 @@
 import os
 
-from .status import StatusFile, TaskStatus
+from ..utils.setting import SubflowStatusFile, SubflowTask
 from ..utils import file
 from ..utils.diagram import DiagManager, init_config, update_svg
 
@@ -8,11 +8,11 @@ from ..utils.diagram import DiagManager, init_config, update_svg
 script_dir = os.path.dirname(os.path.abspath(__file__))
 
 
-class SubFlow:
+class SubFlowManager:
 
     def __init__(self, current_dir: str, status_file :str, diag_file :str, using_task_dir: str) -> None:
         self.current_dir = current_dir
-        self.tasks = StatusFile(status_file).read().tasks
+        self.tasks = SubflowStatusFile(status_file).read().tasks
         self.diag_file = diag_file
         self.task_dir = using_task_dir
 
@@ -47,7 +47,7 @@ class SubFlow:
             self._adjust_by_status(task, display_all)
             self._adjust_by_optional(task, display_all)
 
-    def _adjust_by_optional(self, task: TaskStatus, display_all=True):
+    def _adjust_by_optional(self, task: SubflowTask, display_all=True):
         if task.disable:
             if display_all:
                 #self.diag.update_node_style(task.id, 'dotted')
@@ -58,7 +58,7 @@ class SubFlow:
                 self.diag.update_node_color(task.id, "#77787B")
                 self.svg_config[task.id]['is_link'] = False
 
-    def _adjust_by_status(self, task: TaskStatus, display_all=True):
+    def _adjust_by_status(self, task: SubflowTask, display_all=True):
         if task.disable and not display_all:
             return
 

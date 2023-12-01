@@ -5,7 +5,7 @@ from pathlib import Path
 import datetime
 
 from ..config import path_config
-from ...task_director import get_subflow_type_and_id
+from ..setting import get_subflow_type_and_id
 
 
 class BaseLogger:

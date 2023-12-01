@@ -4,7 +4,6 @@ import panel as pn
 from IPython.display import display
 
 from ..task_director import TaskDirector
-from ..utils.config import path_config, message as msg_config
 from ..utils.storage_provider import grdm
 
 # 本ファイルのファイル名

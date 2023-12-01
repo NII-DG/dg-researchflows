@@ -1,13 +1,55 @@
-import json
 import os
 from typing import List
 from datetime import datetime
-from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus, SubFlowStatus,FlowDrawer
-from ..utils.config import message as msg_config, path_config
 import uuid
-from ..utils.error import NotFoundSubflowDataError
-from ..utils.html.security import escape_html_text
-from ..utils.file import JsonFile
+
+from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus, SubFlowStatus,FlowDrawer
+
+from ..config import message as msg_config, path_config
+from ..error import NotFoundSubflowDataError
+from ..html.security import escape_html_text
+from ..file import JsonFile
+
+
+def get_subflow_type_and_id(working_file_path: str):
+    """ノートブックのパスを受け取ってsubflowの種別とidを返す
+
+    Args:
+        working_file_path (str): ノートブックのパス
+
+    Raises:
+        ValueError: working_file_pathにsubflow_typeが含まれない場合
+
+    Returns:
+        str: サブフロー種別
+        str: サブフローID（無い場合はNone）
+    """
+    parts = os.path.normpath(working_file_path).split(os.sep)
+    target_directory = path_config.RESEARCHFLOW
+    subflow_type = ""
+    subflow_id = None
+
+    try:
+        index = parts.index(target_directory)
+    except:
+        raise
+
+    if index < len(parts) - 1:
+        subflow_type = parts[index + 1]
+    else:
+        raise ValueError
+
+    if index + 2 < len(parts) - 1:
+        abs_root = path_config.get_abs_root_form_working_dg_file_path(working_file_path)
+        id_list = ResearchFlowStatusOperater(
+                    path_config.get_research_flow_status_file_path(abs_root)
+                ).get_subflow_ids(subflow_type)
+        dir_name = parts[index + 2]
+        if dir_name in id_list:
+            subflow_id = dir_name
+
+    return subflow_type, subflow_id
+
 
 class ResearchFlowStatusOperater(JsonFile):
 

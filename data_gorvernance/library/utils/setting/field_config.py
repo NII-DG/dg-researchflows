@@ -2,12 +2,12 @@ import os
 from pathlib import Path
 from typing import List
 
-from .file import JsonFile
+from ..file import JsonFile
 
 # field.jsonのファイルパス
 script_dir_path = os.path.dirname(__file__)
 p = Path(script_dir_path)
-field_json_file = p.joinpath('../data/field.json').resolve()
+field_json_file = p.joinpath('../../data/field.json').resolve()
 
 class Field:
     __FIELD = "field"

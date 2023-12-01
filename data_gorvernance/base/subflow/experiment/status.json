@@ -38,7 +38,7 @@
         },
         {
             "id": "RF003007",
-            "name": "set_up_backup",
+            "name": "setup_experiment_backup",
             "is_multiple": true,
             "is_required": false,
             "completed_count": 0,

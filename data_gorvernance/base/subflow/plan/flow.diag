@@ -22,7 +22,7 @@ blockdiag {
             shape = line;
             style = none;
             dummy-1-2[shape=none, height=1, width=250]
-            RF003007;
+            RF002004;
         }
         RF009003;
         RF009002;

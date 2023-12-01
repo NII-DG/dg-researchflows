@@ -26,8 +26,8 @@
             "disabled": false
         },
         {
-            "id": "RF003007",
-            "name": "set_up_backup",
+            "id": "RF002004",
+            "name": "setup_research_backup",
             "is_multiple": true,
             "is_required": false,
             "completed_count": 0,

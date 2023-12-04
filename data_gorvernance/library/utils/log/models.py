@@ -99,6 +99,12 @@ class UserActivityLog(BaseLogger):
     def finish_cell(self, message=''):
         self.info("-- 処理終了 --" + message)
 
+    def start_callback(self, event_name):
+        self.info("-- " + event_name + "開始 --")
+
+    def finish_callback(self, event_name):
+        self.info("-- " + event_name + "終了 --")
+
     def record(self):
 
         return {

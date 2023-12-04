@@ -172,8 +172,6 @@ class MainMenu(TaskLog):
         except Exception as e:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
-    callback_type = ""
-
     def callback_sub_flow_menu(self, event):
         """サブフロー操作フォーム by サブフロー操作コントローラーオプション"""
         try:
@@ -182,17 +180,17 @@ class MainMenu(TaskLog):
                 self.update_sub_flow_widget_box_for_init()
                 return
             elif selected_value == 1: ## サブフロー新規作成
-                self.subflow_form = CreateSubflowForm(self.abs_root, self._err_output)
                 self.callback_type = "create"
+                self.subflow_form = CreateSubflowForm(self.abs_root, self._err_output)
             elif selected_value == 2: ## サブフロー間接続編集
-                self.subflow_form = RelinkSubflowForm(self.abs_root, self._err_output)
                 self.callback_type = "relink"
+                self.subflow_form = RelinkSubflowForm(self.abs_root, self._err_output)
             elif selected_value == 3: ## サブフロー名称変更
-                self.subflow_form = RenameSubflowForm(self.abs_root, self._err_output)
                 self.callback_type = "rename"
+                self.subflow_form = RenameSubflowForm(self.abs_root, self._err_output)
             elif selected_value == 4: ## サブフロー削除
-                self.subflow_form = DeleteSubflowForm(self.abs_root, self._err_output)
                 self.callback_type = "delete"
+                self.subflow_form = DeleteSubflowForm(self.abs_root, self._err_output)
             self.update_sub_flow_widget_box()
         except Exception as e:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
@@ -219,26 +217,20 @@ class MainMenu(TaskLog):
         # ボタンの無効化をする（最初の設定が反映されないため）
         self.subflow_form.submit_button.disabled=True
 
-    @TaskLog.callback_form(callback_type)
     def callback_submit_button(self, event):
         try:
+            # start
+            self.log.start_callback(self.callback_type)
             self.subflow_form.main()
 
             # サブフロー関係図を更新
-            self.update_research_flow_image()
+            self._research_flow_image.object = self.reserch_flow_status_operater.get_svg_of_research_flow_status()
             display(Javascript('IPython.notebook.save_checkpoint();'))
+            # end
+            self.log.finish_callback(self.callback_type)
         except  Exception as e:
             self.subflow_form.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
-
-    def update_research_flow_image(self):
-        """リサーチフロー図の更新"""
-        try:
-            self._research_flow_image.object = self.reserch_flow_status_operater.get_svg_of_research_flow_status()
-        except Exception as e:
-            self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
-            raise
-
 
     #################
     # クラスメソッド #

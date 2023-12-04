@@ -10,6 +10,7 @@ from ...utils.config import path_config, message as msg_config
 
 
 class BaseSubflowForm():
+    """サブフロー操作基底クラス"""
 
     def __init__(self, abs_root, message_box) -> None:
         self.abs_root = abs_root
@@ -67,14 +68,14 @@ class BaseSubflowForm():
         # 親サブフロー選択のイベントリスナー
         self._parent_sub_flow_selector.param.watch(self.callback_parent_sub_flow_selector, 'value')
 
-        # 新規作成ボタン
+        # 処理開始ボタン
         self.submit_button = pn.widgets.Button(disabled=True)
         self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
         self.submit_button.width = 500
 
 
     def set_submit_button_on_click(self, callback_function):
-        # 新規作成ボタンのイベントリスナー
+        """処理開始ボタンのイベントリスナー設定"""
         self.submit_button.on_click(callback_function)
 
     def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus])->Dict[str, int]:

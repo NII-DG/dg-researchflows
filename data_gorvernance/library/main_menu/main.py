@@ -10,7 +10,12 @@ from ..utils.config import path_config, message as msg_config
 from ..utils.html import button as html_button
 from ..utils.log import TaskLog
 from ..utils.widgets import MessageBox
-from .subflow_controller import CreateSubflowForm
+from .subflow_controller import (
+    CreateSubflowForm,
+    RelinkSubflowForm,
+    RenameSubflowForm,
+    DeleteSubflowForm
+)
 
 
 # git clone https://github.com/NII-DG/dg-researchflows.git -b feature/main_menu_v2 ./demo
@@ -167,20 +172,28 @@ class MainMenu(TaskLog):
         except Exception as e:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
+    callback_type = ""
+
     def callback_sub_flow_menu(self, event):
         """サブフロー操作フォーム by サブフロー操作コントローラーオプション"""
         try:
             selected_value = self._sub_flow_menu.value
             if selected_value == 0: ## 選択なし
                 self.update_sub_flow_widget_box_for_init()
+                return
             elif selected_value == 1: ## サブフロー新規作成
-                self.update_sub_flow_widget_box_for_new_sub_flow()
+                self.subflow_form = CreateSubflowForm(self.abs_root, self._err_output)
+                self.callback_type = "create"
             elif selected_value == 2: ## サブフロー間接続編集
-                self.update_sub_flow_widget_box_for_relink()
+                self.subflow_form = RelinkSubflowForm(self.abs_root, self._err_output)
+                self.callback_type = "relink"
             elif selected_value == 3: ## サブフロー名称変更
-                self.update_sub_flow_widget_box_for_rename()
+                self.subflow_form = RenameSubflowForm(self.abs_root, self._err_output)
+                self.callback_type = "rename"
             elif selected_value == 4: ## サブフロー削除
-                self.update_sub_flow_widget_box_for_delete()
+                self.subflow_form = DeleteSubflowForm(self.abs_root, self._err_output)
+                self.callback_type = "delete"
+            self.update_sub_flow_widget_box()
         except Exception as e:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
@@ -195,15 +208,10 @@ class MainMenu(TaskLog):
         alert = pn.pane.Alert(msg_config.get('main_menu','guide_select_action'),sizing_mode="stretch_width",alert_type='info')
         self._sub_flow_widget_box.append(alert)
 
-
-    #########################
-    # サブフロー新規作成フォーム #
-    #########################
-
-    def update_sub_flow_widget_box_for_new_sub_flow(self):
-        self.subflow_form = CreateSubflowForm(self.abs_root, self._err_output)
-        # 新規作成ボタンのイベントリスナー
-        self.subflow_form.set_submit_button_on_click(self.callback_create_new_sub_flow)
+    def update_sub_flow_widget_box(self):
+        """サブフロー操作フォームの表示"""
+        # ボタンのイベントリスナー
+        self.subflow_form.set_submit_button_on_click(self.callback_submit_button)
 
         sub_flow_form_layout = self.subflow_form.define_input_form()
         self._sub_flow_widget_box.clear()
@@ -211,10 +219,8 @@ class MainMenu(TaskLog):
         # ボタンの無効化をする（最初の設定が反映されないため）
         self.subflow_form.submit_button.disabled=True
 
-    @TaskLog.callback_form('create')
-    def callback_create_new_sub_flow(self, event):
-        # 新規作成ボタンコールバックファンクション
-        # サブフロー作成処理
+    @TaskLog.callback_form(callback_type)
+    def callback_submit_button(self, event):
         try:
             self.subflow_form.main()
 
@@ -224,39 +230,6 @@ class MainMenu(TaskLog):
         except  Exception as e:
             self.subflow_form.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
-
-    #########################
-    # サブフロー間接続編集フォーム #
-    #########################
-    def update_sub_flow_widget_box_for_relink(self):
-        # サブフロー間接続編集フォーム
-        # 開発中のためアラートを表示する。
-        alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
-        self._sub_flow_widget_box.clear()
-        self._sub_flow_widget_box.append(alert)
-
-
-    #########################
-    # サブフロー名称変更フォーム #
-    #########################
-    def update_sub_flow_widget_box_for_rename(self):
-        # サブフロー名称変更フォーム
-        # 開発中のためアラートを表示する。
-        alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
-        self._sub_flow_widget_box.clear()
-        self._sub_flow_widget_box.append(alert)
-
-
-    #########################
-    # サブフロー削除フォーム #
-    #########################
-    def update_sub_flow_widget_box_for_delete(self):
-        # サブフロー削除フォーム
-        # 開発中のためアラートを表示する。
-        alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
-        self._sub_flow_widget_box.clear()
-        self._sub_flow_widget_box.append(alert)
-
 
     def update_research_flow_image(self):
         """リサーチフロー図の更新"""

@@ -9,8 +9,10 @@ from .base import BaseSubflowForm
 
 
 class CreateSubflowForm(BaseSubflowForm):
+    """サブフロー新規作成クラス"""
 
     def define_input_form(self):
+        """サブフロー新規作成フォーム"""
         return pn.Column(
             f'### {msg_config.get("main_menu", "create_sub_flow_title")}',
             self._sub_flow_type_selector,
@@ -23,6 +25,7 @@ class CreateSubflowForm(BaseSubflowForm):
 
 
     def main(self):
+        """サブフロー新規作成処理"""
 
         # 新規作成ボタンを処理中ステータスに更新する
         self.change_submit_button_processing(msg_config.get('main_menu', 'creating_sub_flow'))

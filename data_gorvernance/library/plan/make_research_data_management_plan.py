@@ -11,6 +11,7 @@ from IPython.display import display
 from ..utils.config import path_config, message as msg_config
 from ..task_director import TaskDirector
 from ..utils.setting import get_dg_customize_config, SubflowStatusFile, SubflowStatus
+from ..utils.widgets import MessageBox
 
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
 notebook_name = script_file_name+'.ipynb'
@@ -32,11 +33,79 @@ class DGPlaner(TaskDirector):
         # 想定値：data_gorvernance\researchflow\plan\plan.json
         self._plan_path =  os.path.join(self._abs_root_path, path_config.PLAN_FILE_PATH)
 
+    @TaskDirector.task_cell("1")
+    def get_dmp(self):
+        # タスク開始による研究準備のサブフローステータス管理JSONの更新
+        self.doing_task(script_file_name)
+
+        # フォーム定義
+
+        # フォーム表示
+        pn.extension()
+        form_section = pn.WidgetBox()
+        display(form_section)
+
+
+    @TaskDirector.task_cell("2")
+    def generateFormScetion(self):
+        """フォームセクション用"""
+
+        # フォーム定義
+        dg_customize = DGCustomizeSetter(self.nb_working_file_path)
+        dg_customize.define_form()
+
+        # フォーム表示
+        pn.extension()
+        form_section = pn.WidgetBox()
+        form_section.append(dg_customize._form_box)
+        form_section.append(dg_customize._msg_output)
+        display(form_section)
+
+    @TaskDirector.task_cell("3")
+    def completed_task(self):
+        # フォーム定義
+        source = []
+        self.define_save_form(source, script_file_name)
+        # フォーム表示
+        pn.extension()
+        form_section = pn.WidgetBox()
+        form_section.append(self.save_form_box)
+        form_section.append(self.save_msg_output)
+        display(form_section)
+
+
+class DMPGetter(TaskDirector):
+
+    def __init__(self, working_path:str) -> None:
+        # working_path = .data_gorvernance/researchflow/plan/task/plan/make_research_data_management_plan.ipynbが想定値
+        super().__init__(working_path, notebook_name)
+
         # フォームボックス
         self._form_box = pn.WidgetBox()
         self._form_box.width = 900
         # メッセージ用ボックス
-        self._msg_output = pn.WidgetBox()
+        self._msg_output = MessageBox()
+        self._msg_output.width = 900
+
+
+
+
+
+class DGCustomizeSetter(TaskDirector):
+
+    def __init__(self, working_path:str) -> None:
+        # working_path = .data_gorvernance/researchflow/plan/task/plan/make_research_data_management_plan.ipynbが想定値
+        super().__init__(working_path, notebook_name)
+
+        # α設定JSON定義書(plan.json)
+        # 想定値：data_gorvernance\researchflow\plan\plan.json
+        self._plan_path =  os.path.join(self._abs_root_path, path_config.PLAN_FILE_PATH)
+
+        # フォームボックス
+        self._form_box = pn.WidgetBox()
+        self._form_box.width = 900
+        # メッセージ用ボックス
+        self._msg_output = MessageBox()
         self._msg_output.width = 900
 
     def define_form(self):
@@ -165,7 +234,11 @@ class DGPlaner(TaskDirector):
                 if task.id in disable_task_ids and not task.is_required:
                     # 無効化タスクIDリストに標的タスクIDが含まれ、かつ必須タスクではない場合、disabledを真にする
                     task.disable = True
+                else:
+                    task.disable = False
             sf.write(sub_flow_status)
+        # タスクの無効化処理
+        self.disable_task_by_phase()
 
     def change_submit_button_init(self, name):
         self.submit_button.name = name
@@ -192,29 +265,3 @@ class DGPlaner(TaskDirector):
         self.submit_button.name = name
         self.submit_button.button_type = 'danger'
         self.submit_button.button_style = 'solid'
-
-    @TaskDirector.task_cell("1")
-    def generateFormScetion(self):
-        """フォームセクション用"""
-        # タスク開始による研究準備のサブフローステータス管理JSONの更新
-        self.doing_task(script_file_name)
-
-        # フォーム定義
-        self.define_form()
-
-        # フォーム表示
-        pn.extension()
-        form_section = pn.WidgetBox()
-        form_section.append(self._form_box)
-        form_section.append(self._msg_output)
-        display(form_section)
-
-    @TaskDirector.task_cell("2")
-    def customize_research_flow(self):
-        # タスクの無効化処理
-        self.disable_task_by_phase()
-
-    @TaskDirector.task_cell("3")
-    def completed_task(self):
-        # タスク実行の完了情報を研究準備のサブフローステータス管理JSONに書き込む
-        self.done_task(script_file_name)

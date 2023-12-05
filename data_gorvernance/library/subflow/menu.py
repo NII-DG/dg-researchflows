@@ -1,5 +1,4 @@
 import os
-import traceback
 from pathlib import Path
 import xml.etree.ElementTree as ET
 from tempfile import TemporaryDirectory
@@ -8,11 +7,12 @@ import panel as pn
 from IPython.display import display
 from IPython.core.display import Javascript, HTML
 
-from .subflow import SubFlow, get_subflow_type_and_id
+from .subflow import SubFlowManager
 from ..utils.config import path_config, message
 from ..utils.html import button as html_button
 from ..utils import file
-from ..utils.log import UserActivityLog
+from ..utils.log import TaskLog
+from ..task_director import get_subflow_type_and_id
 
 def access_main_menu(working_file: str):
     root_folder = Path(
@@ -30,10 +30,10 @@ def access_main_menu(working_file: str):
     display(Javascript('IPython.notebook.save_checkpoint();'))
 
 
-class SubflowMenu:
+class SubflowMenu(TaskLog):
 
     def __init__(self, working_file) -> None:
-        self.log = UserActivityLog(working_file, "menu.ipynb")
+        super().__init__(working_file, path_config.MENU_NOTEBOOK)
 
         # 表示するウィジェットを格納する
         self.menu_widgetbox = pn.WidgetBox()
@@ -68,11 +68,11 @@ class SubflowMenu:
         self.msg_output = pn.WidgetBox()
 
     # イベント
-    def select_flow(self, subflow: SubFlow, root_folder: Path):
+    def select_flow(self, subflow: SubFlowManager, font_folder: Path):
         def callback(event):
             self.diagram_widgetbox.disabled = True
             self.set_title()
-            self.set_diagram(subflow, root_folder, self.is_display_all())
+            self.set_diagram(subflow, font_folder, self.is_display_all())
             self.diagram_widgetbox.disabled = False
         return callback
 
@@ -91,7 +91,7 @@ class SubflowMenu:
         self.select_widgetbox.width = d
         self._msg_output = d
 
-    def set_diagram(self, subflow: SubFlow, root_folder: Path, display_all=True):
+    def set_diagram(self, subflow: SubFlowManager, font_folder: Path, display_all=True):
         """フロー図の生成と表示設定"""
         with TemporaryDirectory() as workdir:
             tmp_diag = Path(workdir) / 'skeleton.diag'
@@ -99,7 +99,7 @@ class SubflowMenu:
             subflow.generate(
                 svg_path=str(skeleton),
                 tmp_diag=str(tmp_diag),
-                font=str(root_folder / '.fonts/ipag.ttf'),
+                font=str(font_folder / '.fonts/ipag.ttf'),
                 display_all=display_all
             )
             self.diagram.object = self._get_contents(str(skeleton))
@@ -147,7 +147,6 @@ class SubflowMenu:
         subflow_menu = cls(working_file)
         pn.extension()
         # log
-        subflow_menu.log.cell_id = "subflow_cell"
         subflow_menu.log.start_cell()
 
         # base path
@@ -158,6 +157,8 @@ class SubflowMenu:
 
         # get subflow type and id from path
         subflow_type, subflow_id = get_subflow_type_and_id(working_file)
+        if not subflow_type:
+            raise ValueError('don\'t get subflow type.')
         subflow_rel_path = Path(subflow_type)
         if subflow_id:
             subflow_rel_path = subflow_rel_path / subflow_id
@@ -173,9 +174,10 @@ class SubflowMenu:
             / subflow_rel_path / path_config.TASK
         )
         souce_task_dir = root_folder / path_config.DG_TASK_BASE_DATA_FOLDER
+        font_folder = Path(os.environ['HOME'])
 
         # setup
-        subflow = SubFlow(
+        subflow = SubFlowManager(
             str(parent), str(status_file), str(diag_file), str(using_task_dir)
         )
         subflow.setup_tasks(str(souce_task_dir))
@@ -184,14 +186,14 @@ class SubflowMenu:
         if is_selected:
             subflow_menu.set_title()
             subflow_menu.set_diagram(
-                subflow, root_folder, subflow_menu.is_display_all()
+                subflow, font_folder, subflow_menu.is_display_all()
             )
             subflow_menu.button.on_click(
-                subflow_menu.select_flow(subflow, root_folder)
+                subflow_menu.select_flow(subflow, font_folder)
             )
             subflow_menu.menu_widgetbox.append(subflow_menu.select_widgetbox)
         else:
-            subflow_menu.set_diagram(subflow, root_folder, True)
+            subflow_menu.set_diagram(subflow, font_folder, True)
         subflow_menu.menu_widgetbox.append(subflow_menu.diagram_widgetbox)
         display(subflow_menu.menu_widgetbox)
         display(Javascript('IPython.notebook.save_checkpoint();'))

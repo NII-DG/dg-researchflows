@@ -22,7 +22,7 @@ class UrlUpdateError(Exception):
     pass
 
 
-class Unauthorized(Exception):
+class UnauthorizedError(Exception):
     """認証が通らなかった時のエラー"""
     pass
 

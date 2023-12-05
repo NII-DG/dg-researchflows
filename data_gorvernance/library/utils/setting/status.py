@@ -1,10 +1,12 @@
-from ..utils.file import JsonFile
+"""サブフローステータス管理JSON(status.json)マネージャー"""
+from ..file import JsonFile
 
 _IS_COMPLETED = 'is_completed'
 _TASKS = 'tasks'
 
 
-class TaskStatus:
+class SubflowTask:
+    """サブフローの各タスクのステータスを管理する"""
 
     __ID = 'id'
     __NAME = 'name'
@@ -49,6 +51,10 @@ class TaskStatus:
     @property
     def name(self):
         return self._name
+
+    @property
+    def is_multiple(self):
+        return self._is_multiple
 
     @property
     def is_required(self):
@@ -100,10 +106,11 @@ class TaskStatus:
 
 
 class SubflowStatus:
+    """サブフローステータス管理JSON(status.json)の各項目を管理する"""
 
     def __init__(self, is_completed: bool, tasks: list[dict]) -> None:
         self._is_completed = is_completed
-        self._tasks = [TaskStatus(**task) for task in tasks]
+        self._tasks = [SubflowTask(**task) for task in tasks]
 
     @property
     def is_completed(self):
@@ -125,7 +132,7 @@ class SubflowStatus:
             ]
         }
 
-    def get_task_by_task_id(self, id:str)->TaskStatus:
+    def get_task_by_task_id(self, id:str)->SubflowTask:
         for task in self._tasks:
             if task.id == id:
                 return task
@@ -135,7 +142,7 @@ class SubflowStatus:
         for task in self._tasks:
             if task.name == task_name:
                 ## status を実行中ステータスへ更新
-                task.status = TaskStatus.STATUS_DOING
+                task.status = SubflowTask.STATUS_DOING
                 task.add_execution_environments(environment_id)
 
     def completed_task_by_task_name(self, task_name:str, environment_id:str):
@@ -146,7 +153,7 @@ class SubflowStatus:
                 task.increme_completed_count()
                 ## ステータスへ更新
                 if len(task.execution_environments) == 1:
-                    task.status = TaskStatus.STATUS_DONE
+                    task.status = SubflowTask.STATUS_DONE
                 else:
                     continue
                 ## 実行環境IDをリストから削除する。
@@ -154,7 +161,7 @@ class SubflowStatus:
 
         # 上記の更新を受け、下流の実行可能状態を更新する。
         for task in self._tasks:
-            if len(task.dependent_task_ids) > 0 and task.status == TaskStatus.STATUS_UNFEASIBLE:
+            if len(task.dependent_task_ids) > 0 and task.status == SubflowTask.STATUS_UNFEASIBLE:
                 # 上流依存タスクを持ち、実行不可状態タスクのみ処理する。
                 is_executable_state = True
                 for dependent_task_id in task.dependent_task_ids:
@@ -165,23 +172,22 @@ class SubflowStatus:
                         break
                 if is_executable_state:
                     #実行可能の場合、ステータスを実行不可から未実行に変更
-                    task.status = TaskStatus.STATUS_UNEXECUTED
+                    task.status = SubflowTask.STATUS_UNEXECUTED
             else:
                 continue
 
         # 上記の更新を受け、必須タスクのステータスがdone（実行完了）になっていたら、is_completedを真に更新
         is_completed_ok = True
         for task in self._tasks:
-            if task.is_required and task.status != TaskStatus.STATUS_DONE:
+            if task.is_required and task.status != SubflowTask.STATUS_DONE:
                 # 必須タスクで、ステータスDone以外の場合
                 is_completed_ok = False
         # 判定ないようで更新する。
         self._is_completed = is_completed_ok
 
 
-
-
-class StatusFile(JsonFile):
+class SubflowStatusFile(JsonFile):
+    """サブフローステータス管理JSON(status.json)のファイル操作"""
 
     def __init__(self, file_path: str):
         super().__init__(file_path)

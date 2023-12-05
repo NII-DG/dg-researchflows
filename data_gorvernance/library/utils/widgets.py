@@ -1,8 +1,6 @@
-import traceback
-
 import panel as pn
 
-from .config import path_config, message as msg_config
+from .config import message as msg_config
 
 class Button(pn.widgets.Button):
 

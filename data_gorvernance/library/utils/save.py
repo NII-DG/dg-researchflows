@@ -2,8 +2,6 @@ import traceback
 from requests.exceptions import RequestException
 
 import panel as pn
-from IPython.display import display
-from IPython.core.display import Javascript
 
 from .config import path_config, message as msg_config
 from .widgets import Button, MessageBox

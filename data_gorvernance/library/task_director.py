@@ -6,10 +6,21 @@ from IPython.display import display
 from IPython.core.display import Javascript
 
 from .utils.html.button import create_button
-from .subflow.status import StatusFile, SubflowStatus
 from .utils.config import path_config, message as msg_config
-from .subflow.subflow import get_return_sub_flow_menu_relative_url_path, get_subflow_type_and_id
 from .utils.save import TaskSave
+from .utils.setting import get_subflow_type_and_id, SubflowStatusFile, SubflowStatus
+
+
+def get_return_sub_flow_menu_relative_url_path(working_file_path: str)->str:
+    subflow_type, subflow_id = get_subflow_type_and_id(working_file_path)
+    if not subflow_type:
+            raise ValueError('don\'t get subflow type.')
+    if not subflow_id:
+        menu_path = path_config.get_sub_flow_menu_path(subflow_type)
+        return os.path.join('../../../../..', menu_path)
+    else:
+        menu_path = path_config.get_sub_flow_menu_path(subflow_type, subflow_id)
+        return os.path.join('../../../../../..', menu_path)
 
 
 class TaskDirector(TaskSave):
@@ -32,7 +43,9 @@ class TaskDirector(TaskSave):
         # 想定値：data_gorvernance\researchflow\plan\status.json
         # 想定値：data_gorvernance\researchflow\サブフロー種別\サブフローID\status.json
         subflow_type, subflow_id = get_subflow_type_and_id(nb_working_file_path)
-        if subflow_id is None:
+        if not subflow_type:
+            raise ValueError('don\'t get subflow type.')
+        if not subflow_id:
             # 研究準備の場合
             self._sub_flow_status_file_path = os.path.join(self._abs_root_path, path_config.get_sub_flow_status_file_path(subflow_type))
         else:
@@ -49,7 +62,7 @@ class TaskDirector(TaskSave):
             task_name (str): [タスク名]
         """
         # タスク開始によるサブフローステータス管理JSONの更新
-        sf = StatusFile(self._sub_flow_status_file_path)
+        sf = SubflowStatusFile(self._sub_flow_status_file_path)
         sf_status: SubflowStatus = sf.read()
         sf_status.doing_task_by_task_name(task_name, os.environ["JUPYTERHUB_SERVER_NAME"])
         # 更新内容を記録する。
@@ -61,7 +74,7 @@ class TaskDirector(TaskSave):
         Args:
             script_file_name (str): [タスク名]
         """
-        sf = StatusFile(self._sub_flow_status_file_path)
+        sf = SubflowStatusFile(self._sub_flow_status_file_path)
         sf_status: SubflowStatus = sf.read()
         sf_status.completed_task_by_task_name(task_name, os.environ["JUPYTERHUB_SERVER_NAME"])
         sf.write(sf_status)

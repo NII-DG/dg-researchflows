@@ -1,4 +1,3 @@
-import os
 import functools
 
 from .models import UserActivityLog
@@ -31,9 +30,9 @@ class TaskLog:
         def wrapper(func):
             @functools.wraps(func)
             def decorate(self, *args, **kwargs):
-                self.log.info("-- " + event_name + "開始 --")
+                self.log.start_callback(event_name)
                 result = func(self, *args, **kwargs)
-                self.log.info("-- " + event_name + "終了 --")
+                self.log.finish_callback(event_name)
                 return result
             return decorate
         return wrapper

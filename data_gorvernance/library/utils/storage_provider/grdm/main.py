@@ -2,7 +2,7 @@ import os
 from urllib.parse import urlparse
 
 from .models import UpdateArgs, upload
-from ...config import path_config, message as msg_config
+from ...config import path_config
 
 
 def get_project_id():

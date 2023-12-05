@@ -1,6 +1,7 @@
 """メッセージ用HTML生成モジュール
 """
-from IPython.display import display, HTML
+from IPython.display import display
+from IPython.core.display import HTML
 
 def creat_html_msg(msg='', fore=None, back=None, tag='p'):
     """HTMLを生成するメソッド

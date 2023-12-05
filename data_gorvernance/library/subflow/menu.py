@@ -1,5 +1,4 @@
 import os
-import traceback
 from pathlib import Path
 import xml.etree.ElementTree as ET
 from tempfile import TemporaryDirectory
@@ -8,11 +7,12 @@ import panel as pn
 from IPython.display import display
 from IPython.core.display import Javascript, HTML
 
-from .subflow import SubFlow, get_subflow_type_and_id
+from .subflow import SubFlowManager
 from ..utils.config import path_config, message
 from ..utils.html import button as html_button
 from ..utils import file
-from ..utils.log import UserActivityLog
+from ..utils.log import TaskLog
+from ..task_director import get_subflow_type_and_id
 
 def access_main_menu(working_file: str):
     root_folder = Path(
@@ -30,10 +30,10 @@ def access_main_menu(working_file: str):
     display(Javascript('IPython.notebook.save_checkpoint();'))
 
 
-class SubflowMenu:
+class SubflowMenu(TaskLog):
 
     def __init__(self, working_file) -> None:
-        self.log = UserActivityLog(working_file, "menu.ipynb")
+        super().__init__(working_file, path_config.MENU_NOTEBOOK)
 
         # 表示するウィジェットを格納する
         self.menu_widgetbox = pn.WidgetBox()
@@ -68,7 +68,7 @@ class SubflowMenu:
         self.msg_output = pn.WidgetBox()
 
     # イベント
-    def select_flow(self, subflow: SubFlow, font_folder: Path):
+    def select_flow(self, subflow: SubFlowManager, font_folder: Path):
         def callback(event):
             self.diagram_widgetbox.disabled = True
             self.set_title()
@@ -91,7 +91,7 @@ class SubflowMenu:
         self.select_widgetbox.width = d
         self._msg_output = d
 
-    def set_diagram(self, subflow: SubFlow, font_folder: Path, display_all=True):
+    def set_diagram(self, subflow: SubFlowManager, font_folder: Path, display_all=True):
         """フロー図の生成と表示設定"""
         with TemporaryDirectory() as workdir:
             tmp_diag = Path(workdir) / 'skeleton.diag'
@@ -147,7 +147,6 @@ class SubflowMenu:
         subflow_menu = cls(working_file)
         pn.extension()
         # log
-        subflow_menu.log.cell_id = "subflow_cell"
         subflow_menu.log.start_cell()
 
         # base path
@@ -158,6 +157,8 @@ class SubflowMenu:
 
         # get subflow type and id from path
         subflow_type, subflow_id = get_subflow_type_and_id(working_file)
+        if not subflow_type:
+            raise ValueError('don\'t get subflow type.')
         subflow_rel_path = Path(subflow_type)
         if subflow_id:
             subflow_rel_path = subflow_rel_path / subflow_id
@@ -176,7 +177,7 @@ class SubflowMenu:
         font_folder = Path(os.environ['HOME'])
 
         # setup
-        subflow = SubFlow(
+        subflow = SubFlowManager(
             str(parent), str(status_file), str(diag_file), str(using_task_dir)
         )
         subflow.setup_tasks(str(souce_task_dir))

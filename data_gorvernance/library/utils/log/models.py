@@ -5,7 +5,7 @@ from pathlib import Path
 import datetime
 
 from ..config import path_config
-from ...subflow.subflow import get_subflow_type_and_id
+from ..setting import get_subflow_type_and_id
 
 
 class BaseLogger:
@@ -79,14 +79,7 @@ class UserActivityLog(BaseLogger):
         return str(log_dir)
 
     def _get_format(self):
-        fmt = '%(levelname)s\t%(asctime)s\t%(username)s\t'
-        if self.subflow_id:
-            fmt += '%(subflow_id)s\t'
-        fmt += '%(subflow_type)s\t%(ipynb_name)s\t'
-        if self.cell_id:
-            fmt += '%(cell_id)s\t'
-        fmt += '%(message)s'
-        return fmt
+        return '%(levelname)s\t%(asctime)s\t%(username)s\t%(subflow_id)s\t%(subflow_type)s\t%(ipynb_name)s\t%(cell_id)s\t%(message)s'
 
     def info(self, message):
         self.reset_file(self._get_format())
@@ -105,6 +98,12 @@ class UserActivityLog(BaseLogger):
 
     def finish_cell(self, message=''):
         self.info("-- 処理終了 --" + message)
+
+    def start_callback(self, event_name):
+        self.info("-- " + event_name + "開始 --")
+
+    def finish_callback(self, event_name):
+        self.info("-- " + event_name + "終了 --")
 
     def record(self):
 

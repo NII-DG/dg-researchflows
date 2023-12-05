@@ -7,10 +7,10 @@ from ..task_director import TaskDirector
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
 notebook_name = script_file_name+'.ipynb'
 
-class BackUpSetter(TaskDirector):
+class ResearchBackUpSetter(TaskDirector):
 
     def __init__(self, working_path:str) -> None:
-        """BackUpSetter コンストラクタ
+        """ExperimentEnvBuilder コンストラクタ
 
         Args:
             working_path (str): [実行Notebookファイルパス]

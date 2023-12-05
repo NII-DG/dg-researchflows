@@ -2,13 +2,12 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List
 
-from ..utils.config import path_config
-from .file import JsonFile
+from ..file import JsonFile
 
 script_dir_path = os.path.dirname(__file__)
 p = Path(script_dir_path)
 # DGカスタマイズJSON定義書絶対パス(data_gorvernance\library\data\data_governance_customize.json)
-data_governance_customize_file = p.joinpath('..', 'data/data_governance_customize.json').resolve()
+data_governance_customize_file = p.joinpath('../../', 'data/data_governance_customize.json').resolve()
 
 class AlphaProperty:
     __ID = 'id'

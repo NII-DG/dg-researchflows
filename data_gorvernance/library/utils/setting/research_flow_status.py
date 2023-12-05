@@ -1,13 +1,58 @@
-import json
 import os
 from typing import List
 from datetime import datetime
-from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus, SubFlowStatus,FlowDrawer
-from ..utils.config import message as msg_config, path_config
 import uuid
-from ..utils.error import NotFoundSubflowDataError
-from ..utils.html.security import escape_html_text
-from ..utils.file import JsonFile
+
+from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus, SubFlowStatus,FlowDrawer
+
+from ..config import message as msg_config, path_config
+from ..error import NotFoundSubflowDataError
+from ..html.security import escape_html_text
+from ..file import JsonFile
+
+
+def get_subflow_type_and_id(working_file_path: str):
+    """ノートブックのパスを受け取ってsubflowの種別とidを返す
+
+    Args:
+        working_file_path (str): researchflowディレクトリ配下のノートブックのファイルパス
+
+    Returns:
+        str: サブフロー種別（無い場合は空文字）
+        str: サブフローID（無い場合は空文字）
+    """
+    working_file_path = os.path.normpath(working_file_path)
+    parts = os.path.dirname(working_file_path).split(os.sep)
+    target_directory = path_config.RESEARCHFLOW
+    subflow_type = ""
+    subflow_id = ""
+
+    try:
+        index = parts.index(target_directory)
+    except:
+        raise
+
+    abs_root = path_config.get_abs_root_form_working_dg_file_path(working_file_path)
+    rf_status = ResearchFlowStatusOperater(
+                    path_config.get_research_flow_status_file_path(abs_root)
+                )
+
+    phase_index = index + 1
+    if phase_index < len(parts):
+        phase_list = rf_status.get_subflow_phases()
+        dir_name = parts[phase_index]
+        if dir_name in phase_list:
+            subflow_type = dir_name
+
+    id_index = index + 2
+    if id_index < len(parts):
+        id_list = rf_status.get_subflow_ids(subflow_type)
+        dir_name = parts[id_index]
+        if dir_name in id_list:
+            subflow_id = dir_name
+
+    return subflow_type, subflow_id
+
 
 class ResearchFlowStatusOperater(JsonFile):
 
@@ -21,6 +66,15 @@ class ResearchFlowStatusOperater(JsonFile):
     def get_research_flow_status(self):
         return super().read()
 
+    def get_data_dir(self, phase_name, id):
+        """phase nameとidからdata_dirを取得する"""
+        research_flow_status = self.load_research_flow_status()
+        for phase in research_flow_status:
+            if phase._name != phase_name:
+                continue
+            for sb in phase._sub_flow_data:
+                if sb._id == id:
+                    return sb._data_dir
 
     def get_svg_of_research_flow_status(self)->str:
         """Get SVG data of Research Flow Image by file path
@@ -65,7 +119,6 @@ class ResearchFlowStatusOperater(JsonFile):
         self.update_file(research_flow_status)
 
 
-
     def update_file(self, research_flow_status:List[PhaseStatus]):
         # research_flow_statusを基にリサーチフローステータス管理JSONを更新する。
         research_flow_status_data = {}
@@ -80,6 +133,7 @@ class ResearchFlowStatusOperater(JsonFile):
                 sub_flow_unit_data = {}
                 sub_flow_unit_data['id'] = sub_flow_unit._id
                 sub_flow_unit_data['name'] = sub_flow_unit._name
+                sub_flow_unit_data['data_dir'] = sub_flow_unit._data_dir
                 sub_flow_unit_data['link'] = sub_flow_unit._link
                 sub_flow_unit_data['parent_ids'] = sub_flow_unit._parent_ids
                 sub_flow_unit_data['create_datetime'] = sub_flow_unit._create_datetime
@@ -116,7 +170,7 @@ class ResearchFlowStatusOperater(JsonFile):
                 ## ユニークID取得に成功
                 return candidate_id
 
-    def update_research_flow_status(self, creating_phase_seq_number, sub_flow_name, parent_sub_flow_ids):
+    def update_research_flow_status(self, creating_phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids):
         """リサーチフローステータスの更新
 
         Args:
@@ -138,6 +192,7 @@ class ResearchFlowStatusOperater(JsonFile):
                 new_subflow_item = SubFlowStatus(
                     id=new_sub_flow_id,
                     name=sub_flow_name,
+                    data_dir=data_dir_name,
                     link=f'./{phase_name}/{new_sub_flow_id}/{path_config.MENU_NOTEBOOK}',
                     parent_ids=parent_sub_flow_ids,
                     create_datetime=int(current_datetime.timestamp())
@@ -190,17 +245,43 @@ class ResearchFlowStatusOperater(JsonFile):
 
         return True
 
+    def is_unique_data_dir(self, phase_seq_number, data_dir_name)->bool:
+        """データディレクトリ名のユニークチェック"""
+        exist_phase = False
+        research_flow_status = self.load_research_flow_status()
+        for phase_status in research_flow_status:
+            if phase_status._seq_number == phase_seq_number:
+                exist_phase = True
+                for sub_flow_item in phase_status._sub_flow_data:
+                    if sub_flow_item._data_dir == data_dir_name:
+                        return False
+            else:
+                continue
+
+        if not exist_phase:
+            raise Exception(f'Not Found phase. target phase seq_number : {phase_seq_number}')
+
+        return True
+
     def load_research_flow_status(self)->List[PhaseStatus]:
         """リサーチフローステータス管理JSONからリサーチフローステータスインスタンスを取得する"""
         return ResearchFlowStatus.load_from_json(str(self.path))
 
+    def get_subflow_phases(self)->List[str]:
+        """全てのphase名を取得する"""
+        research_flow_status = self.load_research_flow_status()
+        phase_list = []
+        for phase_status in research_flow_status:
+            phase_list.append(phase_status._name)
+        return phase_list
+
     def get_subflow_ids(self, phase_name: str)->List[str]:
+        """指定したphaseにあるサブフローのidを全て取得する"""
         research_flow_status = self.load_research_flow_status()
         id_list = []
         for phase_status in research_flow_status:
             if phase_status._name != phase_name:
                 continue
-            # phase_status._name == phase_name
             for subflow_data in phase_status._sub_flow_data:
                 id_list.append(subflow_data._id)
         return id_list

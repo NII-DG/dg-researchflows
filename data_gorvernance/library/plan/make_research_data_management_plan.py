@@ -155,6 +155,8 @@ class DGCustomizeSetter(TaskDirector):
                     raise Exception('cb variable is not panel.widgets.Checkbox or cb value is not bool type')
 
             self.update_plan_data(plan_data)
+            # タスクの無効化処理
+            self.disable_task_by_phase()
 
             # 登録内容を出力する
             registration_msg = f"""### {msg_config.get("form", "registration_content")}
@@ -167,6 +169,9 @@ class DGCustomizeSetter(TaskDirector):
             alert = pn.pane.Alert(registration_msg, sizing_mode="stretch_width",alert_type='info')
             self._msg_output.append(alert)
             self.change_submit_button_success(msg_config.get('form', 'accepted'))
+            # タスク実行の完了情報を該当サブフローステータス管理JSONに書き込む
+            # NOTE: 開発中の仮置き
+            self.done_task(script_file_name)
 
         except Exception as e:
             self._msg_output.clear()
@@ -237,8 +242,7 @@ class DGCustomizeSetter(TaskDirector):
                 else:
                     task.disable = False
             sf.write(sub_flow_status)
-        # タスクの無効化処理
-        self.disable_task_by_phase()
+
 
     def change_submit_button_init(self, name):
         self.submit_button.name = name

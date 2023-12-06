@@ -57,7 +57,6 @@ RUN rm ${HOME}/.fonts/${font_deb}
 RUN rm -rf ${HOME}/.fonts/etc ${HOME}/.fonts/usr
 RUN rm .wget-hsts
 
-
 ARG NB_USER=jovyan
 ARG NB_UID=1000
 
@@ -72,6 +71,10 @@ COPY . ${HOME}
 USER root
 RUN chown -R ${NB_UID} ${HOME}
 
+# install aws-cli
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+RUN unzip awscliv2.zip
+RUN ./aws/install
 
 ##### User Custom Area [Start] ######
 # Dockerfileを編集する場合は、「User Custom Area」内に記述してください。

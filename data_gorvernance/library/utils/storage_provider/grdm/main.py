@@ -83,7 +83,7 @@ def format_metadata(metadata):
     first_value = []
     for data in datas:
         # first_value = [first_value_item, ...]
-        first_value_item = {}
+        first_value_item = {'title': data['attributes']['title']}
         registration = data['attributes']['registration_responses']
         for key, value in registration.items():
             if key != 'grdm-files':

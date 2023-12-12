@@ -10,7 +10,7 @@ class DMPManager(JsonFile):
         dmps = contents['dmp']
         options = {}
         for i, dmp in enumerate(dmps):
-            title = f"{dmp['project-name-ja']} ({dmp['project-name-en']})"
+            title = dmp['title']
             options[title] = i
         return options
 
@@ -21,13 +21,13 @@ class DMPManager(JsonFile):
     @staticmethod
     def display_format(content):
         dmp = content['dmp'][0]
-        dmp_str = ""
+        dmp_str = f"### {dmp['title']}<br><hr><br>"
         for key, value in dmp.items():
-            if key != 'grdm-files':
+            if key != "title" or key != 'grdm-files':
                 dmp_str += f'{key} : {value}<br>'
         files = dmp['grdm-files']
         dmp_str += "grdm-files :<br>"
         for file in files:
             dmp_str += f'&emsp;{file["path"]}<br>'
-        return dmp_str
+        return dmp['title'], dmp_str
 

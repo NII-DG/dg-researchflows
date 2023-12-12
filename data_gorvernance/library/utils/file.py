@@ -14,6 +14,31 @@ def copy_file(source_path, destination_path):
     shutil.copyfile(source_path, destination_path)
 
 
+def copy_dir(src, dst, overwrite=False):
+    """ src から dst へディレクトリをコピーする
+
+    Args:
+        src: コピー元ディレクトリ
+        dst: コピー先ディレクトリ
+        overwrite: ファイルが既に存在する場合、上書きするかどうか
+
+    Note:
+        指定したディレクトリがなければ作成される。
+    """
+    def f_exists(base, dst):
+        base, dst = Path(base), Path(dst)
+        def _ignore(path, names):   # サブディレクトリー毎に呼び出される
+            names = set(names)
+            rel = Path(path).relative_to(base)
+            return {f.name for f in (dst/ rel).glob('*') if f.name in names}
+        return _ignore
+
+    if overwrite:
+        shutil.copytree(src, dst, dirs_exist_ok=True)
+    else:
+        shutil.copytree(src, dst, ignore=f_exists(src, dst), dirs_exist_ok=True)
+
+
 def relative_path(target_path, start_dir):
     """target_pathをstart_dirからの相対パスに変換する
 

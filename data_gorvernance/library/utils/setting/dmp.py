@@ -10,7 +10,7 @@ class DMPManager(JsonFile):
         dmps = contents['dmp']
         options = {}
         for i, dmp in enumerate(dmps):
-            title = f"{dmp['project-name-ja']} ({dmp['program-name-en']})"
+            title = f"{dmp['project-name-ja']} ({dmp['project-name-en']})"
             options[title] = i
         return options
 

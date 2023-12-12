@@ -29,5 +29,5 @@ class DMPManager(JsonFile):
         dmp_str += "grdm-files :<br>"
         for file in files:
             dmp_str += f'&emsp;{file["path"]}<br>'
-        return dmp['title'], dmp_str
+        return dmp_str
 

@@ -16,6 +16,7 @@ WORKING = 'working' ## 同期非対称フォルダ
 ## base直下
 SUB_FLOW = 'subflow'
 TASK = 'task'
+IMAGES = 'images'
 ## researchflow直下
 PLAN = 'plan'
 

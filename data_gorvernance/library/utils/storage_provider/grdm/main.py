@@ -1,8 +1,11 @@
 import os
 from urllib.parse import urlparse
+import json
 
 from .models import UpdateArgs, upload
+from .api import get_project_registrations
 from ...config import path_config
+from ...error import MetadataNotExist
 
 
 def get_project_id():
@@ -65,3 +68,41 @@ def sync(token, base_url, project_id, abs_source, abs_root="/home/jovyan"):
                 force=True,
             )
     upload(token, base_url, arg)
+
+def get_project_metadata(scheme, domain, token, project_id):
+    metadata = get_project_registrations(scheme, domain, token, project_id)
+    if len(metadata['data']) < 1:
+        raise MetadataNotExist
+
+    return format_metadata(metadata)
+
+def format_metadata(metadata):
+
+    datas = metadata['data']
+    # {'dmp': first_value}
+    first_value = []
+    for data in datas:
+        # first_value = [first_value_item, ...]
+        first_value_item = {}
+        registration = data['attributes']['registration_responses']
+        for key, value in registration.items:
+            if key != 'grdm-files':
+                first_value_item[key] = value
+
+        files = json.loads(registration['grdm-files'])
+        # {'dmp': {'grdm-files': second_value}}
+        second_value = []
+        for file in files:
+            # second_value = [second_value_item, ...]
+            second_value_item = {}
+            second_value_item['path'] = file['path']
+            # {'dmp': {'grdm-files': {'metadata': third_value}}}
+            third_value = {}
+            for key, value in file['metadata'].items():
+                third_value[key] = value['value']
+            second_value_item['metadata'] = third_value
+            second_value.append(second_value_item)
+
+        first_value_item['grdm-files'] = second_value
+        first_value.append(first_value_item)
+    return {'dmp': first_value}

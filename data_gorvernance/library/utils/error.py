@@ -8,6 +8,8 @@ class PrepareNewSubflowDataError(Exception):
 class NotFoundSubflowDataError(Exception):
     pass
 
+class MetadataNotExist(Exception):
+    pass
 
 """通信系のエラー"""
 

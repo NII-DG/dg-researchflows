@@ -180,6 +180,7 @@ class DMPGetter():
         self.form_box.clear()
         self.msg_output.clear()
 
+        self.make_form_button.set_looks_init(msg_config.get('make_research_data_management_plan', 'get_dmp'))
         self.make_form_button.on_click(self._make_form_button_callback)
         self.form_box.append(self.make_form_button)
 
@@ -244,7 +245,7 @@ class DMPGetter():
         self.dmp_selector.value = 0
         self.form_box.append(self.dmp_selector)
 
-        self.dmp_select_button.set_looks_init()
+        self.dmp_select_button.set_looks_init(msg_config.get('make_research_data_management_plan', 'select'))
         self.form_box.append(self.dmp_select_button)
 
     def register_dmp(self):

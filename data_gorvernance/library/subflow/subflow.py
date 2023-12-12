@@ -3,6 +3,7 @@ import os
 from ..utils.setting import SubflowStatusFile, SubflowTask
 from ..utils import file
 from ..utils.diagram import DiagManager, init_config, update_svg
+from ..utils.config import path_config
 
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -25,11 +26,20 @@ class SubFlowManager:
         for root, dirs, files in os.walk(search_directory):
             for filename in files:
                 if filename.startswith(target_file):
-                    source_path = os.path.join(root, filename)
+                    source_dir = root
                     relative_path = file.relative_path(root, search_directory)
-                    destination_path = os.path.join(destination_directory, relative_path, filename)
-                    if not os.path.isfile(destination_path):
-                        file.copy_file(source_path, destination_path)
+                    destination_dir = os.path.join(destination_directory, relative_path)
+
+                    source_file = os.path.join(source_dir, filename)
+                    destination_file = os.path.join(destination_dir, filename)
+                    if not os.path.isfile(destination_file):
+                        file.copy_file(source_file, destination_file)
+
+                    source_images = os.path.join(source_dir, path_config.IMAGES)
+                    destination_images = os.path.join(destination_dir, path_config.IMAGES)
+                    if not os.path.isdir(destination_images):
+                        file.copy_dir(source_images, destination_images, overwrite=True)
+
 
     def generate(self, svg_path: str, tmp_diag: str, font: str, display_all=True):
         # 毎回元ファイルを読み込む

@@ -59,6 +59,7 @@ class DGPlaner(TaskDirector):
     @TaskDirector.callback_form('get_dmp')
     def _token_callback(self, event):
         """dmpを取得する"""
+        self.dmp_getter.get_dmp_button.set_looks_processing()
         is_ok, message = self.dmp_getter.validate_token_form()
         if not is_ok:
             self.log.warning(message)
@@ -69,6 +70,7 @@ class DGPlaner(TaskDirector):
                 scheme=grdm.SCHEME,
                 domain=grdm.DOMAIN
             )
+            self.dmp_getter.make_select_dmp_form()
         except UnauthorizedError:
             message = msg_config.get('form', 'token_unauthorized')
             self.log.warning(message)
@@ -87,24 +89,21 @@ class DGPlaner(TaskDirector):
             return
         except Exception:
             message = msg_config.get('DEFAULT', 'unexpected_error')
-            self.log.error(message)
             self.dmp_getter.get_dmp_button.set_looks_error(message)
-            self.dmp_getter.msg_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self.log.error(message)
+            self.dmp_getter.msg_output.update_error(message)
             return
-
-        self.dmp_getter.make_select_dmp_form()
 
     @TaskDirector.callback_form('selected_dmp')
     def _dmp_select_callback(self, event):
-        is_ok, index = self.dmp_getter.validate_dmp_selector()
-        if not is_ok:
-            message = msg_config.get('form', 'select_warning')
-            self._save_submit_button.set_looks_warning("message")
-            self.log.warning(message)
-            return
-
-        self.dmp_getter.register_dmp(index)
-
+        self.dmp_getter.dmp_select_button.set_looks_processing()
+        try:
+            self.dmp_getter.register_dmp()
+        except Exception:
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self.log.error(message)
+            self.dmp_getter.msg_output.update_error(message)
 
     @TaskDirector.task_cell("2")
     def generateFormScetion(self):
@@ -159,7 +158,7 @@ class DMPGetter():
         self.project_form = pn.widgets.TextInput(name="Project ID", width=600)
         self.get_dmp_button = Button(width=600)
         # select dmp form
-        self.dmp_selector = pn.widgets.Select(width=600)
+        self.dmp_selector = pn.widgets.Select(width=600, size=5)
         self.dmp_select_button = Button(width=600)
 
     def set_get_dmp_button_callback(self, func):
@@ -210,7 +209,7 @@ class DMPGetter():
         message = ""
 
         token = self.token_form.value_input
-        if len(token) <= 0:
+        if len(token) < 1:
             message = msg_config.get('form', 'none_input_value').format("GRDM Token")
             self.get_dmp_button.set_looks_warning(message)
             return False, message
@@ -218,7 +217,7 @@ class DMPGetter():
 
         if not self.project_id:
             project_id = self.project_form.value_input
-            if len(project_id) <= 0:
+            if len(project_id) < 1:
                 message = msg_config.get('form', 'none_input_value').format("Project ID")
                 self.get_dmp_button.set_looks_warning(message)
                 return False, message
@@ -240,28 +239,20 @@ class DMPGetter():
         self.msg_output.clear()
 
         options = dict()
-        options[msg_config.get('form', 'selector_default')] = False
         options.update(self.dmp_file.create_dmp_options(self.dmps))
         self.dmp_selector.options = options
-        self.dmp_selector.size = len(options)
+        self.dmp_selector.value = 0
         self.form_box.append(self.dmp_selector)
 
         self.dmp_select_button.set_looks_init()
         self.form_box.append(self.dmp_select_button)
 
-    def validate_dmp_selector(self):
+    def register_dmp(self):
         index = self.dmp_selector.value
-        if not index:
-            return False, index
-        return True, index
-
-    def register_dmp(self, selected_value):
-
-        dmp = self.dmp_file.get_dmp(self.dmps, selected_value)
+        dmp = self.dmp_file.get_dmp(self.dmps, index)
         self.dmp_file.write(dmp)
         self.form_box.clear()
-        info = Alert.info(self.dmp_file.display_format(dmp))
-        self.msg_output.update_info(info)
+        self.msg_output.update_info(self.dmp_file.display_format(dmp))
 
 
 class DGCustomizeSetter(TaskDirector):

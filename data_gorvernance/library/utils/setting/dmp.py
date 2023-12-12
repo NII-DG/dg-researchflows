@@ -16,7 +16,7 @@ class DMPManager(JsonFile):
 
     @staticmethod
     def get_dmp(contents, index):
-        return {"dmp": contents['dmp'][index]}
+        return {"dmp": [contents['dmp'][index]]}
 
     @staticmethod
     def display_format(content):

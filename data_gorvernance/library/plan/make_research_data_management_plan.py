@@ -89,6 +89,7 @@ class DGPlaner(TaskDirector):
             message = msg_config.get('DEFAULT', 'unexpected_error')
             self.log.error(message)
             self.dmp_getter.get_dmp_button.set_looks_error(message)
+            self.dmp_getter.msg_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
             return
 
         self.dmp_getter.make_select_dmp_form()
@@ -138,7 +139,6 @@ class DGPlaner(TaskDirector):
 class DMPGetter():
 
     def __init__(self, dmp_path) -> None:
-        # working_path = .data_gorvernance/researchflow/plan/task/plan/make_research_data_management_plan.ipynbが想定値
         self.dmp_file = DMPManager(dmp_path)
         self.token = ""
         self.project_id = grdm.get_project_id()

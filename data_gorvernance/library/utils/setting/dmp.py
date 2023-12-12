@@ -22,7 +22,7 @@ class DMPManager(JsonFile):
     def display_format(content):
         dmp = content['dmp'][0]
         dmp_str = ""
-        for key, value in dmp.items:
+        for key, value in dmp.items():
             if key != 'grdm-files':
                 dmp_str += f'{key} : {value}<br>'
         files = dmp['grdm-files']

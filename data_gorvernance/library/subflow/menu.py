@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import xml.etree.ElementTree as ET
 from tempfile import TemporaryDirectory
+import traceback
 
 import panel as pn
 from IPython.display import display
@@ -13,6 +14,7 @@ from ..utils.html import button as html_button
 from ..utils import file
 from ..utils.log import TaskLog
 from ..task_director import get_subflow_type_and_id
+from ..utils.widgets import MessageBox
 
 def access_main_menu(working_file: str):
     root_folder = Path(
@@ -64,8 +66,6 @@ class SubflowMenu(TaskLog):
         self.select_widgetbox.append(
             pn.Row(self.selector, self.button, margin=(10,10,10,25))
         )
-        # メッセージ用ボックス
-        self.msg_output = pn.WidgetBox()
 
     # イベント
     def select_flow(self, subflow: SubFlowManager, font_folder: Path):
@@ -105,11 +105,6 @@ class SubflowMenu(TaskLog):
             self.diagram.object = self._get_contents(str(skeleton))
             self.diagram.width = self._get_svg_size(str(skeleton))
             self._set_width()
-
-    def error_message(self, message):
-        self.msg_output.clear()
-        alert = pn.pane.Alert(message, sizing_mode="stretch_width",alert_type='danger')
-        self.msg_output.append(alert)
 
     # その他
     def is_display_all(self):
@@ -176,25 +171,29 @@ class SubflowMenu(TaskLog):
         souce_task_dir = root_folder / path_config.DG_TASK_BASE_DATA_FOLDER
         font_folder = Path(os.environ['HOME'])
 
-        # setup
-        subflow = SubFlowManager(
-            str(parent), str(status_file), str(diag_file), str(using_task_dir)
-        )
-        subflow.setup_tasks(str(souce_task_dir))
+        try:
+            # setup
+            subflow = SubFlowManager(
+                str(parent), str(status_file), str(diag_file), str(using_task_dir)
+            )
+            subflow.setup_tasks(str(souce_task_dir))
 
-        # panel activation
-        if is_selected:
-            subflow_menu.set_title()
-            subflow_menu.set_diagram(
-                subflow, font_folder, subflow_menu.is_display_all()
-            )
-            subflow_menu.button.on_click(
-                subflow_menu.select_flow(subflow, font_folder)
-            )
-            subflow_menu.menu_widgetbox.append(subflow_menu.select_widgetbox)
-        else:
-            subflow_menu.set_diagram(subflow, font_folder, True)
-        subflow_menu.menu_widgetbox.append(subflow_menu.diagram_widgetbox)
+            # panel activation
+            if is_selected:
+                subflow_menu.set_title()
+                subflow_menu.set_diagram(
+                    subflow, font_folder, subflow_menu.is_display_all()
+                )
+                subflow_menu.button.on_click(
+                    subflow_menu.select_flow(subflow, font_folder)
+                )
+                subflow_menu.menu_widgetbox.append(subflow_menu.select_widgetbox)
+            else:
+                subflow_menu.set_diagram(subflow, font_folder, True)
+            subflow_menu.menu_widgetbox.append(subflow_menu.diagram_widgetbox)
+        except Exception:
+            message_box = MessageBox().update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
+            subflow_menu.menu_widgetbox.append(message_box)
         display(subflow_menu.menu_widgetbox)
         display(Javascript('IPython.notebook.save_checkpoint();'))
         subflow_menu.log.finish_cell()

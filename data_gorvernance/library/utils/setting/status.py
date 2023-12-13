@@ -176,11 +176,11 @@ class SubflowStatus:
             else:
                 continue
 
-        # 上記の更新を受け、必須タスクのステータスがdone（実行完了）になっていたら、is_completedを真に更新
+        # 上記の更新を受け、必須タスクが一度でも実行されていれば、is_completedを真に更新
         is_completed_ok = True
         for task in self._tasks:
-            if task.is_required and task.status != SubflowTask.STATUS_DONE:
-                # 必須タスクで、ステータスDone以外の場合
+            if task.is_required and task.completed_count < 1:
+                # 必須タスクで、一度も実行されていない場合
                 is_completed_ok = False
         # 判定ないようで更新する。
         self._is_completed = is_completed_ok

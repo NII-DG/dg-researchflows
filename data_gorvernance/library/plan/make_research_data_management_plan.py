@@ -141,7 +141,7 @@ class DGPlaner(TaskDirector):
         for root, dirs, files in os.walk(search_directory):
             for filename in files:
                 if filename.startswith(target_file_name):
-                    path = os.path.join(search_directory, filename)
+                    path = os.path.join(root, filename)
                     source.append(path)
         return source
 

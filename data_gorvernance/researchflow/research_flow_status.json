@@ -18,6 +18,11 @@
             "seq_number": 2,
             "name": "experiment",
             "sub_flow_data": []
+        },
+        {
+            "seq_number": 3,
+            "name": "paper_writing",
+            "sub_flow_data": []
         }
     ]
 }

@@ -112,7 +112,7 @@ class DGPlaner(TaskDirector):
         self.doing_task(script_file_name)
 
         # フォーム定義
-        dg_customize = DGCustomizeSetter(self.nb_working_file_path)
+        dg_customize = DGCustomizeSetter(self.nb_working_file_path, self._plan_path)
         dg_customize.define_form()
 
         # フォーム表示
@@ -124,8 +124,10 @@ class DGPlaner(TaskDirector):
 
     @TaskDirector.task_cell("3")
     def completed_task(self):
+        base_subflow_path = os.path.join(self._abs_root_path, path_config.DG_SUB_FLOW_BASE_DATA_FOLDER)
+        source = self.get_sync_source(path_config.STATUS_JSON, base_subflow_path)
+        source.append(self.dmp_getter.dmp_file.path)
         # フォーム定義
-        source = []
         self.define_save_form(source, script_file_name)
         # フォーム表示
         pn.extension()
@@ -133,6 +135,16 @@ class DGPlaner(TaskDirector):
         form_section.append(self.save_form_box)
         form_section.append(self.save_msg_output)
         display(form_section)
+
+    def get_sync_source(self, target_file_name: str, search_directory :str):
+        source = []
+        for root, dirs, files in os.walk(search_directory):
+            for filename in files:
+                if filename.startswith(target_file_name):
+                    path = os.path.join(search_directory, filename)
+                    source.append(path)
+        return source
+
 
 
 class DMPGetter():
@@ -258,13 +270,13 @@ class DMPGetter():
 
 class DGCustomizeSetter(TaskDirector):
 
-    def __init__(self, working_path:str) -> None:
+    def __init__(self, working_path:str, plan_file:str) -> None:
         # working_path = .data_gorvernance/researchflow/plan/task/plan/make_research_data_management_plan.ipynbが想定値
         super().__init__(working_path, notebook_name)
 
         # α設定JSON定義書(plan.json)
         # 想定値：data_gorvernance\researchflow\plan\plan.json
-        self._plan_path =  os.path.join(self._abs_root_path, path_config.PLAN_FILE_PATH)
+        self._plan_path =  plan_file
 
         # フォームボックス
         self._form_box = pn.WidgetBox()

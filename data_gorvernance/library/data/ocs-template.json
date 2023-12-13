@@ -1,32 +1,32 @@
 {
-    "field": [
+    "ocs_template": [
         {
             "id":"T001",
-            "field_name": "GRDMの解析基盤を利用する",
+            "ocs_template_name": "GRDMの解析基盤を利用する",
             "experiment_package": "https://github.com/audreyfeldroy/cookiecutter-pypackage.git",
             "is_active": true
         },
         {
             "id":"T002",
-            "field_name": "OCSを利用して解析環境を作成する（JupyterHub）",
+            "ocs_template_name": "OCSを利用して解析環境を作成する（JupyterHub）",
             "experiment_package": "",
             "is_active": true
         },
         {
             "id":"T003",
-            "field_name": "OCSを利用して解析環境を作成する（OnDemand）",
+            "ocs_template_name": "OCSを利用して解析環境を作成する（OnDemand）",
             "experiment_package": "",
             "is_active": false
         },
         {
             "id":"T004",
-            "field_name": "OCSを利用して解析環境を作成する（Sapporo）",
+            "ocs_template_name": "OCSを利用して解析環境を作成する（Sapporo）",
             "experiment_package": "",
             "is_active": false
         },
         {
             "id":"T005",
-            "field_name": "独自の環境にOCSを構築して解析環境を作成する",
+            "ocs_template_name": "独自の環境にOCSを構築して解析環境を作成する",
             "experiment_package": "",
             "is_active": true
         }

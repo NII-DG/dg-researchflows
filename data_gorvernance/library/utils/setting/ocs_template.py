@@ -7,7 +7,7 @@ from ..file import JsonFile
 # ocs_template.jsonのファイルパス
 script_dir_path = os.path.dirname(__file__)
 p = Path(script_dir_path)
-ocs_template_json_file = p.joinpath('../../data/ocs_template.json').resolve()
+ocs_template_json_file = p.joinpath('../../data/ocs-template.json').resolve()
 
 class ocs_template:
     __FIELD = "ocs_template"
@@ -18,19 +18,19 @@ class ocs_template:
 
     def __init__(self) -> None:
         contents = JsonFile(str(ocs_template_json_file)).read()
-        self.field = contents[self.__FIELD]
+        self.ocs_template = contents[self.__FIELD]
 
     def get_name(self):
-        return [fld[self.__FIELD_NAME] for fld in self.field]
+        return [fld[self.__FIELD_NAME] for fld in self.ocs_template]
 
     def get_disabled_ids(self)->List[str]:
         disabled = []
-        for fld in self.field:
+        for fld in self.ocs_template:
             if not fld[self.__IS_ACTIVE]:
                 disabled.append(fld[self.__FIELD_NAME])
         return disabled
 
     def get_template_path(self, target_name):
-        for fld in self.field:
+        for fld in self.ocs_template:
             if fld[self.__FIELD_NAME] == target_name:
                 return fld[self.__EXPERIMENT_PACKAGE]

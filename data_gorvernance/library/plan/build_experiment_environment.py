@@ -1,8 +1,5 @@
 import os
 import traceback
-from typing import Any, List
-from pathlib import Path
-import json
 
 import panel as pn
 from IPython.display import display
@@ -17,11 +14,6 @@ from ..utils.setting import ocs_template, ResearchFlowStatusOperater
 # 本ファイルのファイル名
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
 notebook_name = script_file_name+'.ipynb'
-
-script_dir_path = os.path.dirname(__file__)
-p = Path(script_dir_path)
-# DGカスタマイズJSON定義書パス(data_gorvernance\library\data\data_governance_customize.json)
-data_governance_customize_file = p.joinpath('..', 'data/data_governance_customize.json').resolve()
 
 DEFAULT_WIDTH = 600
 
@@ -57,16 +49,18 @@ class ExperimentEnvBuilder(TaskDirector):
 
         self.ocs_template = ocs_template()
         options = []
-        self.field_list_default = msg_config.get('form', 'selector_default')
+        #self.field_list_default = msg_config.get('form', 'selector_default')
 
-        options.append(self.field_list_default)
+        #options.append(self.field_list_default)
         options.extend(self.ocs_template.get_name())
 
         self.field_list = pn.widgets.Select(
                 name=msg_config.get('select_ocs_template', 'ocs_template_title'),
                 options=options,
-                disabled_options=self.field.get_disabled_ids(),
-                value=self.field_list_default
+                disabled_options=self.ocs_template.get_disabled_ids(),
+                #size=4,
+                width=600,
+                #value=self.field_list_default
             )
 
         self.field_list.param.watch(self._ocs_template_select_callback, 'value')
@@ -78,8 +72,10 @@ class ExperimentEnvBuilder(TaskDirector):
         self._template_form_box.clear()
         self._msg_output.clear()
 
-        if self.selected == self.ocs_template_list_default:
-            self._msg_output.update_warning(msg_config.get('form', 'select_warning'))
+        self._msg_output.update_info("ここまで動いた 1")
+
+        #if self.selected == self.ocs_template_list_default:
+        #    self._msg_output.update_warning(msg_config.get('form', 'select_warning'))
 
         self.set_template_form()  
 
@@ -118,56 +114,102 @@ class ExperimentEnvBuilder(TaskDirector):
         # NOTE: この位置ならば無効化される
         self.radio.param.trigger('value')
 
-    def get_data_governance_customize_id_by_index(self, index)->str:
-        ids = self.get_data_governance_customize_ids()
-        return ids[index]
+    def _radiobox_callback(self, event):
+        radio_value = self.radio.value
 
-    def get_data_governance_customize_data(self)->List[dict]:
-        with data_governance_customize_file.open('r') as file:
-            data_governance_customize_data = json.loads(file.read())
-            return data_governance_customize_data['dg_customize']
+        if radio_value:
+            self.template_path_form.value = self.field.get_template_path(self.selected)
+            self.template_path_form.disabled = True
+        else:
+            self.template_path_form.disabled = False
+            self.template_path_form.value = ""
 
-    def get_data_governance_customize_ids(self)->List:
-        return [p['id'] for p in self.get_data_governance_customize_data()]
+    @TaskDirector.callback_form("get_cookiecutter_template")
+    def callback_submit_template_form(self, event):
+        self.submit_button.set_looks_processing()
 
-    def change_submit_button_init(self, name):
-        self.submit_button.name = name
-        self.submit_button.button_type = 'primary'
-        self.submit_button.button_style = 'solid'
-        self.submit_button.icon = 'settings-plus'
+        radio_value = self.radio.value
+        if radio_value:
+            template = self.template_path_form.value
+        else:
+            template = self.template_path_form.value_input
 
-    def callback_submit_input(self, event):
+        if not template:
+            self.submit_button.set_looks_warning(msg_config.get('form', 'value_empty_warning'))
+            return
+
         try:
-            # 適応するDGカスタマイズプロパティの設定値をα設定JSON定義書(data_gorvernance\researchflow\plan\plan.json)に記録する。
-            plan_data = self.get_plan_data()
+            context = self.make_package.get_template(template)
+        except Exception:
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self._msg_output.update_error(message)
+            self.log.error(message)
+            return
+        else:
+            self.set_context_form(context)
 
-            registration_content = ''
-            for index, cb in enumerate(self._checkbox_list):
-                if type(cb) is Checkbox and type(cb.value) is bool:
-                    plan_data['governance_plan'][index]['is_enabled'] = cb.value
-                    governance_plan_id = plan_data['governance_plan'][index]['id']
-                    registration_content += f'{msg_config.get("data_governance_customize_property", governance_plan_id)} : {self.get_msg_disable_or_able(cb.value)}<br>'
+    def set_context_form(self, context):
+        self._form_box.clear()
+        self._msg_output.clear()
+        self.create_context_form(context)
+        self.submit_button = Button(width=DEFAULT_WIDTH)
+        self.submit_button.set_looks_init()
+        self.submit_button.on_click(self.callback_submit_context_form)
+        self._form_box.append(self.submit_button)
+
+    def create_context_form(self, context):
+        for key, raw in context.items():
+            title = key
+            if isinstance(raw, list):
+                obj = pn.widgets.Select(name=title, options=raw, width=DEFAULT_WIDTH)
+            elif isinstance(raw, bool):
+                obj = pn.widgets.RadioBoxGroup(name=title, options=['yes', 'no'], inline=True, width=DEFAULT_WIDTH)
+                if raw:
+                    obj.value = 'yes'
                 else:
-                    raise Exception('cb variable is not panel.widgets.Checkbox or cb value is not bool type')
+                    obj.value = 'no'
+            elif isinstance(raw, dict):
+                continue
+            else:
+                obj = pn.widgets.TextInput(name=title, value=raw, width=DEFAULT_WIDTH)
 
-            self.update_plan_data(plan_data)
+            self._form_box.append(obj)
 
-            # 登録内容を出力する
-            registration_msg = f"""### {msg_config.get("form", "registration_content")}
+    @TaskDirector.callback_form("create_package")
+    def callback_submit_context_form(self, event):
+        self.submit_button.set_looks_processing()
+        context_dict = {}
+        for obj in self._form_box.objects:
+            if isinstance(obj, pn.widgets.Button):
+                continue
+            if obj.value:
+                context_dict[obj.name] = obj.value
+            else:
+                message = msg_config.get('form', 'none_input_value').format(obj.name)
+                self._msg_output.update_error(message)
+                return
 
-<hr>
+        try:
+            self.make_package.create_package(
+                context_dict=context_dict,
+                output_dir=self.output_dir
+            )
+        except OutputDirExistsException:
+            message = msg_config.get('make_experiment_package', 'dir_exixts_error')
+            self._msg_output.update_warning(message)
+            self.submit_button.set_looks_init()
+            return
+        except Exception:
+            message = msg_config.get('DEFAULT', 'unexpected_error')
+            self.submit_button.set_looks_error(message)
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self._msg_output.update_error(message)
+            self.log.error(message)
+            return
 
-{registration_content}
-            """
-            self._msg_output.clear()
-            alert = pn.pane.Alert(registration_msg, sizing_mode="stretch_width",alert_type='info')
-            self._msg_output.append(alert)
-            self.change_submit_button_success(msg_config.get('form', 'accepted'))
-
-        except Exception as e:
-            self._msg_output.clear()
-            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
-            self._msg_output.append(alert)
+        self._form_box.clear()
+        message = msg_config.get('make_experiment_package', 'create_success').format(self.output_dir)
+        self._msg_output.update_success(message)
 
 
     @TaskDirector.task_cell("1")

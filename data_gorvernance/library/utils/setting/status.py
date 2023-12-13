@@ -42,7 +42,8 @@ class SubflowTask:
             raise ValueError
 
     def add_execution_environments(self, id:str):
-        self._execution_environments.append(id)
+        if id not in self._execution_environments:
+            self._execution_environments.append(id)
 
     @property
     def id(self):

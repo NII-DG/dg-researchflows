@@ -25,20 +25,22 @@ class SubFlowManager:
     def _copy_file_by_name(self, target_file: str, search_directory :str, destination_directory: str):
         for root, dirs, files in os.walk(search_directory):
             for filename in files:
-                if filename.startswith(target_file):
-                    source_dir = root
-                    relative_path = file.relative_path(root, search_directory)
-                    destination_dir = os.path.join(destination_directory, relative_path)
+                if not filename.startswith(target_file):
+                    continue
+                # if filename.startswith(target_file) のとき
+                source_dir = root
+                relative_path = file.relative_path(root, search_directory)
+                destination_dir = os.path.join(destination_directory, relative_path)
 
-                    source_file = os.path.join(source_dir, filename)
-                    destination_file = os.path.join(destination_dir, filename)
-                    if not os.path.isfile(destination_file):
-                        file.copy_file(source_file, destination_file)
+                source_file = os.path.join(source_dir, filename)
+                destination_file = os.path.join(destination_dir, filename)
+                if not os.path.isfile(destination_file):
+                    file.copy_file(source_file, destination_file)
 
-                    source_images = os.path.join(source_dir, path_config.IMAGES)
-                    destination_images = os.path.join(destination_dir, path_config.IMAGES)
-                    if not os.path.isdir(destination_images):
-                        file.copy_dir(source_images, destination_images, overwrite=True)
+                source_images = os.path.join(source_dir, path_config.IMAGES)
+                destination_images = os.path.join(destination_dir, path_config.IMAGES)
+                if not os.path.isdir(destination_images):
+                    file.copy_dir(source_images, destination_images, overwrite=True)
 
 
     def generate(self, svg_path: str, tmp_diag: str, font: str, display_all=True):

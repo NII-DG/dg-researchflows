@@ -200,8 +200,11 @@ class ExperimentPackageMaker(TaskDirector):
         except OutputDirExistsException:
             message = msg_config.get('make_experiment_package', 'dir_exixts_error')
             self._msg_output.update_warning(message)
+            self.submit_button.set_looks_init()
             return
         except Exception:
+            message = msg_config.get('DEFAULT', 'unexpected_error')
+            self.submit_button.set_looks_error(message)
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
             self._msg_output.update_error(message)
             self.log.error(message)

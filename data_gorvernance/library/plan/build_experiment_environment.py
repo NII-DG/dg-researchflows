@@ -74,9 +74,11 @@ class ExperimentEnvBuilder(TaskDirector):
             self.template_path = self.ocs_template.get_template_path(self.selected)
 
             if self.ConstructionProcedureId == "T001":
+                
                 # 解析基盤をそのまま利用
                 self._msg_output.update_success( msg_config.get('select_ocs_template', 'use_computing_service'))
-            if self.ConstructionProcedureId == "T999":
+
+            elif self.ConstructionProcedureId == "T999":
                 # ポータブル版VCCを利用して構築する。
                 messsage = msg_config.get('select_ocs_template', 'use_portable_vcc')
                 self._msg_output.update_success( messsage )

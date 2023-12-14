@@ -8,6 +8,10 @@ class PrepareNewSubflowDataError(Exception):
 class NotFoundSubflowDataError(Exception):
     pass
 
+class InputWarning(Exception):
+    """入力値に問題があった場合の例外"""
+    pass
+
 
 """通信系のエラー"""
 

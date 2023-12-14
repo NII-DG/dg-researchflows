@@ -13,7 +13,7 @@ class ocs_template:
     __FIELD = "ocs_template"
     __ID = "id"
     __FIELD_NAME = "ocs_template_name"
-    __EXPERIMENT_PACKAGE = "experiment_package"
+    __OCS_TEMPLATE_PATH = "ocs_template_path"
     __IS_ACTIVE = "is_active"
 
     def __init__(self) -> None:
@@ -30,7 +30,12 @@ class ocs_template:
                 disabled.append(fld[self.__FIELD_NAME])
         return disabled
 
+    def get_id(self, target_name):
+        for fld in self.ocs_template:
+            if fld[self.__FIELD_NAME] == target_name:
+                return fld[self.__ID]
+
     def get_template_path(self, target_name):
         for fld in self.ocs_template:
             if fld[self.__FIELD_NAME] == target_name:
-                return fld[self.__EXPERIMENT_PACKAGE]
+                return fld[self.__OCS_TEMPLATE_PATH]

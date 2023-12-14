@@ -3,31 +3,31 @@
         {
             "id":"T001",
             "ocs_template_name": "GRDMの解析基盤を利用する",
-            "experiment_package": "https://github.com/audreyfeldroy/cookiecutter-pypackage.git",
+            "ocs_template_path": "",
             "is_active": true
         },
         {
             "id":"T002",
             "ocs_template_name": "OCSを利用して解析環境を作成する（JupyterHub）",
-            "experiment_package": "",
+            "ocs_template_path": "TheLittlestJupyterHub/001-JupyterHub環境構築.ipynb",
             "is_active": true
         },
         {
             "id":"T003",
             "ocs_template_name": "OCSを利用して解析環境を作成する（OnDemand）",
-            "experiment_package": "",
+            "ocs_template_path": "",
             "is_active": false
         },
         {
             "id":"T004",
             "ocs_template_name": "OCSを利用して解析環境を作成する（Sapporo）",
-            "experiment_package": "",
+            "ocs_template_path": "",
             "is_active": false
         },
         {
-            "id":"T005",
+            "id":"T999",
             "ocs_template_name": "独自の環境にOCSを構築して解析環境を作成する",
-            "experiment_package": "",
+            "ocs_template_path": "https://github.com/nii-gakunin-cloud/ocs-vcp-portable/blob/main/manual.md",
             "is_active": true
         }
     ]

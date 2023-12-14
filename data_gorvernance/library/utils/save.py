@@ -75,7 +75,7 @@ class TaskSave(TaskLog):
                 grdm.SCHEME, grdm.DOMAIN, token
             )
         except UnauthorizedError:
-            message = msg_config.get('save', 'token_unauthorized')
+            message = msg_config.get('form', 'token_unauthorized')
             self.log.warning(message)
             self._save_submit_button.set_looks_warning(message)
             return False
@@ -129,6 +129,7 @@ class TaskSave(TaskLog):
             message = msg_config.get('form', 'select_warning')
             self._save_submit_button.set_looks_warning("message")
             self.log.warning(message)
+            return
         self.project_id = self._save_form.value
         self._save()
 

@@ -10,7 +10,7 @@ from ..utils.widgets import Button, MessageBox
 from ..utils.package import MakePackage, OutputDirExistsException
 from ..utils.config import path_config, message as msg_config
 from ..utils.setting import Field, ResearchFlowStatusOperater
-from ..utils.checker import PatternMatcher
+from ..utils.checker import StringManager
 
 
 # 本ファイルのファイル名
@@ -33,8 +33,7 @@ class ExperimentPackageMaker(TaskDirector):
         # パッケージ作成場所
         subflow_type, subflow_id = get_subflow_type_and_id(self.nb_working_file_path)
         if not subflow_type or not subflow_id:
-            self._msg_output.update_error(f'## [INTERNAL ERROR] : don\'t get subflow type or id.')
-            return
+            raise Exception(f'## [INTERNAL ERROR] : don\'t get subflow type or id.')
         try:
             rf_status_file = path_config.get_research_flow_status_file_path(self._abs_root_path)
             rf_status = ResearchFlowStatusOperater(rf_status_file)
@@ -42,8 +41,7 @@ class ExperimentPackageMaker(TaskDirector):
             if data_dir_name is None:
                 raise Exception
         except Exception:
-            self._msg_output.update_error(f'## [INTERNAL ERROR] : don\'t get directory name of data')
-            return
+            raise Exception(f'## [INTERNAL ERROR] : don\'t get directory name of data')
         self.output_dir = path_config.get_task_data_dir(self._abs_root_path, subflow_type, data_dir_name)
 
         # フォームボックス
@@ -138,7 +136,8 @@ class ExperimentPackageMaker(TaskDirector):
         else:
             template = self.template_path_form.value_input
 
-        if PatternMatcher.is_empty(template):
+        template = StringManager.strip(template)
+        if StringManager.is_empty(template):
             self.submit_button.set_looks_warning(msg_config.get('form', 'value_empty_warning'))
             return
 
@@ -189,7 +188,8 @@ class ExperimentPackageMaker(TaskDirector):
             value = ""
             if isinstance(obj, pn.widgets.TextInput):
                 value = obj.value_input
-                if PatternMatcher.is_empty(value):
+                value = StringManager.strip(value)
+                if StringManager.is_empty(value):
                     message = msg_config.get('form', 'none_input_value').format(obj.name)
                     self._msg_output.update_error(message)
                     return

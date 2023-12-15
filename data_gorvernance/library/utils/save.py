@@ -9,7 +9,7 @@ from .storage_provider import grdm
 from .time import TimeDiff
 from .log import TaskLog
 from .error import UnauthorizedError
-from .checker import PatternMatcher
+from .checker import StringManager
 
 class TaskSave(TaskLog):
 
@@ -52,6 +52,7 @@ class TaskSave(TaskLog):
         self._save_submit_button.set_looks_processing()
 
         token = self._save_form.value_input
+        token = StringManager.strip(token)
         if not self._validate_token(token):
             return
 
@@ -65,8 +66,13 @@ class TaskSave(TaskLog):
             self._project_id_form()
 
     def _validate_token(self, token):
-        if PatternMatcher.is_empty(token):
+        if not token:
             message = msg_config.get('save', 'empty_warning')
+            self.log.warning(message)
+            self._save_submit_button.set_looks_warning(message)
+            return False
+        if StringManager.has_whitespace(token):
+            message = msg_config.get('form', 'must_not_space').format("GRDM Token")
             self.log.warning(message)
             self._save_submit_button.set_looks_warning(message)
             return False

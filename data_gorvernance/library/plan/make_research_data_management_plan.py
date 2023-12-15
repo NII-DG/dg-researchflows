@@ -15,7 +15,7 @@ from ..utils.setting import get_dg_customize_config, SubflowStatusFile, SubflowS
 from ..utils.widgets import MessageBox, Button, Alert
 from ..utils.storage_provider import grdm
 from ..utils.error import MetadataNotExist, UnauthorizedError
-from ..utils.checker import PatternMatcher
+from ..utils.checker import StringManager
 
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
 notebook_name = script_file_name+'.ipynb'
@@ -223,15 +223,21 @@ class DMPGetter():
         message = ""
 
         token = self.token_form.value_input
-        if PatternMatcher.is_empty(token):
+        token = StringManager.strip(token, remove_empty=True)
+        if not token:
             message = msg_config.get('form', 'none_input_value').format("GRDM Token")
+            self.get_dmp_button.set_looks_warning(message)
+            return False, message
+        if StringManager.has_whitespace(token):
+            message = msg_config.get('form', 'must_not_space').format("GRDM Token")
             self.get_dmp_button.set_looks_warning(message)
             return False, message
         self.token = token
 
         if not self.project_id:
             project_id = self.project_form.value_input
-            if PatternMatcher.is_empty(project_id):
+            project_id = StringManager.strip(project_id)
+            if StringManager.is_empty(project_id):
                 message = msg_config.get('form', 'none_input_value').format("Project ID")
                 self.get_dmp_button.set_looks_warning(message)
                 return False, message

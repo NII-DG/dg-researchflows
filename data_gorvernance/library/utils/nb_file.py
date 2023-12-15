@@ -4,7 +4,6 @@ from typing import Any
 import nbformat
 
 from .file import File
-from .config import message as msg_config
 from .html import security
 
 class NbFile(File):
@@ -22,8 +21,8 @@ class NbFile(File):
         """
         notebook = self.read()
         for cell in notebook.cells:
-            if cell.cell_type == 'markdown' and msg_config.get('DEFAULT', 'param_subflow_name') in cell.source:
-                cell.source = cell.source.replace(msg_config.get('DEFAULT', 'param_subflow_name'), security.escape_html_text(subflow_name))
+            if cell.cell_type == 'markdown' and ':subflow_name' in cell.source:
+                cell.source = cell.source.replace(':subflow_name', security.escape_html_text(subflow_name))
         self.write(notebook)
 
 

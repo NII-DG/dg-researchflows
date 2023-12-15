@@ -7,7 +7,7 @@ from ...utils.nb_file import NbFile
 from ...utils import file
 from ...utils.config import path_config, message as msg_config
 from .base import BaseSubflowForm
-
+from ...utils.checker import StringManager
 
 class CreateSubflowForm(BaseSubflowForm):
     """サブフロー新規作成クラス"""
@@ -37,10 +37,12 @@ class CreateSubflowForm(BaseSubflowForm):
         data_dir_name = self._data_dir_name_form.value_input
         parent_sub_flow_ids = self._parent_sub_flow_selector.value
 
-        if not self.validate_sub_flow_name():
+        sub_flow_name = StringManager.strip(sub_flow_name)
+        if not self.validate_sub_flow_name(sub_flow_name, creating_phase_seq_number):
             return
 
-        if not self.validate_data_dir_name():
+        data_dir_name = StringManager.strip(data_dir_name)
+        if not self.validate_data_dir_name(data_dir_name, creating_phase_seq_number):
             return
 
         # リサーチフローステータス管理JSONの更新

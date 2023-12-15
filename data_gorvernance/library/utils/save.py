@@ -9,6 +9,7 @@ from .storage_provider import grdm
 from .time import TimeDiff
 from .log import TaskLog
 from .error import UnauthorizedError
+from .checker import StringManager
 
 class TaskSave(TaskLog):
 
@@ -24,7 +25,7 @@ class TaskSave(TaskLog):
         self.save_form_box = pn.WidgetBox()
         self.save_form_box.width = 900
         # 入力フォーム
-        self._save_form = pn.widgets.TextInput(name="GRDM Token", width=600)
+        self._save_form = pn.widgets.PasswordInput(name="GRDM Token", width=600)
         self.save_form_box.append(self._save_form)
         # 確定ボタン
         self._save_submit_button = Button(width=600)
@@ -51,10 +52,11 @@ class TaskSave(TaskLog):
         self._save_submit_button.set_looks_processing()
 
         token = self._save_form.value_input
+        token = StringManager.strip(token, remove_empty=True)
         if not self._validate_token(token):
             return
-
         self.grdm_token = token
+
         project_id = grdm.get_project_id()
         if project_id:
             self.project_id = project_id
@@ -64,8 +66,13 @@ class TaskSave(TaskLog):
             self._project_id_form()
 
     def _validate_token(self, token):
-        if len(token) <= 0:
+        if not token:
             message = msg_config.get('save', 'empty_warning')
+            self.log.warning(message)
+            self._save_submit_button.set_looks_warning(message)
+            return False
+        if StringManager.has_whitespace(token):
+            message = msg_config.get('form', 'must_not_space').format("GRDM Token")
             self.log.warning(message)
             self._save_submit_button.set_looks_warning(message)
             return False
@@ -125,12 +132,13 @@ class TaskSave(TaskLog):
 
     @TaskLog.callback_form("select_grdm_project")
     def _id_form_callback(self, event):
-        if not self._save_form.value:
+        value = self._save_form.value
+        if not value:
             message = msg_config.get('form', 'select_warning')
             self._save_submit_button.set_looks_warning("message")
             self.log.warning(message)
             return
-        self.project_id = self._save_form.value
+        self.project_id = value
         self._save()
 
     def _save(self):

@@ -7,7 +7,7 @@ from IPython.display import display
 
 from ..task_director import TaskDirector, get_subflow_type_and_id
 from ..utils.widgets import Button, MessageBox
-from ..utils.package import MakePackage
+from ..utils.package import MakePackage, OutputDirExistsException
 from ..utils.config import path_config, message as msg_config
 from ..utils.setting import Field, ResearchFlowStatusOperater
 
@@ -197,7 +197,14 @@ class ExperimentPackageMaker(TaskDirector):
                 context_dict=context_dict,
                 output_dir=self.output_dir
             )
+        except OutputDirExistsException:
+            message = msg_config.get('make_experiment_package', 'dir_exixts_error')
+            self._msg_output.update_warning(message)
+            self.submit_button.set_looks_init()
+            return
         except Exception:
+            message = msg_config.get('DEFAULT', 'unexpected_error')
+            self.submit_button.set_looks_error(message)
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
             self._msg_output.update_error(message)
             self.log.error(message)

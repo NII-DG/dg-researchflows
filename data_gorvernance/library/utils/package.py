@@ -12,6 +12,7 @@ from cookiecutter.prompt import (
     render_variable,
     StrictEnvironment
 )
+from cookiecutter.exceptions import OutputDirExistsException
 
 
 class MakePackage:

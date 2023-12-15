@@ -16,6 +16,7 @@ WORKING = 'working' ## 同期非対称フォルダ
 ## base直下
 SUB_FLOW = 'subflow'
 TASK = 'task'
+IMAGES = 'images'
 ## researchflow直下
 PLAN = 'plan'
 
@@ -104,4 +105,4 @@ def get_sub_flow_status_file_path(phase:str, subflow_id:str='')->str:
 
 # other method
 def get_prepare_file_name_list_for_subflow()->List[str]:
-    return [MENU_NOTEBOOK, STATUS_JSON, PROPERTY_JSON]
+    return [MENU_NOTEBOOK, STATUS_JSON, PROPERTY_JSON, IMAGES]

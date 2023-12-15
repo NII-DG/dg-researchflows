@@ -4,6 +4,7 @@ import os
 import panel as pn
 
 from ...utils.nb_file import NbFile
+from ...utils import file
 from ...utils.config import path_config, message as msg_config
 from .base import BaseSubflowForm
 
@@ -92,7 +93,7 @@ class CreateSubflowForm(BaseSubflowForm):
         # コピー先フォルダの作成
         os.makedirs(dect_dir_path) # 既に存在している場合はエラーになる
 
-        # 対象コピーファイルリスト
+        # 対象コピーファイルorディレクトリリスト
         copy_files = path_config.get_prepare_file_name_list_for_subflow()
 
         try:
@@ -101,7 +102,10 @@ class CreateSubflowForm(BaseSubflowForm):
                 src_path = os.path.join(dg_base_subflow_path, phase_name, copy_file_name)
                 dect_path = os.path.join(dg_researchflow_path, phase_name, new_sub_flow_id, copy_file_name)
                 # コピーする。
-                shutil.copyfile(src_path, dect_path)
+                if os.path.isfile(src_path):
+                    shutil.copyfile(src_path, dect_path)
+                if os.path.isdir(src_path):
+                    file.copy_dir(src_path, dect_path, overwrite=True)
                 # menu.ipynbファイルの場合は、menu.ipynbのヘッダーにサブフロー名を埋め込む
                 if copy_file_name == path_config.MENU_NOTEBOOK:
                     nb_file = NbFile(dect_path)

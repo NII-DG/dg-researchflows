@@ -218,6 +218,8 @@ class ExperimentPackageMaker(TaskDirector):
         self._form_box.clear()
         message = msg_config.get('make_experiment_package', 'create_success').format(self.output_dir)
         self._msg_output.update_success(message)
+        # TODO: 開発中の仮置きのため後で削除すること
+        self.done_task(script_file_name)
 
     @TaskDirector.task_cell("1")
     def generateFormScetion(self):

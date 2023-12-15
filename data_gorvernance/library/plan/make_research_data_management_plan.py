@@ -353,8 +353,7 @@ class DGCustomizeSetter(TaskDirector):
             alert = pn.pane.Alert(registration_msg, sizing_mode="stretch_width",alert_type='info')
             self._msg_output.append(alert)
             self.change_submit_button_success(msg_config.get('form', 'accepted'))
-            # タスク実行の完了情報を該当サブフローステータス管理JSONに書き込む
-            # NOTE: 開発中の仮置き
+            # TODO: 開発中の仮置きのため後で削除すること
             self.done_task(script_file_name)
 
         except Exception as e:

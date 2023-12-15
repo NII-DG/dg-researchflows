@@ -119,7 +119,7 @@ class TaskSave(TaskLog):
     def _project_select_callback(self, event):
         # NOTE: 一度値を格納してからでないと上手く動かない
         value = self._save_form.value
-        if PatternMatcher.is_empty(value):
+        if value:
             self._save_submit_button.disabled = False
         else:
             self._save_submit_button.disabled = True

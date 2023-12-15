@@ -91,7 +91,6 @@ class ExperimentPackageMaker(TaskDirector):
             msg_config.get('make_experiment_package', 'not_use'): False
         }
         self.radio = pn.widgets.RadioBoxGroup(options=options, value=True,inline=True, margin=(0, 0, 0, 20))
-        self.radio.param.watch(self._radiobox_callback, 'value')
         if  not self.field.get_template_path(self.selected):
             self.radio.value = False
         else:
@@ -113,6 +112,8 @@ class ExperimentPackageMaker(TaskDirector):
 
         self._form_box.append(self._template_form_box)
 
+        # NOTE: callbackで利用するフォームが定義されてから設定する
+        self.radio.param.watch(self._radiobox_callback, 'value')
         # NOTE: この位置ならば無効化される
         self.radio.param.trigger('value')
 

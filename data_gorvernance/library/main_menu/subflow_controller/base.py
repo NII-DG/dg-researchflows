@@ -241,12 +241,12 @@ class BaseSubflowForm():
         sub_flow_name = self._sub_flow_name_form.value_input
 
         if PatternMatcher.is_empty(sub_flow_name):
-            # sub_flow_nameがNoneの場合、ユーザ警告
+            # sub_flow_nameが未入力の場合、ユーザ警告
             self.change_submit_button_warning(msg_config.get('main_menu','not_input_subflow_name'))
             return False
 
         if not self.reserch_flow_status_operater.is_unique_subflow_name(creating_phase_seq_number, sub_flow_name):
-            # サブフロー名がユニークでないの場合、ユーザ警告
+            # サブフロー名がユニークでない場合、ユーザ警告
             self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_subflow_name'))
             return False
 
@@ -258,7 +258,7 @@ class BaseSubflowForm():
 
         # データディレクトリ名の検証
         if PatternMatcher.is_empty(data_dir_name):
-            # data_dir_nameがNoneの場合、ユーザ警告
+            # data_dir_nameが未入力の場合、ユーザ警告
             self.change_submit_button_warning(msg_config.get('main_menu','not_input_data_dir'))
             return False
 
@@ -273,7 +273,7 @@ class BaseSubflowForm():
             return False
 
         if not self.reserch_flow_status_operater.is_unique_data_dir(creating_phase_seq_number, data_dir_name):
-            # data_dir_nameがユニークでないの場合、ユーザ警告
+            # data_dir_nameがユニークでない場合、ユーザ警告
             self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_data_dir'))
             return False
 

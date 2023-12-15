@@ -7,6 +7,7 @@ from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus
 
 from ...utils.setting import ResearchFlowStatusOperater
 from ...utils.config import path_config, message as msg_config
+from ...utils.checker import StringManager
 
 
 class BaseSubflowForm():
@@ -235,38 +236,29 @@ class BaseSubflowForm():
         self.submit_button.disabled = False
         self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
 
-    def validate_sub_flow_name(self):
-        creating_phase_seq_number = self._sub_flow_type_selector.value
-        sub_flow_name = self._sub_flow_name_form.value_input
+    def validate_sub_flow_name(self, sub_flow_name, creating_phase_seq_number):
 
-        if sub_flow_name is None:
-            # sub_flow_nameがNoneの場合、ユーザ警告
+        if StringManager.is_empty(sub_flow_name):
+            # sub_flow_nameが未入力の場合、ユーザ警告
             self.change_submit_button_warning(msg_config.get('main_menu','not_input_subflow_name'))
             return False
 
         if not self.reserch_flow_status_operater.is_unique_subflow_name(creating_phase_seq_number, sub_flow_name):
-            # サブフロー名がユニークでないの場合、ユーザ警告
+            # サブフロー名がユニークでない場合、ユーザ警告
             self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_subflow_name'))
-            return False
-
-        if len(str(sub_flow_name).replace(" ", "").replace("　", "")) < 1:
-            # 半角と全角スペースのみの場合、ユーザ警告
-            self.change_submit_button_warning(msg_config.get('main_menu','must_not_only_space'))
             return False
 
         return True
 
-    def validate_data_dir_name(self):
-        creating_phase_seq_number = self._sub_flow_type_selector.value
-        data_dir_name = self._data_dir_name_form.value_input
+    def validate_data_dir_name(self, data_dir_name, creating_phase_seq_number):
 
         # データディレクトリ名の検証
-        if data_dir_name is None:
-            # data_dir_nameがNoneの場合、ユーザ警告
+        if StringManager.is_empty(data_dir_name):
+            # data_dir_nameが未入力の場合、ユーザ警告
             self.change_submit_button_warning(msg_config.get('main_menu','not_input_data_dir'))
             return False
 
-        if re.search(r"[^\x20-\x7E]", data_dir_name):
+        if not StringManager.is_half(data_dir_name):
             # 半角文字でない時、ユーザ警告
             self.change_submit_button_warning(msg_config.get('main_menu','data_dir_pattern_error'))
             return False
@@ -277,7 +269,7 @@ class BaseSubflowForm():
             return False
 
         if not self.reserch_flow_status_operater.is_unique_data_dir(creating_phase_seq_number, data_dir_name):
-            # data_dir_nameがユニークでないの場合、ユーザ警告
+            # data_dir_nameがユニークでない場合、ユーザ警告
             self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_data_dir'))
             return False
 

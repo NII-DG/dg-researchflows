@@ -3,6 +3,7 @@ import traceback
 from typing import Any, List
 from pathlib import Path
 import json
+from requests.exceptions import RequestException
 
 import panel as pn
 from panel.widgets import Checkbox
@@ -10,7 +11,11 @@ from IPython.display import display
 
 from ..utils.config import path_config, message as msg_config
 from ..task_director import TaskDirector
-from ..utils.setting import get_dg_customize_config, SubflowStatusFile, SubflowStatus
+from ..utils.setting import get_dg_customize_config, SubflowStatusFile, SubflowStatus, DMPManager
+from ..utils.widgets import MessageBox, Button, Alert
+from ..utils.storage_provider import grdm
+from ..utils.error import MetadataNotExist, UnauthorizedError
+from ..utils.checker import StringManager
 
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
 notebook_name = script_file_name+'.ipynb'
@@ -18,7 +23,8 @@ script_dir_path = os.path.dirname(__file__)
 p = Path(script_dir_path)
 # DGカスタマイズJSON定義書パス(data_gorvernance\library\data\data_governance_customize.json)
 data_governance_customize_file = p.joinpath('..', 'data/data_governance_customize.json').resolve()
-
+# dmp.json(data_gorvernance\researchflow\plan\dmp.json)
+dmp_file = p.joinpath('../../researchflow/plan/dmp.json').resolve()
 
 
 class DGPlaner(TaskDirector):
@@ -32,11 +38,258 @@ class DGPlaner(TaskDirector):
         # 想定値：data_gorvernance\researchflow\plan\plan.json
         self._plan_path =  os.path.join(self._abs_root_path, path_config.PLAN_FILE_PATH)
 
+        self.dmp_getter = DMPGetter(dmp_file)
+
+    @TaskDirector.task_cell("1")
+    def get_dmp(self):
+        # タスク開始による研究準備のサブフローステータス管理JSONの更新
+        self.doing_task(script_file_name)
+
+        # フォーム定義
+        self.dmp_getter.define_form()
+        self.dmp_getter.set_get_dmp_button_callback(self._token_callback)
+        self.dmp_getter.set_dmp_select_button_callback(self._dmp_select_callback)
+
+        # フォーム表示
+        pn.extension()
+        form_section = pn.WidgetBox()
+        form_section.append(self.dmp_getter.form_box)
+        form_section.append(self.dmp_getter.msg_output)
+        display(form_section)
+
+    @TaskDirector.callback_form('get_dmp')
+    def _token_callback(self, event):
+        """dmpを取得する"""
+        self.dmp_getter.get_dmp_button.set_looks_processing()
+        is_ok, message = self.dmp_getter.validate_token_form()
+        if not is_ok:
+            self.log.warning(message)
+            return
+
+        try:
+            self.dmp_getter.get_project_metadata(
+                scheme=grdm.SCHEME,
+                domain=grdm.DOMAIN
+            )
+            self.dmp_getter.make_select_dmp_form()
+        except UnauthorizedError:
+            message = msg_config.get('form', 'token_unauthorized')
+            self.log.warning(message)
+            self.dmp_getter.get_dmp_button.set_looks_warning(message)
+            return
+        except MetadataNotExist:
+            message = msg_config.get('make_research_data_management_plan', 'metadata_not_exist')
+            self.log.warning(message)
+            self.dmp_getter.form_box.clear()
+            self.dmp_getter.msg_output.update_warning(message)
+            return
+        except RequestException:
+            message = msg_config.get('DEFAULT', 'connection_error')
+            self.log.error(message)
+            self.dmp_getter.get_dmp_button.set_looks_error(message)
+            return
+        except Exception:
+            message = msg_config.get('DEFAULT', 'unexpected_error')
+            self.dmp_getter.get_dmp_button.set_looks_error(message)
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self.log.error(message)
+            self.dmp_getter.msg_output.update_error(message)
+            return
+
+    @TaskDirector.callback_form('selected_dmp')
+    def _dmp_select_callback(self, event):
+        self.dmp_getter.dmp_select_button.set_looks_processing()
+        try:
+            self.dmp_getter.register_dmp()
+        except Exception:
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self.log.error(message)
+            self.dmp_getter.msg_output.update_error(message)
+
+    @TaskDirector.task_cell("2")
+    def generateFormScetion(self):
+        """フォームセクション用"""
+        # タスク開始による研究準備のサブフローステータス管理JSONの更新
+        self.doing_task(script_file_name)
+
+        # フォーム定義
+        dg_customize = DGCustomizeSetter(self.nb_working_file_path, self._plan_path)
+        dg_customize.define_form()
+
+        # フォーム表示
+        pn.extension()
+        form_section = pn.WidgetBox()
+        form_section.append(dg_customize._form_box)
+        form_section.append(dg_customize._msg_output)
+        display(form_section)
+
+    @TaskDirector.task_cell("3")
+    def completed_task(self):
+        base_subflow_path = os.path.join(self._abs_root_path, path_config.DG_SUB_FLOW_BASE_DATA_FOLDER)
+        source = self.get_sync_source(path_config.STATUS_JSON, base_subflow_path)
+        source.append(self.dmp_getter.dmp_file.path)
+        # フォーム定義
+        self.define_save_form(source, script_file_name)
+        # フォーム表示
+        pn.extension()
+        form_section = pn.WidgetBox()
+        form_section.append(self.save_form_box)
+        form_section.append(self.save_msg_output)
+        display(form_section)
+
+    def get_sync_source(self, target_file_name: str, search_directory :str):
+        source = []
+        for root, dirs, files in os.walk(search_directory):
+            for filename in files:
+                if filename.startswith(target_file_name):
+                    path = os.path.join(root, filename)
+                    source.append(path)
+        return source
+
+
+
+class DMPGetter():
+
+    def __init__(self, dmp_path) -> None:
+        self.dmp_file = DMPManager(dmp_path)
+        self.token = ""
+        self.project_id = grdm.get_project_id()
+        self.metadata = {}
+
+        # フォームボックス
+        self.form_box = pn.WidgetBox()
+        self.form_box.width = 900
+        # メッセージ用ボックス
+        self.msg_output = MessageBox()
+        self.msg_output.width = 900
+
+        # display registrated dmp
+        self.display_dmp = Alert.info()
+        self.make_form_button = Button(width=600)
+        # get dmp form
+        self.token_form = pn.widgets.PasswordInput(name="GRDM Token", width=600)
+        self.project_form = pn.widgets.TextInput(name="Project ID", width=600)
+        self.get_dmp_button = Button(width=600)
+        # select dmp form
+        self.dmp_selector = pn.widgets.Select(width=600, size=5)
+        self.dmp_select_button = Button(width=600)
+
+    def set_get_dmp_button_callback(self, func):
+        self.get_dmp_button.on_click(func)
+
+    def set_dmp_select_button_callback(self, func):
+        self.dmp_select_button.on_click(func)
+
+    def define_form(self):
+        """セル実行時の表示を制御する"""
+        if os.path.isfile(dmp_file):
+            self._display_registrated_dmp()
+        else:
+            self._make_token_form()
+
+    ##### display registrated dmp ######
+
+    def _display_registrated_dmp(self):
+        self.form_box.clear()
+        self.msg_output.clear()
+
+        self.make_form_button.set_looks_init(msg_config.get('make_research_data_management_plan', 'get_dmp'))
+        self.make_form_button.on_click(self._make_form_button_callback)
+        self.form_box.append(self.make_form_button)
+
+        dmp = self.dmp_file.read()
+        self.display_dmp.object = self.dmp_file.display_format(dmp)
+        self.form_box.append(self.display_dmp)
+
+    def _make_form_button_callback(self, event):
+        self._make_token_form()
+
+    ##### get dmp form #####
+
+    def _make_token_form(self):
+        """DMPを取得するためにトークン等を入力させる"""
+        self.form_box.clear()
+        self.msg_output.clear()
+
+        self.form_box.append(self.token_form)
+
+        if not self.project_id:
+            self.form_box.append(self.project_form)
+
+        self.get_dmp_button.set_looks_init()
+        self.form_box.append(self.get_dmp_button)
+
+    def validate_token_form(self):
+        message = ""
+
+        token = self.token_form.value_input
+        token = StringManager.strip(token, remove_empty=True)
+        if not token:
+            message = msg_config.get('form', 'none_input_value').format("GRDM Token")
+            self.get_dmp_button.set_looks_warning(message)
+            return False, message
+        if StringManager.has_whitespace(token):
+            message = msg_config.get('form', 'must_not_space').format("GRDM Token")
+            self.get_dmp_button.set_looks_warning(message)
+            return False, message
+        self.token = token
+
+        if not self.project_id:
+            project_id = self.project_form.value_input
+            project_id = StringManager.strip(project_id)
+            if StringManager.is_empty(project_id):
+                message = msg_config.get('form', 'none_input_value').format("Project ID")
+                self.get_dmp_button.set_looks_warning(message)
+                return False, message
+            self.project_id = project_id
+
+        return True, message
+
+    def get_project_metadata(self, scheme, domain):
+        """入力されたトークンを利用してDMPを取得する"""
+        if not self.token or not self.project_id:
+            raise Exception(f"don't have token or project id.")
+        self.dmps = grdm.get_project_metadata(scheme, domain, self.token, self.project_id)
+
+    ##### select dmp form #####
+
+    def make_select_dmp_form(self):
+        """取得したDMPの中から任意のものを選択する"""
+        self.form_box.clear()
+        self.msg_output.clear()
+
+        options = dict()
+        options.update(self.dmp_file.create_dmp_options(self.dmps))
+        self.dmp_selector.options = options
+        self.dmp_selector.value = 0
+        self.form_box.append(self.dmp_selector)
+
+        self.dmp_select_button.set_looks_init(msg_config.get('make_research_data_management_plan', 'select'))
+        self.form_box.append(self.dmp_select_button)
+
+    def register_dmp(self):
+        index = self.dmp_selector.value
+        dmp = self.dmp_file.get_dmp(self.dmps, index)
+        self.dmp_file.write(dmp)
+        self.form_box.clear()
+        self.msg_output.update_info(self.dmp_file.display_format(dmp))
+
+
+class DGCustomizeSetter(TaskDirector):
+
+    def __init__(self, working_path:str, plan_file:str) -> None:
+        # working_path = .data_gorvernance/researchflow/plan/task/plan/make_research_data_management_plan.ipynbが想定値
+        super().__init__(working_path, notebook_name)
+
+        # α設定JSON定義書(plan.json)
+        # 想定値：data_gorvernance\researchflow\plan\plan.json
+        self._plan_path =  plan_file
+
         # フォームボックス
         self._form_box = pn.WidgetBox()
         self._form_box.width = 900
         # メッセージ用ボックス
-        self._msg_output = pn.WidgetBox()
+        self._msg_output = MessageBox()
         self._msg_output.width = 900
 
     def define_form(self):
@@ -86,6 +339,8 @@ class DGPlaner(TaskDirector):
                     raise Exception('cb variable is not panel.widgets.Checkbox or cb value is not bool type')
 
             self.update_plan_data(plan_data)
+            # タスクの無効化処理
+            self.disable_task_by_phase()
 
             # 登録内容を出力する
             registration_msg = f"""### {msg_config.get("form", "registration_content")}
@@ -98,6 +353,8 @@ class DGPlaner(TaskDirector):
             alert = pn.pane.Alert(registration_msg, sizing_mode="stretch_width",alert_type='info')
             self._msg_output.append(alert)
             self.change_submit_button_success(msg_config.get('form', 'accepted'))
+            # TODO: 開発中の仮置きのため後で削除すること
+            self.done_task(script_file_name)
 
         except Exception as e:
             self._msg_output.clear()
@@ -165,7 +422,10 @@ class DGPlaner(TaskDirector):
                 if task.id in disable_task_ids and not task.is_required:
                     # 無効化タスクIDリストに標的タスクIDが含まれ、かつ必須タスクではない場合、disabledを真にする
                     task.disable = True
+                else:
+                    task.disable = False
             sf.write(sub_flow_status)
+
 
     def change_submit_button_init(self, name):
         self.submit_button.name = name
@@ -192,29 +452,3 @@ class DGPlaner(TaskDirector):
         self.submit_button.name = name
         self.submit_button.button_type = 'danger'
         self.submit_button.button_style = 'solid'
-
-    @TaskDirector.task_cell("1")
-    def generateFormScetion(self):
-        """フォームセクション用"""
-        # タスク開始による研究準備のサブフローステータス管理JSONの更新
-        self.doing_task(script_file_name)
-
-        # フォーム定義
-        self.define_form()
-
-        # フォーム表示
-        pn.extension()
-        form_section = pn.WidgetBox()
-        form_section.append(self._form_box)
-        form_section.append(self._msg_output)
-        display(form_section)
-
-    @TaskDirector.task_cell("2")
-    def customize_research_flow(self):
-        # タスクの無効化処理
-        self.disable_task_by_phase()
-
-    @TaskDirector.task_cell("3")
-    def completed_task(self):
-        # タスク実行の完了情報を研究準備のサブフローステータス管理JSONに書き込む
-        self.done_task(script_file_name)

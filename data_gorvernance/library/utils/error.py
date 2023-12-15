@@ -12,6 +12,8 @@ class InputWarning(Exception):
     """入力値に問題があった場合の例外"""
     pass
 
+class MetadataNotExist(Exception):
+    pass
 
 """通信系のエラー"""
 

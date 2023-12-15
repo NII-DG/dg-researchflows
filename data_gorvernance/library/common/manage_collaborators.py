@@ -25,6 +25,3 @@ class CollaboratorManager(TaskDirector):
         # タスク実行の完了情報を該当サブフローステータス管理JSONに書き込む
         self.done_task(script_file_name)
 
-    @TaskDirector.task_cell("id_3")
-    def return_subflow_menu(self):
-        super().return_subflow_menu()

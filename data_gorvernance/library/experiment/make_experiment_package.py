@@ -121,20 +121,18 @@ class ExperimentPackageMaker(TaskDirector):
 
         if radio_value:
             self.template_path_form.value = self.field.get_template_path(self.selected)
+            self.template_path_form.value_input = self.field.get_template_path(self.selected)
             self.template_path_form.disabled = True
         else:
             self.template_path_form.disabled = False
             self.template_path_form.value = ""
+            self.template_path_form.value_input = ""
 
     @TaskDirector.callback_form("get_cookiecutter_template")
     def callback_submit_template_form(self, event):
         self.submit_button.set_looks_processing()
 
-        radio_value = self.radio.value
-        if radio_value:
-            template = self.template_path_form.value
-        else:
-            template = self.template_path_form.value_input
+        template = self.template_path_form.value_input
 
         template = StringManager.strip(template)
         if StringManager.is_empty(template):
@@ -174,7 +172,7 @@ class ExperimentPackageMaker(TaskDirector):
             elif isinstance(raw, dict):
                 continue
             else:
-                obj = pn.widgets.TextInput(name=title, value=raw, width=DEFAULT_WIDTH)
+                obj = pn.widgets.TextInput(name=title, value=raw, value_input=raw, width=DEFAULT_WIDTH)
 
             self._form_box.append(obj)
 

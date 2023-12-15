@@ -25,7 +25,7 @@ class TaskSave(TaskLog):
         self.save_form_box = pn.WidgetBox()
         self.save_form_box.width = 900
         # 入力フォーム
-        self._save_form = pn.widgets.TextInput(name="GRDM Token", width=600)
+        self._save_form = pn.widgets.PasswordInput(name="GRDM Token", width=600)
         self.save_form_box.append(self._save_form)
         # 確定ボタン
         self._save_submit_button = Button(width=600)

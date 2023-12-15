@@ -186,13 +186,16 @@ class ExperimentPackageMaker(TaskDirector):
         for obj in self._form_box.objects:
             if isinstance(obj, pn.widgets.Button):
                 continue
-            value = obj.value_input
-            if not PatternMatcher.is_empty(value):
-                context_dict[obj.name] = value
+            value = ""
+            if isinstance(obj, pn.widgets.TextInput):
+                value = obj.value_input
+                if PatternMatcher.is_empty(value):
+                    message = msg_config.get('form', 'none_input_value').format(obj.name)
+                    self._msg_output.update_error(message)
+                    return
             else:
-                message = msg_config.get('form', 'none_input_value').format(obj.name)
-                self._msg_output.update_error(message)
-                return
+                value = obj.value
+            context_dict[obj.name] = value
 
         try:
             self.make_package.create_package(

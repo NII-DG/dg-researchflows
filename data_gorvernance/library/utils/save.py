@@ -9,6 +9,7 @@ from .storage_provider import grdm
 from .time import TimeDiff
 from .log import TaskLog
 from .error import UnauthorizedError
+from .checker import PatternMatcher
 
 class TaskSave(TaskLog):
 
@@ -64,7 +65,7 @@ class TaskSave(TaskLog):
             self._project_id_form()
 
     def _validate_token(self, token):
-        if len(token) <= 0:
+        if PatternMatcher.is_empty(token):
             message = msg_config.get('save', 'empty_warning')
             self.log.warning(message)
             self._save_submit_button.set_looks_warning(message)
@@ -118,19 +119,20 @@ class TaskSave(TaskLog):
     def _project_select_callback(self, event):
         # NOTE: 一度値を格納してからでないと上手く動かない
         value = self._save_form.value
-        if value:
+        if PatternMatcher.is_empty(value):
             self._save_submit_button.disabled = False
         else:
             self._save_submit_button.disabled = True
 
     @TaskLog.callback_form("select_grdm_project")
     def _id_form_callback(self, event):
-        if not self._save_form.value:
+        value = self._save_form.value
+        if PatternMatcher.is_empty(value):
             message = msg_config.get('form', 'select_warning')
             self._save_submit_button.set_looks_warning("message")
             self.log.warning(message)
             return
-        self.project_id = self._save_form.value
+        self.project_id = value
         self._save()
 
     def _save(self):

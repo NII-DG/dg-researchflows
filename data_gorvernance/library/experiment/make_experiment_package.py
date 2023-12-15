@@ -10,6 +10,7 @@ from ..utils.widgets import Button, MessageBox
 from ..utils.package import MakePackage, OutputDirExistsException
 from ..utils.config import path_config, message as msg_config
 from ..utils.setting import Field, ResearchFlowStatusOperater
+from ..utils.checker import PatternMatcher
 
 
 # 本ファイルのファイル名
@@ -137,7 +138,7 @@ class ExperimentPackageMaker(TaskDirector):
         else:
             template = self.template_path_form.value_input
 
-        if not template:
+        if PatternMatcher.is_empty(template):
             self.submit_button.set_looks_warning(msg_config.get('form', 'value_empty_warning'))
             return
 
@@ -185,7 +186,7 @@ class ExperimentPackageMaker(TaskDirector):
         for obj in self._form_box.objects:
             if isinstance(obj, pn.widgets.Button):
                 continue
-            if obj.value:
+            if not PatternMatcher.is_empty(obj.value):
                 context_dict[obj.name] = obj.value
             else:
                 message = msg_config.get('form', 'none_input_value').format(obj.name)

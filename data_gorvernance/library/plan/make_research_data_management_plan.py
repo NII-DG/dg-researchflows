@@ -15,6 +15,7 @@ from ..utils.setting import get_dg_customize_config, SubflowStatusFile, SubflowS
 from ..utils.widgets import MessageBox, Button, Alert
 from ..utils.storage_provider import grdm
 from ..utils.error import MetadataNotExist, UnauthorizedError
+from ..utils.checker import PatternMatcher
 
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
 notebook_name = script_file_name+'.ipynb'
@@ -166,7 +167,7 @@ class DMPGetter():
         self.display_dmp = Alert.info()
         self.make_form_button = Button(width=600)
         # get dmp form
-        self.token_form = pn.widgets.TextInput(name="GRDM Token", width=600)
+        self.token_form = pn.widgets.PasswordInput(name="GRDM Token", width=600)
         self.project_form = pn.widgets.TextInput(name="Project ID", width=600)
         self.get_dmp_button = Button(width=600)
         # select dmp form
@@ -222,7 +223,7 @@ class DMPGetter():
         message = ""
 
         token = self.token_form.value_input
-        if len(token) < 1:
+        if PatternMatcher.is_empty(token):
             message = msg_config.get('form', 'none_input_value').format("GRDM Token")
             self.get_dmp_button.set_looks_warning(message)
             return False, message
@@ -230,7 +231,7 @@ class DMPGetter():
 
         if not self.project_id:
             project_id = self.project_form.value_input
-            if len(project_id) < 1:
+            if PatternMatcher.is_empty(project_id):
                 message = msg_config.get('form', 'none_input_value').format("Project ID")
                 self.get_dmp_button.set_looks_warning(message)
                 return False, message

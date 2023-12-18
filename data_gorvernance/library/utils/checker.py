@@ -18,12 +18,12 @@ class StringManager:
         return bool(re.match(r'^[\x20-\x7E]*$', text))
 
     @staticmethod
-    def strip(text:str, remove_empty=False)->str:
+    def strip(text:str, remove_empty=True)->str:
         """文字列の両端の空白文字を削除する
 
-        remove_empty=Trueのとき、空白文字のみで構成された文字列が渡された場合にもとの文字列をそのまま返す
+        remove_empty=Falseのとき、空白文字のみで構成された文字列が渡された場合にもとの文字列をそのまま返す
         """
-        if not text.strip() and remove_empty:
+        if not text.strip() and not remove_empty:
             return text
         else:
             return text.strip()

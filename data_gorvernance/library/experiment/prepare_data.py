@@ -1,5 +1,6 @@
 import os
 import traceback
+import re
 
 import panel as pn
 from IPython.display import display
@@ -8,6 +9,8 @@ from ..task_director import TaskDirector
 from ..utils.widgets import Button, MessageBox
 from ..utils.config import path_config, message as msg_config
 from ..utils.error import InputWarning
+from ..utils.checker import StringManager
+from ..utils.storage_provider import AWS
 
 
 # 本ファイルのファイル名
@@ -97,9 +100,6 @@ class AWSPreparer():
         self._form_box = form_box
         self._msg_output = message_box
 
-        self.submit_button = Button()
-
-    def define_aws_form(self):
         # define widgets
         self.access_key_form = pn.widgets.PasswordInput(
             name="アクセスキー",
@@ -123,8 +123,11 @@ class AWSPreparer():
         self.local_path_form = pn.widgets.TextInput(
             width=400
         )
+        self.submit_button = Button()
         self.submit_button.width = 600
         self.submit_button.set_looks_init("実行")
+
+    def define_aws_form(self):
         # display
         self._form_box.append(self.access_key_form)
         self._form_box.append(self.secret_key_form)
@@ -146,27 +149,48 @@ class AWSPreparer():
 
         try:
             # アクセスキー
-            if len(access_key) < 1:
+            access_key = StringManager.strip(access_key, remove_empty=False)
+            if StringManager.is_empty(access_key):
                 raise InputWarning
-            if len(access_key) < 20:
+            if len(access_key) != 20:
+                raise InputWarning
+            if StringManager.has_whitespace(access_key):
                 raise InputWarning
             # シークレットキー
-            if len(secret_key) < 1:
+            secret_key = StringManager.strip(secret_key, remove_empty=False)
+            if StringManager.is_empty(secret_key):
                 raise InputWarning
-            if len(secret_key) < 40:
+            if len(secret_key) != 40:
+                raise InputWarning
+            if StringManager.has_whitespace(secret_key):
                 raise InputWarning
             # バケット名
-            if len(bucket_name) < 1:
+            bucket_name = StringManager.strip(bucket_name)
+            if StringManager.is_empty(bucket_name):
                 raise InputWarning
-            if len(bucket_name) < 3:
+            if re.fullmatch(r'^[a-z0-9][a-z0-9\.-]{1,61}[a-z0-9]$', bucket_name):
+                # 以下の条件を満たさない場合エラー
+                #   3文字以上63文字以下
+                #   小文字・数字・ドット・ハイフンのみ
+                #   先頭と末尾は小文字か数字のみ
+                raise InputWarning
+            if re.search(r'\.{2,}', bucket_name):
+                # ドットが連続する場合エラー
                 raise InputWarning
             # 転送元データパス（AWS）
-            if len(aws_path) < 1:
+            aws_path = StringManager.strip(aws_path)
+            if StringManager.is_empty(aws_path):
                 raise InputWarning
             # 転送先
-            if len(local_path) < 1:
+            local_path = StringManager.strip(local_path)
+            if StringManager.is_empty(local_path):
+                raise InputWarning
+
+            if aws_path.endswith("/") != local_path.endswith("/"):
                 raise InputWarning
 
         except InputWarning as e:
             self.submit_button.set_looks_warning(e)
             raise
+
+        AWS.download(access_key, secret_key, bucket_name, aws_path, local_path)

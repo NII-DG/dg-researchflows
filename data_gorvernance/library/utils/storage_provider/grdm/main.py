@@ -4,7 +4,6 @@ import json
 
 from .models import UpdateArgs, upload
 from .api import get_project_registrations
-from ...config import path_config
 from ...error import MetadataNotExist
 
 
@@ -18,26 +17,6 @@ def get_project_id():
         return split_path[1]
     else:
         return None
-
-
-def all_sync_path(abs_root):
-    paths = []
-
-    # /home/jovyan/data
-    paths.append(os.path.join(abs_root, path_config.DATA))
-    # 暫定処置
-    os.makedirs(os.path.join(abs_root, path_config.DATA), exist_ok=True)
-
-    # /home/jovyan/data_gorvernance配下のworking以外
-    dg_dir = os.path.join(abs_root, path_config.DATA_GOVERNANCE)
-    contents = os.listdir(dg_dir)
-    contents.remove(path_config.WORKING)
-    paths.extend([
-        os.path.join(dg_dir, con)
-        for con in contents
-    ])
-
-    return paths
 
 
 def sync(token, base_url, project_id, abs_source, abs_root="/home/jovyan"):

@@ -223,7 +223,7 @@ class DMPGetter():
         message = ""
 
         token = self.token_form.value_input
-        token = StringManager.strip(token, remove_empty=True)
+        token = StringManager.strip(token, remove_empty=False)
         if not token:
             message = msg_config.get('form', 'none_input_value').format("GRDM Token")
             self.get_dmp_button.set_looks_warning(message)

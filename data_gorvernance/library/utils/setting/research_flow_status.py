@@ -70,7 +70,7 @@ def get_data_dir(working_file_path: str):
             raise Exception
     except Exception:
         raise Exception(f'## [INTERNAL ERROR] : don\'t get directory name of data')
-    return os.path.join(abs_root, path_config.DATA, subflow_type, data_dir_name)
+    return path_config.get_task_data_dir(abs_root, subflow_type, data_dir_name)
 
 
 class ResearchFlowStatusOperater(JsonFile):

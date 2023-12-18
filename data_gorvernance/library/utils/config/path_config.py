@@ -38,6 +38,10 @@ DG_LOG_FOLDER = os.path.join(DATA_GOVERNANCE, LOG, RESEARCHFLOW)
 DG_WORKING_FOLDER = os.path.join(DATA_GOVERNANCE, WORKING)
 DG_WORKING_RESEARCHFLOW_FOLDER = os.path.join(DG_WORKING_FOLDER, RESEARCHFLOW)
 
+def get_task_data_dir(abs_root, phase:str, data_dir_name:str):
+    """<root>/data/<phase>/<data_dir_name>"""
+    return os.path.join(abs_root, DATA, phase, data_dir_name)
+
 
 # File
 MAIN_NOTEBOOK = 'main.ipynb'

@@ -9,7 +9,7 @@ from ..task_director import TaskDirector, get_subflow_type_and_id
 from ..utils.widgets import Button, MessageBox
 from ..utils.package import MakePackage, OutputDirExistsException
 from ..utils.config import path_config, message as msg_config
-from ..utils.setting import Field, ResearchFlowStatusOperater
+from ..utils.setting import Field, get_data_dir
 from ..utils.checker import StringManager
 
 
@@ -31,18 +31,7 @@ class ExperimentPackageMaker(TaskDirector):
         self.make_package = MakePackage()
 
         # パッケージ作成場所
-        subflow_type, subflow_id = get_subflow_type_and_id(self.nb_working_file_path)
-        if not subflow_type or not subflow_id:
-            raise Exception(f'## [INTERNAL ERROR] : don\'t get subflow type or id.')
-        try:
-            rf_status_file = path_config.get_research_flow_status_file_path(self._abs_root_path)
-            rf_status = ResearchFlowStatusOperater(rf_status_file)
-            data_dir_name = rf_status.get_data_dir(subflow_type, subflow_id)
-            if data_dir_name is None:
-                raise Exception
-        except Exception:
-            raise Exception(f'## [INTERNAL ERROR] : don\'t get directory name of data')
-        self.output_dir = path_config.get_task_data_dir(self._abs_root_path, subflow_type, data_dir_name)
+        self.output_dir = get_data_dir(working_path)
 
         # フォームボックス
         self._form_box = pn.WidgetBox()

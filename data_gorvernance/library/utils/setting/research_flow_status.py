@@ -54,6 +54,25 @@ def get_subflow_type_and_id(working_file_path: str):
     return subflow_type, subflow_id
 
 
+def get_data_dir(working_file_path: str):
+    """該当するdataディレクトリまでの絶対パスを返す"""
+    working_file_path = os.path.normpath(working_file_path)
+    abs_root = path_config.get_abs_root_form_working_dg_file_path(working_file_path)
+
+    subflow_type, subflow_id = get_subflow_type_and_id(working_file_path)
+    if not subflow_type or not subflow_id:
+        raise Exception(f'## [INTERNAL ERROR] : don\'t get subflow type or id.')
+    try:
+        rf_status_file = path_config.get_research_flow_status_file_path(abs_root)
+        rf_status = ResearchFlowStatusOperater(rf_status_file)
+        data_dir_name = rf_status.get_data_dir(subflow_type, subflow_id)
+        if data_dir_name is None:
+            raise Exception
+    except Exception:
+        raise Exception(f'## [INTERNAL ERROR] : don\'t get directory name of data')
+    return os.path.join(abs_root, path_config.DATA, subflow_type, data_dir_name)
+
+
 class ResearchFlowStatusOperater(JsonFile):
 
     def __init__(self, file_path: str):

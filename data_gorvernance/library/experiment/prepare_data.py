@@ -11,6 +11,7 @@ from ..utils.config import path_config, message as msg_config
 from ..utils.error import InputWarning
 from ..utils.checker import StringManager
 from ..utils.storage_provider import AWS
+from ..utils.setting import get_data_dir
 
 
 # 本ファイルのファイル名
@@ -26,6 +27,7 @@ class DataPreparer(TaskDirector):
             working_path (str): [実行Notebookファイルパス]
         """
         super().__init__(working_path, notebook_name)
+        self.data_dir = get_data_dir(self.nb_working_file_path)
 
         # フォームボックス
         self._form_box = pn.WidgetBox()
@@ -42,7 +44,7 @@ class DataPreparer(TaskDirector):
         self.doing_task(script_file_name)
 
         # フォーム定義
-        self.aws_pre.define_aws_form()
+        self.aws_pre.define_aws_form(self.data_dir)
         self.aws_pre.set_submit_button_callback(self.aws_callback)
         # フォーム表示
         pn.extension()
@@ -121,21 +123,25 @@ class AWSPreparer():
             width=600
         )
         self.local_path_form = pn.widgets.TextInput(
-            width=400
+            width=400,
+            margin=(0, 10)
         )
         self.submit_button = Button()
         self.submit_button.width = 600
         self.submit_button.set_looks_init("実行")
 
-    def define_aws_form(self):
+    def define_aws_form(self, data_dir):
+        self.local_path_form.value = data_dir
+        self.local_path_form.value_input = data_dir
         # display
         self._form_box.append(self.access_key_form)
         self._form_box.append(self.secret_key_form)
         self._form_box.append(self.bucket_form)
         self._form_box.append(self.aws_path_form)
-        self._form_box.append('### 転送先')
-        row = pn.Row(f"{os.environ['HOME']}", self.local_path_form)
-        self._form_box.append(row)
+        title = pn.pane.Markdown('転送先（ローカル）', margin=(0, 10))
+        path_text = pn.pane.Markdown(f"{os.environ['HOME']}", margin=(0, 0, 0, 5))
+        widgets = pn.Column(title, pn.Row(path_text, self.local_path_form, margin=(0, 10)))
+        self._form_box.append(widgets)
 
     def set_submit_button_callback(self, func):
         self.submit_button.on_click(func)
@@ -193,4 +199,5 @@ class AWSPreparer():
             self.submit_button.set_looks_warning(e)
             raise
 
+        local_path = os.path.join(os.environ['HOME'], local_path)
         AWS.download(access_key, secret_key, bucket_name, aws_path, local_path)

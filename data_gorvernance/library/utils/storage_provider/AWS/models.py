@@ -4,6 +4,12 @@ import boto3
 
 
 def download_file(s3_client, bucket_name:str, aws_path:str, local_path:str):
+    # エラーハンドリングの統一のため値の整合性確認
+    response = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=aws_path)
+    try:
+        contents = response['Contents']
+    except KeyError:
+        raise FileNotFoundError
     if os.path.exists(local_path):
         raise FileExistsError
     os.makedirs(os.path.dirname(local_path))
@@ -20,7 +26,12 @@ def download_dir(s3_client, bucket_name:str, aws_dir:str, local_dir:str):
         else:
             response = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=aws_dir, ContinuationToken=next_token)
 
-        for s3_object_response in response['Contents']:
+        try:
+            contents = response['Contents']
+        except KeyError:
+            raise FileNotFoundError
+
+        for s3_object_response in contents:
             # S3オブジェクト側のファイルパスを取得する
             s3_file_path = s3_object_response['Key']
 

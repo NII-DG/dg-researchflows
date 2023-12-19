@@ -4,6 +4,7 @@ import re
 
 import panel as pn
 from IPython.display import display
+from botocore.exceptions import ClientError
 
 from ..task_director import TaskDirector
 from ..utils.widgets import Button, MessageBox
@@ -56,6 +57,7 @@ class DataPreparer(TaskDirector):
     @TaskDirector.callback_form("aws_preparer")
     def aws_callback(self, event):
         self.aws_pre.submit_button.set_looks_processing()
+        self._msg_output.clear()
         try:
             self.aws_pre.get_data()
 
@@ -64,9 +66,13 @@ class DataPreparer(TaskDirector):
             return
         except Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self.aws_pre.submit_button.set_looks_error(msg_config.get('prepare_data', 'submit'))
             self._msg_output.update_error(message)
             self.log.error(message)
             return
+
+        self._form_box.clear()
+        self._msg_output.update_success(msg_config.get('prepare_data', 'success'))
 
 
     @TaskDirector.task_cell("2")
@@ -137,7 +143,11 @@ class AWSPreparer():
 
     def define_aws_form(self, data_dir: str):
         home_path = os.environ['HOME']
+        if not home_path.endswith("/"):
+            home_path += "/"
         data_dir = data_dir.replace(home_path, '')
+        if not data_dir.endswith("/"):
+            data_dir += "/"
         self.local_path_form.value = data_dir
         self.local_path_form.value_input = data_dir
         # display
@@ -185,7 +195,7 @@ class AWSPreparer():
             bucket_name = StringManager.strip(bucket_name)
             if StringManager.is_empty(bucket_name):
                 raise InputWarning(requred_msg.format(self.bucket_title))
-            if re.fullmatch(r'^[a-z0-9][a-z0-9\.-]{1,61}[a-z0-9]$', bucket_name):
+            if not re.fullmatch(r'^[a-z0-9][a-z0-9\.-]{1,61}[a-z0-9]$', bucket_name):
                 # 以下の条件を満たさない場合エラー
                 #   3文字以上63文字以下
                 #   小文字・数字・ドット・ハイフンのみ
@@ -215,6 +225,25 @@ class AWSPreparer():
         try:
             AWS.download(access_key, secret_key, bucket_name, aws_path, local_path)
         except FileExistsError as e:
-            self._msg_output.update_warning(msg_config.get('prepare_data', 'path_warning'))
+            # 転送先が既に存在する
+            self._msg_output.update_warning(msg_config.get('prepare_data', 'local_path_exist'))
             self.submit_button.set_looks_warning(invalid_msg.format(self.local_path_title))
             raise InputWarning(str(e))
+        except FileNotFoundError as e:
+            # 転送元が存在しない
+            self._msg_output.update_warning(msg_config.get('prepare_data', 'aws_file_not_found'))
+            self.submit_button.set_looks_warning(invalid_msg.format(self.aws_path_title))
+            raise InputWarning(str(e))
+        except ClientError as e:
+            if e.response["ResponseMetadata"]["HTTPStatusCode"] == 403:
+                # アクセスキーかシークレットキーが間違っている
+                self._msg_output.update_warning(msg_config.get('prepare_data', 'aws_unauthorized'))
+                self.submit_button.set_looks_warning(msg_config.get('prepare_data', 'invalid'))
+                raise InputWarning(str(e))
+            elif e.response['Error']['Code'] == 'NoSuchBucket':
+                # バケットが存在しない
+                self._msg_output.update_warning(msg_config.get('prepare_data', 'bucket_not_found'))
+                self.submit_button.set_looks_warning(invalid_msg.format(self.bucket_title))
+                raise InputWarning(str(e))
+            else:
+                raise

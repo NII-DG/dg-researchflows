@@ -81,6 +81,7 @@ class DataPreparer(TaskDirector):
         self.doing_task(script_file_name)
 
         # フォーム定義
+        self._msg_output.update_warning("開発中")
         # フォーム表示
         pn.extension()
         form_section = pn.WidgetBox()

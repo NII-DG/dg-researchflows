@@ -60,7 +60,7 @@ class DataPreparer(TaskDirector):
             self.aws_pre.get_data()
 
         except InputWarning as e:
-            self.log.warning(e)
+            self.log.warning(str(e))
             return
         except Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
@@ -98,39 +98,46 @@ class DataPreparer(TaskDirector):
 
 class AWSPreparer():
 
-    def __init__(self, form_box, message_box) -> None:
+    def __init__(self, form_box, message_box:MessageBox) -> None:
         self._form_box = form_box
         self._msg_output = message_box
 
         # define widgets
+        self.access_key_title = msg_config.get('prepare_data', 'access_key_title')
         self.access_key_form = pn.widgets.PasswordInput(
-            name="アクセスキー",
+            name=self.access_key_title,
             width=600,
             max_length=20
         )
+        self.secret_key_title = msg_config.get('prepare_data', 'secret_key_title')
         self.secret_key_form = pn.widgets.PasswordInput(
-            name="シークレットキー",
+            name=self.secret_key_title,
             width=600,
             max_length=40
         )
+        self.bucket_title = msg_config.get('prepare_data', 'bucket_title')
         self.bucket_form = pn.widgets.TextInput(
-            name="バケット",
+            name=self.bucket_title,
             width=600,
             max_length=63
         )
+        self.aws_path_title = msg_config.get('prepare_data', 'aws_path_title')
         self.aws_path_form = pn.widgets.TextInput(
-            name="転送元データパス（AWS）",
+            name=self.aws_path_title,
             width=600
         )
+        self.local_path_title = msg_config.get('prepare_data', 'local_path_title')
         self.local_path_form = pn.widgets.TextInput(
             width=400,
             margin=(0, 10)
         )
         self.submit_button = Button()
         self.submit_button.width = 600
-        self.submit_button.set_looks_init("実行")
+        self.submit_button.set_looks_init(msg_config.get('prepare_data', 'submit'))
 
-    def define_aws_form(self, data_dir):
+    def define_aws_form(self, data_dir: str):
+        home_path = os.environ['HOME']
+        data_dir = data_dir.replace(home_path, '')
         self.local_path_form.value = data_dir
         self.local_path_form.value_input = data_dir
         # display
@@ -138,10 +145,11 @@ class AWSPreparer():
         self._form_box.append(self.secret_key_form)
         self._form_box.append(self.bucket_form)
         self._form_box.append(self.aws_path_form)
-        title = pn.pane.Markdown('転送先（ローカル）', margin=(0, 10))
-        path_text = pn.pane.Markdown(f"{os.environ['HOME']}", margin=(0, 0, 0, 5))
+        title = pn.pane.Markdown(self.local_path_title, margin=(0, 10))
+        path_text = pn.pane.Markdown(f"{home_path}", margin=(0, 0, 0, 5))
         widgets = pn.Column(title, pn.Row(path_text, self.local_path_form, margin=(0, 10)))
         self._form_box.append(widgets)
+        self._form_box.append(self.submit_button)
 
     def set_submit_button_callback(self, func):
         self.submit_button.on_click(func)
@@ -153,51 +161,60 @@ class AWSPreparer():
         aws_path = self.aws_path_form.value_input
         local_path = self.local_path_form.value_input
 
+        requred_msg = msg_config.get('prepare_data', 'required_format')
+        invalid_msg = msg_config.get('prepare_data', 'invalid_format')
+
         try:
             # アクセスキー
             access_key = StringManager.strip(access_key, remove_empty=False)
             if StringManager.is_empty(access_key):
-                raise InputWarning
+                raise InputWarning(requred_msg.format(self.access_key_title))
             if len(access_key) != 20:
-                raise InputWarning
+                raise InputWarning(invalid_msg.format(self.access_key_title))
             if StringManager.has_whitespace(access_key):
-                raise InputWarning
+                raise InputWarning(invalid_msg.format(self.access_key_title))
             # シークレットキー
             secret_key = StringManager.strip(secret_key, remove_empty=False)
             if StringManager.is_empty(secret_key):
-                raise InputWarning
+                raise InputWarning(requred_msg.format(self.secret_key_title))
             if len(secret_key) != 40:
-                raise InputWarning
+                raise InputWarning(invalid_msg.format(self.secret_key_title))
             if StringManager.has_whitespace(secret_key):
-                raise InputWarning
+                raise InputWarning(invalid_msg.format(self.secret_key_title))
             # バケット名
             bucket_name = StringManager.strip(bucket_name)
             if StringManager.is_empty(bucket_name):
-                raise InputWarning
+                raise InputWarning(requred_msg.format(self.bucket_title))
             if re.fullmatch(r'^[a-z0-9][a-z0-9\.-]{1,61}[a-z0-9]$', bucket_name):
                 # 以下の条件を満たさない場合エラー
                 #   3文字以上63文字以下
                 #   小文字・数字・ドット・ハイフンのみ
                 #   先頭と末尾は小文字か数字のみ
-                raise InputWarning
+                raise InputWarning(invalid_msg.format(self.bucket_title))
             if re.search(r'\.{2,}', bucket_name):
                 # ドットが連続する場合エラー
-                raise InputWarning
+                raise InputWarning(invalid_msg.format(self.bucket_title))
             # 転送元データパス（AWS）
             aws_path = StringManager.strip(aws_path)
             if StringManager.is_empty(aws_path):
-                raise InputWarning
+                raise InputWarning(requred_msg.format(self.aws_path_title))
             # 転送先
             local_path = StringManager.strip(local_path)
             if StringManager.is_empty(local_path):
-                raise InputWarning
+                raise InputWarning(requred_msg.format(self.aws_path_title))
 
             if aws_path.endswith("/") != local_path.endswith("/"):
-                raise InputWarning
+                self._msg_output.update_warning(msg_config.get('prepare_data', 'path_warning'))
+                raise InputWarning(msg_config.get('prepare_data', 'invalid'))
 
         except InputWarning as e:
-            self.submit_button.set_looks_warning(e)
+            self.submit_button.set_looks_warning(str(e))
             raise
 
         local_path = os.path.join(os.environ['HOME'], local_path)
-        AWS.download(access_key, secret_key, bucket_name, aws_path, local_path)
+        try:
+            AWS.download(access_key, secret_key, bucket_name, aws_path, local_path)
+        except FileExistsError as e:
+            self._msg_output.update_warning(msg_config.get('prepare_data', 'path_warning'))
+            self.submit_button.set_looks_warning(invalid_msg.format(self.local_path_title))
+            raise InputWarning(str(e))

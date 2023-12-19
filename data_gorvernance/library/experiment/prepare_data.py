@@ -185,7 +185,7 @@ class AWSPreparer():
                 raise InputWarning(invalid_msg.format(self.access_key_title))
             if StringManager.has_whitespace(access_key):
                 raise InputWarning(invalid_msg.format(self.access_key_title))
-            # シークレットキー
+            # シークレットアクセスキー
             secret_key = StringManager.strip(secret_key, remove_empty=False)
             if StringManager.is_empty(secret_key):
                 raise InputWarning(requred_msg.format(self.secret_key_title))
@@ -242,7 +242,7 @@ class AWSPreparer():
             raise InputWarning(str(e))
         except ClientError as e:
             if e.response["ResponseMetadata"]["HTTPStatusCode"] == 403:
-                # アクセスキーかシークレットキーが間違っている
+                # アクセスキーかシークレットアクセスキーが間違っている
                 self._msg_output.update_warning(msg_config.get('prepare_data', 'aws_unauthorized'))
                 self.submit_button.set_looks_warning(msg_config.get('prepare_data', 'invalid'))
                 raise InputWarning(str(e))

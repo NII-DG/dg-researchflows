@@ -12,7 +12,7 @@ def download_file(s3_client, bucket_name:str, aws_path:str, local_path:str):
         raise FileNotFoundError
     if os.path.exists(local_path):
         raise FileExistsError
-    os.makedirs(os.path.dirname(local_path))
+    os.makedirs(os.path.dirname(local_path), exist_ok=True)
     s3_client.download_file(bucket_name, aws_path, local_path)
 
 

@@ -245,5 +245,10 @@ class AWSPreparer():
                 self._msg_output.update_warning(msg_config.get('prepare_data', 'bucket_not_found'))
                 self.submit_button.set_looks_warning(invalid_msg.format(self.bucket_title))
                 raise InputWarning(str(e))
+            elif e.response["ResponseMetadata"]["HTTPStatusCode"] == 404:
+                # 転送元が存在しない
+                self._msg_output.update_warning(msg_config.get('prepare_data', 'aws_file_not_found'))
+                self.submit_button.set_looks_warning(invalid_msg.format(self.aws_path_title))
+                raise InputWarning(str(e))
             else:
                 raise

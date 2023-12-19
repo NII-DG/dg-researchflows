@@ -175,6 +175,7 @@ class AWSPreparer():
         requred_msg = msg_config.get('prepare_data', 'required_format')
         invalid_msg = msg_config.get('prepare_data', 'invalid_format')
 
+        # 入力項目の確認
         try:
             # アクセスキー
             access_key = StringManager.strip(access_key, remove_empty=False)
@@ -222,9 +223,11 @@ class AWSPreparer():
             self.submit_button.set_looks_warning(str(e))
             raise
 
+        # 先頭に/がある場合joinで失敗するので確認
         if local_path.startswith("/"):
             local_path.replace("/", '')
         local_path = os.path.join(os.environ['HOME'], local_path)
+        # データ取得
         try:
             AWS.download(access_key, secret_key, bucket_name, aws_path, local_path)
         except FileExistsError as e:

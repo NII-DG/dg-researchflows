@@ -222,6 +222,8 @@ class AWSPreparer():
             self.submit_button.set_looks_warning(str(e))
             raise
 
+        if local_path.startswith("/"):
+            local_path.replace("/", '')
         local_path = os.path.join(os.environ['HOME'], local_path)
         try:
             AWS.download(access_key, secret_key, bucket_name, aws_path, local_path)

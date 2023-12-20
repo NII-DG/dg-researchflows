@@ -99,36 +99,27 @@ class ExperimentEnvBuilder(TaskDirector):
                 # ボタンを作成
                 #button = pn.widgets.Button(name='Click me!', button_type='primary')
 
-                # メッセージとボタンを同時に表示
+                md = pn.pane.Markdown( message )
                 self._template_form_box.extend(
-                    pn.Column(message)
+                    pn.Column( md,self.get_ocs_template_button_object() )
                 )
                 self._form_box.append(self._template_form_box)
-
+                self._msg_output.update_success( self.template_link )
             else:
                 # OCSテンプレートを利用して構築する。
                 message = msg_config.get('select_ocs_template', 'use_ocs_template') \
-                            + '\n' \
+                            + '<br>' \
                             + msg_config.get('select_ocs_template', 'success') 
 
                 #self._msg_output.update_success( message )
 
-                relative_url = get_return_sub_flow_menu_relative_url_path(self.nb_working_file_path)
-                self.template_link = relative_url + "/data_gorvernance/working/researchflow/plan/task/plan/ocs-templates/" + self.template_path
-
-                # メッセージを作成
-                #message = pn.pane.Markdown("## これはメッセージです")
-
-                # ボタンを作成
-                button = pn.widgets.Button(name='Click me!', button_type='primary')
-
-                # メッセージとボタンを同時に表示
+                relative_url = "../../../../.."
+                self.template_link = relative_url + "/working/researchflow/plan/task/plan/ocs-templates/" + self.template_path
+                self._msg_output.update_success( self.template_link )
+                md = pn.pane.Markdown( message )
                 self._template_form_box.extend(
-                    pn.Column(message, button)
+                    pn.Column( md,self.get_ocs_template_button_object() )
                 )
-
-
-
                 self._form_box.append(self._template_form_box)
                 
             #if self.template_link:
@@ -149,8 +140,8 @@ class ExperimentEnvBuilder(TaskDirector):
             #display(Javascript('IPython.notebook.save_checkpoint();'))
             
         except Exception:
-            #message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
-            message = f' selected ={ print(self.selected)} ConstructionProcedureId = {print(self.ConstructionProcedureId)} template_path = {print(self.template_path)}'
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            #message = f' selected ={ print(self.selected)} ConstructionProcedureId = {print(self.ConstructionProcedureId)} template_path = {print(self.template_path)}'
             self._msg_output.update_error( message )
             return
 
@@ -163,11 +154,11 @@ class ExperimentEnvBuilder(TaskDirector):
             [panel.pane.HTML]: [HTMLオブジェクト]
         """
         button_width = 500
-        ocs_template_link = self.template_link
         ocs_template_link_button = pn.pane.HTML()
         ocs_template_link_button.object = create_button(
-            url={ocs_template_link},
+            url=self.template_link,
             msg=msg_config.get('select_ocs_template', 'go_template_link'),
+            target='_blank',
             button_width=f'{button_width}px'
         )
         ocs_template_link_button.width = button_width

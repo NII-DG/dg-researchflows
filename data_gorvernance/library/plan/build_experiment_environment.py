@@ -72,9 +72,7 @@ class ExperimentEnvBuilder(TaskDirector):
         
     def set_templatelink_form(self):
         try:
-            #pn.extension()
             self._msg_output.clear()
-            #self._form_box.clear()
             self._template_form_box.clear()
 
             self.ConstructionProcedureId = self.ocs_template.get_id(self.selected)
@@ -90,55 +88,28 @@ class ExperimentEnvBuilder(TaskDirector):
                             + '\n' \
                             + msg_config.get('select_ocs_template', 'success') 
 
-                #self._msg_output.update_success( message )
                 self.template_link = self.template_path
-                
-                # メッセージを作成
-                #message = pn.pane.Markdown("## これはメッセージです")
-
-                # ボタンを作成
-                #button = pn.widgets.Button(name='Click me!', button_type='primary')
 
                 md = pn.pane.Markdown( message )
                 self._template_form_box.extend(
                     pn.Column( md,self.get_ocs_template_button_object() )
                 )
                 self._form_box.append(self._template_form_box)
-                self._msg_output.update_success( self.template_link )
+
             else:
                 # OCSテンプレートを利用して構築する。
                 message = msg_config.get('select_ocs_template', 'use_ocs_template') \
                             + '<br>' \
                             + msg_config.get('select_ocs_template', 'success') 
 
-                #self._msg_output.update_success( message )
+                self.template_link = "../../../../../working/researchflow/plan/task/plan/ocs-templates/" + self.template_path
 
-                relative_url = "../../../../.."
-                self.template_link = relative_url + "/working/researchflow/plan/task/plan/ocs-templates/" + self.template_path
-                self._msg_output.update_success( self.template_link )
                 md = pn.pane.Markdown( message )
                 self._template_form_box.extend(
                     pn.Column( md,self.get_ocs_template_button_object() )
                 )
                 self._form_box.append(self._template_form_box)
                 
-            #if self.template_link:
-            #    self.field_list = pn.widgets.Button(
-            #        name=msg_config.get('select_ocs_template', 'go_template_link'),
-            #        button_type='primary',
-            #        width=600
-            #    )
-            #    self._template_form_box.append(self.field_list)
-
-            #self.return_ocs_template_button()
-
-            # ボタンを作成
-
-            #button.on_click( webbrowser.open('http://www.google.com') )
-            #button.servable()
-            #display(self.ocs_template_link_button)
-            #display(Javascript('IPython.notebook.save_checkpoint();'))
-            
         except Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
             #message = f' selected ={ print(self.selected)} ConstructionProcedureId = {print(self.ConstructionProcedureId)} template_path = {print(self.template_path)}'
@@ -163,20 +134,6 @@ class ExperimentEnvBuilder(TaskDirector):
         )
         ocs_template_link_button.width = button_width
         return ocs_template_link_button
-
-    # ここではログを吐かない
-    def return_ocs_template_button(self):
-        pn.extension()
-        #self.ocs_template_link_button  = self.get_ocs_template_button_object()
-        # メッセージを作成
-        message = pn.pane.Markdown("## これはメッセージです")
-
-        # ボタンを作成
-        button = pn.widgets.Button(name=msg_config.get('select_ocs_template', 'go_template_link'), button_type='primary')
-        button.on_click( webbrowser.open('http://www.google.com') )
-
-        # メッセージとボタンを同時に表示
-        pn.Column(message, button).servable()
 
     @TaskDirector.task_cell("1")
     def generateFormScetion(self):

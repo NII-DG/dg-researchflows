@@ -90,6 +90,7 @@ class ShowCollaborator:
         self._form_box.append(self.token_form)
         if not self.project_id:
             self._form_box.append(self.project_form)
+        self.submit_button.set_looks_init()
         self._form_box.append(self.submit_button)
 
     def set_submit_button_callback(self, func):

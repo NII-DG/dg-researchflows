@@ -80,12 +80,16 @@ class ExperimentEnvBuilder(TaskDirector):
 
             if self.ConstructionProcedureId == "T001":
                 # 解析基盤をそのまま利用
-                self._msg_output.update_success( msg_config.get('select_ocs_template', 'use_computing_service'))
+                md = pn.pane.Markdown( msg_config.get('select_ocs_template', 'use_computing_service') )
+                self._template_form_box.extend(
+                    pn.Column( md,self.get_ocs_template_button_object() )
+                )
+                self._form_box.append(self._template_form_box)
 
             elif self.ConstructionProcedureId == "T999":
                 # ポータブル版VCCを利用して構築する。
                 message = msg_config.get('select_ocs_template', 'use_portable_vcc') \
-                            + '\n' \
+                            + '<br>' \
                             + msg_config.get('select_ocs_template', 'success') 
 
                 self.template_link = self.template_path

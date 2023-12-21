@@ -51,6 +51,7 @@ class CollaboratorManager(TaskDirector):
 
     @TaskDirector.callback_form("show_collaborator")
     def show_collaborator_callback(self, event):
+        self.show_col.submit_button.set_looks_processing()
         try:
             self.show_col.get_collaborators()
         except InputWarning as e:
@@ -98,7 +99,7 @@ class ShowCollaborator:
 
     def get_collaborators(self):
         """メイン処理"""
-        token = self.token_form
+        token = self.token_form.value_input
 
         try:
             # token

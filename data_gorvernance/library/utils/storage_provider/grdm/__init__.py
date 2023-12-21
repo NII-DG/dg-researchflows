@@ -1,5 +1,4 @@
-from .api import get_projects
-from .main import get_project_id, all_sync_path, sync, get_project_metadata
+from .main import get_project_id, get_projects_list, sync, get_project_metadata, get_collaborator_list
 
 from urllib import parse
 

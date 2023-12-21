@@ -229,7 +229,7 @@ class DMPGetter():
             self.get_dmp_button.set_looks_warning(message)
             return False, message
         if StringManager.has_whitespace(token):
-            message = msg_config.get('form', 'must_not_space').format("GRDM Token")
+            message = msg_config.get('form', 'token_invalid').format("GRDM Token")
             self.get_dmp_button.set_looks_warning(message)
             return False, message
         self.token = token

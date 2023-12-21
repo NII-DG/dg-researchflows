@@ -4,7 +4,7 @@ import panel as pn
 from IPython.display import display
 
 from ..task_director import TaskDirector
-from ..utils.storage_provider import grdm
+from ..utils.save import all_sync_path
 
 # 本ファイルのファイル名
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
@@ -26,7 +26,7 @@ class DataSaver(TaskDirector):
         self.doing_task(script_file_name)
 
         # フォーム定義
-        source = grdm.all_sync_path(self._abs_root_path)
+        source = all_sync_path(self._abs_root_path)
         self.define_save_form(source, script_file_name)
         # フォーム表示
         pn.extension()

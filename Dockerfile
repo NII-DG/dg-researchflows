@@ -30,6 +30,7 @@ RUN pip install --no-cache chardet==4.0.0
 RUN pip install --no-cache panel==1.3.0
 RUN pip install --no-cache python-magic==0.4.27
 RUN pip install --no-cache natsort==8.3.1
+RUN pip install --no-cache pandas
 RUN pip install --no-cache git+https://github.com/nbgallery/ipyparams
 RUN pip install --no-cache git+https://github.com/RCOSDP/rdmclient.git
 RUN pip install --no-cache git+https://github.com/NII-DG/nii-dg.git@230419_8c684da

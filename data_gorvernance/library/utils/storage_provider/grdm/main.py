@@ -2,9 +2,8 @@ import os
 from urllib.parse import urlparse
 import json
 
-from .models import UpdateArgs, upload
-from .api import get_project_registrations
-from ...config import path_config
+from .client import UpdateArgs, upload
+from .api import get_projects, get_project_registrations, get_project_collaborators
 from ...error import MetadataNotExist
 
 
@@ -20,24 +19,16 @@ def get_project_id():
         return None
 
 
-def all_sync_path(abs_root):
-    paths = []
+def get_projects_list(scheme, domain, token):
+    """プロジェクトの一覧を取得する
 
-    # /home/jovyan/data
-    paths.append(os.path.join(abs_root, path_config.DATA))
-    # 暫定処置
-    os.makedirs(os.path.join(abs_root, path_config.DATA), exist_ok=True)
-
-    # /home/jovyan/data_gorvernance配下のworking以外
-    dg_dir = os.path.join(abs_root, path_config.DATA_GOVERNANCE)
-    contents = os.listdir(dg_dir)
-    contents.remove(path_config.WORKING)
-    paths.extend([
-        os.path.join(dg_dir, con)
-        for con in contents
-    ])
-
-    return paths
+    Raises:
+        UnauthorizedError: 認証エラー
+        requests.exceptions.RequestException: 通信エラー
+    """
+    response = get_projects(scheme, domain, token)
+    data = response['data']
+    return {d['id']: d['attributes']['title'] for d in data}
 
 
 def sync(token, base_url, project_id, abs_source, abs_root="/home/jovyan"):
@@ -69,12 +60,14 @@ def sync(token, base_url, project_id, abs_source, abs_root="/home/jovyan"):
             )
     upload(token, base_url, arg)
 
+
 def get_project_metadata(scheme, domain, token, project_id):
     metadata = get_project_registrations(scheme, domain, token, project_id)
     if len(metadata['data']) < 1:
         raise MetadataNotExist
 
     return format_metadata(metadata)
+
 
 def format_metadata(metadata):
 
@@ -106,3 +99,13 @@ def format_metadata(metadata):
         first_value_item['grdm-files'] = second_value
         first_value.append(first_value_item)
     return {'dmp': first_value}
+
+
+def get_collaborator_list(scheme, domain, token, project_id):
+    response = get_project_collaborators(scheme, domain, token, project_id)
+    data = response['data']
+    return {
+        d['embeds']['users']['data']['attributes']['full_name']: d['attributes']['permission']
+        for d in data
+    }
+

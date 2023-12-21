@@ -1,3 +1,4 @@
+import os
 import traceback
 from requests.exceptions import RequestException
 
@@ -10,6 +11,27 @@ from .time import TimeDiff
 from .log import TaskLog
 from .error import UnauthorizedError
 from .checker import StringManager
+
+
+def all_sync_path(abs_root):
+    paths = []
+
+    # /home/jovyan/data
+    paths.append(os.path.join(abs_root, path_config.DATA))
+    # 暫定処置
+    os.makedirs(os.path.join(abs_root, path_config.DATA), exist_ok=True)
+
+    # /home/jovyan/data_gorvernance配下のworking以外
+    dg_dir = os.path.join(abs_root, path_config.DATA_GOVERNANCE)
+    contents = os.listdir(dg_dir)
+    contents.remove(path_config.WORKING)
+    paths.extend([
+        os.path.join(dg_dir, con)
+        for con in contents
+    ])
+
+    return paths
+
 
 class TaskSave(TaskLog):
 
@@ -72,13 +94,13 @@ class TaskSave(TaskLog):
             self._save_submit_button.set_looks_warning(message)
             return False
         if StringManager.has_whitespace(token):
-            message = msg_config.get('form', 'must_not_space').format("GRDM Token")
+            message = msg_config.get('form', 'token_invalid')
             self.log.warning(message)
             self._save_submit_button.set_looks_warning(message)
             return False
 
         try:
-            grdm.get_projects(
+            grdm.get_projects_list(
                 grdm.SCHEME, grdm.DOMAIN, token
             )
         except UnauthorizedError:
@@ -101,7 +123,7 @@ class TaskSave(TaskLog):
 
     def _project_id_form(self):
         self.save_msg_output.clear()
-        projects = grdm.get_projects(
+        projects = grdm.get_projects_list(
             grdm.SCHEME, grdm.DOMAIN, self.grdm_token
         )
 

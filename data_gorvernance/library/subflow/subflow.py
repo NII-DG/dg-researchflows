@@ -37,7 +37,10 @@ class SubFlowManager:
                 if not os.path.isfile(destination_file):
                     file.copy_file(source_file, destination_file)
                 # imagesのシンボリックリンク
-                source_images = os.path.join(source_dir, path_config.IMAGES)
+                source_images = os.path.join(
+                    path_config.get_abs_root_form_working_dg_file_path(root),
+                    path_config.DG_IMAGES_FOLDER
+                )
                 destination_images = os.path.join(destination_dir, path_config.IMAGES)
                 if not os.path.isdir(destination_images):
                     os.symlink(source_images, destination_images, target_is_directory=True)

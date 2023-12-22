@@ -47,7 +47,9 @@ class TaskSave(TaskLog):
         self.save_form_box = pn.WidgetBox()
         self.save_form_box.width = 900
         # 入力フォーム
-        self._save_form = pn.widgets.PasswordInput(name="GRDM Token", width=600)
+        self._save_form = pn.widgets.PasswordInput(
+            name=msg_config.get('form', 'token_title'),
+            width=600)
         self.save_form_box.append(self._save_form)
         # 確定ボタン
         self._save_submit_button = Button(width=600)
@@ -109,7 +111,7 @@ class TaskSave(TaskLog):
             self._save_submit_button.set_looks_warning(message)
             return False
         except RequestException:
-            message = msg_config.get('save', 'connection_error')
+            message = msg_config.get('DEFAULT', 'connection_error')
             self.log.error(message)
             self._save_submit_button.set_looks_error(message)
             return False

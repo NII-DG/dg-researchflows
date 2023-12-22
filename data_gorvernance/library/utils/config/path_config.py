@@ -105,4 +105,4 @@ def get_sub_flow_status_file_path(phase:str, subflow_id:str='')->str:
 
 # other method
 def get_prepare_file_name_list_for_subflow()->List[str]:
-    return [MENU_NOTEBOOK, STATUS_JSON, PROPERTY_JSON, IMAGES]
+    return [MENU_NOTEBOOK, STATUS_JSON, PROPERTY_JSON]

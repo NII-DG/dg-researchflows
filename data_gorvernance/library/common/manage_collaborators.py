@@ -62,7 +62,7 @@ class CollaboratorManager(TaskDirector):
             return
         except Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
-            self.show_col.submit_button.set_looks_error(msg_config.get('prepare_data', 'submit'))
+            self.show_col.submit_button.set_looks_error(msg_config.get('DEFAULT', 'unexpected_error'))
             self._msg_output.update_error(message)
             self.log.error(message)
             return
@@ -79,8 +79,9 @@ class ShowCollaborator:
 
         self.project_id = grdm.get_project_id()
         # define widgets
+        self.token_title = msg_config.get('form', 'token_title')
         self.token_form = pn.widgets.PasswordInput(
-            name=msg_config.get('form', 'token_title'),
+            name=self.token_title,
             width=600
         )
         self.project_form = pn.widgets.TextInput(name="Project ID", width=600)
@@ -105,7 +106,7 @@ class ShowCollaborator:
             # token
             token = StringManager.strip(token, remove_empty=True)
             if not token:
-                raise InputWarning(msg_config.get('save', 'empty_warning'))
+                raise InputWarning(msg_config.get('form', 'none_input_value').format(self.token_title))
             if StringManager.has_whitespace(token):
                 raise InputWarning(msg_config.get('form', 'token_invalid'))
             # priject id
@@ -126,7 +127,7 @@ class ShowCollaborator:
             self.submit_button.set_looks_warning(message)
             raise InputWarning(message)
         except RequestException:
-            message = msg_config.get('save', 'connection_error')
+            message = msg_config.get('DEFAULT', 'connection_error')
             self.submit_button.set_looks_error(message)
             raise
         except Exception:

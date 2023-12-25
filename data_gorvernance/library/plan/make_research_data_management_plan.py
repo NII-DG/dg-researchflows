@@ -69,7 +69,7 @@ class DGPlaner(TaskDirector):
         try:
             self.dmp_getter.get_project_metadata(
                 scheme=grdm.SCHEME,
-                domain=grdm.DOMAIN
+                domain=grdm.API_DOMAIN
             )
             self.dmp_getter.make_select_dmp_form()
         except UnauthorizedError:

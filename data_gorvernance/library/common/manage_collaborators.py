@@ -6,6 +6,7 @@ from requests.exceptions import RequestException
 import panel as pn
 import pandas as pd
 from IPython.display import display
+from IPython.core.display import Javascript, HTML
 
 from ..task_director import TaskDirector
 from ..utils.widgets import Button, MessageBox
@@ -86,17 +87,29 @@ class ShowCollaborator:
         )
         self.project_form = pn.widgets.TextInput(name="Project ID", width=600)
         self.submit_button = Button(width=600)
+        self.link_button = Button(width=600)
 
     def define_form(self):
+        self.link_button.on_click(self.link_button_callback)
+        self.link_button.set_looks_init(msg_config.get('manage_collaborators', 'go_grdm'))
         # display
         self._form_box.append(self.token_form)
         if not self.project_id:
             self._form_box.append(self.project_form)
         self.submit_button.set_looks_init()
         self._form_box.append(self.submit_button)
+        self._form_box.append(self.link_button)
 
     def set_submit_button_callback(self, func):
         self.submit_button.on_click(func)
+
+    def link_button_callback(self, event):
+        if not self.project_id:
+            self._msg_output.update_error("don't have project id")
+        url = grdm.get_collaborator_url(grdm.SCHEME, grdm.DOMAIN, self.project_id)
+        script = f'window.open("{url}", "_blank");'
+        display(Javascript('IPython.notebook.save_checkpoint();'))
+        display(HTML(f'<script>{script}</script>'))
 
     def get_collaborators(self):
         """メイン処理"""
@@ -136,6 +149,7 @@ class ShowCollaborator:
             raise
 
         self.display_table(contents)
+        self._form_box.append(self.link_button)
 
 
     def display_table(self, contents:dict):

@@ -1,5 +1,5 @@
 import os
-from urllib.parse import urlparse
+from urllib import parse
 import json
 
 from .client import UpdateArgs, upload
@@ -12,7 +12,7 @@ def get_project_id():
     url = os.environ.get("BINDER_REPO_URL", "")
     if not url:
         return None
-    split_path = urlparse(url).path.split("/")
+    split_path = parse.urlparse(url).path.split("/")
     if "osfstorage" in split_path:
         return split_path[1]
     else:
@@ -109,3 +109,6 @@ def get_collaborator_list(scheme, domain, token, project_id):
         for d in data
     }
 
+def get_collaborator_url(scheme, domain, project_id):
+    sub_url = f'{project_id}/contributors/'
+    return parse.urlunparse((scheme, domain, sub_url, "", "", ""))

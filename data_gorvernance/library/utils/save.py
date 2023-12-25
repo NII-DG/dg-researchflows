@@ -103,7 +103,7 @@ class TaskSave(TaskLog):
 
         try:
             grdm.get_projects_list(
-                grdm.SCHEME, grdm.DOMAIN, token
+                grdm.SCHEME, grdm.API_DOMAIN, token
             )
         except UnauthorizedError:
             message = msg_config.get('form', 'token_unauthorized')
@@ -126,7 +126,7 @@ class TaskSave(TaskLog):
     def _project_id_form(self):
         self.save_msg_output.clear()
         projects = grdm.get_projects_list(
-            grdm.SCHEME, grdm.DOMAIN, self.grdm_token
+            grdm.SCHEME, grdm.API_DOMAIN, self.grdm_token
         )
 
         options =  dict()
@@ -179,7 +179,7 @@ class TaskSave(TaskLog):
                 self.save_msg_output.update_info(f'{msg} {i+1}/{size}')
                 grdm.sync(
                     token=self.grdm_token,
-                    base_url=grdm.BASE_URL,
+                    base_url=grdm.API_V2_BASE_URL,
                     project_id=self.project_id,
                     abs_source = path,
                     abs_root=self._abs_root_path

@@ -33,3 +33,4 @@ def get_project_registrations(scheme, domain, token, project_id):
         raise UnauthorizedError
     response.raise_for_status()
     return response.json()
+

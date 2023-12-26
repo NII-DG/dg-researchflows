@@ -209,7 +209,7 @@ class DMPGetter():
         self.form_box.append(self.get_dmp_button)
 
     def get_project_metadata(self, scheme, domain):
-
+        # token
         token = self.token_form.value_input
         token = StringManager.strip(token, remove_empty=True)
         if not token:
@@ -221,7 +221,7 @@ class DMPGetter():
             self.get_dmp_button.set_looks_warning(message)
             return False, message
         self.token = token
-
+        # project id
         if not self.project_id:
             project_id = self.project_form.value_input
             project_id = StringManager.strip(project_id)

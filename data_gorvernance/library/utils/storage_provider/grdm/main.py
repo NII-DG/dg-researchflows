@@ -1,6 +1,7 @@
 import os
 from urllib.parse import urlparse
 import json
+import requests
 
 from .models import UpdateArgs, upload
 from .api import get_project_registrations
@@ -82,12 +83,15 @@ def format_metadata(metadata):
     # {'dmp': first_value}
     first_value = []
     for data in datas:
+        url = data["relationships"]["registration_schema"]["links"]["related"]["href"]
+        schema = get_schema(url)
+
         # first_value = [first_value_item, ...]
         first_value_item = {'title': data['attributes']['title']}
         registration = data['attributes']['registration_responses']
         for key, value in registration.items():
             if key != 'grdm-files':
-                first_value_item[key] = value
+                first_value_item[key] = format_display_name(schema, "page1", key, value)
 
         files = json.loads(registration['grdm-files'])
         # {'dmp': {'grdm-files': second_value}}
@@ -96,13 +100,53 @@ def format_metadata(metadata):
             # second_value = [second_value_item, ...]
             second_value_item = {}
             second_value_item['path'] = file['path']
+            second_value_item.update(format_display_name(schema, "page2", 'grdm-files'))
             # {'dmp': {'grdm-files': {'metadata': third_value}}}
             third_value = {}
-            for key, value in file['metadata'].items():
-                third_value[key] = value['value']
+            for key, item in file['metadata'].items():
+                third_value[key] = item['value']
             second_value_item['metadata'] = third_value
             second_value.append(second_value_item)
 
         first_value_item['grdm-files'] = second_value
         first_value.append(first_value_item)
+
     return {'dmp': first_value}
+
+
+def get_schema(url):
+    response = requests.get(url=url)
+    response.raise_for_status()
+    return response.json()
+
+
+def format_display_name(schema, page_id, qid, value=None):
+    pages = schema["data"]["attributes"]["schema"]["pages"]
+    items = {}
+    for page in pages:
+        if page.get("id") == page_id:
+            continue
+
+        questions = page["questions"]
+        for question in questions:
+            if question.get("qid") != qid:
+                continue
+
+            items['label_jp'] = question.get("nav")
+            if value is None:
+                break
+            items['value'] = value
+
+            options = question.get("options", [])
+            for option in options:
+                if option.get("text") != value:
+                    continue
+                items['field_name_jp'] = option.get("tooltip")
+                break
+            break
+        break
+
+    return items
+
+
+

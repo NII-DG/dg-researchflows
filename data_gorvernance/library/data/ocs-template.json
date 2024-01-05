@@ -2,7 +2,7 @@
     "ocs_template": [
         {
             "id":"T001",
-            "ocs_template_name": "GRDMの解析基盤を利用する",
+            "ocs_template_name": "Gakunin RDMの解析基盤を利用する",
             "ocs_template_path": "",
             "is_active": true
         },
@@ -26,8 +26,8 @@
         },
         {
             "id":"T999",
-            "ocs_template_name": "独自の環境にOCSを構築して解析環境を作成する",
-            "ocs_template_path": "https://github.com/nii-gakunin-cloud/ocs-vcp-portable/blob/main/manual.md",
+            "ocs_template_name": "独自の環境(mdx)にポータブル版VCPを構築して解析環境を作成する",
+            "ocs_template_path": "http://163.220.176.50:8888/jupyter/notebooks/templates/TheLittlestJupyterHub/001-JupyterHub%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89.ipynb",
             "is_active": true
         }
     ]

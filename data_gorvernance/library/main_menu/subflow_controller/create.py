@@ -1,7 +1,10 @@
 import shutil
 import os
+import traceback
+from typing import Dict, List
 
 import panel as pn
+from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus
 
 from ...utils.nb_file import NbFile
 from ...utils import file
@@ -11,6 +14,126 @@ from ...utils.checker import StringManager
 
 class CreateSubflowForm(BaseSubflowForm):
     """サブフロー新規作成クラス"""
+
+    def __init__(self, abs_root, message_box) -> None:
+        super().__init__(abs_root, message_box)
+        research_flow_status = ResearchFlowStatus.load_from_json(self._research_flow_status_file_path)
+        sub_flow_type_options = self.generate_sub_flow_type_options(research_flow_status)
+
+        # 親サブフロー種別(フェーズ)オプション
+        parent_sub_flow_type_options = self.generate_parent_sub_flow_type_options(sub_flow_type_options[msg_config.get('form', 'selector_default')], research_flow_status)
+        # 親サブフロー種別(フェーズ)（必須)：シングルセレクト
+        self._parent_sub_flow_type_selector = pn.widgets.Select(
+            name=msg_config.get('main_menu', 'parent_sub_flow_type'),
+            options=parent_sub_flow_type_options,
+            value=parent_sub_flow_type_options[msg_config.get('form', 'selector_default')],
+            )
+        # 親サブフロー種別(フェーズ)のイベントリスナー
+        self._parent_sub_flow_type_selector.param.watch(self.callback_parent_sub_flow_type_selector, 'value')
+
+        # 親サブフロー選択オプション
+        parent_sub_flow_options = self.generate_parent_sub_flow_options(parent_sub_flow_type_options[msg_config.get('form', 'selector_default')], research_flow_status)
+        # 親サブフロー選択 : マルチセレクト
+        self._parent_sub_flow_selector = pn.widgets.MultiSelect(
+            name=msg_config.get('main_menu', 'parent_sub_flow_name'),
+            options=parent_sub_flow_options
+            )
+        # 親サブフロー選択のイベントリスナー
+        self._parent_sub_flow_selector.param.watch(self.callback_menu_form, 'value')
+
+    def generate_parent_sub_flow_type_options(self, pahase_seq_number:int, research_flow_status:List[PhaseStatus])->Dict[str, int]:
+        # 親サブフロー種別(フェーズ)オプション(表示名をKey、順序値をVauleとする)
+        pahse_options = {}
+        pahse_options['--'] = 0
+        if pahase_seq_number == 0:
+            return pahse_options
+        else:
+            for phase_status in research_flow_status:
+                if phase_status._seq_number < pahase_seq_number:
+                    pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
+        return pahse_options
+
+    # overwrite
+    def callback_sub_flow_type_selector(self, event):
+        # サブフロー種別(フェーズ):シングルセレクトコールバックファンクション
+        try:
+            # リサーチフローステータス管理情報の取得
+            research_flow_status = ResearchFlowStatus.load_from_json(self._research_flow_status_file_path)
+
+            selected_value = self._sub_flow_type_selector.value
+            if selected_value is None:
+                raise Exception('Sub Flow Type Selector has None')
+            # 親サブフロー種別(フェーズ)（必須)：シングルセレクトの更新
+            parent_sub_flow_type_options = self.generate_parent_sub_flow_type_options(selected_value, research_flow_status)
+            self._parent_sub_flow_type_selector.options = parent_sub_flow_type_options
+            # 新規作成ボタンのボタンの有効化チェック
+            self.change_diable_submit_button()
+        except Exception as e:
+            self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
+
+    def callback_parent_sub_flow_type_selector(self, event):
+        # 親サブフロー種別(フェーズ)のコールバックファンクション
+        try:
+            # リサーチフローステータス管理情報の取得
+            research_flow_status = ResearchFlowStatus.load_from_json(self._research_flow_status_file_path)
+
+            selected_value = self._parent_sub_flow_type_selector.value
+            if selected_value is None:
+                raise Exception('Parent Sub Flow Type Selector has None')
+
+            parent_sub_flow_options = self.generate_parent_sub_flow_options(selected_value, research_flow_status)
+            self._parent_sub_flow_selector.options = parent_sub_flow_options
+            # 新規作成ボタンのボタンの有効化チェック
+            self.change_diable_submit_button()
+        except Exception as e:
+            self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
+
+    # overwrite
+    def change_diable_submit_button(self):
+        # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
+
+        value = self._sub_flow_type_selector.value
+        if value is None:
+            self.submit_button.disabled = True
+            return
+        elif int(value) == 0:
+            self.submit_button.disabled = True
+            return
+
+        value = self._sub_flow_name_form.value_input
+        if value is None:
+            self.submit_button.disabled = True
+            return
+        elif len(value) < 1:
+            self.submit_button.disabled = True
+            return
+
+        value = self._data_dir_name_form.value_input
+        if value is None:
+            self.submit_button.disabled = True
+            return
+        elif len(value) < 1:
+            self.submit_button.disabled = True
+            return
+
+        value = self._parent_sub_flow_type_selector.value
+        if value is None:
+            self.submit_button.disabled = True
+            return
+        elif int(value) == 0:
+            self.submit_button.disabled = True
+            return
+
+        value = self._parent_sub_flow_selector.value
+        if value is None:
+            self.submit_button.disabled = True
+            return
+        elif len(value) < 1:
+            self.submit_button.disabled = True
+            return
+
+        self.submit_button.disabled = False
+        self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
 
     def define_input_form(self):
         """サブフロー新規作成フォーム"""
@@ -23,7 +146,6 @@ class CreateSubflowForm(BaseSubflowForm):
             self._parent_sub_flow_selector,
             self.submit_button
             )
-
 
     def main(self):
         """サブフロー新規作成処理"""

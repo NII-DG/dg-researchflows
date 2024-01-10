@@ -120,11 +120,22 @@ def get_schema(url):
     return response.json()
 
 
-def format_display_name(schema, page_id, qid, value=None):
+def format_display_name(schema: dict, page_id: str, qid: str, value=None):
+    """メタデータをフォーマットして返却する
+
+    Args:
+        schema (dict): メタデータのテンプレート
+        page_id (str): プロジェクトメタデータ("page1")、ファイルメタデータ("page2")
+        qid (str): メタデータのqid
+        value (optional): メタデータに設定された値. Defaults to None.
+
+    Returns:
+        dict: フォーマットされたメタデータの値
+    """
     pages = schema["data"]["attributes"]["schema"]["pages"]
     items = {}
     for page in pages:
-        if page.get("id") == page_id:
+        if page.get("id") != page_id:
             continue
 
         questions = page["questions"]

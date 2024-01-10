@@ -24,7 +24,7 @@ class DMPManager(JsonFile):
         dmp_str = f"### {dmp['title']}<br><hr><br>"
         for key, value in dmp.items():
             if key != "title" and key != 'grdm-files':
-                dmp_str += f'{key} : {value.get("label_jp")}<br>'
+                dmp_str += f'{value.get("label_jp")} : {value.get("value")}<br>'
         files = dmp['grdm-files']
         dmp_str += f'{files.get("label_jp")} :<br>'
         value = files.get("value")

@@ -27,7 +27,8 @@ class DMPManager(JsonFile):
                 dmp_str += f'{key} : {value.get("label_jp")}<br>'
         files = dmp['grdm-files']
         dmp_str += f'{files.get("label_jp")} :<br>'
-        for file in files:
+        value = files.get("value")
+        for file in value:
             dmp_str += f'&emsp;{file.get("path")}<br>'
         return dmp_str
 

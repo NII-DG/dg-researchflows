@@ -86,30 +86,27 @@ def format_metadata(metadata):
         url = data["relationships"]["registration_schema"]["links"]["related"]["href"]
         schema = get_schema(url)
 
-        # first_value = [first_value_item, ...]
-        first_value_item = {'title': data['attributes']['title']}
+        # first_value = [second_layer, ...]
+        second_layer = {'title': data['attributes']['title']}
         registration = data['attributes']['registration_responses']
         for key, value in registration.items():
             if key != 'grdm-files':
-                first_value_item[key] = format_display_name(schema, "page1", key, value)
+                second_layer[key] = format_display_name(schema, "page1", key, value)
 
         files = json.loads(registration['grdm-files'])
-        # {'dmp': {'grdm-files': second_value}}
-        second_value = []
+        # grdm-files > value
+        file_values = []
         for file in files:
-            # second_value = [second_value_item, ...]
-            second_value_item = {}
-            second_value_item['path'] = file['path']
-            second_value_item.update(format_display_name(schema, "page2", 'grdm-files'))
-            # {'dmp': {'grdm-files': {'metadata': third_value}}}
-            third_value = {}
+            file_datas = {}
+            file_datas['path'] = file['path']
+            file_metadata = {}
             for key, item in file['metadata'].items():
-                third_value[key] = item['value']
-            second_value_item['metadata'] = third_value
-            second_value.append(second_value_item)
+                file_metadata[key] = item['value']
+            file_datas['metadata'] = file_metadata
+            file_values.append(file_datas)
 
-        first_value_item['grdm-files'] = second_value
-        first_value.append(first_value_item)
+        second_layer['grdm-files'] = format_display_name(schema, "page2", 'grdm-files', file_values)
+        first_value.append(second_layer)
 
     return {'dmp': first_value}
 

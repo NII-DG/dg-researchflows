@@ -38,7 +38,7 @@ class BaseSubflowForm():
         # サブフロー名称オプション
         sub_flow_name_options = self.generate_sub_flow_name_options(sub_flow_type_options[msg_config.get('form', 'selector_default')], research_flow_status)
         # サブフロー名称：シングルセレクト
-        self._sub_flow_name_selector = pn.pn.widgets.Select(
+        self._sub_flow_name_selector = pn.widgets.Select(
             name="サブフロー選択（必須）",
             options=sub_flow_name_options,
             value=sub_flow_name_options[msg_config.get('form', 'selector_default')]

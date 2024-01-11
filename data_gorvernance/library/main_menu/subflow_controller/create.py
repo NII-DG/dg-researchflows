@@ -95,6 +95,7 @@ class CreateSubflowForm(BaseSubflowForm):
     # overwrite
     def change_disable_submit_button(self):
         # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
+        self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
 
         value = self._sub_flow_type_selector.value
         if value is None:
@@ -137,7 +138,6 @@ class CreateSubflowForm(BaseSubflowForm):
             return
 
         self.submit_button.disabled = False
-        self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
 
     def define_input_form(self):
         """サブフロー新規作成フォーム"""

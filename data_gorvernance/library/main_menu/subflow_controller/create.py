@@ -4,7 +4,7 @@ import traceback
 from typing import Dict, List
 
 import panel as pn
-from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus
+from dg_drawer.research_flow import PhaseStatus
 
 from ...utils.nb_file import NbFile
 from ...utils import file
@@ -17,7 +17,7 @@ class CreateSubflowForm(BaseSubflowForm):
 
     def __init__(self, abs_root, message_box) -> None:
         super().__init__(abs_root, message_box)
-        research_flow_status = ResearchFlowStatus.load_from_json(self._research_flow_status_file_path)
+        research_flow_status = self.reserch_flow_status_operater.load_research_flow_status()
         sub_flow_type_options = self.generate_sub_flow_type_options(research_flow_status)
 
         # 親サブフロー種別(フェーズ)オプション
@@ -53,12 +53,16 @@ class CreateSubflowForm(BaseSubflowForm):
                     pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
         return pahse_options
 
+    def change_submit_button_init(self, name):
+        self.submit_button.set_looks_init(name)
+        self.submit_button.icon = 'plus'
+
     # overwrite
     def callback_sub_flow_type_selector(self, event):
         # サブフロー種別(フェーズ):シングルセレクトコールバックファンクション
         try:
             # リサーチフローステータス管理情報の取得
-            research_flow_status = ResearchFlowStatus.load_from_json(self._research_flow_status_file_path)
+            research_flow_status = self.reserch_flow_status_operater.load_research_flow_status()
 
             selected_value = self._sub_flow_type_selector.value
             if selected_value is None:
@@ -75,7 +79,7 @@ class CreateSubflowForm(BaseSubflowForm):
         # 親サブフロー種別(フェーズ)のコールバックファンクション
         try:
             # リサーチフローステータス管理情報の取得
-            research_flow_status = ResearchFlowStatus.load_from_json(self._research_flow_status_file_path)
+            research_flow_status = self.reserch_flow_status_operater.load_research_flow_status()
 
             selected_value = self._parent_sub_flow_type_selector.value
             if selected_value is None:
@@ -168,7 +172,7 @@ class CreateSubflowForm(BaseSubflowForm):
             return
 
         # リサーチフローステータス管理JSONの更新
-        phase_name, new_sub_flow_id = self.reserch_flow_status_operater.update_research_flow_status(creating_phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
+        phase_name, new_sub_flow_id = self.reserch_flow_status_operater.create_sub_flow(creating_phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
 
         # /data/<phase_name>/<data_dir_name>の作成
         data_dir_path = ""

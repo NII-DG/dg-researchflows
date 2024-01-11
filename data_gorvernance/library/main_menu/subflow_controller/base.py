@@ -3,11 +3,12 @@ from typing import Dict, List
 import traceback
 
 import panel as pn
-from dg_drawer.research_flow import ResearchFlowStatus, PhaseStatus
+from dg_drawer.research_flow import PhaseStatus
 
 from ...utils.setting import ResearchFlowStatusOperater
 from ...utils.config import path_config, message as msg_config
 from ...utils.checker import StringManager
+from ...utils.widgets import Button
 
 
 class BaseSubflowForm():
@@ -16,11 +17,11 @@ class BaseSubflowForm():
     def __init__(self, abs_root, message_box) -> None:
         self.abs_root = abs_root
 
-        self._research_flow_status_file_path = path_config.get_research_flow_status_file_path(abs_root)
-        self.reserch_flow_status_operater = ResearchFlowStatusOperater(self._research_flow_status_file_path)
+        research_flow_status_file_path = path_config.get_research_flow_status_file_path(abs_root)
+        self.reserch_flow_status_operater = ResearchFlowStatusOperater(research_flow_status_file_path)
 
         # リサーチフローステータス管理情報の取得
-        research_flow_status = ResearchFlowStatus.load_from_json(self._research_flow_status_file_path)
+        research_flow_status = self.reserch_flow_status_operater.load_research_flow_status()
         self._err_output = message_box
 
         # サブフロー種別(フェーズ)オプション
@@ -60,7 +61,7 @@ class BaseSubflowForm():
         self._data_dir_name_form.param.watch(self.callback_menu_form, 'value')
 
         # 処理開始ボタン
-        self.submit_button = pn.widgets.Button(disabled=True)
+        self.submit_button = Button(disabled=True)
         self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
         self.submit_button.width = 500
 
@@ -108,30 +109,19 @@ class BaseSubflowForm():
         return pahse_options
 
     def change_submit_button_init(self, name):
-        self.submit_button.name = name
-        self.submit_button.button_type = 'primary'
-        self.submit_button.button_style = 'solid'
-        self.submit_button.icon = 'plus'
+        self.submit_button.set_looks_init(name)
 
     def change_submit_button_processing(self, name):
-        self.submit_button.name = name
-        self.submit_button.button_type = 'primary'
-        self.submit_button.button_style = 'outline'
+        self.submit_button.set_looks_processing(name)
 
     def change_submit_button_success(self, name):
-        self.submit_button.name = name
-        self.submit_button.button_type = 'success'
-        self.submit_button.button_style = 'solid'
+        self.submit_button.set_looks_success(name)
 
     def change_submit_button_warning(self, name):
-        self.submit_button.name = name
-        self.submit_button.button_type = 'warning'
-        self.submit_button.button_style = 'solid'
+        self.submit_button.set_looks_warning(name)
 
     def change_submit_button_error(self, name):
-        self.submit_button.name = name
-        self.submit_button.button_type = 'danger'
-        self.submit_button.button_style = 'solid'
+        self.submit_button.set_looks_error(name)
 
     ############
     # callback #
@@ -149,7 +139,7 @@ class BaseSubflowForm():
         # サブフロー種別(フェーズ):シングルセレクトコールバックファンクション
         try:
             # リサーチフローステータス管理情報の取得
-            research_flow_status = ResearchFlowStatus.load_from_json(self._research_flow_status_file_path)
+            research_flow_status = self.reserch_flow_status_operater.load_research_flow_status()
 
             selected_value = self._sub_flow_type_selector.value
             if selected_value is None:
@@ -164,6 +154,7 @@ class BaseSubflowForm():
 
     def callback_sub_flow_name_selector(self, event):
         # サブフロー名称：シングルセレクトコールバックファンクション
+        # relinkで継承するため個別処理
         try:
             # 新規作成ボタンのボタンの有効化チェック
             self.change_diable_submit_button()

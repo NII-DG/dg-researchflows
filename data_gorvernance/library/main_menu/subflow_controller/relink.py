@@ -6,6 +6,7 @@ from dg_drawer.research_flow import PhaseStatus
 
 from ...utils.config import path_config, message as msg_config
 from .base import BaseSubflowForm
+from ...utils.widgets import Alert
 
 class RelinkSubflowForm(BaseSubflowForm):
     """サブフロー間接続編集クラス"""
@@ -116,6 +117,10 @@ class RelinkSubflowForm(BaseSubflowForm):
 
     def define_input_form(self):
         """サブフロー間接続編集フォーム"""
+        sub_flow_type_list = self._sub_flow_type_selector.options
+        if len(sub_flow_type_list) < 1:
+            return Alert.warning(msg_config.get('main_menu','nothing_warning'))
+
         return pn.Column(
             f'### {msg_config.get("main_menu", "update_sub_flow_link_title")}',
             self._sub_flow_type_selector,

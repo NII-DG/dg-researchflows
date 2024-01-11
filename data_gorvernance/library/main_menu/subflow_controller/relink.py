@@ -35,7 +35,7 @@ class RelinkSubflowForm(BaseSubflowForm):
             # experimentはplanのみを親とするため
             if phase_status._seq_number == 2:
                 continue
-            if len(phase_status._sub_flow_data) > 1:
+            else:
                 pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
         return pahse_options
 

@@ -172,7 +172,11 @@ class CreateSubflowForm(BaseSubflowForm):
             return
 
         # リサーチフローステータス管理JSONの更新
-        phase_name, new_sub_flow_id = self.reserch_flow_status_operater.create_sub_flow(creating_phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
+        try:
+            phase_name, new_sub_flow_id = self.reserch_flow_status_operater.create_sub_flow(creating_phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
+        except Exception:
+            self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
+            raise
 
         # /data/<phase_name>/<data_dir_name>の作成
         data_dir_path = ""
@@ -195,6 +199,7 @@ class CreateSubflowForm(BaseSubflowForm):
             # 失敗した場合は、リサーチフローステータス管理JSONをロールバック
             self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
             # 新規作成ボタンを作成失敗ステータスに更新する
+            self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             raise
 
         # 新規作成ボタンを作成完了ステータスに更新する

@@ -39,7 +39,7 @@ class BaseSubflowForm():
         sub_flow_name_options = self.generate_sub_flow_name_options(sub_flow_type_options[msg_config.get('form', 'selector_default')], research_flow_status)
         # サブフロー名称：シングルセレクト
         self._sub_flow_name_selector = pn.widgets.Select(
-            name="サブフロー選択（必須）",
+            name=msg_config.get('main_menu', 'sub_flow_name_select'),
             options=sub_flow_name_options,
             value=sub_flow_name_options[msg_config.get('form', 'selector_default')]
         )
@@ -48,7 +48,7 @@ class BaseSubflowForm():
 
         # サブフロー名称：テキストフォーム
         self._sub_flow_name_form = pn.widgets.TextInput(
-            name=msg_config.get('main_menu', 'sub_flow_name'),
+            name=msg_config.get('main_menu', 'sub_flow_name_input'),
             placeholder='Enter a sub flow name here…', max_length=15)
         # サブフロー名称：テキストフォームのイベントリスナー
         self._sub_flow_name_form.param.watch(self.callback_menu_form, 'value')

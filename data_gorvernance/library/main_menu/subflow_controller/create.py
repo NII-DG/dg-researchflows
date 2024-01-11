@@ -71,7 +71,7 @@ class CreateSubflowForm(BaseSubflowForm):
             parent_sub_flow_type_options = self.generate_parent_sub_flow_type_options(selected_value, research_flow_status)
             self._parent_sub_flow_type_selector.options = parent_sub_flow_type_options
             # 新規作成ボタンのボタンの有効化チェック
-            self.change_diable_submit_button()
+            self.change_disable_submit_button()
         except Exception as e:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
@@ -88,12 +88,12 @@ class CreateSubflowForm(BaseSubflowForm):
             parent_sub_flow_options = self.generate_parent_sub_flow_options(selected_value, research_flow_status)
             self._parent_sub_flow_selector.options = parent_sub_flow_options
             # 新規作成ボタンのボタンの有効化チェック
-            self.change_diable_submit_button()
+            self.change_disable_submit_button()
         except Exception as e:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     # overwrite
-    def change_diable_submit_button(self):
+    def change_disable_submit_button(self):
         # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
 
         value = self._sub_flow_type_selector.value

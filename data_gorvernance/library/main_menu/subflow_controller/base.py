@@ -131,7 +131,7 @@ class BaseSubflowForm():
         # フォームコールバックファンクション
         try:
             # 新規作成ボタンのボタンの有効化チェック
-            self.change_diable_submit_button()
+            self.change_disable_submit_button()
         except Exception as e:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
@@ -148,7 +148,7 @@ class BaseSubflowForm():
             sub_flow_name_options = self.generate_sub_flow_name_options(selected_value, research_flow_status)
             self._sub_flow_name_selector.options = sub_flow_name_options
             # 新規作成ボタンのボタンの有効化チェック
-            self.change_diable_submit_button()
+            self.change_disable_submit_button()
         except Exception as e:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
@@ -157,7 +157,7 @@ class BaseSubflowForm():
         # relinkで継承するため個別処理
         try:
             # 新規作成ボタンのボタンの有効化チェック
-            self.change_diable_submit_button()
+            self.change_disable_submit_button()
         except Exception as e:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
@@ -165,7 +165,7 @@ class BaseSubflowForm():
     # validate #
     ############
 
-    def change_diable_submit_button(self):
+    def change_disable_submit_button(self):
         """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する"""
         # 継承した先で実装する
 

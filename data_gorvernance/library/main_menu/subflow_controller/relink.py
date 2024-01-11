@@ -64,12 +64,12 @@ class RelinkSubflowForm(BaseSubflowForm):
             self._parent_sub_flow_selector.options = parent_sub_flow_options
             self._parent_sub_flow_selector.value = parent_ids
             # 新規作成ボタンのボタンの有効化チェック
-            self.change_diable_submit_button()
+            self.change_disable_submit_button()
         except Exception as e:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     # overwrite
-    def change_diable_submit_button(self):
+    def change_disable_submit_button(self):
         # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
 
         value = self._sub_flow_type_selector.value
@@ -84,15 +84,7 @@ class RelinkSubflowForm(BaseSubflowForm):
         if value is None:
             self.submit_button.disabled = True
             return
-        elif int(value) == 0:
-            self.submit_button.disabled = True
-            return
-
-        value = self._data_dir_name_form.value_input
-        if value is None:
-            self.submit_button.disabled = True
-            return
-        elif len(value) < 1:
+        elif value == 0:
             self.submit_button.disabled = True
             return
 

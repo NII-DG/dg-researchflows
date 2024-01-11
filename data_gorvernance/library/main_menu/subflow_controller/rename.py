@@ -7,7 +7,7 @@ class RenameSubflowForm(BaseSubflowForm):
     """サブフロー名称変更クラス"""
 
     # overwrite
-    def change_diable_submit_button(self):
+    def change_disable_submit_button(self):
         # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
 
         value = self._sub_flow_type_selector.value
@@ -22,7 +22,7 @@ class RenameSubflowForm(BaseSubflowForm):
         if value is None:
             self.submit_button.disabled = True
             return
-        elif int(value) == 0:
+        elif value == 0:
             self.submit_button.disabled = True
             return
 

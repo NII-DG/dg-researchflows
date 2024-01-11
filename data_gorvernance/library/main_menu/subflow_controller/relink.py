@@ -118,8 +118,9 @@ class RelinkSubflowForm(BaseSubflowForm):
     def define_input_form(self):
         """サブフロー間接続編集フォーム"""
         sub_flow_type_list = self._sub_flow_type_selector.options
-        if len(sub_flow_type_list) < 1:
-            return Alert.warning(msg_config.get('main_menu','nothing_warning'))
+        if len(sub_flow_type_list) < 2:
+            # defaultがあるため2未満にする
+            return Alert.warning(msg_config.get('main_menu','relink_nothing'))
 
         return pn.Column(
             f'### {msg_config.get("main_menu", "update_sub_flow_link_title")}',

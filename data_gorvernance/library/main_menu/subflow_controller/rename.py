@@ -6,6 +6,45 @@ from .base import BaseSubflowForm
 class RenameSubflowForm(BaseSubflowForm):
     """サブフロー名称変更クラス"""
 
+    # overwrite
+    def change_diable_submit_button(self):
+        # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
+
+        value = self._sub_flow_type_selector.value
+        if value is None:
+            self.submit_button.disabled = True
+            return
+        elif int(value) == 0:
+            self.submit_button.disabled = True
+            return
+
+        value = self._sub_flow_name_selector.value
+        if value is None:
+            self.submit_button.disabled = True
+            return
+        elif int(value) == 0:
+            self.submit_button.disabled = True
+            return
+
+        value = self._sub_flow_name_form.value_input
+        if value is None:
+            self.submit_button.disabled = True
+            return
+        elif len(value) < 1:
+            self.submit_button.disabled = True
+            return
+
+        value = self._data_dir_name_form.value_input
+        if value is None:
+            self.submit_button.disabled = True
+            return
+        elif len(value) < 1:
+            self.submit_button.disabled = True
+            return
+
+        self.submit_button.disabled = False
+        self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
+
     def define_input_form(self):
         """サブフロー名称変更フォーム"""
         # 開発中のためアラートを表示する。
@@ -18,7 +57,7 @@ class RenameSubflowForm(BaseSubflowForm):
         self.change_submit_button_processing(msg_config.get('main_menu', 'creating_sub_flow'))
 
         # 入力情報を取得する。
-        creating_phase_seq_number = self._sub_flow_type_selector.value
+        phase_seq_number = self._sub_flow_type_selector.value
+        sub_flow_id = self._sub_flow_name_selector.value
         sub_flow_name = self._sub_flow_name_form.value_input
         data_dir_name = self._data_dir_name_form.value_input
-        parent_sub_flow_ids = self._parent_sub_flow_selector.value

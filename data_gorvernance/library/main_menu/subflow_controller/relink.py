@@ -120,7 +120,7 @@ class RelinkSubflowForm(BaseSubflowForm):
         self.change_submit_button_processing(msg_config.get('main_menu', 'creating_sub_flow'))
 
         # 入力情報を取得する。
-        creating_phase_seq_number = self._sub_flow_type_selector.value
-        sub_flow_name = self._sub_flow_name_selector.value
-        data_dir_name = self._data_dir_name_form.value_input
+        phase_seq_number = self._sub_flow_type_selector.value
+        sub_flow_id = self._sub_flow_name_selector.value
         parent_sub_flow_ids = self._parent_sub_flow_selector.value
+

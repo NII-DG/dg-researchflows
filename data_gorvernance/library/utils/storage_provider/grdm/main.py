@@ -63,6 +63,7 @@ def sync(token, base_url, project_id, abs_source, abs_root="/home/jovyan"):
 
 
 def get_project_metadata(scheme, domain, token, project_id):
+    """プロジェクトメタデータを取得する"""
     metadata = get_project_registrations(scheme, domain, token, project_id)
     if len(metadata['data']) < 1:
         raise MetadataNotExist
@@ -71,6 +72,7 @@ def get_project_metadata(scheme, domain, token, project_id):
 
 
 def format_metadata(metadata):
+    """GRDMから取得したプロジェクトメタデータを整形する"""
 
     datas = metadata['data']
     # {'dmp': first_value}
@@ -105,6 +107,7 @@ def format_metadata(metadata):
 
 
 def get_schema(url):
+    """メタデータのテンプレートを取得する"""
     response = requests.get(url=url)
     response.raise_for_status()
     return response.json()
@@ -151,6 +154,11 @@ def format_display_name(schema: dict, page_id: str, qid: str, value=None):
 
 
 def get_collaborator_list(scheme, domain, token, project_id):
+    """共同管理者の取得
+
+    Returns:
+        dict: ユーザー名がkey、権限種別がvalue
+    """
     response = get_project_collaborators(scheme, domain, token, project_id)
     data = response['data']
     return {
@@ -160,5 +168,6 @@ def get_collaborator_list(scheme, domain, token, project_id):
 
 
 def get_collaborator_url(scheme, domain, project_id):
+    """プロジェクトのメンバー一覧のURLを返す"""
     sub_url = f'{project_id}/contributors/'
     return parse.urlunparse((scheme, domain, sub_url, "", "", ""))

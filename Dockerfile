@@ -34,6 +34,8 @@ RUN pip install --no-cache pandas==2.1.4
 RUN pip install --no-cache git+https://github.com/RCOSDP/rdmclient.git@master
 RUN pip install --no-cache git+https://github.com/NII-DG/nii-dg.git@230419_8c684da
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-packager.git@master
+RUN pip install --no-cache git+https://github.com/NII-cloud-operation/Jupyter-LC_nblineage
+
 # TODO: リリース時にはdg-drawerのブランチを変更する(@Rel20230929のようにする)
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-drawer.git@develop/Rel_V2.0
 RUN pip install --no-cache cookiecutter==2.5.0
@@ -47,6 +49,8 @@ RUN jupyter nbextension enable --py lc_multi_outputs --user
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-nb-extensions.git@master
 RUN jupyter nbextension install --py dg_nb_extensions --user
 RUN jupyter nbextension enable --py dg_nb_extensions --user
+
+RUN jupyter nblineage quick-setup
 
 # upgrade nbclassic ( after nbextension installed )
 RUN pip install --no-cache nbclassic==0.4.8

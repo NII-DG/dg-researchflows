@@ -46,3 +46,4 @@ def get_project_collaborators(scheme, domain, token, project_id):
         raise UnauthorizedError
     response.raise_for_status()
     return response.json()
+

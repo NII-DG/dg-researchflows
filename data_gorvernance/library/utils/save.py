@@ -76,7 +76,7 @@ class TaskSave(TaskLog):
         self._save_submit_button.set_looks_processing()
 
         token = self._save_form.value_input
-        token = StringManager.strip(token, remove_empty=True)
+        token = StringManager.strip(token, remove_empty=False)
         if not self._validate_token(token):
             return
         self.grdm_token = token

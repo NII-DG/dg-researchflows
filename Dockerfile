@@ -5,7 +5,8 @@ RUN apt-get update -y
 RUN apt-get install -y netbase
 RUN apt-get install -y graphviz
 RUN apt-get install -y libmagic1
-RUN apt-get install -y --fix-missing curl
+#RUN apt-get install -y --fix-missing curl
+RUN apt-get install -y iputils-ping net-tools
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 

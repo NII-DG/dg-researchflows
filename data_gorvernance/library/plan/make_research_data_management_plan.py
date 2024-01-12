@@ -14,7 +14,7 @@ from ..task_director import TaskDirector
 from ..utils.setting import get_dg_customize_config, SubflowStatusFile, SubflowStatus, DMPManager
 from ..utils.widgets import MessageBox, Button, Alert
 from ..utils.storage_provider import grdm
-from ..utils.error import MetadataNotExist, UnauthorizedError
+from ..utils.error import MetadataNotExist, UnauthorizedError, InputWarning
 from ..utils.checker import StringManager
 
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
@@ -34,11 +34,18 @@ class DGPlaner(TaskDirector):
         # working_path = .data_gorvernance/researchflow/plan/task/plan/make_research_data_management_plan.ipynbが想定値
         super().__init__(working_path, notebook_name)
 
+        # フォームボックス
+        self.form_box = pn.WidgetBox()
+        self.form_box.width = 900
+        # メッセージ用ボックス
+        self.msg_output = MessageBox()
+        self.msg_output.width = 900
+
         # α設定JSON定義書(plan.json)
         # 想定値：data_gorvernance\researchflow\plan\plan.json
         self._plan_path =  os.path.join(self._abs_root_path, path_config.PLAN_FILE_PATH)
 
-        self.dmp_getter = DMPGetter(dmp_file)
+        self.dmp_getter = DMPGetter(dmp_file, self.form_box, self.msg_output)
 
     @TaskDirector.task_cell("1")
     def get_dmp(self):
@@ -53,47 +60,33 @@ class DGPlaner(TaskDirector):
         # フォーム表示
         pn.extension()
         form_section = pn.WidgetBox()
-        form_section.append(self.dmp_getter.form_box)
-        form_section.append(self.dmp_getter.msg_output)
+        form_section.append(self.form_box)
+        form_section.append(self.msg_output)
         display(form_section)
 
     @TaskDirector.callback_form('get_dmp')
     def _token_callback(self, event):
         """dmpを取得する"""
         self.dmp_getter.get_dmp_button.set_looks_processing()
-        is_ok, message = self.dmp_getter.validate_token_form()
-        if not is_ok:
-            self.log.warning(message)
-            return
 
         try:
             self.dmp_getter.get_project_metadata(
                 scheme=grdm.SCHEME,
-                domain=grdm.DOMAIN
+                domain=grdm.API_DOMAIN
             )
             self.dmp_getter.make_select_dmp_form()
-        except UnauthorizedError:
-            message = msg_config.get('form', 'token_unauthorized')
-            self.log.warning(message)
-            self.dmp_getter.get_dmp_button.set_looks_warning(message)
+        except InputWarning as e:
+            self.log.warning(str(e))
             return
-        except MetadataNotExist:
-            message = msg_config.get('make_research_data_management_plan', 'metadata_not_exist')
-            self.log.warning(message)
-            self.dmp_getter.form_box.clear()
-            self.dmp_getter.msg_output.update_warning(message)
-            return
-        except RequestException:
-            message = msg_config.get('DEFAULT', 'connection_error')
-            self.log.error(message)
-            self.dmp_getter.get_dmp_button.set_looks_error(message)
+        except RequestException as e:
+            self.log.error(str(e))
             return
         except Exception:
             message = msg_config.get('DEFAULT', 'unexpected_error')
             self.dmp_getter.get_dmp_button.set_looks_error(message)
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
             self.log.error(message)
-            self.dmp_getter.msg_output.update_error(message)
+            self.msg_output.update_error(message)
             return
 
     @TaskDirector.callback_form('selected_dmp')
@@ -104,7 +97,7 @@ class DGPlaner(TaskDirector):
         except Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
             self.log.error(message)
-            self.dmp_getter.msg_output.update_error(message)
+            self.msg_output.update_error(message)
 
     @TaskDirector.task_cell("2")
     def generateFormScetion(self):
@@ -150,18 +143,14 @@ class DGPlaner(TaskDirector):
 
 class DMPGetter():
 
-    def __init__(self, dmp_path) -> None:
+    def __init__(self, dmp_path, form_box, message_box:MessageBox) -> None:
         self.dmp_file = DMPManager(dmp_path)
         self.token = ""
         self.project_id = grdm.get_project_id()
         self.metadata = {}
 
-        # フォームボックス
-        self.form_box = pn.WidgetBox()
-        self.form_box.width = 900
-        # メッセージ用ボックス
-        self.msg_output = MessageBox()
-        self.msg_output.width = 900
+        self.form_box =form_box
+        self.msg_output = message_box
 
         # display registrated dmp
         self.display_dmp = Alert.info()
@@ -219,9 +208,8 @@ class DMPGetter():
         self.get_dmp_button.set_looks_init()
         self.form_box.append(self.get_dmp_button)
 
-    def validate_token_form(self):
-        message = ""
-
+    def get_project_metadata(self, scheme, domain):
+        # token
         token = self.token_form.value_input
         token = StringManager.strip(token, remove_empty=True)
         if not token:
@@ -229,11 +217,11 @@ class DMPGetter():
             self.get_dmp_button.set_looks_warning(message)
             return False, message
         if StringManager.has_whitespace(token):
-            message = msg_config.get('form', 'must_not_space').format("GRDM Token")
+            message = msg_config.get('form', 'token_invalid').format("GRDM Token")
             self.get_dmp_button.set_looks_warning(message)
             return False, message
         self.token = token
-
+        # project id
         if not self.project_id:
             project_id = self.project_form.value_input
             project_id = StringManager.strip(project_id)
@@ -243,13 +231,23 @@ class DMPGetter():
                 return False, message
             self.project_id = project_id
 
-        return True, message
+        try:
+            self.dmps = grdm.get_project_metadata(scheme, domain, self.token, self.project_id)
 
-    def get_project_metadata(self, scheme, domain):
-        """入力されたトークンを利用してDMPを取得する"""
-        if not self.token or not self.project_id:
-            raise Exception(f"don't have token or project id.")
-        self.dmps = grdm.get_project_metadata(scheme, domain, self.token, self.project_id)
+        except UnauthorizedError:
+            message = msg_config.get('form', 'token_unauthorized')
+            self.get_dmp_button.set_looks_warning(message)
+            raise InputWarning(message)
+        except MetadataNotExist:
+            message = msg_config.get('make_research_data_management_plan', 'metadata_not_exist')
+            self.form_box.clear()
+            self.msg_output.update_warning(message)
+            raise InputWarning(message)
+        except RequestException:
+            message = msg_config.get('DEFAULT', 'connection_error')
+            self.get_dmp_button.set_looks_error(message)
+            raise
+
 
     ##### select dmp form #####
 

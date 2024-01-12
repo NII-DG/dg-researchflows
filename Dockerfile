@@ -5,6 +5,7 @@ RUN apt-get update -y
 RUN apt-get install -y netbase
 RUN apt-get install -y graphviz
 RUN apt-get install -y libmagic1
+RUN apt-get install -y curl
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
@@ -34,8 +35,7 @@ RUN pip install --no-cache pandas==2.1.4
 RUN pip install --no-cache git+https://github.com/RCOSDP/rdmclient.git@master
 RUN pip install --no-cache git+https://github.com/NII-DG/nii-dg.git@230419_8c684da
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-packager.git@master
-RUN pip install --no-cache git+https://github.com/NII-cloud-operation/Jupyter-LC_nblineage
-RUN pip install --no-cache git+https://github.com/NII-cloud-operation/sidestickies.git
+
 
 # TODO: リリース時にはdg-drawerのブランチを変更する(@Rel20230929のようにする)
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-drawer.git@develop/Rel_V2.0
@@ -50,11 +50,6 @@ RUN jupyter nbextension enable --py lc_multi_outputs --user
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-nb-extensions.git@master
 RUN jupyter nbextension install --py dg_nb_extensions --user
 RUN jupyter nbextension enable --py dg_nb_extensions --user
-
-RUN jupyter nblineage quick-setup
-RUN jupyter nbextension install --py nbtags
-RUN jupyter serverextension enable --py nbtags
-RUN jupyter nbextension enable --py nbtags
 
 # upgrade nbclassic ( after nbextension installed )
 RUN pip install --no-cache nbclassic==0.4.8

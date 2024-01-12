@@ -1,3 +1,4 @@
+import os
 import traceback
 from requests.exceptions import RequestException
 
@@ -10,6 +11,27 @@ from .time import TimeDiff
 from .log import TaskLog
 from .error import UnauthorizedError
 from .checker import StringManager
+
+
+def all_sync_path(abs_root):
+    paths = []
+
+    # /home/jovyan/data
+    paths.append(os.path.join(abs_root, path_config.DATA))
+    # 暫定処置
+    os.makedirs(os.path.join(abs_root, path_config.DATA), exist_ok=True)
+
+    # /home/jovyan/data_gorvernance配下のworking以外
+    dg_dir = os.path.join(abs_root, path_config.DATA_GOVERNANCE)
+    contents = os.listdir(dg_dir)
+    contents.remove(path_config.WORKING)
+    paths.extend([
+        os.path.join(dg_dir, con)
+        for con in contents
+    ])
+
+    return paths
+
 
 class TaskSave(TaskLog):
 
@@ -25,7 +47,9 @@ class TaskSave(TaskLog):
         self.save_form_box = pn.WidgetBox()
         self.save_form_box.width = 900
         # 入力フォーム
-        self._save_form = pn.widgets.PasswordInput(name="GRDM Token", width=600)
+        self._save_form = pn.widgets.PasswordInput(
+            name=msg_config.get('form', 'token_title'),
+            width=600)
         self.save_form_box.append(self._save_form)
         # 確定ボタン
         self._save_submit_button = Button(width=600)
@@ -52,7 +76,7 @@ class TaskSave(TaskLog):
         self._save_submit_button.set_looks_processing()
 
         token = self._save_form.value_input
-        token = StringManager.strip(token, remove_empty=True)
+        token = StringManager.strip(token, remove_empty=False)
         if not self._validate_token(token):
             return
         self.grdm_token = token
@@ -72,14 +96,14 @@ class TaskSave(TaskLog):
             self._save_submit_button.set_looks_warning(message)
             return False
         if StringManager.has_whitespace(token):
-            message = msg_config.get('form', 'must_not_space').format("GRDM Token")
+            message = msg_config.get('form', 'token_invalid')
             self.log.warning(message)
             self._save_submit_button.set_looks_warning(message)
             return False
 
         try:
-            grdm.get_projects(
-                grdm.SCHEME, grdm.DOMAIN, token
+            grdm.get_projects_list(
+                grdm.SCHEME, grdm.API_DOMAIN, token
             )
         except UnauthorizedError:
             message = msg_config.get('form', 'token_unauthorized')
@@ -87,7 +111,7 @@ class TaskSave(TaskLog):
             self._save_submit_button.set_looks_warning(message)
             return False
         except RequestException:
-            message = msg_config.get('save', 'connection_error')
+            message = msg_config.get('DEFAULT', 'connection_error')
             self.log.error(message)
             self._save_submit_button.set_looks_error(message)
             return False
@@ -101,8 +125,8 @@ class TaskSave(TaskLog):
 
     def _project_id_form(self):
         self.save_msg_output.clear()
-        projects = grdm.get_projects(
-            grdm.SCHEME, grdm.DOMAIN, self.grdm_token
+        projects = grdm.get_projects_list(
+            grdm.SCHEME, grdm.API_DOMAIN, self.grdm_token
         )
 
         options =  dict()
@@ -155,7 +179,7 @@ class TaskSave(TaskLog):
                 self.save_msg_output.update_info(f'{msg} {i+1}/{size}')
                 grdm.sync(
                     token=self.grdm_token,
-                    base_url=grdm.BASE_URL,
+                    base_url=grdm.API_V2_BASE_URL,
                     project_id=self.project_id,
                     abs_source = path,
                     abs_root=self._abs_root_path

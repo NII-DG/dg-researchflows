@@ -72,7 +72,7 @@ class DGPlaner(TaskDirector):
         try:
             self.dmp_getter.get_project_metadata(
                 scheme=grdm.SCHEME,
-                domain=grdm.DOMAIN
+                domain=grdm.API_DOMAIN
             )
             self.dmp_getter.make_select_dmp_form()
         except InputWarning as e:
@@ -217,7 +217,7 @@ class DMPGetter():
             self.get_dmp_button.set_looks_warning(message)
             return False, message
         if StringManager.has_whitespace(token):
-            message = msg_config.get('form', 'must_not_space').format("GRDM Token")
+            message = msg_config.get('form', 'token_invalid').format("GRDM Token")
             self.get_dmp_button.set_looks_warning(message)
             return False, message
         self.token = token

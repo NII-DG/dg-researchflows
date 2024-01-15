@@ -10,6 +10,7 @@ from ..utils.widgets import Button, MessageBox
 from ..utils.package import MakePackage, OutputDirExistsException
 from ..utils.config import path_config, message as msg_config
 from ..utils.setting import Field, ResearchFlowStatusOperater
+from ..utils.checker import StringManager
 
 
 # 本ファイルのファイル名
@@ -32,8 +33,7 @@ class ExperimentPackageMaker(TaskDirector):
         # パッケージ作成場所
         subflow_type, subflow_id = get_subflow_type_and_id(self.nb_working_file_path)
         if not subflow_type or not subflow_id:
-            self._msg_output.update_error(f'## [INTERNAL ERROR] : don\'t get subflow type or id.')
-            return
+            raise Exception(f'## [INTERNAL ERROR] : don\'t get subflow type or id.')
         try:
             rf_status_file = path_config.get_research_flow_status_file_path(self._abs_root_path)
             rf_status = ResearchFlowStatusOperater(rf_status_file)
@@ -41,8 +41,7 @@ class ExperimentPackageMaker(TaskDirector):
             if data_dir_name is None:
                 raise Exception
         except Exception:
-            self._msg_output.update_error(f'## [INTERNAL ERROR] : don\'t get directory name of data')
-            return
+            raise Exception(f'## [INTERNAL ERROR] : don\'t get directory name of data')
         self.output_dir = path_config.get_task_data_dir(self._abs_root_path, subflow_type, data_dir_name)
 
         # フォームボックス
@@ -92,7 +91,6 @@ class ExperimentPackageMaker(TaskDirector):
             msg_config.get('make_experiment_package', 'not_use'): False
         }
         self.radio = pn.widgets.RadioBoxGroup(options=options, value=True,inline=True, margin=(0, 0, 0, 20))
-        self.radio.param.watch(self._radiobox_callback, 'value')
         if  not self.field.get_template_path(self.selected):
             self.radio.value = False
         else:
@@ -114,6 +112,8 @@ class ExperimentPackageMaker(TaskDirector):
 
         self._form_box.append(self._template_form_box)
 
+        # NOTE: callbackで利用するフォームが定義されてから設定する
+        self.radio.param.watch(self._radiobox_callback, 'value')
         # NOTE: この位置ならば無効化される
         self.radio.param.trigger('value')
 
@@ -122,22 +122,21 @@ class ExperimentPackageMaker(TaskDirector):
 
         if radio_value:
             self.template_path_form.value = self.field.get_template_path(self.selected)
+            self.template_path_form.value_input = self.field.get_template_path(self.selected)
             self.template_path_form.disabled = True
         else:
             self.template_path_form.disabled = False
             self.template_path_form.value = ""
+            self.template_path_form.value_input = ""
 
     @TaskDirector.callback_form("get_cookiecutter_template")
     def callback_submit_template_form(self, event):
         self.submit_button.set_looks_processing()
 
-        radio_value = self.radio.value
-        if radio_value:
-            template = self.template_path_form.value
-        else:
-            template = self.template_path_form.value_input
+        template = self.template_path_form.value_input
 
-        if not template:
+        template = StringManager.strip(template)
+        if StringManager.is_empty(template):
             self.submit_button.set_looks_warning(msg_config.get('form', 'value_empty_warning'))
             return
 
@@ -174,7 +173,7 @@ class ExperimentPackageMaker(TaskDirector):
             elif isinstance(raw, dict):
                 continue
             else:
-                obj = pn.widgets.TextInput(name=title, value=raw, width=DEFAULT_WIDTH)
+                obj = pn.widgets.TextInput(name=title, value=raw, value_input=raw, width=DEFAULT_WIDTH)
 
             self._form_box.append(obj)
 
@@ -185,12 +184,17 @@ class ExperimentPackageMaker(TaskDirector):
         for obj in self._form_box.objects:
             if isinstance(obj, pn.widgets.Button):
                 continue
-            if obj.value:
-                context_dict[obj.name] = obj.value
+            value = ""
+            if isinstance(obj, pn.widgets.TextInput):
+                value = obj.value_input
+                value = StringManager.strip(value)
+                if StringManager.is_empty(value):
+                    message = msg_config.get('form', 'none_input_value').format(obj.name)
+                    self._msg_output.update_error(message)
+                    return
             else:
-                message = msg_config.get('form', 'none_input_value').format(obj.name)
-                self._msg_output.update_error(message)
-                return
+                value = obj.value
+            context_dict[obj.name] = value
 
         try:
             self.make_package.create_package(
@@ -213,6 +217,8 @@ class ExperimentPackageMaker(TaskDirector):
         self._form_box.clear()
         message = msg_config.get('make_experiment_package', 'create_success').format(self.output_dir)
         self._msg_output.update_success(message)
+        # TODO: 開発中の仮置きのため後で削除すること
+        self.done_task(script_file_name)
 
     @TaskDirector.task_cell("1")
     def generateFormScetion(self):

@@ -54,7 +54,8 @@ def get_subflow_type_and_id(working_file_path: str):
     return subflow_type, subflow_id
 
 
-class ResearchFlowStatusOperater(JsonFile):
+class ResearchFlowStatusFile(JsonFile):
+    """research_flow_status.pyの読み書きと関連処理"""
 
     def __init__(self, file_path: str):
         if os.path.isfile(file_path):
@@ -62,19 +63,96 @@ class ResearchFlowStatusOperater(JsonFile):
         else:
             raise FileNotFoundError(f'[ERROR] : Not Found File. File Path : {file_path}')
 
+    def load_research_flow_status(self)->List[PhaseStatus]:
+        """リサーチフローステータス管理JSONからリサーチフローステータスインスタンスを取得する"""
+        return ResearchFlowStatus.load_from_json(str(self.path))
 
-    def get_research_flow_status(self):
-        return super().read()
+    def update_file(self, research_flow_status:List[PhaseStatus]):
+        # research_flow_statusを基にリサーチフローステータス管理JSONを更新する。
+        research_flow_status_data = {}
+        research_flow_status_data['research_flow_pahse_data'] = []
 
-    def get_data_dir(self, phase_name, id):
-        """phase nameとidからdata_dirを取得する"""
-        research_flow_status = self.load_research_flow_status()
+        for phase_status in research_flow_status:
+            phase_status_data = {}
+            phase_status_data['seq_number'] = phase_status._seq_number
+            phase_status_data['name'] = phase_status._name
+            phase_status_data['sub_flow_data'] = []
+            for sub_flow_unit in phase_status._sub_flow_data:
+                sub_flow_unit_data = {}
+                sub_flow_unit_data['id'] = sub_flow_unit._id
+                sub_flow_unit_data['name'] = sub_flow_unit._name
+                sub_flow_unit_data['data_dir'] = sub_flow_unit._data_dir
+                sub_flow_unit_data['link'] = sub_flow_unit._link
+                sub_flow_unit_data['parent_ids'] = sub_flow_unit._parent_ids
+                sub_flow_unit_data['create_datetime'] = sub_flow_unit._create_datetime
+                phase_status_data['sub_flow_data'].append(sub_flow_unit_data)
+            research_flow_status_data['research_flow_pahse_data'].append(phase_status_data)
+        # リサーチフローステータス管理JSONをアップデート
+        super().write(research_flow_status_data)
+
+    def issue_uuidv4(self)->str:
+        """UUIDv4の発行"""
+        return str(uuid.uuid4())
+
+    def exist_sub_flow_id_in_research_flow_status(self, research_flow_status:List[PhaseStatus], target_id:str)->bool:
+        """リサーチフローステータス管理情報にサブフローIDが存在するかチェック"""
+
         for phase in research_flow_status:
-            if phase._name != phase_name:
+            for sub_flow in phase._sub_flow_data:
+                if sub_flow._id == target_id:
+                    return True
+        return False
+
+    def issue_unique_sub_flow_id(self)->str:
+        """ユニークなサブフローIDを発行する"""
+        while True:
+            candidate_id = self.issue_uuidv4()
+            research_flow_status = self.load_research_flow_status()
+            if self.exist_sub_flow_id_in_research_flow_status(research_flow_status, candidate_id):
+                ## 存在する場合は、発行し直し
                 continue
-            for sb in phase._sub_flow_data:
-                if sb._id == id:
-                    return sb._data_dir
+            else:
+                ## ユニークID取得に成功
+                return candidate_id
+
+    def is_unique_subflow_name(self, phase_seq_number, sub_flow_name)->bool:
+        """サブフロー名のユニークチェック"""
+        exist_phase = False
+        research_flow_status = self.load_research_flow_status()
+        for phase_status in research_flow_status:
+            if phase_status._seq_number == phase_seq_number:
+                exist_phase = True
+                for sub_flow_item in phase_status._sub_flow_data:
+                    if sub_flow_item._name == sub_flow_name:
+                        return False
+            else:
+                continue
+
+        if not exist_phase:
+            raise Exception(f'Not Found phase. target phase seq_number : {phase_seq_number}')
+
+        return True
+
+    def is_unique_data_dir(self, phase_seq_number, data_dir_name)->bool:
+        """データディレクトリ名のユニークチェック"""
+        exist_phase = False
+        research_flow_status = self.load_research_flow_status()
+        for phase_status in research_flow_status:
+            if phase_status._seq_number == phase_seq_number:
+                exist_phase = True
+                for sub_flow_item in phase_status._sub_flow_data:
+                    if sub_flow_item._data_dir == data_dir_name:
+                        return False
+            else:
+                continue
+
+        if not exist_phase:
+            raise Exception(f'Not Found phase. target phase seq_number : {phase_seq_number}')
+
+        return True
+
+class ResearchFlowStatusOperater(ResearchFlowStatusFile):
+    """リサーチフローステータスの操作と利用"""
 
     def get_svg_of_research_flow_status(self)->str:
         """Get SVG data of Research Flow Image by file path
@@ -118,59 +196,7 @@ class ResearchFlowStatusOperater(JsonFile):
         #リサーチフローステータス管理JSONを更新する。
         self.update_file(research_flow_status)
 
-
-    def update_file(self, research_flow_status:List[PhaseStatus]):
-        # research_flow_statusを基にリサーチフローステータス管理JSONを更新する。
-        research_flow_status_data = {}
-        research_flow_status_data['research_flow_pahse_data'] = []
-
-        for phase_status in research_flow_status:
-            phase_status_data = {}
-            phase_status_data['seq_number'] = phase_status._seq_number
-            phase_status_data['name'] = phase_status._name
-            phase_status_data['sub_flow_data'] = []
-            for sub_flow_unit in phase_status._sub_flow_data:
-                sub_flow_unit_data = {}
-                sub_flow_unit_data['id'] = sub_flow_unit._id
-                sub_flow_unit_data['name'] = sub_flow_unit._name
-                sub_flow_unit_data['data_dir'] = sub_flow_unit._data_dir
-                sub_flow_unit_data['link'] = sub_flow_unit._link
-                sub_flow_unit_data['parent_ids'] = sub_flow_unit._parent_ids
-                sub_flow_unit_data['create_datetime'] = sub_flow_unit._create_datetime
-                phase_status_data['sub_flow_data'].append(sub_flow_unit_data)
-            research_flow_status_data['research_flow_pahse_data'].append(phase_status_data)
-        # リサーチフローステータス管理JSONをアップデート
-        super().write(research_flow_status_data)
-
-
-    def issue_uuidv4(self)->str:
-        """UUIDv4の発行"""
-        return str(uuid.uuid4())
-
-
-    def exist_sub_flow_id_in_research_flow_status(self, research_flow_status:List[PhaseStatus], target_id:str)->bool:
-        """リサーチフローステータス管理情報にサブフローIDが存在するかチェック"""
-
-        for phase in research_flow_status:
-            for sub_flow in phase._sub_flow_data:
-                if sub_flow._id == target_id:
-                    return True
-        return False
-
-
-    def issue_unique_sub_flow_id(self)->str:
-        """ユニークなサブフローIDを発行する"""
-        while True:
-            candidate_id = self.issue_uuidv4()
-            research_flow_status = self.load_research_flow_status()
-            if self.exist_sub_flow_id_in_research_flow_status(research_flow_status, candidate_id):
-                ## 存在する場合は、発行し直し
-                continue
-            else:
-                ## ユニークID取得に成功
-                return candidate_id
-
-    def update_research_flow_status(self, creating_phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids):
+    def create_sub_flow(self, creating_phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids):
         """リサーチフローステータスの更新
 
         Args:
@@ -226,46 +252,27 @@ class ResearchFlowStatusOperater(JsonFile):
         # リサーチフローステータス管理JSONの上書き
         self.update_file(research_flow_status)
 
-
-    def is_unique_subflow_name(self, phase_seq_number, sub_flow_name)->bool:
-        """サブフロー名のユニークチェック"""
-        exist_phase = False
+    def relink_sub_flow(self, phase_seq_number, sub_flow_id, parent_sub_flow_ids):
         research_flow_status = self.load_research_flow_status()
         for phase_status in research_flow_status:
-            if phase_status._seq_number == phase_seq_number:
-                exist_phase = True
-                for sub_flow_item in phase_status._sub_flow_data:
-                    if sub_flow_item._name == sub_flow_name:
-                        return False
-            else:
+            if phase_status._seq_number != phase_seq_number:
                 continue
+            for sf in phase_status._sub_flow_data:
+                if sf._id == sub_flow_id:
+                    sf._parent_ids = parent_sub_flow_ids
+                    break
+            break
+        self.update_file(research_flow_status)
 
-        if not exist_phase:
-            raise Exception(f'Not Found phase. target phase seq_number : {phase_seq_number}')
-
-        return True
-
-    def is_unique_data_dir(self, phase_seq_number, data_dir_name)->bool:
-        """データディレクトリ名のユニークチェック"""
-        exist_phase = False
+    def get_data_dir(self, phase_name, id):
+        """phase nameとidからdata_dirを取得する"""
         research_flow_status = self.load_research_flow_status()
-        for phase_status in research_flow_status:
-            if phase_status._seq_number == phase_seq_number:
-                exist_phase = True
-                for sub_flow_item in phase_status._sub_flow_data:
-                    if sub_flow_item._data_dir == data_dir_name:
-                        return False
-            else:
+        for phase in research_flow_status:
+            if phase._name != phase_name:
                 continue
-
-        if not exist_phase:
-            raise Exception(f'Not Found phase. target phase seq_number : {phase_seq_number}')
-
-        return True
-
-    def load_research_flow_status(self)->List[PhaseStatus]:
-        """リサーチフローステータス管理JSONからリサーチフローステータスインスタンスを取得する"""
-        return ResearchFlowStatus.load_from_json(str(self.path))
+            for sb in phase._sub_flow_data:
+                if sb._id == id:
+                    return sb._data_dir
 
     def get_subflow_phases(self)->List[str]:
         """全てのphase名を取得する"""

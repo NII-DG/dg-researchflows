@@ -11,11 +11,11 @@
                     "task_ids": [],
                     "verification_ids": []
                 },
-                "paper_writing": {
+                "writing": {
                     "task_ids": [],
                     "verification_ids": []
                 },
-                "peer_review": {
+                "review": {
                     "task_ids": [],
                     "verification_ids": []
                 },
@@ -26,7 +26,7 @@
                         "V009001"
                     ]
                 },
-                "public_preparation": {
+                "publication": {
                     "task_ids": [],
                     "verification_ids": [
                         "V008001",
@@ -48,13 +48,13 @@
                         "V010001"
                     ]
                 },
-                "paper_writing": {
+                "writing": {
                     "task_ids": [],
                     "verification_ids": [
                         "V010001"
                     ]
                 },
-                "peer_review": {
+                "review": {
                     "task_ids": [],
                     "verification_ids": [
                         "V010002"
@@ -66,7 +66,7 @@
                         "V010003"
                     ]
                 },
-                "public_preparation": {
+                "publication": {
                     "task_ids": [],
                     "verification_ids": [
                         "V010003"
@@ -85,11 +85,11 @@
                     "task_ids": [],
                     "verification_ids": []
                 },
-                "paper_writing": {
+                "writing": {
                     "task_ids": [],
                     "verification_ids": []
                 },
-                "peer_review": {
+                "review": {
                     "task_ids": [],
                     "verification_ids": []
                 },
@@ -99,7 +99,7 @@
                         "V011001"
                     ]
                 },
-                "public_preparation": {
+                "publication": {
                     "task_ids": [],
                     "verification_ids": [
                         "V011001"
@@ -122,13 +122,13 @@
                         "V012001"
                     ]
                 },
-                "paper_writing": {
+                "writing": {
                     "task_ids": [],
                     "verification_ids": [
                         "V012001"
                     ]
                 },
-                "peer_review": {
+                "review": {
                     "task_ids": [],
                     "verification_ids": [
                         "V012001"
@@ -140,7 +140,7 @@
                         "V012001"
                     ]
                 },
-                "public_preparation": {
+                "publication": {
                     "task_ids": [],
                     "verification_ids": [
                         "V012001"
@@ -161,13 +161,13 @@
                     ],
                     "verification_ids": []
                 },
-                "paper_writing": {
+                "writing": {
                     "task_ids": [],
                     "verification_ids": [
                         "V012001"
                     ]
                 },
-                "peer_review": {
+                "review": {
                     "task_ids": [],
                     "verification_ids": []
                 },
@@ -175,7 +175,7 @@
                     "task_ids": [],
                     "verification_ids": []
                 },
-                "public_preparation": {
+                "publication": {
                     "task_ids": [],
                     "verification_ids": []
                 }

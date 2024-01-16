@@ -61,6 +61,12 @@ RUN rm ${HOME}/.fonts/${font_deb}
 RUN rm -rf ${HOME}/.fonts/etc ${HOME}/.fonts/usr
 RUN rm .wget-hsts
 
+# install vcpsdk
+RUN wget https://s3-ap-northeast-1.amazonaws.com/vcp-jupyternotebook/23.11.0/jupyternotebook_vcpsdk-23.11.0.tgz
+RUN mkdir ~/data_gorvernance/library/vcpsdk
+RUN tar zxvf jupyternotebook_vcpsdk-23.11.0.tgz -C ~/data_gorvernance/library/vcpsdk/
+RUN rm jupyternotebook_vcpsdk-23.11.0.tgz
+RUN export PATH=$PATH:/home/jovyan/data_gorvernance/library/vcpsdk
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000

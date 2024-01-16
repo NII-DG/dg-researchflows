@@ -63,7 +63,7 @@ RUN rm .wget-hsts
 
 # install vcpsdk
 RUN wget https://s3-ap-northeast-1.amazonaws.com/vcp-jupyternotebook/23.11.0/jupyternotebook_vcpsdk-23.11.0.tgz
-RUN mkdir ~/data_gorvernance/library/vcpsdk
+RUN mkdir -p ~/data_gorvernance/library/vcpsdk
 RUN tar zxvf jupyternotebook_vcpsdk-23.11.0.tgz -C ~/data_gorvernance/library/vcpsdk/
 RUN rm jupyternotebook_vcpsdk-23.11.0.tgz
 RUN export PATH=$PATH:/home/jovyan/data_gorvernance/library/vcpsdk

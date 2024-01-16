@@ -66,7 +66,8 @@ RUN wget https://s3-ap-northeast-1.amazonaws.com/vcp-jupyternotebook/23.11.0/jup
 RUN mkdir -p ~/data_gorvernance/library/vcpsdk
 RUN tar zxvf jupyternotebook_vcpsdk-23.11.0.tgz -C ~/data_gorvernance/library/vcpsdk/
 RUN rm jupyternotebook_vcpsdk-23.11.0.tgz
-ENV PYTHONPATH "${PYTHONPATH}:/home/jovyan/data_gorvernance/library/vcpsdk"
+ENV PYTHONPATH "${PYTHONPATH}:/home/jovyan/data_gorvernance/library/vcpsdk/vcpsdk"
+RUN pip install --no-cache vrplib==1.3.0
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000

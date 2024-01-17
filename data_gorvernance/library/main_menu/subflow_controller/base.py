@@ -62,7 +62,6 @@ class BaseSubflowForm():
 
         # 処理開始ボタン
         self.submit_button = Button(disabled=True)
-        self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
         self.submit_button.width = 500
 
 
@@ -154,7 +153,7 @@ class BaseSubflowForm():
 
     def callback_sub_flow_name_selector(self, event):
         # サブフロー名称：シングルセレクトコールバックファンクション
-        # relinkで継承するため個別処理
+        # relinkとrenameで継承するため個別処理
         try:
             # 新規作成ボタンのボタンの有効化チェック
             self.change_disable_submit_button()

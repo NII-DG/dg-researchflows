@@ -41,6 +41,9 @@ class CreateSubflowForm(BaseSubflowForm):
         # 親サブフロー選択のイベントリスナー
         self._parent_sub_flow_selector.param.watch(self.callback_menu_form, 'value')
 
+        # 処理開始ボタン
+        self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
+
     def generate_parent_sub_flow_type_options(self, pahase_seq_number:int, research_flow_status:List[PhaseStatus])->Dict[str, int]:
         # 親サブフロー種別(フェーズ)オプション(表示名をKey、順序値をVauleとする)
         pahse_options = {}

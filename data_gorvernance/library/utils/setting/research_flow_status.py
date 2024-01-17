@@ -278,6 +278,23 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
                 if sf._id == sub_flow_id:
                     sf._parent_ids = parent_sub_flow_ids
                     break
+            else:
+                raise NotFoundSubflowDataError(f'There Is No Subflow Data to Relink. sub_flow_id : {sub_flow_id}')
+            break
+        self.update_file(research_flow_status)
+
+    def rename_sub_flow(self, phase_seq_number, sub_flow_id, sub_flow_name, data_dir_name):
+        research_flow_status = self.load_research_flow_status()
+        for phase_status in research_flow_status:
+            if phase_status._seq_number != phase_seq_number:
+                continue
+            for sf in phase_status._sub_flow_data:
+                if sf._id == sub_flow_id:
+                    sf._name = sub_flow_name
+                    sf._data_dir = data_dir_name
+                    break
+            else:
+                raise NotFoundSubflowDataError(f'There Is No Subflow Data to Rename. sub_flow_id : {sub_flow_id}')
             break
         self.update_file(research_flow_status)
 

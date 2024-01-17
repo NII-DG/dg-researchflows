@@ -68,9 +68,10 @@ RUN tar zxvf jupyternotebook_vcpsdk-23.11.0.tgz -C ~/data_gorvernance/library/vc
 RUN rm jupyternotebook_vcpsdk-23.11.0.tgz
 RUN pip install --no-cache vrplib==1.3.0
 ENV PYTHONPATH "${PYTHONPATH}:/home/jovyan/data_gorvernance/library/vcpsdk/vcpsdk"
-RUN mkdir /usr/share/ca-certificates/vcc
-RUN cp ~/data_gorvernance/library/vcpsdk/vcpsdk/ca_cert/tokyo_ca.crt /usr/share/ca-certificates/vcc
+USER root
+RUN cp ~/data_gorvernance/library/vcpsdk/vcpsdk/ca_cert/tokyo_ca.crt /usr/local/share/ca-certificates/
 RUN update-ca-certificates
+USER ${NB_USER}
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000

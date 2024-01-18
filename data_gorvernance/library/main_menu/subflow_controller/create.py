@@ -18,9 +18,9 @@ class CreateSubflowForm(BaseSubflowForm):
     def __init__(self, abs_root, message_box) -> None:
         super().__init__(abs_root, message_box)
         research_flow_status = self.reserch_flow_status_operater.load_research_flow_status()
-        sub_flow_type_options = self.generate_sub_flow_type_options(research_flow_status)
 
         # 親サブフロー種別(フェーズ)オプション
+        sub_flow_type_options = self.generate_sub_flow_type_options(research_flow_status)
         parent_sub_flow_type_options = self.generate_parent_sub_flow_type_options(sub_flow_type_options[msg_config.get('form', 'selector_default')], research_flow_status)
         # 親サブフロー種別(フェーズ)（必須)：シングルセレクト
         self._parent_sub_flow_type_selector = pn.widgets.Select(

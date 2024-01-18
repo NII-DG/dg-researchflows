@@ -76,7 +76,7 @@ class BaseSubflowForm():
         for phase_status in research_flow_status:
             if phase_status._seq_number == 1:
                 continue
-            else:
+            if len(phase_status._sub_flow_data) > 0:
                 pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
         return pahse_options
 

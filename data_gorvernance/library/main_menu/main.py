@@ -155,6 +155,7 @@ class MainMenu(TaskLog):
                 ## サブフロー操作コントローラーオプションを初期化
                 self._sub_flow_menu.value = 0
                 self._project_widget_box.clear()
+                self.check_status_research_preparation_flow()
             if tab_index == 1:
                 # プロジェクト操作が選択
                 self._project_menu.value = 0

@@ -38,7 +38,8 @@ class RelinkSubflowForm(BaseSubflowForm):
             # experimentはplanのみを親とするため
             if phase_status._seq_number == 2:
                 continue
-            else:
+
+            if len(phase_status._sub_flow_data) > 0:
                 pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
         return pahse_options
 
@@ -72,11 +73,11 @@ class RelinkSubflowForm(BaseSubflowForm):
             selected_sub_flow_type = self._sub_flow_type_selector.value
             if selected_sub_flow_type is None:
                 raise Exception('Sub Flow Type Selector has None')
-            selected_sub_flow_name = self._sub_flow_name_selector.value
-            if selected_sub_flow_name is None:
+            selected_sub_flow_id = self._sub_flow_name_selector.value
+            if selected_sub_flow_id is None:
                 raise Exception('Sub Flow Name Selector has None')
             parent_sub_flow_type, parent_ids = self.get_parent_type_and_ids(
-                phase_seq_number=selected_sub_flow_type, sub_flow_id=selected_sub_flow_name,
+                phase_seq_number=selected_sub_flow_type, sub_flow_id=selected_sub_flow_id,
                 research_flow_status=research_flow_status
             )
             parent_sub_flow_options = self.generate_parent_sub_flow_options(parent_sub_flow_type, research_flow_status)

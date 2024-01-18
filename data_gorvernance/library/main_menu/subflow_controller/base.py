@@ -74,8 +74,10 @@ class BaseSubflowForm():
         pahse_options = {}
         pahse_options['--'] = 0
         for phase_status in research_flow_status:
+            # planは選択させない
             if phase_status._seq_number == 1:
                 continue
+            # サブフローのあるフェーズのみ
             if len(phase_status._sub_flow_data) > 0:
                 pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
         return pahse_options

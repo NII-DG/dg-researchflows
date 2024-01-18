@@ -6,6 +6,7 @@ import panel as pn
 from ...utils.config import path_config, message as msg_config
 from .base import BaseSubflowForm
 from ...utils.checker import StringManager
+from ...utils.widgets import Alert
 
 class RenameSubflowForm(BaseSubflowForm):
     """サブフロー名称変更クラス"""
@@ -80,7 +81,10 @@ class RenameSubflowForm(BaseSubflowForm):
 
     def define_input_form(self):
         """サブフロー名称変更フォーム"""
-        # 開発中のためアラートを表示する。
+        sub_flow_type_list = self._sub_flow_type_selector.options
+        if len(sub_flow_type_list) < 2:
+            # defaultがあるため2未満にする
+            return Alert.warning(msg_config.get('main_menu','nothing_editable_subflow'))
         return  pn.Column(
             f'### {msg_config.get("main_menu", "update_sub_flow_name_title")}',
             self._sub_flow_type_selector,
@@ -120,7 +124,7 @@ class RenameSubflowForm(BaseSubflowForm):
         old_path = path_config.get_task_data_dir(self.abs_root, phase_name, old_data_dir_name)
         if not os.path.isdir(old_path):
             self.change_submit_button_error(msg_config.get('main_menu', 'error_rename_sub_flow'))
-            return
+            raise Exception(f'There is no directory. path : {old_path}')
 
 
         try:

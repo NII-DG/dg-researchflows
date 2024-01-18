@@ -44,6 +44,18 @@ class CreateSubflowForm(BaseSubflowForm):
         # 処理開始ボタン
         self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
 
+    def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus])->Dict[str, int]:
+    # サブフロー種別(フェーズ)オプション(表示名をKey、順序値をVauleとする)
+        pahse_options = {}
+        pahse_options['--'] = 0
+        for phase_status in research_flow_status:
+            if phase_status._seq_number == 1:
+                continue
+            else:
+                # plan以外の全てのフェーズ
+                pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
+        return pahse_options
+
     def generate_parent_sub_flow_type_options(self, pahase_seq_number:int, research_flow_status:List[PhaseStatus])->Dict[str, int]:
         # 親サブフロー種別(フェーズ)オプション(表示名をKey、順序値をVauleとする)
         pahse_options = {}

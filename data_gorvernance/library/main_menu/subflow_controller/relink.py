@@ -33,12 +33,13 @@ class RelinkSubflowForm(BaseSubflowForm):
         pahse_options = {}
         pahse_options['--'] = 0
         for phase_status in research_flow_status:
+            # planには親が無い
             if phase_status._seq_number == 1:
                 continue
             # experimentはplanのみを親とするため
             if phase_status._seq_number == 2:
                 continue
-
+            # サブフローのあるフェーズのみ
             if len(phase_status._sub_flow_data) > 0:
                 pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
         return pahse_options
@@ -124,7 +125,7 @@ class RelinkSubflowForm(BaseSubflowForm):
         sub_flow_type_list = self._sub_flow_type_selector.options
         if len(sub_flow_type_list) < 2:
             # defaultがあるため2未満にする
-            return Alert.warning(msg_config.get('main_menu','relink_nothing'))
+            return Alert.warning(msg_config.get('main_menu','nothing_editable_subflow'))
 
         return pn.Column(
             f'### {msg_config.get("main_menu", "update_sub_flow_link_title")}',

@@ -2,6 +2,7 @@ import panel as pn
 
 from ...utils.config import path_config, message as msg_config
 from .base import BaseSubflowForm
+from ...utils.widgets import Alert
 
 class DeleteSubflowForm(BaseSubflowForm):
     """サブフロー削除クラス"""
@@ -36,7 +37,10 @@ class DeleteSubflowForm(BaseSubflowForm):
 
     def define_input_form(self):
         """サブフロー削除フォーム"""
-        # 開発中のためアラートを表示する。
+        sub_flow_type_list = self._sub_flow_type_selector.options
+        if len(sub_flow_type_list) < 2:
+            # defaultがあるため2未満にする
+            return Alert.warning(msg_config.get('main_menu','nothing_editable_subflow'))
         return pn.Column(
             f'### {msg_config.get("main_menu", "delete_sub_flow_title")}',
             self._sub_flow_type_selector,

@@ -1,4 +1,5 @@
 import os
+import re
 import traceback
 
 import panel as pn
@@ -27,13 +28,13 @@ class RenameSubflowForm(BaseSubflowForm):
             if selected_sub_flow_id is None:
                 raise Exception('Sub Flow Name Selector has None')
 
-            sub_flow_name, data_dir_name = self.reserch_flow_status_operater.get_flow_name_and_dir_name(selected_sub_flow_type, selected_sub_flow_id)
+            self.old_sub_flow_name, self.old_data_dir_name = self.reserch_flow_status_operater.get_flow_name_and_dir_name(selected_sub_flow_type, selected_sub_flow_id)
 
-            self._sub_flow_name_form.value = sub_flow_name
-            self._sub_flow_name_form.value_input = sub_flow_name
+            self._sub_flow_name_form.value = self.old_sub_flow_name
+            self._sub_flow_name_form.value_input = self.old_sub_flow_name
 
-            self._data_dir_name_form.value = data_dir_name
-            self._data_dir_name_form.value_input = data_dir_name
+            self._data_dir_name_form.value = self.old_data_dir_name
+            self._data_dir_name_form.value_input = self.old_data_dir_name
 
             # 新規作成ボタンのボタンの有効化チェック
             self.change_disable_submit_button()
@@ -106,13 +107,20 @@ class RenameSubflowForm(BaseSubflowForm):
         sub_flow_name = self._sub_flow_name_form.value_input
         data_dir_name = self._data_dir_name_form.value_input
 
+        # 入力値の検証
         sub_flow_name = StringManager.strip(sub_flow_name)
-        if not self.validate_sub_flow_name(sub_flow_name, phase_seq_number):
+        if not self.validate_sub_flow_name(sub_flow_name):
             return
+        if sub_flow_name != self.old_sub_flow_name:
+            if not self.is_unique_subflow_name(sub_flow_name, phase_seq_number):
+                return
 
         data_dir_name = StringManager.strip(data_dir_name)
-        if not self.validate_data_dir_name(data_dir_name, phase_seq_number):
+        if not self.validate_data_dir_name(data_dir_name):
             return
+        if data_dir_name != self.old_data_dir_name:
+            if not self.is_unique_data_dir(data_dir_name, phase_seq_number):
+                return
 
         phase_name = self.reserch_flow_status_operater.get_subflow_phase(phase_seq_number)
         new_path = path_config.get_task_data_dir(self.abs_root, phase_name, data_dir_name)
@@ -120,13 +128,12 @@ class RenameSubflowForm(BaseSubflowForm):
             self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_data_dir'))
             return
 
-        old_data_dir_name = self.reserch_flow_status_operater.get_data_dir(phase_name, sub_flow_id)
-        old_path = path_config.get_task_data_dir(self.abs_root, phase_name, old_data_dir_name)
+        old_path = path_config.get_task_data_dir(self.abs_root, phase_name, self.old_data_dir_name)
         if not os.path.isdir(old_path):
             self.change_submit_button_error(msg_config.get('main_menu', 'error_rename_sub_flow'))
             raise Exception(f'There is no directory. path : {old_path}')
 
-
+        # ディレクトリ名を変更してからファイルを更新する
         try:
             os.rename(old_path, new_path)
         except (FileExistsError, NotADirectoryError, OSError):

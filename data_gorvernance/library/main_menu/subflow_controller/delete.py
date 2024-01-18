@@ -58,11 +58,18 @@ class DeleteSubflowForm(BaseSubflowForm):
         phase_seq_number = self._sub_flow_type_selector.value
         sub_flow_id = self._sub_flow_name_selector.value
 
+        # 削除前にパスを取得しておく
+        phase_name = self.reserch_flow_status_operater.get_subflow_phase(phase_seq_number)
+        data_dir_name = self.reserch_flow_status_operater.get_data_dir(phase_name, sub_flow_id)
+        path = path_config.get_task_data_dir(self.abs_root, phase_name, data_dir_name)
+
         try:
             self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(sub_flow_id)
         except Exception:
             self.change_submit_button_error(msg_config.get('main_menu', 'error_delete_sub_flow'))
             raise
 
+        message = msg_config.get('main_menu', 'delete_caution').format(path)
+        self._err_output.info(message)
         # 新規作成ボタンを作成完了ステータスに更新する
         self.change_submit_button_success(msg_config.get('main_menu', 'success_delete_sub_flow'))

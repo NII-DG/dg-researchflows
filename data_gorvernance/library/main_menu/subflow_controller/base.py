@@ -170,21 +170,23 @@ class BaseSubflowForm():
         """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する"""
         # 継承した先で実装する
 
-    def validate_sub_flow_name(self, sub_flow_name, creating_phase_seq_number):
+    def validate_sub_flow_name(self, sub_flow_name):
 
         if StringManager.is_empty(sub_flow_name):
             # sub_flow_nameが未入力の場合、ユーザ警告
             self.change_submit_button_warning(msg_config.get('main_menu','not_input_subflow_name'))
             return False
-
-        if not self.reserch_flow_status_operater.is_unique_subflow_name(creating_phase_seq_number, sub_flow_name):
-            # サブフロー名がユニークでない場合、ユーザ警告
-            self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_subflow_name'))
-            return False
-
         return True
 
-    def validate_data_dir_name(self, data_dir_name, creating_phase_seq_number):
+    def is_unique_subflow_name(self, sub_flow_name, phase_seq_number):
+
+        if not self.reserch_flow_status_operater.is_unique_subflow_name(phase_seq_number, sub_flow_name):
+            # サブフロー名がユニークでない場合、ユーザ警告
+                self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_subflow_name'))
+                return False
+        return True
+
+    def validate_data_dir_name(self, data_dir_name):
 
         # データディレクトリ名の検証
         if StringManager.is_empty(data_dir_name):
@@ -202,9 +204,12 @@ class BaseSubflowForm():
             self.change_submit_button_warning(msg_config.get('main_menu','data_dir_pattern_error'))
             return False
 
-        if not self.reserch_flow_status_operater.is_unique_data_dir(creating_phase_seq_number, data_dir_name):
+        return True
+
+    def is_unique_data_dir(self, data_dir_name, phase_seq_number):
+
+        if not self.reserch_flow_status_operater.is_unique_data_dir(phase_seq_number, data_dir_name):
             # data_dir_nameがユニークでない場合、ユーザ警告
             self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_data_dir'))
             return False
-
         return True

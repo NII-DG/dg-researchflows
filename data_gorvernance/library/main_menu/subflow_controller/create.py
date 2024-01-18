@@ -173,22 +173,27 @@ class CreateSubflowForm(BaseSubflowForm):
         self.change_submit_button_processing(msg_config.get('main_menu', 'creating_sub_flow'))
 
         # 入力情報を取得する。
-        creating_phase_seq_number = self._sub_flow_type_selector.value
+        phase_seq_number = self._sub_flow_type_selector.value
         sub_flow_name = self._sub_flow_name_form.value_input
         data_dir_name = self._data_dir_name_form.value_input
         parent_sub_flow_ids = self._parent_sub_flow_selector.value
 
+        # 入力値の検証
         sub_flow_name = StringManager.strip(sub_flow_name)
-        if not self.validate_sub_flow_name(sub_flow_name, creating_phase_seq_number):
+        if not self.validate_sub_flow_name(sub_flow_name):
+            return
+        if not self.is_unique_subflow_name(sub_flow_name, phase_seq_number):
             return
 
         data_dir_name = StringManager.strip(data_dir_name)
-        if not self.validate_data_dir_name(data_dir_name, creating_phase_seq_number):
+        if not self.validate_data_dir_name(data_dir_name):
+            return
+        if not self.is_unique_data_dir(data_dir_name, phase_seq_number):
             return
 
         # リサーチフローステータス管理JSONの更新
         try:
-            phase_name, new_sub_flow_id = self.reserch_flow_status_operater.create_sub_flow(creating_phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
+            phase_name, new_sub_flow_id = self.reserch_flow_status_operater.create_sub_flow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
         except Exception:
             self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             raise

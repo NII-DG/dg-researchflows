@@ -149,6 +149,7 @@ class MainMenu(TaskLog):
 
     def callback_menu_tabs(self, event):
         try:
+            self._err_output.clear()
             tab_index = event.new
             if tab_index == 0:
                 # サブフロー操作が選択
@@ -167,6 +168,7 @@ class MainMenu(TaskLog):
         """遷移ボタン for プロジェクト操作コントローラーの更新"""
         # 開発中のためアラートを表示する。
         try:
+            self._err_output.clear()
             self._project_widget_box.clear()
             alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
             self._project_widget_box.append(alert)
@@ -176,6 +178,7 @@ class MainMenu(TaskLog):
     def callback_sub_flow_menu(self, event):
         """サブフロー操作フォーム by サブフロー操作コントローラーオプション"""
         try:
+            self._err_output.clear()
             selected_value = self._sub_flow_menu.value
             if selected_value == 0: ## 選択なし
                 self.update_sub_flow_widget_box_for_init()
@@ -229,8 +232,10 @@ class MainMenu(TaskLog):
             display(Javascript('IPython.notebook.save_checkpoint();'))
             # end
             self.log.finish_callback(self.callback_type)
-        except  Exception as e:
-            self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
+        except  Exception:
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self.log.error(message)
+            self._err_output.update_error(message)
 
     #################
     # クラスメソッド #
@@ -291,5 +296,5 @@ class MainMenu(TaskLog):
         #    display(alert)
         #    display(initial_setup_link_button)
 
-        display(Javascript('IPython.notebook.save_checkpoint();'))
         main_menu.log.finish_cell()
+        display(Javascript('IPython.notebook.save_checkpoint();'))

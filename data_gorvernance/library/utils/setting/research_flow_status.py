@@ -264,8 +264,9 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
                     continue
             if remove_subflow is not None:
                 phase_status._sub_flow_data.remove(remove_subflow)
-            else:
-                raise NotFoundSubflowDataError(f'There Is No Subflow Data to Delete. sub_flow_id : {sub_flow_id}')
+                break
+        else:
+            raise NotFoundSubflowDataError(f'There Is No Subflow Data to Delete. sub_flow_id : {sub_flow_id}')
         # リサーチフローステータス管理JSONの上書き
         self.update_file(research_flow_status)
 
@@ -301,7 +302,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
     def get_flow_name_and_dir_name(self, phase_seq_number, id):
         research_flow_status = self.load_research_flow_status()
         for phase in research_flow_status:
-            if phase._id != phase_seq_number:
+            if phase._seq_number != phase_seq_number:
                 continue
             for sb in phase._sub_flow_data:
                 if sb._id == id:

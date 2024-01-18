@@ -135,7 +135,8 @@ class RenameSubflowForm(BaseSubflowForm):
 
         # ディレクトリ名を変更してからファイルを更新する
         try:
-            os.rename(old_path, new_path)
+            if data_dir_name != self.old_data_dir_name:
+                os.rename(old_path, new_path)
         except (FileExistsError, NotADirectoryError, OSError):
             self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_data_dir'))
             return
@@ -148,7 +149,8 @@ class RenameSubflowForm(BaseSubflowForm):
         except Exception:
             self.change_submit_button_error(msg_config.get('main_menu', 'error_rename_sub_flow'))
             # エラーの場合は変更したディレクトリ名を元に戻す
-            os.rename(new_path, old_path)
+            if data_dir_name != self.old_data_dir_name:
+                os.rename(new_path, old_path)
             raise
 
         # 新規作成ボタンを作成完了ステータスに更新する

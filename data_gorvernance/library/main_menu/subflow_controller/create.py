@@ -207,7 +207,7 @@ class CreateSubflowForm(BaseSubflowForm):
             # リサーチフローステータス管理JSONをロールバック
             self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
             # ユーザーに再入力を促す
-            self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_data_dir'))
+            self.change_submit_button_warning(msg_config.get('main_menu','data_directory_exist'))
             return
 
         # 新規サブフローデータの用意

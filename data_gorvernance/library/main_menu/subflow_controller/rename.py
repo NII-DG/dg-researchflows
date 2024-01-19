@@ -132,7 +132,7 @@ class RenameSubflowForm(BaseSubflowForm):
         if new_path != old_path:
 
             if os.path.exists(new_path):
-                self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_data_dir'))
+                self.change_submit_button_warning(msg_config.get('main_menu','data_directory_exist'))
                 return
 
             if not os.path.isdir(old_path):
@@ -142,7 +142,7 @@ class RenameSubflowForm(BaseSubflowForm):
             try:
                 os.rename(old_path, new_path)
             except (FileExistsError, NotADirectoryError, OSError):
-                self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_data_dir'))
+                self.change_submit_button_warning(msg_config.get('main_menu','data_directory_exist'))
                 return
             except Exception:
                 self.change_submit_button_error(msg_config.get('main_menu', 'error_rename_sub_flow'))

@@ -269,14 +269,12 @@ class MainMenu(TaskLog):
 
         ## 機能コントローラーを配置
         main_menu_title = 'メインメニュー'
-        main_menu_box = pn.WidgetBox(f'## {main_menu_title}', main_menu._menu_tabs)
+        main_menu_box = pn.WidgetBox(f'## {main_menu_title}', main_menu._menu_tabs, main_menu._err_output)
         display(main_menu_box)
         ## リサーチフロー図を配置
         research_flow_image_title = pn.pane.Markdown(f'### {msg_config.get("main_menu", "subflow_relationship_diagram")}')
         display(research_flow_image_title)
         display(main_menu._research_flow_image)
-        ## システムエラー表示オブジェクトを配置
-        display(main_menu._err_output)
 
         # Hidden Setup
         #else:

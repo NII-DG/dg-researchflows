@@ -31,17 +31,16 @@ class DeleteSubflowForm(BaseSubflowForm):
                     name_options[sf._name] = sf._id
                 break
 
-        del_names = []
         for phase_status in research_flow_status:
             if phase_status._seq_number <= phase_seq_number:
                 continue
             for sf in phase_status._sub_flow_data:
-                for name, id in name_options:
+                del_names = []
+                for name, id in name_options.items():
                     if id in sf._parent_ids:
                         del_names.append(name)
-
-        for name in del_names:
-            del name_options[name]
+                for name in del_names:
+                    del name_options[name]
 
         return name_options
 

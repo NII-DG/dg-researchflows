@@ -103,6 +103,6 @@ class DeleteSubflowForm(BaseSubflowForm):
             raise
 
         message = msg_config.get('main_menu', 'delete_caution').format(path)
-        self._err_output.info(message)
+        self._err_output.update_info(message)
         # 新規作成ボタンを作成完了ステータスに更新する
         self.change_submit_button_success(msg_config.get('main_menu', 'success_delete_sub_flow'))

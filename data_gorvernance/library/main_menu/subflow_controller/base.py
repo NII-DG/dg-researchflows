@@ -8,13 +8,13 @@ from dg_drawer.research_flow import PhaseStatus
 from ...utils.setting import ResearchFlowStatusOperater
 from ...utils.config import path_config, message as msg_config
 from ...utils.checker import StringManager
-from ...utils.widgets import Button
+from ...utils.widgets import Button, MessageBox
 
 
 class BaseSubflowForm():
     """サブフロー操作基底クラス"""
 
-    def __init__(self, abs_root, message_box) -> None:
+    def __init__(self, abs_root, message_box: MessageBox) -> None:
         self.abs_root = abs_root
 
         research_flow_status_file_path = path_config.get_research_flow_status_file_path(abs_root)

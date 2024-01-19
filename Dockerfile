@@ -63,13 +63,13 @@ RUN rm .wget-hsts
 
 # install vcpsdk
 RUN wget https://s3-ap-northeast-1.amazonaws.com/vcp-jupyternotebook/23.11.0/jupyternotebook_vcpsdk-23.11.0.tgz
-RUN mkdir -p ~/data_gorvernance/library/vcpsdk
-RUN tar zxvf jupyternotebook_vcpsdk-23.11.0.tgz -C ~/data_gorvernance/library/vcpsdk/
+RUN mkdir -p ~/data_gorvernance/library/vcp
+RUN tar zxvf jupyternotebook_vcpsdk-23.11.0.tgz -C ~/data_gorvernance/library/vcp/
 RUN rm jupyternotebook_vcpsdk-23.11.0.tgz
 RUN pip install --no-cache vrplib==1.3.0
-ENV PYTHONPATH "${PYTHONPATH}:/home/jovyan/data_gorvernance/library/vcpsdk/vcpsdk"
+ENV PYTHONPATH "${PYTHONPATH}:/home/jovyan/data_gorvernance/library/vcp/vcpsdk"
 USER root
-RUN cp ~/data_gorvernance/library/vcpsdk/vcpsdk/ca_cert/tokyo_ca.crt /usr/local/share/ca-certificates/
+RUN cp ~/data_gorvernance/library/vcp/vcpsdk/ca_cert/tokyo_ca.crt /usr/local/share/ca-certificates/
 RUN update-ca-certificates
 USER ${NB_USER}
 

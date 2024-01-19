@@ -157,5 +157,8 @@ class RenameSubflowForm(BaseSubflowForm):
                 os.rename(new_path, old_path)
             raise
 
+        # 完了したらサブフロー名称の選択肢の更新
+        self._sub_flow_type_selector.param.trigger('value')
+        self._sub_flow_name_selector.value = sub_flow_id
         # 新規作成ボタンを作成完了ステータスに更新する
         self.change_submit_button_success(msg_config.get('main_menu', 'success_rename_sub_flow'))

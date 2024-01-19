@@ -1,4 +1,7 @@
+from typing import Dict, List
+
 import panel as pn
+from dg_drawer.research_flow import PhaseStatus
 
 from ...utils.config import path_config, message as msg_config
 from .base import BaseSubflowForm
@@ -11,6 +14,36 @@ class DeleteSubflowForm(BaseSubflowForm):
         super().__init__(abs_root, message_box)
         # 処理開始ボタン
         self.change_submit_button_init(msg_config.get('main_menu', 'delete_sub_flow'))
+
+    # overwrite
+    def generate_sub_flow_name_options(self, phase_seq_number:int, research_flow_status:List[PhaseStatus])->Dict[str, int]:
+        # サブフロー名(表示名をkey, サブフローIDをVauleとする)
+        name_options = {}
+        name_options['--'] = 0
+        if phase_seq_number == 0:
+            return name_options
+
+        for phase_status in research_flow_status:
+            if phase_status._seq_number < phase_seq_number:
+                continue
+            if phase_status._seq_number == phase_seq_number:
+                for sf in phase_status._sub_flow_data:
+                    name_options[sf._name] = sf._id
+                break
+
+        del_names = []
+        for phase_status in research_flow_status:
+            if phase_status._seq_number <= phase_seq_number:
+                continue
+            for sf in phase_status._sub_flow_data:
+                for name, id in name_options:
+                    if id in sf._parent_ids:
+                        del_names.append(name)
+
+        for name in del_names:
+            del name_options[name]
+
+        return name_options
 
     # overwrite
     def change_disable_submit_button(self):

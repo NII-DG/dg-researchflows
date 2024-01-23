@@ -9,8 +9,8 @@ RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
 USER ${NB_USER}
-#RUN conda install --quiet --yes git==2.35.0
-#RUN conda install --quiet --yes git-annex==8.20210903
+RUN conda install --quiet --yes git==2.35.0
+RUN conda install --quiet --yes git-annex==8.20210903
 RUN conda clean -i -t -y
 
 # install the notebook package etc.

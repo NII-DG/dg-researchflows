@@ -9,7 +9,7 @@ script_dir_path = os.path.dirname(__file__)
 p = Path(script_dir_path)
 ocs_template_json_file = p.joinpath('../../data/ocs-template.json').resolve()
 
-class ocs_template:
+class OCSTemplate:
     __FIELD = "ocs_template"
     __ID = "id"
     __FIELD_NAME = "ocs_template_name"

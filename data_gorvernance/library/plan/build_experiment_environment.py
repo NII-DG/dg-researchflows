@@ -10,14 +10,13 @@ from ..task_director import TaskDirector, get_subflow_type_and_id, get_return_su
 from ..utils.widgets import Button, MessageBox
 from ..utils.package import MakePackage, OutputDirExistsException
 from ..utils.config import path_config, message as msg_config
-from ..utils.setting import ocs_template, ResearchFlowStatusOperater
+from ..utils.setting import OCSTemplate, ResearchFlowStatusOperater
 from ..utils.html.button import create_button
 
 # 本ファイルのファイル名
 script_file_name = os.path.splitext(os.path.basename(__file__))[0]
 notebook_name = script_file_name+'.ipynb'
 
-OCS_TEMPLATE_PATH="../../../../../working/researchflow/plan/task/plan/ocs-templates/"
 DEFAULT_WIDTH = 600
 
 class ExperimentEnvBuilder(TaskDirector):
@@ -46,7 +45,7 @@ class ExperimentEnvBuilder(TaskDirector):
         self._form_box.clear()
         self._template_form_box.clear()
 
-        self.ocs_template = ocs_template()
+        self.ocs_template = OCSTemplate()
         options = []
         options.extend(self.ocs_template.get_name())
 
@@ -106,7 +105,7 @@ class ExperimentEnvBuilder(TaskDirector):
                             + '<br>' \
                             + msg_config.get('select_ocs_template', 'success') 
 
-                self.template_link =  OCS_TEMPLATE_PATH + self.template_path
+                self.template_link =  path_config.get_ocs_template_link_path(  self._abs_root_path ) + self.template_path
 
                 md = pn.pane.Markdown( message )
                 self._template_form_box.extend(

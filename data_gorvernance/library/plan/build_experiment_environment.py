@@ -158,8 +158,8 @@ class ExperimentEnvBuilder(TaskDirector):
         self.done_task(script_file_name)
         
         # フォーム定義
-        source = []
-        source.append(os.path.join( self.abs_root, path_config.DATA, path_config.PLAN, "build_experiment_environment") )
+        save_target_path = os.path.join( self._abs_root_path, path_config.DATA, path_config.PLAN, "build_experiment_environment")
+        source = self.get_sync_source(save_target_path)
         self.define_save_form(source, script_file_name)
         
         # フォーム表示
@@ -168,3 +168,12 @@ class ExperimentEnvBuilder(TaskDirector):
         form_section.append(self.save_form_box)
         form_section.append(self.save_msg_output)
         display(form_section)
+
+    def get_sync_source(self, search_directory :str):
+        source = []
+        for root, dirs, files in os.walk(search_directory):
+            for filename in files:
+                if filename.endswith(".ipynb"):
+                    path = os.path.join(root, filename)
+                    source.append(path)
+        return source

@@ -9,7 +9,7 @@
         {
             "id":"T002",
             "ocs_template_name": "OCSを利用して解析環境を作成する（JupyterHub）",
-            "ocs_template_path": "TheLittlestJupyterHub/001-JupyterHub環境構築.ipynb",
+            "ocs_template_path": "/TheLittlestJupyterHub/001-JupyterHub環境構築.ipynb",
             "is_active": true
         },
         {

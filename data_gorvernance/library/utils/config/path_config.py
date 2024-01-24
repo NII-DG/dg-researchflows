@@ -8,6 +8,7 @@ from typing import List
 # Folder
 DATA_GOVERNANCE = 'data_gorvernance'
 DATA = 'data'
+OCS_TEMPLATES = 'ocs-templates'
 ## data_gorvernance直下
 BASE = 'base'
 LOG = 'log'
@@ -105,7 +106,7 @@ def get_sub_flow_status_file_path(phase:str, subflow_id:str='')->str:
 def get_ocs_template_dir( abs_root ):
     """<root>/data/<phase>/<data_dir_name>"""
     ## home/jovyan/working/researchflow/plan/task/plan/ocs-templates/"
-    return os.path.join(abs_root, DG_WORKING_RESEARCHFLOW_FOLDER, PLAN, TASK, PLAN, )
+    return os.path.join(abs_root, DG_WORKING_RESEARCHFLOW_FOLDER, PLAN, TASK, PLAN, OCS_TEMPLATES)
 
 # other method
 def get_prepare_file_name_list_for_subflow()->List[str]:

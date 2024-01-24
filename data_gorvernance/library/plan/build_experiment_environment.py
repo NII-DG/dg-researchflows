@@ -105,7 +105,7 @@ class ExperimentEnvBuilder(TaskDirector):
                             + '<br>' \
                             + msg_config.get('select_ocs_template', 'success') 
 
-                self.template_link =  path_config.get_ocs_template_link_path(  self._abs_root_path ) + self.template_path
+                self.template_link =  path_config.get_ocs_template_dir(  self._abs_root_path ) + self.template_path
 
                 md = pn.pane.Markdown( message )
                 self._template_form_box.extend(

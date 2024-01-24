@@ -107,9 +107,9 @@ def get_ocs_template_dir( subflow_id:str='' ):
 
     # working/researchflow/plan/task/plan/ocs-templates
     if len(subflow_id) > 0:
-        return os.path.join( '../../../../../../', DG_WORKING_RESEARCHFLOW_FOLDER, PLAN, TASK, PLAN, OCS_TEMPLATES)
+        return os.path.join( '../../../../../../../', DG_WORKING_RESEARCHFLOW_FOLDER, PLAN, TASK, PLAN, OCS_TEMPLATES)
     else:
-        return os.path.join( '../../../../../', DG_WORKING_RESEARCHFLOW_FOLDER, PLAN, TASK, PLAN, OCS_TEMPLATES)
+        return os.path.join( '../../../../../../', DG_WORKING_RESEARCHFLOW_FOLDER, PLAN, TASK, PLAN, OCS_TEMPLATES)
 
 # other method
 def get_prepare_file_name_list_for_subflow()->List[str]:

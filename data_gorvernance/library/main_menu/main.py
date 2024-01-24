@@ -229,7 +229,6 @@ class MainMenu(TaskLog):
             # end
             self.log.finish_callback(self.callback_type)
         except  Exception as e:
-            self.subflow_form.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     #################

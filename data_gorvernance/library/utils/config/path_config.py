@@ -12,12 +12,12 @@ OCS_TEMPLATES = 'ocs-templates'
 ## data_gorvernance直下
 BASE = 'base'
 LOG = 'log'
+IMAGES = 'images'
 RESEARCHFLOW = 'researchflow'
 WORKING = 'working' ## 同期非対称フォルダ
 ## base直下
 SUB_FLOW = 'subflow'
 TASK = 'task'
-IMAGES = 'images'
 ## researchflow直下
 PLAN = 'plan'
 
@@ -35,6 +35,8 @@ DG_TASK_BASE_DATA_FOLDER = os.path.join(DATA_GOVERNANCE, BASE, TASK)
 DG_RESEARCHFLOW_FOLDER = os.path.join(DATA_GOVERNANCE, RESEARCHFLOW)
 # ログフォルダ
 DG_LOG_FOLDER = os.path.join(DATA_GOVERNANCE, LOG, RESEARCHFLOW)
+# 画像フォルダ
+DG_IMAGES_FOLDER = os.path.join(DATA_GOVERNANCE, IMAGES)
 # 非同期フォルダパス
 DG_WORKING_FOLDER = os.path.join(DATA_GOVERNANCE, WORKING)
 DG_WORKING_RESEARCHFLOW_FOLDER = os.path.join(DG_WORKING_FOLDER, RESEARCHFLOW)
@@ -113,5 +115,4 @@ def get_ocs_template_dir( subflow_id:str='' ):
 
 # other method
 def get_prepare_file_name_list_for_subflow()->List[str]:
-    return [MENU_NOTEBOOK, STATUS_JSON, PROPERTY_JSON, IMAGES]
-
+    return [MENU_NOTEBOOK, STATUS_JSON, PROPERTY_JSON]

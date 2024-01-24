@@ -103,10 +103,13 @@ def get_sub_flow_status_file_path(phase:str, subflow_id:str='')->str:
     else:
         return os.path.join(DG_RESEARCHFLOW_FOLDER, phase, STATUS_JSON)
 
-def get_ocs_template_dir( abs_root ):
-    """<root>/data/<phase>/<data_dir_name>"""
-    ## home/jovyan/working/researchflow/plan/task/plan/ocs-templates/"
-    return os.path.join(abs_root, DG_WORKING_RESEARCHFLOW_FOLDER, PLAN, TASK, PLAN, OCS_TEMPLATES)
+def get_ocs_template_dir( subflow_id:str='' ):
+
+    # working/researchflow/plan/task/plan/ocs-templates
+    if len(subflow_id) > 0:
+        return os.path.join( '../../../../../../', DG_WORKING_RESEARCHFLOW_FOLDER, PLAN, TASK, PLAN, OCS_TEMPLATES)
+    else
+        return os.path.join( '../../../../../', DG_WORKING_RESEARCHFLOW_FOLDER, PLAN, TASK, PLAN, OCS_TEMPLATES)
 
 # other method
 def get_prepare_file_name_list_for_subflow()->List[str]:

@@ -49,7 +49,7 @@ class ExperimentEnvBuilder(TaskDirector):
         options = []
         options.extend(self.ocs_template.get_name())
 
-        self.ocstemplate_list = pn.widgets.Select(
+        self.ocs_template_list = pn.widgets.Select(
                 name=msg_config.get('select_ocs_template', 'ocs_template_title'),
                 options=options,
                 disabled_options=self.ocs_template.get_disabled_ids(),
@@ -57,12 +57,12 @@ class ExperimentEnvBuilder(TaskDirector):
                 width=600
             )
 
-        self.ocstemplate_list.param.watch(self._ocs_template_select_callback, 'value')
-        self._form_box.append(self.ocstemplate_list)
+        self.ocs_template_list.param.watch(self._ocs_template_select_callback, 'value')
+        self._form_box.append(self.ocs_template_list)
 
     def _ocs_template_select_callback(self, event):
         try:
-            self.selected = self.ocstemplate_list.value
+            self.selected = self.ocs_template_list.value
             self.set_templatelink_form()  
         except Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
@@ -156,3 +156,15 @@ class ExperimentEnvBuilder(TaskDirector):
     def completed_task(self):
         # タスク実行の完了情報を該当サブフローステータス管理JSONに書き込む
         self.done_task(script_file_name)
+        
+        # フォーム定義
+        source = []
+        source.append(os.path.join( self.abs_root, path_config.DATA, path_config.PLAN, "build_experiment_environment") )
+        self.define_save_form(source, script_file_name)
+        
+        # フォーム表示
+        pn.extension()
+        form_section = pn.WidgetBox()
+        form_section.append(self.save_form_box)
+        form_section.append(self.save_msg_output)
+        display(form_section)

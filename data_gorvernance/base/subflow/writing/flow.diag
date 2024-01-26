@@ -1,0 +1,35 @@
+blockdiag {
+    node_width = 200;
+    node_height = 130;
+    span_width = 10;
+    span_height = 30;
+    default_fontsize = 10;
+    orientation = portrait;
+    default_group_color = "#FFFFCC";
+
+    class disable [shape=none, height=1, width=1];
+
+    group {
+        dummy-1-1[shape=none, height=1, width=250];
+        RF004003;
+    }
+
+    group {
+        shape = line;
+        style = none;
+        orientation = portrait;
+        group {
+            orientation = portrait;
+            shape = line;
+            style = none;
+            dummy-1-3[shape=none, height=1, width=250]
+            RF002004;
+        }
+        RF009002;
+        RF009001;
+    }
+
+    // 横幅の調整用ダミーを任意の場所に置くため
+    dummy-1-1 -- RF004003[style=none];
+    dummy-1-3 -- RF002004[style=none];
+}

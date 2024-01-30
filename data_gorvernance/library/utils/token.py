@@ -1,7 +1,7 @@
 
 
 from .config import path_config, message as msg_config
-from .storage_provider.grdm import get_project_id
+from .storage_provider import grdm
 
 
 
@@ -17,7 +17,7 @@ def get_token():
     return token
 
 def get_project_id():
-    project_id = get_project_id()
+    project_id = grdm.get_project_id()
     if project_id:
         return project_id
     while True:

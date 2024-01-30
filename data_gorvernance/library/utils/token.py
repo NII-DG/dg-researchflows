@@ -21,7 +21,7 @@ def get_project_id():
     if project_id:
         return project_id
     while True:
-        project_id = input(msg_config.get('form', 'pls_input_token'))
+        project_id = input(msg_config.get('form', 'pls_input_project_id'))
         if project_id:
             break
     return project_id

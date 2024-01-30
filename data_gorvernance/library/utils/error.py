@@ -13,7 +13,9 @@ class InputWarning(Exception):
     pass
 
 class MetadataNotExist(Exception):
+    """取得したプロジェクトメタデータが空である場合のエラー"""
     pass
+
 
 """通信系のエラー"""
 
@@ -29,7 +31,11 @@ class UrlUpdateError(Exception):
 
 
 class UnauthorizedError(Exception):
-    """認証が通らなかった時のエラー"""
+    """認証が通らなかった時のエラー(HTTPStatus.UNAUTHORIZED)"""
+    pass
+
+class NotFoundURLError(Exception):
+    """存在しないURLのエラー(HTTPStatus.NOT_FOUND)"""
     pass
 
 class ExecCmdError(Exception):

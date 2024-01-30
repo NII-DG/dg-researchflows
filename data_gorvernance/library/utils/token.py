@@ -6,7 +6,6 @@ from .storage_provider import grdm
 from .checker import StringManager
 
 
-
 def get_token():
     # Vaultからトークンを取得する
     token = ""
@@ -15,9 +14,11 @@ def get_token():
     while True:
         token = input(msg_config.get('form', 'pls_input_token'))
         token = StringManager.strip(token)
-        if not StringManager.is_empty(token):
-            break
-    clear_output()
+        if StringManager.is_empty(token):
+            continue
+        if not StringManager.is_half(token):
+            continue
+        break
     return token
 
 def get_project_id():
@@ -27,7 +28,9 @@ def get_project_id():
     while True:
         project_id = input(msg_config.get('form', 'pls_input_project_id'))
         project_id = StringManager.strip(project_id)
-        if not StringManager.is_empty(project_id):
-            break
-    clear_output()
+        if StringManager.is_empty(project_id):
+            continue
+        if not StringManager.is_half(project_id):
+            continue
+        break
     return project_id

@@ -3,14 +3,14 @@ import traceback
 from requests.exceptions import RequestException
 
 import panel as pn
+from IPython.display import clear_output
 
 from .config import path_config, message as msg_config
 from .widgets import Button, MessageBox
 from .storage_provider import grdm
 from .time import TimeDiff
 from .log import TaskLog
-from .error import UnauthorizedError
-from .checker import StringManager
+from .token import get_token, get_project_id
 
 
 def all_sync_path(abs_root):
@@ -18,8 +18,6 @@ def all_sync_path(abs_root):
 
     # /home/jovyan/data
     paths.append(os.path.join(abs_root, path_config.DATA))
-    # 暫定処置
-    os.makedirs(os.path.join(abs_root, path_config.DATA), exist_ok=True)
 
     # /home/jovyan/data_gorvernance配下のworking以外
     dg_dir = os.path.join(abs_root, path_config.DATA_GOVERNANCE)
@@ -46,16 +44,8 @@ class TaskSave(TaskLog):
         # フォーム用ボックス
         self.save_form_box = pn.WidgetBox()
         self.save_form_box.width = 900
-        # 入力フォーム
-        self._save_form = pn.widgets.PasswordInput(
-            name=msg_config.get('form', 'token_title'),
-            width=600)
-        self.save_form_box.append(self._save_form)
         # 確定ボタン
         self._save_submit_button = Button(width=600)
-        self._save_submit_button.set_looks_init()
-        self._save_submit_button.on_click(self._token_form_callback)
-        self.save_form_box.append(self._save_submit_button)
 
     def define_save_form(self, source, script_file_name):
         """source is str or list."""
@@ -69,100 +59,17 @@ class TaskSave(TaskLog):
 
         # config
         self._script_file_name = script_file_name
+        self.token = get_token()
+        self.project_id = get_project_id()
+        clear_output()
+
+        # define form
+        self._save_submit_button.set_looks_init(msg_config.get('save', 'submit'))
+        self._save_submit_button.on_click(self._save_submit_callback)
+        self.save_form_box.append(self._save_submit_button)
 
     @TaskLog.callback_form("input_token")
-    def _token_form_callback(self, event):
-        self.save_msg_output.clear()
-        self._save_submit_button.set_looks_processing()
-
-        token = self._save_form.value_input
-        token = StringManager.strip(token, remove_empty=False)
-        if not self._validate_token(token):
-            return
-        self.grdm_token = token
-
-        project_id = grdm.get_project_id()
-        if project_id:
-            self.project_id = project_id
-            self._save()
-        else:
-            # grdmから起動しない場合（開発用）
-            self._project_id_form()
-
-    def _validate_token(self, token):
-        if not token:
-            message = msg_config.get('save', 'empty_warning')
-            self.log.warning(message)
-            self._save_submit_button.set_looks_warning(message)
-            return False
-        if StringManager.has_whitespace(token):
-            message = msg_config.get('form', 'token_invalid')
-            self.log.warning(message)
-            self._save_submit_button.set_looks_warning(message)
-            return False
-
-        try:
-            grdm.get_projects_list(
-                grdm.SCHEME, grdm.API_DOMAIN, token
-            )
-        except UnauthorizedError:
-            message = msg_config.get('form', 'token_unauthorized')
-            self.log.warning(message)
-            self._save_submit_button.set_looks_warning(message)
-            return False
-        except RequestException:
-            message = msg_config.get('DEFAULT', 'connection_error')
-            self.log.error(message)
-            self._save_submit_button.set_looks_error(message)
-            return False
-        except Exception:
-            message = msg_config.get('DEFAULT', 'unexpected_error')
-            self.log.error(message)
-            self._save_submit_button.set_looks_error(message)
-            return False
-
-        return True
-
-    def _project_id_form(self):
-        self.save_msg_output.clear()
-        projects = grdm.get_projects_list(
-            grdm.SCHEME, grdm.API_DOMAIN, self.grdm_token
-        )
-
-        options =  dict()
-        options[msg_config.get('form', 'selector_default')] = False
-        for id, name in projects.items():
-            options[name] = id
-
-        self.save_form_box.clear()
-
-        self._save_form = pn.widgets.Select(options=options, value=False)
-        self._save_form.param.watch(self._project_select_callback, 'value')
-        self.save_form_box.append(self._save_form)
-
-        self._save_submit_button = Button(width=600)
-        self._save_submit_button.set_looks_init()
-        self._save_submit_button.on_click(self._id_form_callback)
-        self.save_form_box.append(self._save_submit_button)
-        self._save_submit_button.disabled = True
-
-    def _project_select_callback(self, event):
-        # NOTE: 一度値を格納してからでないと上手く動かない
-        value = self._save_form.value
-        if value:
-            self._save_submit_button.disabled = False
-        else:
-            self._save_submit_button.disabled = True
-
-    @TaskLog.callback_form("select_grdm_project")
-    def _id_form_callback(self, event):
-        value = self._save_form.value
-        if not value:
-            message = msg_config.get('form', 'select_warning')
-            self._save_submit_button.set_looks_warning("message")
-            self.log.warning(message)
-            return
-        self.project_id = value
+    def _save_submit_callback(self, event):
         self._save()
 
     def _save(self):
@@ -178,7 +85,7 @@ class TaskSave(TaskLog):
             for i, path in enumerate(self._source):
                 self.save_msg_output.update_info(f'{msg} {i+1}/{size}')
                 grdm.sync(
-                    token=self.grdm_token,
+                    token=self.token,
                     base_url=grdm.API_V2_BASE_URL,
                     project_id=self.project_id,
                     abs_source = path,

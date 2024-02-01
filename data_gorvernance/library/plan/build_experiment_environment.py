@@ -137,7 +137,7 @@ class ExperimentEnvBuilder(TaskDirector):
     @TaskDirector.task_cell("1")
     def generateFormScetion(self):
         # タスク開始によるサブフローステータス管理JSONの更新
-        self.doing_task(script_file_name)
+        self.doing_task()
 
         # フォーム定義
         self.set_ocs_template_selector()
@@ -152,12 +152,12 @@ class ExperimentEnvBuilder(TaskDirector):
     TaskDirector.task_cell("2")
     def completed_task(self):
         # タスク実行の完了情報を該当サブフローステータス管理JSONに書き込む
-        self.done_task(script_file_name)
+        self.done_task()
         
         # フォーム定義
         save_target_path = os.path.join( self._abs_root_path, path_config.DATA, path_config.PLAN, "build_experiment_environment")
         source = self.get_sync_source(save_target_path)
-        self.define_save_form(source, script_file_name)
+        self.define_save_form(source)
         
         # フォーム表示
         pn.extension()

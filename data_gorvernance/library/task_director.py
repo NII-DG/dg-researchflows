@@ -55,28 +55,20 @@ class TaskDirector(TaskSave):
     ########################
     #  update task status  #
     ########################
-    def doing_task(self, task_name:str):
-        """タスク開始によるサブフローステータス管理JSONの更新
-
-        Args:
-            task_name (str): [タスク名]
-        """
+    def doing_task(self):
+        """タスク開始によるサブフローステータス管理JSONの更新"""
         # タスク開始によるサブフローステータス管理JSONの更新
         sf = SubflowStatusFile(self._sub_flow_status_file_path)
         sf_status: SubflowStatus = sf.read()
-        sf_status.doing_task_by_task_name(task_name, os.environ["JUPYTERHUB_SERVER_NAME"])
+        sf_status.doing_task_by_task_name(self._notebook_name, os.environ["JUPYTERHUB_SERVER_NAME"])
         # 更新内容を記録する。
         sf.write(sf_status)
 
-    def done_task(self, task_name:str):
-        """タスク完了によるサブフローステータス管理JSONの更新
-
-        Args:
-            script_file_name (str): [タスク名]
-        """
+    def done_task(self):
+        """タスク完了によるサブフローステータス管理JSONの更新"""
         sf = SubflowStatusFile(self._sub_flow_status_file_path)
         sf_status: SubflowStatus = sf.read()
-        sf_status.completed_task_by_task_name(task_name, os.environ["JUPYTERHUB_SERVER_NAME"])
+        sf_status.completed_task_by_task_name(self._notebook_name, os.environ["JUPYTERHUB_SERVER_NAME"])
         sf.write(sf_status)
 
     #########################
@@ -99,7 +91,9 @@ class TaskDirector(TaskSave):
         return sub_flow_menu_link_button
 
     # ここではログを吐かない
-    def return_subflow_menu(self):
+    def return_subflow_menu(self, done=False):
+        if done:
+            self.done_task()
         pn.extension()
         sub_flow_menu_link_button  = self.get_subflow_menu_button_object()
         display(sub_flow_menu_link_button)
@@ -113,4 +107,4 @@ class TaskDirector(TaskSave):
     def _save(self):
         # uploadしたときにタスク完了とするため
         super()._save()
-        self.done_task(self._script_file_name)
+        self.done_task()

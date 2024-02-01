@@ -36,6 +36,7 @@ class TaskSave(TaskLog):
     def __init__(self, nb_working_file_path, notebook_name) -> None:
         super().__init__(nb_working_file_path, notebook_name)
         self._abs_root_path = path_config.get_abs_root_form_working_dg_file_path(nb_working_file_path)
+        self._notebook_name = notebook_name
 
         # メッセージ出力
         self.save_msg_output = MessageBox()
@@ -47,7 +48,7 @@ class TaskSave(TaskLog):
         # 確定ボタン
         self._save_submit_button = Button(width=600)
 
-    def define_save_form(self, source, script_file_name):
+    def define_save_form(self, source):
         """source is str or list."""
 
         # validate source path
@@ -58,7 +59,6 @@ class TaskSave(TaskLog):
         self._source = source
 
         # config
-        self._script_file_name = script_file_name
         self.token = get_token()
         self.project_id = get_project_id()
         clear_output()

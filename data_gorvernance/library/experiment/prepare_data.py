@@ -19,7 +19,7 @@ class DataPreparer(TaskDirector):
     @TaskDirector.task_cell("1")
     def generateFormScetion(self):
         # タスク開始によるサブフローステータス管理JSONの更新
-        self.doing_task(script_file_name)
+        self.doing_task()
 
         # フォーム定義
         # フォーム表示
@@ -28,4 +28,4 @@ class DataPreparer(TaskDirector):
     TaskDirector.task_cell("2")
     def completed_task(self):
         # タスク実行の完了情報を該当サブフローステータス管理JSONに書き込む
-        self.done_task(script_file_name)
+        self.done_task()

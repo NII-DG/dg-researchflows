@@ -16,6 +16,7 @@ from .subflow_controller import (
     RenameSubflowForm,
     DeleteSubflowForm
 )
+from ..utils.vault import Vault
 
 
 # git clone https://github.com/NII-DG/dg-researchflows.git -b feature/main_menu_v2 ./demo
@@ -260,6 +261,9 @@ class MainMenu(TaskLog):
         main_menu = MainMenu(working_path)
         # log
         main_menu.log.start_cell()
+        # initialize vault
+        vault = Vault()
+        vault.initialize()
 
         ## 機能コントローラーを配置
         main_menu_title = 'メインメニュー'

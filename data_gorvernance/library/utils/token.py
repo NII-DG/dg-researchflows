@@ -4,22 +4,41 @@ from IPython.display import clear_output
 from .config import path_config, message as msg_config
 from .storage_provider import grdm
 from .checker import StringManager
+from .vault import Vault
+from .storage_provider import grdm
+from .error import UnauthorizedError
 
 
 def get_token():
+    TOKEN_KEY = 'grdm_token'
+
     # Vaultからトークンを取得する
-    token = ""
-    if token:
+    vault = Vault()
+    if vault.has_value(TOKEN_KEY):
+        token = vault.get_value(TOKEN_KEY)
         return token
+
     while True:
         token = input(msg_config.get('form', 'pls_input_token'))
+
+        # 形式確認
         token = StringManager.strip(token)
         if StringManager.is_empty(token):
             continue
         if not StringManager.is_half(token):
             continue
+
+        # 接続確認
+        try:
+            grdm.get_projects(grdm.SCHEME, grdm.API_DOMAIN, token)
+        except UnauthorizedError:
+            continue
+
         break
+
+    vault.set_value(TOKEN_KEY, token)
     return token
+
 
 def get_project_id():
     project_id = grdm.get_project_id()

@@ -10,7 +10,7 @@ from .widgets import Button, MessageBox
 from .storage_provider import grdm
 from .time import TimeDiff
 from .log import TaskLog
-from .token import get_token, get_project_id
+from .input import get_token, get_project_id
 
 
 def all_sync_path(abs_root):

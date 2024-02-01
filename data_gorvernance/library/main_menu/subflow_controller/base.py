@@ -7,7 +7,7 @@ from dg_drawer.research_flow import PhaseStatus
 
 from ...utils.setting import ResearchFlowStatusOperater
 from ...utils.config import path_config, message as msg_config
-from ...utils.checker import StringManager
+from ...utils.string import StringManager
 from ...utils.widgets import Button
 
 

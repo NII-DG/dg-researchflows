@@ -38,6 +38,7 @@ class TaskDirector(TaskSave):
         self.nb_working_file_path = nb_working_file_path
         # 絶対rootディレクトリを取得・設定する
         self._abs_root_path = path_config.get_abs_root_form_working_dg_file_path(nb_working_file_path)
+        self._script_file_name = os.path.splitext(notebook_name)[0]
 
         # サブフローステータス管理JSONパス
         # 想定値：data_gorvernance\researchflow\plan\status.json
@@ -60,7 +61,7 @@ class TaskDirector(TaskSave):
         # タスク開始によるサブフローステータス管理JSONの更新
         sf = SubflowStatusFile(self._sub_flow_status_file_path)
         sf_status: SubflowStatus = sf.read()
-        sf_status.doing_task_by_task_name(self._notebook_name, os.environ["JUPYTERHUB_SERVER_NAME"])
+        sf_status.doing_task_by_task_name(self._script_file_name, os.environ["JUPYTERHUB_SERVER_NAME"])
         # 更新内容を記録する。
         sf.write(sf_status)
 
@@ -68,7 +69,7 @@ class TaskDirector(TaskSave):
         """タスク完了によるサブフローステータス管理JSONの更新"""
         sf = SubflowStatusFile(self._sub_flow_status_file_path)
         sf_status: SubflowStatus = sf.read()
-        sf_status.completed_task_by_task_name(self._notebook_name, os.environ["JUPYTERHUB_SERVER_NAME"])
+        sf_status.completed_task_by_task_name(self._script_file_name, os.environ["JUPYTERHUB_SERVER_NAME"])
         sf.write(sf_status)
 
     #########################

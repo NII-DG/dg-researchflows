@@ -36,7 +36,6 @@ class TaskSave(TaskLog):
     def __init__(self, nb_working_file_path, notebook_name) -> None:
         super().__init__(nb_working_file_path, notebook_name)
         self._abs_root_path = path_config.get_abs_root_form_working_dg_file_path(nb_working_file_path)
-        self._notebook_name = notebook_name
 
         # メッセージ出力
         self.save_msg_output = MessageBox()

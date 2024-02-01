@@ -94,6 +94,7 @@ class TaskDirector(TaskSave):
     # ここではログを吐かない
     def return_subflow_menu(self, done=False):
         if done:
+            self.doing_task() # 現在の仕様ではdoneにするために実行環境を設定する必要があるため
             self.done_task()
         pn.extension()
         sub_flow_menu_link_button  = self.get_subflow_menu_button_object()

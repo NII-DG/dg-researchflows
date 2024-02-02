@@ -21,6 +21,7 @@ def start_server():
         os.environ['HOME'], 'data_gorvernance/library/data/vault-config.hcl')
     subprocess.Popen(
         ['vault', 'server', '-config', config_path],
+        stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
 
@@ -51,14 +52,21 @@ class Vault():
     def has_value(self, key):
         """値の存在チェック"""
         client = self.__get_client()
-        secrets = client.secrets.kv.v1.list_secrets(
-            path='',
-            mount_point=DG_ENGINE_NAME,
-        )
+        try:
+            secrets = client.secrets.kv.v1.list_secrets(
+                path='',
+                mount_point=DG_ENGINE_NAME,
+            )
+        except hvac.exceptions.InvalidPath:
+            # キーが1つも存在しない場合
+            return False
         return key in secrets['data']['keys']
 
     def get_value(self, key):
         """値の取得"""
+        if not self.has_value(key):
+            return None
+
         client = self.__get_client()
         read_res = client.secrets.kv.v1.read_secret(
             path=key,

@@ -14,8 +14,8 @@ def get_token():
 
     # Vaultからトークンを取得する
     vault = Vault()
-    if vault.has_value(TOKEN_KEY):
-        token = vault.get_value(TOKEN_KEY)
+    token = vault.get_value(TOKEN_KEY)
+    if token:
         return token
 
     while True:

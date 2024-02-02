@@ -265,9 +265,6 @@ class MainMenu(TaskLog):
         main_menu.log.start_cell()
         # initialize vault
         vault = Vault()
-        # 標準出力を出さないために捨てる
-        #with open(os.devnull, 'w') as f:
-        #    with redirect_stdout(f):
         vault.initialize()
 
         ## 機能コントローラーを配置

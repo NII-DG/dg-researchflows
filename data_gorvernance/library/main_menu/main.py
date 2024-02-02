@@ -1,8 +1,9 @@
 import os
 import traceback
+from contextlib import redirect_stdout
 
 import panel as pn
-from IPython.display import display
+from IPython.display import display, clear_output
 from IPython.core.display import Javascript
 
 from ..utils.setting import ResearchFlowStatusOperater, SubflowStatusFile
@@ -263,7 +264,10 @@ class MainMenu(TaskLog):
         main_menu.log.start_cell()
         # initialize vault
         vault = Vault()
-        vault.initialize()
+        # 標準出力を出さないために捨てる
+        with open(os.devnull, 'w') as f:
+            with redirect_stdout(f):
+                vault.initialize()
 
         ## 機能コントローラーを配置
         main_menu_title = 'メインメニュー'

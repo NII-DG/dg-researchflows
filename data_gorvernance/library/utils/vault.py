@@ -22,6 +22,7 @@ def start_server():
     subprocess.Popen(
         ['vault', 'server', '-config', config_path],
         stderr=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL
     )
 
 

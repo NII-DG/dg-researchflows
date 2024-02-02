@@ -1,6 +1,7 @@
 import os
 import traceback
 from contextlib import redirect_stdout
+import sys
 
 import panel as pn
 from IPython.display import display, clear_output
@@ -265,9 +266,9 @@ class MainMenu(TaskLog):
         # initialize vault
         vault = Vault()
         # 標準出力を出さないために捨てる
-        with open(os.devnull, 'w') as f:
-            with redirect_stdout(f):
-                vault.initialize()
+        #with open(os.devnull, 'w') as f:
+        #    with redirect_stdout(f):
+        vault.initialize()
 
         ## 機能コントローラーを配置
         main_menu_title = 'メインメニュー'

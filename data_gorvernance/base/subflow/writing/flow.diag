@@ -23,13 +23,14 @@ blockdiag {
             shape = line;
             style = none;
             dummy-1-3[shape=none, height=1, width=250]
-            RF002004;
+            RF009004;
         }
         RF009002;
         RF009001;
+        RF009005;
     }
 
     // 横幅の調整用ダミーを任意の場所に置くため
     dummy-1-1 -- RF004003[style=none];
-    dummy-1-3 -- RF002004[style=none];
+    dummy-1-3 -- RF009004[style=none];
 }

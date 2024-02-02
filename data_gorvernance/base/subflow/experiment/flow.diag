@@ -26,7 +26,6 @@ blockdiag {
             RF003012;
             dummy-5-1[shape=none, height=1, width=1];
         }
-        RF003004;
         dummy-7-1[shape=none, height=1, width=250]
 
     }
@@ -40,22 +39,21 @@ blockdiag {
             shape = line;
             style = none;
             dummy-1-3[shape=none, height=1, width=250]
-            RF003007;
+            RF009004;
         }
-        RF009003;
         RF009002;
-        RF003013;
         RF009001;
+        RF009005;
     }
 
     // メインのフロー
-    RF003001 -> RF003010 -> RF003011 -> RF003012 -> RF003004;
+    RF003001 -> RF003010 -> RF003011 -> RF003012;
     // 戻る矢印
     RF003011 <- dummy-4-1;
     dummy-5-1 -- dummy-4-1;
     RF003012 -- dummy-5-1;
     // 横幅の調整用ダミーを任意の場所に置くため
     dummy-1-1 -- RF003001[style=none];
-    dummy-1-3 -- RF003007[style=none];
-    RF003004 -- dummy-7-1[style=none];
+    dummy-1-3 -- RF009004[style=none];
+    RF003012 -- dummy-7-1[style=none];
 }

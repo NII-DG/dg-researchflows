@@ -8,6 +8,7 @@ RUN apt-get install -y libmagic1
 RUN apt-get install -y sshpass
 RUN apt-get install -y iputils-ping net-tools
 RUN apt-get install -y expect
+RUN apt-get install -y curl
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 

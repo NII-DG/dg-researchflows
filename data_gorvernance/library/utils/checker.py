@@ -20,7 +20,6 @@ class StringManager:
     @staticmethod
     def strip(text:str, remove_empty=True)->str:
         """文字列の両端の空白文字を削除する
-
         remove_empty=Falseのとき、空白文字のみで構成された文字列が渡された場合にもとの文字列をそのまま返す
         """
         if not text.strip() and not remove_empty:

@@ -1,6 +1,7 @@
 FROM jupyter/scipy-notebook:ubuntu-20.04
 
 USER root
+RUN rm -rf /var/lib/apt/lists/*
 RUN apt-get update -y
 RUN apt-get install -y netbase
 RUN apt-get install -y graphviz

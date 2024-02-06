@@ -4,11 +4,12 @@ import boto3
 
 
 def download_file(s3_client, bucket_name:str, aws_path:str, local_path:str):
-    # エラーハンドリングの統一のため値の整合性確認
     response = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=aws_path)
     try:
+        # キーの確認
         contents = response['Contents']
     except KeyError:
+        # 転送元が存在しない
         raise FileNotFoundError
     if os.path.exists(local_path):
         raise FileExistsError
@@ -29,6 +30,7 @@ def download_dir(s3_client, bucket_name:str, aws_dir:str, local_dir:str):
         try:
             contents = response['Contents']
         except KeyError:
+            # 転送元が存在しない
             raise FileNotFoundError
 
         for s3_object_response in contents:

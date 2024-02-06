@@ -24,30 +24,6 @@
             "disabled": false
         },
         {
-            "id": "RF003004",
-            "name": "set_experiment_metadata",
-            "is_multiple": true,
-            "is_required": false,
-            "completed_count": 0,
-            "dependent_task_ids": [
-                "RF003012"
-            ],
-            "status": "unfeasible",
-            "execution_environments": [],
-            "disabled": false
-        },
-        {
-            "id": "RF003007",
-            "name": "setup_experiment_backup",
-            "is_multiple": true,
-            "is_required": false,
-            "completed_count": 0,
-            "dependent_task_ids": [],
-            "status": "unexecuted",
-            "execution_environments": [],
-            "disabled": false
-        },
-        {
             "id": "RF003010",
             "name": "prepare_data",
             "is_multiple": true,
@@ -87,17 +63,6 @@
             "disabled": false
         },
         {
-            "id": "RF003013",
-            "name": "save_data",
-            "is_multiple": true,
-            "is_required": false,
-            "completed_count": 0,
-            "dependent_task_ids": [],
-            "status": "unexecuted",
-            "execution_environments": [],
-            "disabled": false
-        },
-        {
             "id": "RF009001",
             "name": "validate",
             "is_multiple": true,
@@ -120,8 +85,19 @@
             "disabled": false
         },
         {
-            "id": "RF009003",
-            "name": "write_lab_notes",
+            "id": "RF009004",
+            "name": "backup",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "disabled": false
+        },
+        {
+            "id": "RF009005",
+            "name": "save_data",
             "is_multiple": true,
             "is_required": false,
             "completed_count": 0,

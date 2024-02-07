@@ -26,17 +26,6 @@
             "disabled": false
         },
         {
-            "id": "RF002004",
-            "name": "setup_research_backup",
-            "is_multiple": true,
-            "is_required": false,
-            "completed_count": 0,
-            "dependent_task_ids": [],
-            "status": "unexecuted",
-            "execution_environments": [],
-            "disabled": false
-        },
-        {
             "id": "RF009001",
             "name": "validate",
             "is_multiple": true,
@@ -59,8 +48,19 @@
             "disabled": false
         },
         {
-            "id": "RF009003",
-            "name": "write_lab_notes",
+            "id": "RF009004",
+            "name": "backup",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "disabled": false
+        },
+        {
+            "id": "RF009005",
+            "name": "save_data",
             "is_multiple": true,
             "is_required": false,
             "completed_count": 0,

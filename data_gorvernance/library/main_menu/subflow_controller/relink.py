@@ -71,7 +71,9 @@ class RelinkSubflowForm(BaseSubflowForm):
                 research_flow_status=research_flow_status
             )
             # 親サブフロー種別の更新
-            self._parent_sub_flow_type_selector.value = parent_sub_flow_type
+            parent_sub_flow_type_options = self.generate_parent_sub_flow_type_options(selected_sub_flow_type, research_flow_status)
+            self._parent_sub_flow_type_selector.options = parent_sub_flow_type_options
+            self._parent_sub_flow_type_selector.value = str(parent_sub_flow_type)
             # 親サブフロー選択の更新
             parent_sub_flow_options = self.generate_parent_sub_flow_options(parent_sub_flow_type, research_flow_status)
             self._parent_sub_flow_selector.options = parent_sub_flow_options

@@ -113,7 +113,8 @@ class MainMenu(TaskLog):
         project_menu_layout = pn.Column(pn.Row(self._project_menu, self.button_for_project_menu), self._project_widget_box)
 
         self._menu_tabs.append((sub_flow_menu_title, sub_flow_menu_layout)) # tab_index = 0
-        self._menu_tabs.append((project_menu_title, project_menu_layout)) # tab_index = 1
+        # 未開発のためコメントアウト
+        # self._menu_tabs.append((project_menu_title, project_menu_layout)) # tab_index = 1
         # 機能コントローラーのイベントリスナー
         self._menu_tabs.param.watch(self.callback_menu_tabs, 'active')
 

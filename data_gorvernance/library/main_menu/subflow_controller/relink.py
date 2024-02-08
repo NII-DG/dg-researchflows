@@ -163,6 +163,7 @@ class RelinkSubflowForm(BaseSubflowForm):
             f'### {msg_config.get("main_menu", "update_sub_flow_link_title")}',
             self._sub_flow_type_selector,
             self._sub_flow_name_selector,
+            self._parent_sub_flow_type_selector,
             self._parent_sub_flow_selector,
             self.submit_button
             )

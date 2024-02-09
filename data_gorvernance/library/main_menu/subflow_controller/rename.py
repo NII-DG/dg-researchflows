@@ -27,13 +27,17 @@ class RenameSubflowForm(BaseSubflowForm):
             if selected_sub_flow_id is None:
                 raise Exception('Sub Flow Name Selector has None')
 
-            old_sub_flow_name, old_data_dir_name = self.reserch_flow_status_operater.get_flow_name_and_dir_name(selected_sub_flow_type, selected_sub_flow_id)
+            if selected_sub_flow_type == 0:
+                self._sub_flow_name_form.value = ''
+                self._sub_flow_name_form.value_input = ''
+            else:
+                old_sub_flow_name, old_data_dir_name = self.reserch_flow_status_operater.get_flow_name_and_dir_name(selected_sub_flow_type, selected_sub_flow_id)
 
-            self._sub_flow_name_form.value = old_sub_flow_name
-            self._sub_flow_name_form.value_input = old_sub_flow_name
+                self._sub_flow_name_form.value = old_sub_flow_name
+                self._sub_flow_name_form.value_input = old_sub_flow_name
 
-            self._data_dir_name_form.value = old_data_dir_name
-            self._data_dir_name_form.value_input = old_data_dir_name
+                self._data_dir_name_form.value = old_data_dir_name
+                self._data_dir_name_form.value_input = old_data_dir_name
 
             # 新規作成ボタンのボタンの有効化チェック
             self.change_disable_submit_button()
@@ -156,8 +160,7 @@ class RenameSubflowForm(BaseSubflowForm):
                 os.rename(new_path, old_path)
             raise
 
-        # 完了したらサブフロー名称の選択肢の更新
-        self._sub_flow_type_selector.param.trigger('value')
-        self._sub_flow_name_selector.value = sub_flow_id
+        # フォームの初期化
+        self._sub_flow_type_selector.value = 0
         # 新規作成ボタンを作成完了ステータスに更新する
         self.change_submit_button_success(msg_config.get('main_menu', 'success_rename_sub_flow'))

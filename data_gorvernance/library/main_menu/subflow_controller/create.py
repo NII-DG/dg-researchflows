@@ -169,6 +169,12 @@ class CreateSubflowForm(BaseSubflowForm):
             self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             raise
 
+        # フォームの初期化
+        self._sub_flow_type_selector.value = 0
+        self._sub_flow_name_form.value = ''
+        self._sub_flow_name_form.value_input = ''
+        self._data_dir_name_form.value = ''
+        self._data_dir_name_form.value_input = ''
         # 新規作成ボタンを作成完了ステータスに更新する
         self.change_submit_button_success(msg_config.get('main_menu', 'success_create_sub_flow'))
 

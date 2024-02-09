@@ -187,6 +187,8 @@ class RelinkSubflowForm(BaseSubflowForm):
             self.change_submit_button_error(msg_config.get('main_menu', 'error_relink_sub_flow'))
             raise
 
+        # フォームの初期化
+        self._sub_flow_type_selector.value = 0
         # 新規作成ボタンを作成完了ステータスに更新する
         self.change_submit_button_success(msg_config.get('main_menu', 'success_relink_sub_flow'))
 

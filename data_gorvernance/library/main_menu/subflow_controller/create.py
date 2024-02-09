@@ -175,8 +175,7 @@ class CreateSubflowForm(BaseSubflowForm):
         self._sub_flow_name_form.value_input = ''
         self._data_dir_name_form.value = ''
         self._data_dir_name_form.value_input = ''
-        # 新規作成ボタンを作成完了ステータスに更新する
-        self.change_submit_button_success(msg_config.get('main_menu', 'success_create_sub_flow'))
+        self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
 
     def create_data_dir(self, phase_name:str, data_dir_name:str):
         path = path_config.get_task_data_dir(self.abs_root, phase_name, data_dir_name)

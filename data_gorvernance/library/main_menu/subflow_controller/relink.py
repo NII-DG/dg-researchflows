@@ -91,15 +91,15 @@ class RelinkSubflowForm(BaseSubflowForm):
             # リサーチフローステータス管理情報の取得
             research_flow_status = self.reserch_flow_status_operater.load_research_flow_status()
 
-            selected_parent_type = self._parent_sub_flow_type_selector.value
-            if selected_parent_type is None:
-                raise Exception('Parent Sub Flow Type Selector has None')
             selected_sub_flow_type = self._sub_flow_type_selector.value
             if selected_sub_flow_type is None:
                 raise Exception('Sub Flow Type Selector has None')
             selected_sub_flow_id = self._sub_flow_name_selector.value
             if selected_sub_flow_id is None:
                 raise Exception('Sub Flow Name Selector has None')
+            selected_parent_type = self._parent_sub_flow_type_selector.value
+            if selected_parent_type is None:
+                raise Exception('Parent Sub Flow Type Selector has None')
 
             # 親サブフロー選択の更新
             parent_sub_flow_options = self.generate_parent_sub_flow_options(selected_parent_type, research_flow_status)

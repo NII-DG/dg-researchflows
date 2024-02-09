@@ -30,12 +30,12 @@ class RenameSubflowForm(BaseSubflowForm):
             if selected_sub_flow_type == 0:
                 self._sub_flow_name_form.value = ''
                 self._sub_flow_name_form.value_input = ''
+                self._data_dir_name_form.value = ''
+                self._data_dir_name_form.value_input = ''
             else:
                 old_sub_flow_name, old_data_dir_name = self.reserch_flow_status_operater.get_flow_name_and_dir_name(selected_sub_flow_type, selected_sub_flow_id)
-
                 self._sub_flow_name_form.value = old_sub_flow_name
                 self._sub_flow_name_form.value_input = old_sub_flow_name
-
                 self._data_dir_name_form.value = old_data_dir_name
                 self._data_dir_name_form.value_input = old_data_dir_name
 

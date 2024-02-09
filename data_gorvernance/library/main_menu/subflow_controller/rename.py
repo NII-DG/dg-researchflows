@@ -27,7 +27,7 @@ class RenameSubflowForm(BaseSubflowForm):
             if selected_sub_flow_id is None:
                 raise Exception('Sub Flow Name Selector has None')
 
-            if selected_sub_flow_type == 0:
+            if selected_sub_flow_type == 0 or selected_sub_flow_id == 0:
                 self._sub_flow_name_form.value = ''
                 self._sub_flow_name_form.value_input = ''
                 self._data_dir_name_form.value = ''

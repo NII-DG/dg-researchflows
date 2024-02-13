@@ -8,15 +8,16 @@ from typing import List
 # Folder
 DATA_GOVERNANCE = 'data_gorvernance'
 DATA = 'data'
+OCS_TEMPLATES = 'ocs-templates'
 ## data_gorvernance直下
 BASE = 'base'
 LOG = 'log'
+IMAGES = 'images'
 RESEARCHFLOW = 'researchflow'
 WORKING = 'working' ## 同期非対称フォルダ
 ## base直下
 SUB_FLOW = 'subflow'
 TASK = 'task'
-IMAGES = 'images'
 ## researchflow直下
 PLAN = 'plan'
 
@@ -34,6 +35,8 @@ DG_TASK_BASE_DATA_FOLDER = os.path.join(DATA_GOVERNANCE, BASE, TASK)
 DG_RESEARCHFLOW_FOLDER = os.path.join(DATA_GOVERNANCE, RESEARCHFLOW)
 # ログフォルダ
 DG_LOG_FOLDER = os.path.join(DATA_GOVERNANCE, LOG, RESEARCHFLOW)
+# 画像フォルダ
+DG_IMAGES_FOLDER = os.path.join(DATA_GOVERNANCE, IMAGES)
 # 非同期フォルダパス
 DG_WORKING_FOLDER = os.path.join(DATA_GOVERNANCE, WORKING)
 DG_WORKING_RESEARCHFLOW_FOLDER = os.path.join(DG_WORKING_FOLDER, RESEARCHFLOW)
@@ -102,7 +105,14 @@ def get_sub_flow_status_file_path(phase:str, subflow_id:str='')->str:
     else:
         return os.path.join(DG_RESEARCHFLOW_FOLDER, phase, STATUS_JSON)
 
+def get_ocs_template_dir( subflow_id:str='' ):
+
+    # working/researchflow/plan/task/plan/ocs-templates
+    if len(subflow_id) > 0:
+        return os.path.join( '../../../../../../../', DG_WORKING_RESEARCHFLOW_FOLDER, PLAN, TASK, PLAN, OCS_TEMPLATES)
+    else:
+        return os.path.join( '../../../../../../', DG_WORKING_RESEARCHFLOW_FOLDER, PLAN, TASK, PLAN, OCS_TEMPLATES)
 
 # other method
 def get_prepare_file_name_list_for_subflow()->List[str]:
-    return [MENU_NOTEBOOK, STATUS_JSON, PROPERTY_JSON, IMAGES]
+    return [MENU_NOTEBOOK, STATUS_JSON, PROPERTY_JSON]

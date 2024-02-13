@@ -13,15 +13,15 @@ RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
 USER ${NB_USER}
-#RUN conda install --quiet --yes git==2.35.0
-#RUN conda install --quiet --yes git-annex==8.20210903
+RUN conda install --quiet --yes git==2.35.0
+RUN conda install --quiet --yes git-annex==8.20210903
 RUN conda clean -i -t -y
 
 # install the notebook package etc.
 RUN pip install --no-cache --upgrade pip
 RUN pip install --no-cache notebook
 RUN pip install --no-cache jupyter_contrib_nbextensions
-RUN pip install --no-cache git+https://github.com/NII-cloud-operation/Jupyter-LC_run_through
+RUN pip install --no-cache git+https://github.com/NII-cloud-operation/Jupyter-LC_run_through@master
 RUN pip install --no-cache git+https://github.com/NII-DG/dg_Jupyter-multi_outputs.git@master
 RUN pip install --no-cache datalad==0.17.6
 RUN pip install --no-cache lxml==4.7.1
@@ -34,8 +34,8 @@ RUN pip install --no-cache chardet==4.0.0
 RUN pip install --no-cache panel==1.3.0
 RUN pip install --no-cache python-magic==0.4.27
 RUN pip install --no-cache natsort==8.3.1
-RUN pip install --no-cache git+https://github.com/nbgallery/ipyparams
-RUN pip install --no-cache git+https://github.com/RCOSDP/rdmclient.git
+RUN pip install --no-cache pandas==2.1.4
+RUN pip install --no-cache git+https://github.com/RCOSDP/rdmclient.git@master
 RUN pip install --no-cache git+https://github.com/NII-DG/nii-dg.git@230419_8c684da
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-packager.git@master
 # TODO: リリース時にはdg-drawerのブランチを変更する(@Rel20230929のようにする)

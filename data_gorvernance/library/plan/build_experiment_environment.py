@@ -10,7 +10,7 @@ from ..task_director import TaskDirector, get_subflow_type_and_id, get_return_su
 from ..utils.widgets import Button, MessageBox
 from ..utils.package import MakePackage, OutputDirExistsException
 from ..utils.config import path_config, message as msg_config
-from ..utils.setting import ocs_template, CloudService
+from ..utils.setting import OCSTemplate, ResearchFlowStatusOperater, CloudService
 from ..utils.html.button import create_button
 
 # 本ファイルのファイル名
@@ -22,13 +22,12 @@ DEFAULT_WIDTH = 600
 class ExperimentEnvBuilder(TaskDirector):
 
     def __init__(self, working_path:str) -> None:
-        """ExperimentPackageMaker コンストラクタ
+        """ExperimentEnvBuilder コンストラクタ
 
         Args:
             working_path (str): [実行Notebookファイルパス]
         """
         super().__init__(working_path, notebook_name)
-        self.make_package = MakePackage()
 
         # フォームボックス
         self._form_box = pn.WidgetBox()
@@ -46,11 +45,11 @@ class ExperimentEnvBuilder(TaskDirector):
         self._form_box.clear()
         self._template_form_box.clear()
 
-        self.ocs_template = ocs_template()
+        self.ocs_template = OCSTemplate()
         options = []
         options.extend(self.ocs_template.get_name())
 
-        self.field_list = pn.widgets.Select(
+        self.ocs_template_list = pn.widgets.Select(
                 name=msg_config.get('select_ocs_template', 'ocs_template_title'),
                 options=options,
                 disabled_options=self.ocs_template.get_disabled_ids(),
@@ -58,12 +57,12 @@ class ExperimentEnvBuilder(TaskDirector):
                 width=600
             )
 
-        self.field_list.param.watch(self._ocs_template_select_callback, 'value')
-        self._form_box.append(self.field_list)
+        self.ocs_template_list.param.watch(self._ocs_template_select_callback, 'value')
+        self._form_box.append(self.ocs_template_list)
 
     def _ocs_template_select_callback(self, event):
         try:
-            self.selected = self.field_list.value
+            self.selected = self.ocs_template_list.value
             self.set_templatelink_form()  
         except Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
@@ -75,10 +74,10 @@ class ExperimentEnvBuilder(TaskDirector):
             self._msg_output.clear()
             self._template_form_box.clear()
 
-            self.ConstructionProcedureId = self.ocs_template.get_id(self.selected)
+            self.construction_procedure_id = self.ocs_template.get_id(self.selected)
             self.template_path = self.ocs_template.get_template_path(self.selected)
 
-            if self.ConstructionProcedureId == "T001":
+            if self.construction_procedure_id == "T001":
                 # 解析基盤をそのまま利用
                 md = pn.pane.Markdown( msg_config.get('select_ocs_template', 'use_computing_service') )
                 self._template_form_box.extend(
@@ -86,7 +85,7 @@ class ExperimentEnvBuilder(TaskDirector):
                 )
                 self._form_box.append(self._template_form_box)
 
-            elif self.ConstructionProcedureId == "T999":
+            elif self.construction_procedure_id == "T999":
                 # ポータブル版VCCを利用して構築する。
                 message = msg_config.get('select_ocs_template', 'use_portable_vcc') \
                             + '<br>' \
@@ -106,7 +105,7 @@ class ExperimentEnvBuilder(TaskDirector):
                             + '<br>' \
                             + msg_config.get('select_ocs_template', 'success') 
 
-                self.template_link = "../../../../../working/researchflow/plan/task/plan/ocs-templates/" + self.template_path
+                self.template_link =  path_config.get_ocs_template_dir() + self.template_path
 
                 md = pn.pane.Markdown( message )
                 self._template_form_box.extend(
@@ -116,7 +115,6 @@ class ExperimentEnvBuilder(TaskDirector):
                 
         except Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
-            #message = f' selected ={ print(self.selected)} ConstructionProcedureId = {print(self.ConstructionProcedureId)} template_path = {print(self.template_path)}'
             self._msg_output.update_error( message )
             return
 
@@ -158,6 +156,27 @@ class ExperimentEnvBuilder(TaskDirector):
     def completed_task(self):
         # タスク実行の完了情報を該当サブフローステータス管理JSONに書き込む
         self.done_task(script_file_name)
+        
+        # フォーム定義
+        save_target_path = os.path.join( self._abs_root_path, path_config.DATA, path_config.PLAN, "build_experiment_environment")
+        source = self.get_sync_source(save_target_path)
+        self.define_save_form(source, script_file_name)
+        
+        # フォーム表示
+        pn.extension()
+        form_section = pn.WidgetBox()
+        form_section.append(self.save_form_box)
+        form_section.append(self.save_msg_output)
+        display(form_section)
+
+    def get_sync_source(self, search_directory :str):
+        source = []
+        for root, dirs, files in os.walk(search_directory):
+            for filename in files:
+                if filename.endswith(".ipynb"):
+                    path = os.path.join(root, filename)
+                    source.append(path)
+        return source
 
 
 class ExperimentEnvCreator(TaskDirector):

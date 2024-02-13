@@ -11,6 +11,7 @@ from .storage_provider import grdm
 from .time import TimeDiff
 from .log import TaskLog
 from .input import get_token, get_project_id
+from .error import UnusableVault
 
 
 def all_sync_path(abs_root):
@@ -58,7 +59,12 @@ class TaskSave(TaskLog):
         self._source = source
 
         # config
-        self.token = get_token()
+        try:
+            self.token = get_token()
+        except UnusableVault:
+            message = msg_config.get('form', 'no_vault')
+            self.save_msg_output.update_error(message)
+            return
         self.project_id = get_project_id()
         clear_output()
 

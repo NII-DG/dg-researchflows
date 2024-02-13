@@ -17,8 +17,14 @@ class MetadataNotExist(Exception):
     pass
 
 
-"""通信系のエラー"""
+# vault
 
+class UnusableVault(Exception):
+    """vaultが利用できないときのエラー"""
+    pass
+
+
+# 通信系のエラー
 
 class RepositoryNotExist(Exception):
     """リモートリポジトリの情報が取得できない時のエラー"""

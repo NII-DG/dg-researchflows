@@ -15,8 +15,15 @@ def get_token():
     # Vaultからトークンを取得する
     vault = Vault()
     token = vault.get_value(TOKEN_KEY)
+
     if token:
-        return token
+        # 接続確認
+        try:
+            grdm.get_projects(grdm.SCHEME, grdm.API_DOMAIN, token)
+        except UnauthorizedError:
+            pass
+        else:
+            return token
 
     while True:
         token = input(msg_config.get('form', 'pls_input_token'))

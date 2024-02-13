@@ -4,6 +4,8 @@ import subprocess
 import threading
 import time
 
+from .error import UnusableVault
+
 VAULT_ADDR = 'http://127.0.0.1:8200'
 TOKEN_PATH = '/home/jovyan/.vault/token'
 DG_ENGINE_NAME = 'dg-kv'
@@ -133,7 +135,7 @@ class Vault():
     def __read_token(self):
         """ルートトークン取得"""
         if not os.path.isfile(TOKEN_PATH):
-            return None
+            raise UnusableVault
 
         with open(TOKEN_PATH, 'r') as f:
             root_token = f.read()

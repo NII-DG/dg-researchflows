@@ -10,7 +10,7 @@ from ..task_director import TaskDirector, get_subflow_type_and_id, get_return_su
 from ..utils.widgets import Button, MessageBox
 from ..utils.package import MakePackage, OutputDirExistsException
 from ..utils.config import path_config, message as msg_config
-from ..utils.setting import ocs_template, ResearchFlowStatusOperater
+from ..utils.setting import ocs_template, CloudService
 from ..utils.html.button import create_button
 
 # 本ファイルのファイル名
@@ -158,3 +158,116 @@ class ExperimentEnvBuilder(TaskDirector):
     def completed_task(self):
         # タスク実行の完了情報を該当サブフローステータス管理JSONに書き込む
         self.done_task(script_file_name)
+
+
+class ExperimentEnvCreator(TaskDirector):
+
+    def __init__(self, working_path: str) -> None:
+        """ExperimentEnvCreator コンストラクタ
+
+        Args:
+            working_path (str): [実行Notebookファイルパス]
+        """
+        super().__init__(working_path, notebook_name)
+
+        # フォームボックス
+        self._form_box = pn.WidgetBox()
+        self._form_box.width = 900
+
+        # 可変フォームボックス
+        self._template_form_box = pn.WidgetBox()
+        self._template_form_box.width = 900
+
+        # メッセージ用ボックス
+        self._msg_output = MessageBox()
+        self._msg_output.width = 900
+
+    @TaskDirector.task_cell('1')
+    def generateFormScetion(self):
+        # タスク開始によるサブフローステータス管理JSONの更新
+        self.doing_task(script_file_name)
+
+        # フォーム定義
+        self.set_ocs_template_selector()
+
+        # フォーム表示
+        pn.extension()
+        form_section = pn.WidgetBox()
+        form_section.append(self._form_box)
+        form_section.append(self._msg_output)
+        display(form_section)
+
+    def set_ocs_template_selector(self):
+        self._form_box.clear()
+        self._template_form_box.clear()
+
+        self.cloud_service = CloudService()
+
+        self.cloud_service_list = pn.widgets.Select(
+            name=msg_config.get('select_cloud_service', 'cloud_service_title'),
+            options=self.cloud_service.get_names(),
+            disabled_options=self.cloud_service.get_disabled_names(),
+            size=4,
+            width=600
+        )
+        self.cloud_service_list.param.watch(self._cloud_service_select_callback, 'value')
+        self._form_box.append(self.cloud_service_list)
+
+        # 選択中の行(一番上の行)を選択したときのイベントを発生させる
+        self._cloud_service_select_callback(None)
+
+    def _cloud_service_select_callback(self, event):
+        try:
+            selected = self.cloud_service_list.value
+            self.set_link_form(selected)
+        except Exception:
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self._msg_output.update_error(message)
+            return
+
+    def set_link_form(self, service_name):
+        try:
+            self._msg_output.clear()
+            self._template_form_box.clear()
+
+            id = self.cloud_service.get_id(service_name)
+            path = self.cloud_service.get_path(service_name)
+            description = self.cloud_service.get_description(service_name)
+
+            if id == 'S001':
+                # mdx
+                md = pn.pane.Markdown(description)
+                link = "../../../../../working/researchflow/plan/task/plan/ocs-templates/" + path
+                self._template_form_box.extend(
+                    pn.Column(md, self.create_link_button(link))
+                )
+                self._form_box.append(self._template_form_box)
+
+            else:
+                # その他
+                md = pn.pane.Markdown(description)
+                self._template_form_box.extend(
+                    pn.Column(md)
+                )
+                self._form_box.append(self._template_form_box)
+
+        except Exception:
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self._msg_output.update_error(message)
+            return
+
+    def create_link_button(self, link):
+        """OCS-Templateへのボタンpanel.HTMLオブジェクトの取得
+        Returns:
+            [panel.pane.HTML]: [HTMLオブジェクト]
+        """
+        button_width = 500
+        link_button = pn.pane.HTML()
+        link_button.object = create_button(
+            url=link,
+            msg=msg_config.get('select_cloud_service', 'go_link'),
+            target='_blank',
+            button_width=f'{button_width}px'
+        )
+        link_button.width = button_width
+        return link_button

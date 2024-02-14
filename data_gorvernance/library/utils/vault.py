@@ -34,8 +34,11 @@ class Vault():
     def initialize(self):
         """Vault初期化"""
 
-        if self.__read_token():
+        try:
+            self.__read_token()
             return
+        except UnusableVault:
+            pass
 
         self.__start_server()
 

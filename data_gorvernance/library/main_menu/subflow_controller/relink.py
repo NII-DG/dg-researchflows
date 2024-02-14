@@ -67,18 +67,18 @@ class RelinkSubflowForm(BaseSubflowForm):
             selected_sub_flow_id = self._sub_flow_name_selector.value
             if selected_sub_flow_id is None:
                 raise Exception('Sub Flow Name Selector has None')
-            parent_sub_flow_type, parent_ids = self.get_parent_type_and_ids(
-                phase_seq_number=selected_sub_flow_type, sub_flow_id=selected_sub_flow_id,
-                research_flow_status=research_flow_status
-            )
+            #parent_sub_flow_type, parent_ids = self.get_parent_type_and_ids(
+            #    phase_seq_number=selected_sub_flow_type, sub_flow_id=selected_sub_flow_id,
+            #    research_flow_status=research_flow_status
+            #)
             # 親サブフロー種別の更新
             parent_sub_flow_type_options = self.generate_parent_sub_flow_type_options(selected_sub_flow_type, research_flow_status)
             self._parent_sub_flow_type_selector.options = parent_sub_flow_type_options
-            self._parent_sub_flow_type_selector.value = str(parent_sub_flow_type)
+            #self._parent_sub_flow_type_selector.value = str(parent_sub_flow_type)
             # 親サブフロー選択の更新
-            parent_sub_flow_options = self.generate_parent_sub_flow_options(parent_sub_flow_type, research_flow_status)
-            self._parent_sub_flow_selector.options = parent_sub_flow_options
-            self._parent_sub_flow_selector.value = parent_ids
+            #parent_sub_flow_options = self.generate_parent_sub_flow_options(parent_sub_flow_type, research_flow_status)
+            #self._parent_sub_flow_selector.options = parent_sub_flow_options
+            #self._parent_sub_flow_selector.value = parent_ids
             # 新規作成ボタンのボタンの有効化チェック
             self.change_disable_submit_button()
         except Exception as e:

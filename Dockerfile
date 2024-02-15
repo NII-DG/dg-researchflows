@@ -17,6 +17,7 @@ RUN gpg --no-default-keyring --keyring /usr/share/keyrings/hashicorp-archive-key
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
 RUN apt-get update -y
 RUN apt-get install -y vault
+RUN setcap -r /usr/bin/vault
 
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*

@@ -5,7 +5,7 @@ import panel as pn
 
 from ...utils.config import path_config, message as msg_config
 from .base import BaseSubflowForm
-from ...utils.checker import StringManager
+from ...utils.string import StringManager
 from ...utils.widgets import Alert
 
 class RenameSubflowForm(BaseSubflowForm):

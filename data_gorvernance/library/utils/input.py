@@ -1,7 +1,7 @@
 
 from IPython.display import clear_output
 
-from .config import path_config, message as msg_config
+from .config import message as msg_config
 from .storage_provider import grdm
 from .string import StringManager
 from .vault import Vault

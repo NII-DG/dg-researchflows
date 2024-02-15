@@ -13,16 +13,8 @@ class RelinkSubflowForm(BaseSubflowForm):
 
     def __init__(self, abs_root, message_box) -> None:
         super().__init__(abs_root, message_box)
-        research_flow_status = self.reserch_flow_status_operater.load_research_flow_status()
-        # 親サブフロー選択オプション
-        parent_sub_flow_options = self.generate_parent_sub_flow_options(0, research_flow_status)
-        # 親サブフロー選択 : マルチセレクト
-        self._parent_sub_flow_selector = pn.widgets.MultiSelect(
-            name=msg_config.get('main_menu', 'parent_sub_flow_name'),
-            options=parent_sub_flow_options
-            )
-        # 親サブフロー選択のイベントリスナー
-        self._parent_sub_flow_selector.param.watch(self.callback_menu_form, 'value')
+        # 処理開始ボタン
+        self.change_submit_button_init(msg_config.get('main_menu', 'relink_sub_flow'))
 
     # overwrite
     def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus])->Dict[str, int]:
@@ -30,12 +22,14 @@ class RelinkSubflowForm(BaseSubflowForm):
         pahse_options = {}
         pahse_options['--'] = 0
         for phase_status in research_flow_status:
+            # planには親が無い
             if phase_status._seq_number == 1:
                 continue
             # experimentはplanのみを親とするため
             if phase_status._seq_number == 2:
                 continue
-            else:
+            # サブフローのあるフェーズのみ
+            if len(phase_status._sub_flow_data) > 0:
                 pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
         return pahse_options
 
@@ -61,6 +55,7 @@ class RelinkSubflowForm(BaseSubflowForm):
 
         return parent_sub_flow_type, parent_ids
 
+    # overwrite
     def callback_sub_flow_name_selector(self, event):
         # サブフロー名称：シングルセレクトコールバックファンクション
         try:
@@ -69,16 +64,44 @@ class RelinkSubflowForm(BaseSubflowForm):
             selected_sub_flow_type = self._sub_flow_type_selector.value
             if selected_sub_flow_type is None:
                 raise Exception('Sub Flow Type Selector has None')
-            selected_sub_flow_name = self._sub_flow_name_selector.value
-            if selected_sub_flow_name is None:
+            selected_sub_flow_id = self._sub_flow_name_selector.value
+            if selected_sub_flow_id is None:
                 raise Exception('Sub Flow Name Selector has None')
+            # 親サブフロー種別の更新
+            parent_sub_flow_type_options = self.generate_parent_sub_flow_type_options(selected_sub_flow_type, research_flow_status)
+            self._parent_sub_flow_type_selector.options = parent_sub_flow_type_options
+            # 新規作成ボタンのボタンの有効化チェック
+            self.change_disable_submit_button()
+        except Exception as e:
+            self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
+
+    # overwrite
+    def callback_parent_sub_flow_type_selector(self, event):
+        # 親サブフロー種別(フェーズ)のコールバックファンクション
+        try:
+            # リサーチフローステータス管理情報の取得
+            research_flow_status = self.reserch_flow_status_operater.load_research_flow_status()
+
+            selected_sub_flow_type = self._sub_flow_type_selector.value
+            if selected_sub_flow_type is None:
+                raise Exception('Sub Flow Type Selector has None')
+            selected_sub_flow_id = self._sub_flow_name_selector.value
+            if selected_sub_flow_id is None:
+                raise Exception('Sub Flow Name Selector has None')
+            selected_parent_type = self._parent_sub_flow_type_selector.value
+            if selected_parent_type is None:
+                raise Exception('Parent Sub Flow Type Selector has None')
+
+            # 親サブフロー選択の更新
+            parent_sub_flow_options = self.generate_parent_sub_flow_options(selected_parent_type, research_flow_status)
+            self._parent_sub_flow_selector.options = parent_sub_flow_options
+            # 親サブフロー選択の値の更新
             parent_sub_flow_type, parent_ids = self.get_parent_type_and_ids(
-                phase_seq_number=selected_sub_flow_type, sub_flow_id=selected_sub_flow_name,
+                phase_seq_number=selected_sub_flow_type, sub_flow_id=selected_sub_flow_id,
                 research_flow_status=research_flow_status
             )
-            parent_sub_flow_options = self.generate_parent_sub_flow_options(parent_sub_flow_type, research_flow_status)
-            self._parent_sub_flow_selector.options = parent_sub_flow_options
-            self._parent_sub_flow_selector.value = parent_ids
+            if parent_sub_flow_type == selected_parent_type:
+                self._parent_sub_flow_selector.value = parent_ids
             # 新規作成ボタンのボタンの有効化チェック
             self.change_disable_submit_button()
         except Exception as e:
@@ -105,6 +128,14 @@ class RelinkSubflowForm(BaseSubflowForm):
             self.submit_button.disabled = True
             return
 
+        value = self._parent_sub_flow_type_selector.value
+        if value is None:
+            self.submit_button.disabled = True
+            return
+        elif int(value) == 0:
+            self.submit_button.disabled = True
+            return
+
         value = self._parent_sub_flow_selector.value
         if value is None:
             self.submit_button.disabled = True
@@ -120,12 +151,13 @@ class RelinkSubflowForm(BaseSubflowForm):
         sub_flow_type_list = self._sub_flow_type_selector.options
         if len(sub_flow_type_list) < 2:
             # defaultがあるため2未満にする
-            return Alert.warning(msg_config.get('main_menu','relink_nothing'))
+            return Alert.warning(msg_config.get('main_menu','nothing_editable_subflow'))
 
         return pn.Column(
             f'### {msg_config.get("main_menu", "update_sub_flow_link_title")}',
             self._sub_flow_type_selector,
             self._sub_flow_name_selector,
+            self._parent_sub_flow_type_selector,
             self._parent_sub_flow_selector,
             self.submit_button
             )
@@ -147,6 +179,7 @@ class RelinkSubflowForm(BaseSubflowForm):
             self.change_submit_button_error(msg_config.get('main_menu', 'error_relink_sub_flow'))
             raise
 
-        # 新規作成ボタンを作成完了ステータスに更新する
-        self.change_submit_button_success(msg_config.get('main_menu', 'success_relink_sub_flow'))
+        # フォームの初期化
+        self._sub_flow_type_selector.value = 0
+        self.change_submit_button_init(msg_config.get('main_menu', 'relink_sub_flow'))
 

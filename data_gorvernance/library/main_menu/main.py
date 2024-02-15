@@ -113,7 +113,8 @@ class MainMenu(TaskLog):
         project_menu_layout = pn.Column(pn.Row(self._project_menu, self.button_for_project_menu), self._project_widget_box)
 
         self._menu_tabs.append((sub_flow_menu_title, sub_flow_menu_layout)) # tab_index = 0
-        self._menu_tabs.append((project_menu_title, project_menu_layout)) # tab_index = 1
+        # 未開発のためコメントアウト
+        # self._menu_tabs.append((project_menu_title, project_menu_layout)) # tab_index = 1
         # 機能コントローラーのイベントリスナー
         self._menu_tabs.param.watch(self.callback_menu_tabs, 'active')
 
@@ -149,12 +150,14 @@ class MainMenu(TaskLog):
 
     def callback_menu_tabs(self, event):
         try:
+            self._err_output.clear()
             tab_index = event.new
             if tab_index == 0:
                 # サブフロー操作が選択
                 ## サブフロー操作コントローラーオプションを初期化
                 self._sub_flow_menu.value = 0
                 self._project_widget_box.clear()
+                self.check_status_research_preparation_flow()
             if tab_index == 1:
                 # プロジェクト操作が選択
                 self._project_menu.value = 0
@@ -166,6 +169,7 @@ class MainMenu(TaskLog):
         """遷移ボタン for プロジェクト操作コントローラーの更新"""
         # 開発中のためアラートを表示する。
         try:
+            self._err_output.clear()
             self._project_widget_box.clear()
             alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
             self._project_widget_box.append(alert)
@@ -175,6 +179,7 @@ class MainMenu(TaskLog):
     def callback_sub_flow_menu(self, event):
         """サブフロー操作フォーム by サブフロー操作コントローラーオプション"""
         try:
+            self._err_output.clear()
             selected_value = self._sub_flow_menu.value
             if selected_value == 0: ## 選択なし
                 self.update_sub_flow_widget_box_for_init()
@@ -228,8 +233,10 @@ class MainMenu(TaskLog):
             display(Javascript('IPython.notebook.save_checkpoint();'))
             # end
             self.log.finish_callback(self.callback_type)
-        except  Exception as e:
-            self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
+        except  Exception:
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self.log.error(message)
+            self._err_output.update_error(message)
 
     #################
     # クラスメソッド #
@@ -263,14 +270,12 @@ class MainMenu(TaskLog):
 
         ## 機能コントローラーを配置
         main_menu_title = 'メインメニュー'
-        main_menu_box = pn.WidgetBox(f'## {main_menu_title}', main_menu._menu_tabs)
+        main_menu_box = pn.WidgetBox(f'## {main_menu_title}', main_menu._menu_tabs, main_menu._err_output)
         display(main_menu_box)
         ## リサーチフロー図を配置
         research_flow_image_title = pn.pane.Markdown(f'### {msg_config.get("main_menu", "subflow_relationship_diagram")}')
         display(research_flow_image_title)
         display(main_menu._research_flow_image)
-        ## システムエラー表示オブジェクトを配置
-        display(main_menu._err_output)
 
         # Hidden Setup
         #else:
@@ -290,5 +295,5 @@ class MainMenu(TaskLog):
         #    display(alert)
         #    display(initial_setup_link_button)
 
-        display(Javascript('IPython.notebook.save_checkpoint();'))
         main_menu.log.finish_cell()
+        display(Javascript('IPython.notebook.save_checkpoint();'))

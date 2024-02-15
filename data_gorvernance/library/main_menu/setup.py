@@ -6,10 +6,9 @@ from ..subflow.menu import access_main_menu
 from pathlib import Path
 import panel as pn
 from IPython.display import display, clear_output
-from IPython.core.display import Javascript, HTML
+from IPython.core.display import Javascript
 import traceback
 from ..utils.error import UnauthorizedError
-import requests
 
 
 

@@ -10,7 +10,7 @@
         {
             "id": "S999",
             "service_name": "その他",
-            "description": "VCノードの準備は不要です。",
+            "description": "本処理は不要ですので次処理へと遷移してください。",
             "path": "",
             "is_active": true
         }

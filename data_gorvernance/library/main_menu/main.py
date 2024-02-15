@@ -1,10 +1,8 @@
 import os
 import traceback
-from contextlib import redirect_stdout
-import sys
 
 import panel as pn
-from IPython.display import display, clear_output
+from IPython.display import display
 from IPython.core.display import Javascript
 
 from ..utils.setting import ResearchFlowStatusOperater, SubflowStatusFile

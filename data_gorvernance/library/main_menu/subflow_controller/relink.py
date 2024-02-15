@@ -4,7 +4,7 @@ import traceback
 import panel as pn
 from dg_drawer.research_flow import PhaseStatus
 
-from ...utils.config import path_config, message as msg_config
+from ...utils.config import message as msg_config
 from .base import BaseSubflowForm
 from ...utils.widgets import Alert
 

@@ -10,7 +10,7 @@ from ...utils.nb_file import NbFile
 from ...utils import file
 from ...utils.config import path_config, message as msg_config
 from .base import BaseSubflowForm
-from ...utils.checker import StringManager
+from ...utils.string import StringManager
 
 class CreateSubflowForm(BaseSubflowForm):
     """サブフロー新規作成クラス"""

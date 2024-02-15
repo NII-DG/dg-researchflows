@@ -1,9 +1,10 @@
 """GRDMのAPIへの通信"""
 from urllib import parse
 import requests
+from requests.exceptions import RequestException
 from http import HTTPStatus
 
-from ...error import UnauthorizedError
+from ...error import UnauthorizedError, NotFoundURLError
 
 
 def get_projects(scheme, domain, token):
@@ -28,9 +29,14 @@ def get_project_registrations(scheme, domain, token, project_id):
         'Authorization': 'Bearer {}'.format(token)
     }
     response = requests.get(url=api_url, headers=headers)
-    if response.status_code == HTTPStatus.UNAUTHORIZED:
-        raise UnauthorizedError
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except RequestException as e:
+        if response.status_code == HTTPStatus.UNAUTHORIZED:
+            raise UnauthorizedError(str(e)) from e
+        if response.status_code == HTTPStatus.NOT_FOUND:
+            # プロジェクトIDが不正確
+            raise NotFoundURLError(str(e)) from e
     return response.json()
 
 
@@ -42,8 +48,14 @@ def get_project_collaborators(scheme, domain, token, project_id):
         'Authorization': 'Bearer {}'.format(token)
     }
     response = requests.get(url=api_url, headers=headers)
-    if response.status_code == HTTPStatus.UNAUTHORIZED:
-        raise UnauthorizedError
+    try:
+        response.raise_for_status()
+    except RequestException as e:
+        if response.status_code == HTTPStatus.UNAUTHORIZED:
+            raise UnauthorizedError(str(e)) from e
+        if response.status_code == HTTPStatus.NOT_FOUND:
+            # プロジェクトIDが不正確
+            raise NotFoundURLError(str(e)) from e
     response.raise_for_status()
     return response.json()
 

@@ -1,16 +1,13 @@
 import os
 import traceback
-import webbrowser
 
 import panel as pn
 from IPython.display import display
-from IPython.core.display import Javascript
 
 from ..task_director import TaskDirector, get_subflow_type_and_id, get_return_sub_flow_menu_relative_url_path
-from ..utils.widgets import Button, MessageBox
-from ..utils.package import MakePackage, OutputDirExistsException
+from ..utils.widgets import MessageBox
 from ..utils.config import path_config, message as msg_config
-from ..utils.setting import OCSTemplate, ResearchFlowStatusOperater
+from ..utils.setting import OCSTemplate
 from ..utils.html.button import create_button
 
 # 本ファイルのファイル名
@@ -140,7 +137,7 @@ class ExperimentEnvBuilder(TaskDirector):
     @TaskDirector.task_cell("1")
     def generateFormScetion(self):
         # タスク開始によるサブフローステータス管理JSONの更新
-        self.doing_task(script_file_name)
+        self.doing_task()
 
         # フォーム定義
         self.set_ocs_template_selector()
@@ -155,12 +152,12 @@ class ExperimentEnvBuilder(TaskDirector):
     TaskDirector.task_cell("2")
     def completed_task(self):
         # タスク実行の完了情報を該当サブフローステータス管理JSONに書き込む
-        self.done_task(script_file_name)
+        self.done_task()
         
         # フォーム定義
         save_target_path = os.path.join( self._abs_root_path, path_config.DATA, path_config.PLAN, "build_experiment_environment")
         source = self.get_sync_source(save_target_path)
-        self.define_save_form(source, script_file_name)
+        self.define_save_form(source)
         
         # フォーム表示
         pn.extension()

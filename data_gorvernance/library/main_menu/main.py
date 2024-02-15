@@ -1,8 +1,10 @@
 import os
 import traceback
+from contextlib import redirect_stdout
+import sys
 
 import panel as pn
-from IPython.display import display
+from IPython.display import display, clear_output
 from IPython.core.display import Javascript
 
 from ..utils.setting import ResearchFlowStatusOperater, SubflowStatusFile
@@ -16,6 +18,7 @@ from .subflow_controller import (
     RenameSubflowForm,
     DeleteSubflowForm
 )
+from ..utils.vault import Vault
 
 
 # git clone https://github.com/NII-DG/dg-researchflows.git -b feature/main_menu_v2 ./demo
@@ -267,6 +270,9 @@ class MainMenu(TaskLog):
         main_menu = MainMenu(working_path)
         # log
         main_menu.log.start_cell()
+        # initialize vault
+        vault = Vault()
+        vault.initialize()
 
         ## 機能コントローラーを配置
         main_menu_title = 'メインメニュー'

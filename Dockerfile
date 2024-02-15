@@ -8,14 +8,6 @@ RUN apt-get install -y graphviz
 RUN apt-get install -y libmagic1
 RUN apt-get install -y sshpass
 
-# install vault
-RUN apt-get install -y gpg wget lsb-release
-RUN wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-RUN gpg --no-default-keyring --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg --fingerprint
-RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
-RUN apt-get update -y
-RUN apt-get install -y vault
-
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
@@ -83,6 +75,13 @@ RUN tar zxvf jupyternotebook_vcpsdk-23.11.0.tgz -C ~/data_gorvernance/library/vc
 RUN rm jupyternotebook_vcpsdk-23.11.0.tgz
 RUN pip install --no-cache vrplib==1.3.0
 ENV PYTHONPATH "${PYTHONPATH}:/home/jovyan/data_gorvernance/library/vcp/vcpsdk"
+
+# install vault
+RUN wget https://releases.hashicorp.com/vault/1.15.5/vault_1.15.5_linux_amd64.zip
+RUN unzip vault_1.15.5_linux_amd64.zip
+RUN mv vault /opt/conda/bin
+RUN rm vault_1.15.5_linux_amd64.zip
+RUN rm .wget-hsts
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000

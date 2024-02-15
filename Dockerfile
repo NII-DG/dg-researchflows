@@ -9,6 +9,15 @@ RUN apt-get install -y libmagic1
 RUN apt-get install -y iputils-ping net-tools
 RUN apt-get install -y expect
 RUN apt-get install -y curl
+
+# install vault
+RUN apt-get install -y gpg wget lsb-release
+RUN wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+RUN gpg --no-default-keyring --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg --fingerprint
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
+RUN apt-get update -y
+RUN apt-get install -y vault
+
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
@@ -20,9 +29,6 @@ RUN conda clean -i -t -y
 # install the notebook package etc.
 RUN pip install --no-cache --upgrade pip
 RUN pip install --no-cache notebook
-RUN pip install --no-cache jupyter_contrib_nbextensions
-RUN pip install --no-cache git+https://github.com/NII-cloud-operation/Jupyter-LC_run_through@master
-RUN pip install --no-cache git+https://github.com/NII-DG/dg_Jupyter-multi_outputs.git@master
 RUN pip install --no-cache datalad==0.17.6
 RUN pip install --no-cache lxml==4.7.1
 RUN pip install --no-cache blockdiag==3.0.0
@@ -35,16 +41,23 @@ RUN pip install --no-cache panel==1.3.0
 RUN pip install --no-cache python-magic==0.4.27
 RUN pip install --no-cache natsort==8.3.1
 RUN pip install --no-cache pandas==2.1.4
+RUN pip install --no-cache cookiecutter==2.5.0
+RUN pip install --no-cache hvac==2.1.0
 RUN pip install --no-cache git+https://github.com/RCOSDP/rdmclient.git@master
 RUN pip install --no-cache git+https://github.com/NII-DG/nii-dg.git@230419_8c684da
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-packager.git@master
 # TODO: リリース時にはdg-drawerのブランチを変更する(@Rel20230929のようにする)
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-drawer.git@develop/Rel_V2.0
-RUN pip install --no-cache cookiecutter==2.5.0
 
+RUN pip install --no-cache jupyter_contrib_nbextensions
 RUN jupyter contrib nbextension install --user
 RUN jupyter nbextensions_configurator enable --user
+RUN jupyter nbextension enable codefolding/main
+
+RUN pip install --no-cache git+https://github.com/NII-cloud-operation/Jupyter-LC_run_through@master
 RUN jupyter run-through quick-setup --user
+
+RUN pip install --no-cache git+https://github.com/NII-DG/dg_Jupyter-multi_outputs.git@master
 RUN jupyter nbextension install --py lc_multi_outputs --user
 RUN jupyter nbextension enable --py lc_multi_outputs --user
 

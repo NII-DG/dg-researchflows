@@ -226,14 +226,14 @@ class MainMenu(TaskLog):
     def callback_submit_button(self, event):
         try:
             # start
-            self.log.start_callback(self.callback_type)
+            self.log.start(detail=self.callback_type)
             self.subflow_form.main()
 
             # サブフロー関係図を更新
             self._research_flow_image.object = self.reserch_flow_status_operater.get_svg_of_research_flow_status()
             display(Javascript('IPython.notebook.save_checkpoint();'))
             # end
-            self.log.finish_callback(self.callback_type)
+            self.log.finish(detail=self.callback_type)
         except  Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
             self.log.error(message)
@@ -267,7 +267,7 @@ class MainMenu(TaskLog):
         # Display the main menu
         main_menu = MainMenu(working_path)
         # log
-        main_menu.log.start_cell()
+        main_menu.log.start()
         # initialize vault
         vault = Vault()
         vault.initialize()
@@ -299,5 +299,5 @@ class MainMenu(TaskLog):
         #    display(alert)
         #    display(initial_setup_link_button)
 
-        main_menu.log.finish_cell()
+        main_menu.log.finish()
         display(Javascript('IPython.notebook.save_checkpoint();'))

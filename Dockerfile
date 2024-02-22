@@ -95,6 +95,8 @@ RUN rm -rf ${HOME}/work
 # prepare datalad procedure dir
 RUN mkdir -p ${HOME}/.config/datalad/procedures
 
+ENV PYTHONPATH "${PYTHONPATH}:${HOME}/data_gorvernance"
+
 WORKDIR ${HOME}
 COPY . ${HOME}
 

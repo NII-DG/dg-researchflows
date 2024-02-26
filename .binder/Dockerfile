@@ -9,6 +9,8 @@ RUN apt-get install -y libmagic1
 RUN apt-get install -y iputils-ping net-tools
 RUN apt-get install -y expect
 RUN apt-get install -y curl
+RUN apt-get install -y git
+RUN apt-get install -y git-annex
 
 # install vault
 RUN apt-get install -y gpg wget lsb-release
@@ -23,9 +25,6 @@ RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
 USER ${NB_USER}
-RUN conda install --quiet --yes git==2.35.0
-RUN conda install --quiet --yes git-annex==8.20210903
-RUN conda clean -i -t -y
 
 # install the notebook package etc.
 RUN pip install --no-cache --upgrade pip

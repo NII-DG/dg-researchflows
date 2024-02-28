@@ -6,7 +6,9 @@ RUN apt-get update -y
 RUN apt-get install -y netbase
 RUN apt-get install -y graphviz
 RUN apt-get install -y libmagic1
-RUN apt-get install -y sshpass
+RUN apt-get install -y iputils-ping net-tools
+RUN apt-get install -y expect
+RUN apt-get install -y curl
 
 # install vault
 RUN apt-get install -y gpg wget lsb-release
@@ -15,6 +17,7 @@ RUN gpg --no-default-keyring --keyring /usr/share/keyrings/hashicorp-archive-key
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
 RUN apt-get update -y
 RUN apt-get install -y vault
+RUN setcap -r /usr/bin/vault
 
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
@@ -91,6 +94,8 @@ RUN rm -rf ${HOME}/work
 
 # prepare datalad procedure dir
 RUN mkdir -p ${HOME}/.config/datalad/procedures
+
+ENV PYTHONPATH "${PYTHONPATH}:${HOME}/data_gorvernance"
 
 WORKDIR ${HOME}
 COPY . ${HOME}

@@ -1,0 +1,18 @@
+{
+    "cloud_service": [
+        {
+            "id": "S001",
+            "service_name": "mdx",
+            "description": "OCSテンプレートを利用した手順へ遷移します。",
+            "path": "CoursewareHub/notebooks/941-mdx仮想マシンの準備.ipynb",
+            "is_active": true
+        },
+        {
+            "id": "S999",
+            "service_name": "その他",
+            "description": "本処理は不要ですので次処理へと遷移してください。",
+            "path": "",
+            "is_active": true
+        }
+    ]
+}

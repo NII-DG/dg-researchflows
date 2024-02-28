@@ -17,9 +17,9 @@ class TaskLog:
             @functools.wraps(func)
             def decorate(self, *args, **kwargs):
                 self.log.cell_id = cell_id
-                self.log.start_cell(start_message)
+                self.log.start(note=start_message)
                 result = func(self, *args, **kwargs)
-                self.log.finish_cell(finish_message)
+                self.log.finish(note=finish_message)
                 return result
             return decorate
         return wrapper
@@ -30,9 +30,9 @@ class TaskLog:
         def wrapper(func):
             @functools.wraps(func)
             def decorate(self, *args, **kwargs):
-                self.log.start_callback(event_name)
+                self.log.start(detail=event_name)
                 result = func(self, *args, **kwargs)
-                self.log.finish_callback(event_name)
+                self.log.finish(detail=event_name)
                 return result
             return decorate
         return wrapper

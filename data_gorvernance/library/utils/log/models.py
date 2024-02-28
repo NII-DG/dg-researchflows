@@ -93,17 +93,11 @@ class UserActivityLog(BaseLogger):
         self.reset_file(self._get_format())
         self.logger.error(message, extra=self.record())
 
-    def start_cell(self, message=''):
-        self.info("-- 処理開始 --" + message)
+    def start(self, detail='', note=''):
+        self.info("-- " + detail + "処理開始 --" + note)
 
-    def finish_cell(self, message=''):
-        self.info("-- 処理終了 --" + message)
-
-    def start_callback(self, event_name):
-        self.info("-- " + event_name + "開始 --")
-
-    def finish_callback(self, event_name):
-        self.info("-- " + event_name + "終了 --")
+    def finish(self, detail='', note=''):
+        self.info("-- " + detail + "処理終了 --" + note)
 
     def record(self):
 

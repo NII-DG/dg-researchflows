@@ -142,7 +142,7 @@ class SubflowMenu(TaskLog):
         subflow_menu = cls(working_file)
         pn.extension()
         # log
-        subflow_menu.log.start_cell()
+        subflow_menu.log.start()
 
         # base path
         parent = Path(os.path.dirname(working_file))
@@ -196,4 +196,4 @@ class SubflowMenu(TaskLog):
             subflow_menu.menu_widgetbox.append(message_box)
         display(subflow_menu.menu_widgetbox)
         display(Javascript('IPython.notebook.save_checkpoint();'))
-        subflow_menu.log.finish_cell()
+        subflow_menu.log.finish()

@@ -1,5 +1,6 @@
 import hvac
 import os
+import requests
 import subprocess
 import threading
 import time
@@ -16,6 +17,7 @@ path "dg-kv/*" {
 }
 '''
 TOKEN_TTL = '1m'
+MAX_RETRY_COUNT = 5
 
 
 def start_server():
@@ -88,11 +90,23 @@ class Vault():
         # 起動処理が終わるまで少し待機
         time.sleep(1)
 
-        # サーバー初期化
         shares = 5
         threshold = 3
         client = hvac.Client(url=VAULT_ADDR)
-        result = client.sys.initialize(shares, threshold)
+
+        # サーバー初期化
+        retry_count = 0
+        while True:
+            try:
+                result = client.sys.initialize(shares, threshold)
+                break
+            except requests.ConnectionError:
+                retry_count = retry_count + 1
+            if retry_count >= MAX_RETRY_COUNT:
+                # 規定回数以上失敗した場合はエラーとする
+                raise UnusableVault
+            # 起動がまだ完了していない可能性があるので少し待機
+            time.sleep(1)
 
         # unseal
         unseal_keys = result['keys']

@@ -54,7 +54,8 @@ RUN jupyter contrib nbextension install --user
 RUN jupyter nbextensions_configurator enable --user
 RUN jupyter nbextension enable codefolding/main
 
-RUN pip install --no-cache git+https://github.com/NII-cloud-operation/Jupyter-LC_run_through@master
+# TODO: リリース時にはdg_Jupyter-LC_run_throughのブランチを変更する(@Rel20230929のようにする)
+RUN pip install --no-cache git+https://github.com/NII-DG/dg_Jupyter-LC_run_through.git@20240216
 RUN jupyter run-through quick-setup --user
 
 RUN pip install --no-cache git+https://github.com/NII-DG/dg_Jupyter-multi_outputs.git@master

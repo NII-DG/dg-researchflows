@@ -8,7 +8,7 @@ from IPython.core.display import Javascript
 from .html.button import create_button
 from .config import path_config, message as msg_config
 from library.utils.setting import get_data_dir
-import file
+from . import file
 
 
 

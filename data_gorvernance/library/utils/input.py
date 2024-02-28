@@ -1,3 +1,4 @@
+import getpass
 
 from IPython.display import clear_output
 
@@ -26,7 +27,7 @@ def get_token():
             return token
 
     while True:
-        token = input(msg_config.get('form', 'pls_input_token'))
+        token = getpass.getpass(msg_config.get('form', 'pls_input_token'))
 
         # 形式確認
         token = StringManager.strip(token)

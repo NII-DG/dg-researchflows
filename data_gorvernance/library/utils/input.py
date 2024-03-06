@@ -7,15 +7,28 @@ from .storage_provider import grdm
 from .string import StringManager
 from .vault import Vault
 from .storage_provider import grdm
-from .error import UnauthorizedError
+from .error import UnauthorizedError, UnusableVault
 
 
 def get_token():
+    """トークンを取得する
+
+    Raises:
+        UnusableVault: vaultが利用できない
+        requests.exceptions.RequestException: 通信不良
+
+    Returns:
+        str: トークン
+    """
+
     TOKEN_KEY = 'grdm_token'
 
     # Vaultからトークンを取得する
-    vault = Vault()
-    token = vault.get_value(TOKEN_KEY)
+    try:
+        vault = Vault()
+        token = vault.get_value(TOKEN_KEY)
+    except Exception as e:
+        raise UnusableVault from e
 
     if token:
         # 接続確認
@@ -49,6 +62,7 @@ def get_token():
 
 
 def get_project_id():
+    """プロジェクトIDを取得する"""
     project_id = grdm.get_project_id()
     if project_id:
         return project_id

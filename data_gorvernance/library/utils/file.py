@@ -91,5 +91,5 @@ class JsonFile(File):
         return json.loads(content)
 
     def write(self, data:dict):
-        json_data = json.dumps(data, indent=4)
+        json_data = json.dumps(data, ensure_ascii=False, indent=4)
         super().write(json_data)

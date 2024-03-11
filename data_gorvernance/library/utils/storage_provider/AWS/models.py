@@ -1,7 +1,5 @@
 import os
 
-import boto3
-
 
 def download_file(s3_client, bucket_name:str, aws_path:str, local_path:str):
     response = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=aws_path)
@@ -40,9 +38,8 @@ def download_dir(s3_client, bucket_name:str, aws_dir:str, local_dir:str):
             if s3_file_path.endswith("/"):
                 continue
 
-            s3_file_name = os.path.basename(s3_file_path)
             relative_path = os.path.relpath(s3_file_path, aws_dir)
-            local_object_file_path = os.path.join(local_dir, relative_path, s3_file_name)
+            local_object_file_path = os.path.join(local_dir, relative_path)
 
             # ローカル側にディレクトリパスが存在するか確認する
             if os.path.exists(local_object_file_path):

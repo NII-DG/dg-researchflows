@@ -12,7 +12,7 @@ from cookiecutter.prompt import (
     render_variable,
     StrictEnvironment
 )
-from cookiecutter.exceptions import OutputDirExistsException
+from cookiecutter.exceptions import OutputDirExistsException, RepositoryNotFound
 
 
 class MakePackage:

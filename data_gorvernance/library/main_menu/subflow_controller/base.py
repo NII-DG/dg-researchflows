@@ -53,11 +53,11 @@ class BaseSubflowForm():
         # サブフロー名称：テキストフォームのイベントリスナー
         self._sub_flow_name_form.param.watch(self.callback_menu_form, 'value')
 
-        # データディレクトリ名
+        # データフォルダ名
         self._data_dir_name_form = pn.widgets.TextInput(
             name=msg_config.get('main_menu', 'data_dir_name'),
             placeholder='Enter a data directory name here…', max_length=50)
-        # データディレクトリ名：テキストフォームのイベントリスナー
+        # データフォルダ名：テキストフォームのイベントリスナー
         self._data_dir_name_form.param.watch(self.callback_menu_form, 'value')
 
         # 親サブフロー種別(フェーズ)オプション
@@ -240,7 +240,7 @@ class BaseSubflowForm():
 
     def validate_data_dir_name(self, data_dir_name):
 
-        # データディレクトリ名の検証
+        # データフォルダ名の検証
         if StringManager.is_empty(data_dir_name):
             # data_dir_nameが未入力の場合、ユーザ警告
             self.change_submit_button_warning(msg_config.get('main_menu','not_input_data_dir'))
@@ -251,8 +251,8 @@ class BaseSubflowForm():
             self.change_submit_button_warning(msg_config.get('main_menu','data_dir_pattern_error'))
             return False
 
-        if re.search(r'[\/\\0]', data_dir_name):
-            # data_dir_nameに禁止文字列が含まれる時、ユーザ警告
+        if re.search(r'[\/]', data_dir_name):
+            # data_dir_nameに禁止文字列(\)が含まれる時、ユーザ警告
             self.change_submit_button_warning(msg_config.get('main_menu','data_dir_pattern_error'))
             return False
 

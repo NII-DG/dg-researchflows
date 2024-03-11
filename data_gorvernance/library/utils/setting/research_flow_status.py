@@ -150,7 +150,7 @@ class ResearchFlowStatusFile(JsonFile):
         return True
 
     def is_unique_data_dir(self, phase_seq_number, data_dir_name)->bool:
-        """データディレクトリ名のユニークチェック"""
+        """データフォルダ名のユニークチェック"""
         exist_phase = False
         research_flow_status = self.load_research_flow_status()
         for phase_status in research_flow_status:

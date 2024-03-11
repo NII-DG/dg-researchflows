@@ -251,7 +251,7 @@ class BaseSubflowForm():
             self.change_submit_button_warning(msg_config.get('main_menu','data_dir_pattern_error'))
             return False
 
-        if re.search(r'[\/]', data_dir_name):
+        if re.search(r'[\\/:\*\?"<>\|]', data_dir_name):
             # data_dir_nameに禁止文字列(\)が含まれる時、ユーザ警告
             self.change_submit_button_warning(msg_config.get('main_menu','data_dir_pattern_error'))
             return False

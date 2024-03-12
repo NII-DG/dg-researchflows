@@ -11,6 +11,8 @@ from ...utils import file
 from ...utils.config import path_config, message as msg_config
 from .base import BaseSubflowForm
 from ...utils.string import StringManager
+from ...utils.error import InputWarning
+
 
 class CreateSubflowForm(BaseSubflowForm):
     """サブフロー新規作成クラス"""
@@ -126,17 +128,17 @@ class CreateSubflowForm(BaseSubflowForm):
         parent_sub_flow_ids = self._parent_sub_flow_selector.value
 
         # 入力値の検証
-        sub_flow_name = StringManager.strip(sub_flow_name)
-        if not self.validate_sub_flow_name(sub_flow_name):
-            return
-        if not self.is_unique_subflow_name(sub_flow_name, phase_seq_number):
-            return
+        try:
+            sub_flow_name = StringManager.strip(sub_flow_name)
+            self.validate_sub_flow_name(sub_flow_name)
+            self.is_unique_subflow_name(sub_flow_name, phase_seq_number)
 
-        data_dir_name = StringManager.strip(data_dir_name)
-        if not self.validate_data_dir_name(data_dir_name):
-            return
-        if not self.is_unique_data_dir(data_dir_name, phase_seq_number):
-            return
+            data_dir_name = StringManager.strip(data_dir_name)
+            self.validate_data_dir_name(data_dir_name)
+            self.is_unique_data_dir(data_dir_name, phase_seq_number)
+        except InputWarning as e:
+            self.change_submit_button_warning(str(e))
+            raise
 
         # リサーチフローステータス管理JSONの更新
         try:
@@ -154,13 +156,14 @@ class CreateSubflowForm(BaseSubflowForm):
             # リサーチフローステータス管理JSONをロールバック
             self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
             # ユーザーに再入力を促す
-            self.change_submit_button_warning(msg_config.get('main_menu','data_directory_exist'))
-            return
+            message = msg_config.get('main_menu','data_directory_exist')
+            self.change_submit_button_warning(message)
+            raise InputWarning(message)
 
         # 新規サブフローデータの用意
         try:
             self.prepare_new_subflow_data(phase_name, new_sub_flow_id, sub_flow_name)
-        except Exception as e:
+        except Exception:
             # 失敗した場合に/data/<phase_name>/<data_dir_name>の削除
             os.remove(data_dir_path)
             # 失敗した場合は、リサーチフローステータス管理JSONをロールバック

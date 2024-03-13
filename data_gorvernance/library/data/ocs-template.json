@@ -14,15 +14,21 @@
         },
         {
             "id":"T003",
+            "ocs_template_name": "OCSを利用して解析環境を作成する（JupyterHub with GPU）",
+            "ocs_template_path": "/TheLittlestJupyterHub/001-JupyterHub環境構築(GPUあり).ipynb",
+            "is_active": true
+        },
+        {
+            "id":"T004",
             "ocs_template_name": "OCSを利用して解析環境を作成する（OnDemand）",
             "ocs_template_path": "",
             "is_active": false
         },
         {
-            "id":"T004",
+            "id":"T005",
             "ocs_template_name": "OCSを利用して解析環境を作成する（Sapporo）",
-            "ocs_template_path": "",
-            "is_active": false
+            "ocs_template_path": "/Sapporo/001-Sapporo環境構築.ipynb",
+            "is_active": true
         },
         {
             "id":"T999",

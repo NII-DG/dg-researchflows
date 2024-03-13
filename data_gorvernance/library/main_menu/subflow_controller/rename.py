@@ -7,6 +7,8 @@ from ...utils.config import path_config, message as msg_config
 from .base import BaseSubflowForm
 from ...utils.string import StringManager
 from ...utils.widgets import Alert
+from ...utils.error import InputWarning
+
 
 class RenameSubflowForm(BaseSubflowForm):
     """サブフロー名称変更クラス"""
@@ -113,19 +115,19 @@ class RenameSubflowForm(BaseSubflowForm):
         old_sub_flow_name, old_data_dir_name = self.reserch_flow_status_operater.get_flow_name_and_dir_name(phase_seq_number, sub_flow_id)
 
         # 入力値の検証
-        sub_flow_name = StringManager.strip(sub_flow_name)
-        if not self.validate_sub_flow_name(sub_flow_name):
-            return
-        if sub_flow_name != old_sub_flow_name:
-            if not self.is_unique_subflow_name(sub_flow_name, phase_seq_number):
-                return
+        try:
+            sub_flow_name = StringManager.strip(sub_flow_name)
+            self.validate_sub_flow_name(sub_flow_name)
+            if sub_flow_name != old_sub_flow_name:
+                self.is_unique_subflow_name(sub_flow_name, phase_seq_number)
 
-        data_dir_name = StringManager.strip(data_dir_name)
-        if not self.validate_data_dir_name(data_dir_name):
-            return
-        if data_dir_name != old_data_dir_name:
-            if not self.is_unique_data_dir(data_dir_name, phase_seq_number):
-                return
+            data_dir_name = StringManager.strip(data_dir_name)
+            self.validate_data_dir_name(data_dir_name)
+            if data_dir_name != old_data_dir_name:
+                self.is_unique_data_dir(data_dir_name, phase_seq_number)
+        except InputWarning as e:
+            self.change_submit_button_warning(str(e))
+            raise
 
         phase_name = self.reserch_flow_status_operater.get_subflow_phase(phase_seq_number)
         new_path = path_config.get_task_data_dir(self.abs_root, phase_name, data_dir_name)
@@ -135,8 +137,9 @@ class RenameSubflowForm(BaseSubflowForm):
         if new_path != old_path:
 
             if os.path.exists(new_path):
-                self.change_submit_button_warning(msg_config.get('main_menu','data_directory_exist'))
-                return
+                message = msg_config.get('main_menu','data_directory_exist')
+                self.change_submit_button_warning(message)
+                raise InputWarning(message)
 
             if not os.path.isdir(old_path):
                 self.change_submit_button_error(msg_config.get('main_menu', 'error_rename_sub_flow'))
@@ -145,8 +148,9 @@ class RenameSubflowForm(BaseSubflowForm):
             try:
                 os.rename(old_path, new_path)
             except (FileExistsError, NotADirectoryError, OSError):
-                self.change_submit_button_warning(msg_config.get('main_menu','data_directory_exist'))
-                return
+                message = msg_config.get('main_menu','data_directory_exist')
+                self.change_submit_button_warning(message)
+                raise InputWarning(message)
             except Exception:
                 self.change_submit_button_error(msg_config.get('main_menu', 'error_rename_sub_flow'))
                 raise

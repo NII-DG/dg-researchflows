@@ -9,6 +9,7 @@ from ...utils.setting import ResearchFlowStatusOperater
 from ...utils.config import path_config, message as msg_config
 from ...utils.string import StringManager
 from ...utils.widgets import Button, MessageBox
+from ...utils.error import InputWarning
 
 
 class BaseSubflowForm():
@@ -226,42 +227,37 @@ class BaseSubflowForm():
 
         if StringManager.is_empty(sub_flow_name):
             # sub_flow_nameが未入力の場合、ユーザ警告
-            self.change_submit_button_warning(msg_config.get('main_menu','not_input_subflow_name'))
-            return False
-        return True
+            message = msg_config.get('main_menu','not_input_subflow_name')
+            raise InputWarning(message)
 
     def is_unique_subflow_name(self, sub_flow_name, phase_seq_number):
 
         if not self.reserch_flow_status_operater.is_unique_subflow_name(phase_seq_number, sub_flow_name):
             # サブフロー名がユニークでない場合、ユーザ警告
-                self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_subflow_name'))
-                return False
-        return True
+            message = msg_config.get('main_menu','must_not_same_subflow_name')
+            raise InputWarning(message)
 
     def validate_data_dir_name(self, data_dir_name):
 
         # データフォルダ名の検証
         if StringManager.is_empty(data_dir_name):
             # data_dir_nameが未入力の場合、ユーザ警告
-            self.change_submit_button_warning(msg_config.get('main_menu','not_input_data_dir'))
-            return False
+            message = msg_config.get('main_menu','not_input_data_dir')
+            raise InputWarning(message)
 
         if not StringManager.is_half(data_dir_name):
             # 半角文字でない時、ユーザ警告
-            self.change_submit_button_warning(msg_config.get('main_menu','data_dir_pattern_error'))
-            return False
+            message = msg_config.get('main_menu','data_dir_pattern_error')
+            raise InputWarning(message)
 
         if re.search(r'[\\/:\*\?"<>\|]', data_dir_name):
             # data_dir_nameに禁止文字列(\/:*?"<>|)が含まれる時、ユーザ警告
-            self.change_submit_button_warning(msg_config.get('main_menu','data_dir_pattern_error'))
-            return False
-
-        return True
+            message = msg_config.get('main_menu','data_dir_pattern_error')
+            raise InputWarning(message)
 
     def is_unique_data_dir(self, data_dir_name, phase_seq_number):
 
         if not self.reserch_flow_status_operater.is_unique_data_dir(phase_seq_number, data_dir_name):
             # data_dir_nameがユニークでない場合、ユーザ警告
-            self.change_submit_button_warning(msg_config.get('main_menu','must_not_same_data_dir'))
-            return False
-        return True
+            message = msg_config.get('main_menu','must_not_same_data_dir')
+            raise InputWarning(message)

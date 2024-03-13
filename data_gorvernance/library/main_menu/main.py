@@ -17,6 +17,7 @@ from .subflow_controller import (
     DeleteSubflowForm
 )
 from ..utils.vault import Vault
+from ..utils.error import InputWarning
 
 
 # git clone https://github.com/NII-DG/dg-researchflows.git -b feature/main_menu_v2 ./demo
@@ -234,6 +235,8 @@ class MainMenu(TaskLog):
             display(Javascript('IPython.notebook.save_checkpoint();'))
             # end
             self.log.finish(detail=self.callback_type)
+        except InputWarning as e:
+            self.log.warning(str(e))
         except  Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
             self.log.error(message)

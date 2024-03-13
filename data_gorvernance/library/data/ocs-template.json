@@ -26,7 +26,7 @@
         },
         {
             "id":"T005",
-            "ocs_template_name": "OCSを利用して解析環境を作成する（Sapporo）",
+            "ocs_template_name": "Sapporoの解析環境を構築する",
             "ocs_template_path": "/Sapporo/001-Sapporo環境構築.ipynb",
             "is_active": true
         },

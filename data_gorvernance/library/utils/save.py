@@ -46,7 +46,7 @@ class TaskSave(TaskLog):
         self.save_form_box = pn.WidgetBox()
         self.save_form_box.width = 900
         # 確定ボタン
-        self._save_submit_button = Button(width=600)
+        self._save_submit_button = Button(width=500)
 
     def define_save_form(self, source):
         """source is str or list."""

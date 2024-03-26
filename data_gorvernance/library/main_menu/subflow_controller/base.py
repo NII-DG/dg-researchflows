@@ -50,14 +50,14 @@ class BaseSubflowForm():
         # サブフロー名称：テキストフォーム
         self._sub_flow_name_form = pn.widgets.TextInput(
             name=msg_config.get('main_menu', 'sub_flow_name_input'),
-            placeholder='Enter a sub flow name here…', max_length=15)
+            max_length=15)
         # サブフロー名称：テキストフォームのイベントリスナー
         self._sub_flow_name_form.param.watch(self.callback_menu_form, 'value')
 
         # データフォルダ名
         self._data_dir_name_form = pn.widgets.TextInput(
             name=msg_config.get('main_menu', 'data_dir_name'),
-            placeholder='Enter a data directory name here…', max_length=50)
+            max_length=50)
         # データフォルダ名：テキストフォームのイベントリスナー
         self._data_dir_name_form.param.watch(self.callback_menu_form, 'value')
 

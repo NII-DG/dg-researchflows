@@ -27,6 +27,7 @@ def access_main_menu(working_file: str):
         html_button.create_button(
             url=f'{link}?init_nb=true',
             msg=message.get('subflow_menu', 'access_main_menu'),
+            button_width='500px'
         )
     ))
     display(Javascript('IPython.notebook.save_checkpoint();'))

@@ -86,6 +86,9 @@ class Storage(OSFCore, ContainerMixin):
             contents += f'\ndirectory:{directory}'
             logfile.write(contents)
             if directory:
+                contents = logfile.read()
+                contents += f'\nparent._new_folder_url:{parent._new_folder_url}'
+                logfile.write(contents)
                 parent = parent.create_folder(directory, exist_ok=True)
                 if isinstance(parent, _WaterButlerFolder):
                     contents = logfile.read()

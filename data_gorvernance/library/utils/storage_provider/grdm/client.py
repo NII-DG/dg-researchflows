@@ -62,6 +62,11 @@ class Storage(OSFCore, ContainerMixin):
         To force overwrite of an existing file, set `force=True`.
         To overwrite an existing file only if the files differ, set `update=True`
         """
+
+        contents = logfile.read()
+        contents += f'\nname:{path}\nbefore_new_file_url:{self._new_file_url}\nbefore_new_folder_url:{self._new_folder_url}\nbefore_files_url:{self._files_url}'
+        logfile.write(contents)
+
         if 'b' not in fp.mode:
             raise ValueError("File has to be opened in binary mode.")
 
@@ -82,13 +87,13 @@ class Storage(OSFCore, ContainerMixin):
             logfile.write(contents)
             if directory:
                 parent = parent.create_folder(directory, exist_ok=True)
-                if isinstance(parent, Folder):
+                if isinstance(parent, _WaterButlerFolder):
+                    contents = logfile.read()
+                    contents += f'\nparent.osf_path:{parent.osf_path}, parent.id:{parent.id}'
+                    logfile.write(contents)
+                else:
                     contents = logfile.read()
                     contents += f'\nparent.path:{parent.path}, parent.name:{parent.name}'
-                    logfile.write(contents)
-                elif isinstance(parent, _WaterButlerFolder):
-                    contents = logfile.read()
-                    contents += f'\nparent.id:{parent.id}, parent.osf_path:{parent.osf_path}'
                     logfile.write(contents)
 
         url = parent._new_file_url
@@ -204,21 +209,11 @@ def upload(token, base_url, args):
                     name = os.path.join(remote_path, dir_name, subdir_path,
                                         fname)
                     contents = logfile.read()
-                    contents += f'\nname:{name}\nbefore_new_file_url:{store._new_file_url}\nbefore_new_folder_url:{store._new_folder_url}\nbefore_files_url:{store._files_url}'
-                    logfile.write(contents)
                     store.create_file(name, fp, force=args.force,
                                         update=args.update)
                     contents = logfile.read()
-                    contents += f'\nafter_new_file_url:{store._new_file_url}\nafter_new_folder_url:{store._new_folder_url}\nafter_files_url:{store._files_url}'
-                    logfile.write(contents)
 
     else:
-        contents = logfile.read()
-        contents += f'\nname:{remote_path}\nbefore_new_file_url:{store._new_file_url}\nbefore_new_folder_url:{store._new_folder_url}\nbefore_files_url:{store._files_url}'
-        logfile.write(contents)
         with open(args.source, 'rb') as fp:
             store.create_file(remote_path, fp, force=args.force,
                                 update=args.update)
-        contents = logfile.read()
-        contents += f'\nafter_new_file_url:{store._new_file_url}\nafter_new_folder_url:{store._new_folder_url}\nbefore_files_url:{store._files_url}'
-        logfile.write(contents)

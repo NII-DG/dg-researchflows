@@ -2,6 +2,13 @@ import os
 
 from osfclient.cli import OSF, split_storage
 
+from ...file import File
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+logfilepath = os.path.abspath(os.path.join(script_dir, "sync_log"))
+logfile = File(logfilepath)
+if not os.path.exists(logfilepath):
+    logfile.create()
 
 class UpdateArgs:
 
@@ -43,10 +50,22 @@ def upload(token, base_url, args):
                     # build the remote path + fname
                     name = os.path.join(remote_path, dir_name, subdir_path,
                                         fname)
+                    contents = logfile.read()
+                    contents += f'\nname:{name}\nbefore_new_file_url:{store._new_file_url}\nbefore_new_folder_url:{store._new_folder_url}'
+                    logfile.write(contents)
                     store.create_file(name, fp, force=args.force,
                                         update=args.update)
+                    contents = logfile.read()
+                    contents += f'\nafter_new_file_url:{store._new_file_url}\nafter_new_folder_url:{store._new_folder_url}'
+                    logfile.write(contents)
 
     else:
+        contents = logfile.read()
+        contents += f'\nname:{remote_path}\nbefore_new_file_url:{store._new_file_url}\nbefore_new_folder_url:{store._new_folder_url}'
+        logfile.write(contents)
         with open(args.source, 'rb') as fp:
             store.create_file(remote_path, fp, force=args.force,
                                 update=args.update)
+        contents = logfile.read()
+        contents += f'\nafter_new_file_url:{store._new_file_url}\nafter_new_folder_url:{store._new_folder_url}'
+        logfile.write(contents)

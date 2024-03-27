@@ -5,7 +5,7 @@ from requests.exceptions import ConnectionError
 from osfclient.cli import OSF, split_storage
 from osfclient.models.core import OSFCore
 from osfclient.models.file import ContainerMixin
-from osfclient.models.file import File
+from osfclient.models.file import File, Folder, _WaterButlerFolder
 from osfclient.utils import checksum
 from osfclient.utils import file_empty
 from osfclient.utils import get_local_file_size
@@ -31,7 +31,6 @@ class Storage(OSFCore, ContainerMixin):
 
         self.path = self._get_attribute(storage, 'attributes', 'path')
         self.name = self._get_attribute(storage, 'attributes', 'name')
-        self.materialized_path = self._get_attribute(storage, 'attributes', 'materialized_path')
         self.node = self._get_attribute(storage, 'attributes', 'node')
         self.provider = self._get_attribute(storage, 'attributes', 'provider')
 
@@ -74,7 +73,7 @@ class Storage(OSFCore, ContainerMixin):
         # navigate to the right parent object for our file
         parent = self
         contents = logfile.read()
-        contents += f'\nparent.materialized_path:{parent.materialized_path}'
+        contents += f'\nparent.path:{parent.path}, parent.name:{parent.name}'
         logfile.write(contents)
         for directory in directories:
             # skip empty directory names
@@ -83,9 +82,14 @@ class Storage(OSFCore, ContainerMixin):
             logfile.write(contents)
             if directory:
                 parent = parent.create_folder(directory, exist_ok=True)
-                contents = logfile.read()
-                contents += f'\nparent.materialized_path:{parent.materialized_path}'
-                logfile.write(contents)
+                if isinstance(parent, Folder):
+                    contents = logfile.read()
+                    contents += f'\nparent.path:{parent.path}, parent.name:{parent.name}'
+                    logfile.write(contents)
+                elif isinstance(parent, _WaterButlerFolder):
+                    contents = logfile.read()
+                    contents += f'\nparent.id:{parent.id}, parent.osf_path:{parent.osf_path}'
+                    logfile.write(contents)
 
         url = parent._new_file_url
         contents = logfile.read()

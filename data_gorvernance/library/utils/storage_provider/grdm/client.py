@@ -52,6 +52,23 @@ class Storage(OSFCore, ContainerMixin):
         return self._iter_children(self._files_url, 'file', File,
                                    self._files_key)
 
+    @property
+    def folders(self):
+        """Iterate over all folders in this storage.
+
+        Recursively lists all folders in all subfolders.
+        """
+        return self._iter_children(self._files_url, 'folder', Folder,
+                                   self._files_key)
+
+    def matched_files(self, target_filter):
+        """Iterate all matched files in this storage.
+
+        Recursively lists files in all subfolders.
+        """
+        return self._iter_children(self._files_url, 'file', File,
+                                   self._files_key, target_filter)
+
     def create_file(self, path, fp, force=False, update=False):
         """Store a new file at `path` in this storage.
 
@@ -82,7 +99,7 @@ class Storage(OSFCore, ContainerMixin):
         # When uploading a large file (>a few MB) that already exists
         # we sometimes get a ConnectionError instead of a status == 409.
         connection_error = False
-        
+
         # peek at the file to check if it is an empty file which needs special
         # handling in requests. If we pass a file like object to data that
         # turns out to be of length zero then no file is created on the OSF.

@@ -79,6 +79,11 @@ class Storage(OSFCore, ContainerMixin):
         To force overwrite of an existing file, set `force=True`.
         To overwrite an existing file only if the files differ, set `update=True`
         """
+
+        contents = logfile.read()
+        contents += f'\nname:{path}\nbefore_new_file_url:{self._new_file_url}\nbefore_new_folder_url:{self._new_folder_url}\nbefore_files_url:{self._files_url}'
+        logfile.write(contents)
+
         if 'b' not in fp.mode:
             raise ValueError("File has to be opened in binary mode.")
 
@@ -89,10 +94,23 @@ class Storage(OSFCore, ContainerMixin):
         directories = directory.split(os.path.sep)
         # navigate to the right parent object for our file
         parent = self
+        contents = logfile.read()
+        contents += f'\nparent.path:{parent.path}, parent.name:{parent.name}'
+        logfile.write(contents)
         for directory in directories:
             # skip empty directory names
             if directory:
+                contents = logfile.read()
+                contents += f'\nparent._new_folder_url:{parent._new_folder_url}'
+                logfile.write(contents)
                 parent = parent.create_folder(directory, exist_ok=True)
+                contents = logfile.read()
+                if isinstance(parent, _WaterButlerFolder):
+                    contents += f'\nparent.osf_path:{parent.osf_path}, parent.id:{parent.id}'
+                else:
+                    contents += f'\nparent.path:{parent.path}, parent.name:{parent.name}, \nparent.osf_path:{parent.osf_path}, parent.id:{parent.id}'
+                contents += f'\nparent._new_file_url:{parent._new_file_url}'
+                logfile.write(contents)
 
         url = parent._new_file_url
 

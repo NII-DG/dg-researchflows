@@ -1,4 +1,4 @@
-"""GRDMのAPIへの通信"""
+"""Gakunin RDMのAPIへの通信"""
 from urllib import parse
 import requests
 from requests.exceptions import RequestException

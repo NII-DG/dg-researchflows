@@ -33,7 +33,7 @@ def get_projects_list(scheme, domain, token):
 
 
 def sync(token, base_url, project_id, abs_source, abs_root="/home/jovyan"):
-    """upload to GRDM
+    """upload to Gakunin RDM
 
     abs_source must be an absolute path.
     """
@@ -72,7 +72,7 @@ def get_project_metadata(scheme, domain, token, project_id):
 
 
 def format_metadata(metadata):
-    """GRDMから取得したプロジェクトメタデータを整形する"""
+    """Gakunin RDMから取得したプロジェクトメタデータを整形する"""
 
     datas = metadata['data']
     # {'dmp': first_value}

@@ -166,65 +166,29 @@ def notebooks_toc(nb_dir):
         for nb, headers in nb_headers
     ]))
 
-
 def _embed_info_in_one_rect(elem, nb_headers, nb_name, current_dir):
     headers = nb_headers[nb_name]
     nb_file = nb_headers[nb_name]['path']
     if nb_file:
         nb_file = file.relative_path(nb_file, current_dir).replace("../", "./../")
-    rect_elem = elem.getprevious()
-    rect = (
-        (int(rect_elem.attrib['x']), int(rect_elem.attrib['y'])),
-        (int(rect_elem.attrib['width']), int(rect_elem.attrib['height'])))
     childpos = elem.getparent().index(elem)
     parent_elem = elem.getparent()
-    remove_texts(elem)
     title = headers['title']['text']
-    # NOTE: textをremoveした後にこれを行う理由は？
-    if elem.text.find(':') >= 0:
-        title = title + ' - ' + elem.text.split(':')[1]
-    line_num = insert_title(parent_elem, childpos, rect, title, str(nb_file))
-    insert_headers(parent_elem, childpos, rect, headers['headers'], line_num)
+    insert_title(elem, parent_elem, childpos, title, str(nb_file))
 
-def remove_texts(elem):
-    old_text = elem
-    while old_text is not None:
-        if (old_text.getnext() is not None and
-                old_text.getnext().tag == SVG_TEXT):
-            next_text = old_text.getnext()
-        else:
-            next_text = None
-        old_text.getparent().remove(old_text)
-        old_text = next_text
-
-def insert_title(parent_elem, childpos, rect, title, link):
+def insert_title(elem, parent_elem, childpos, title, link):
     if link:
         font_color = title_font_color
     else:
         font_color = text_font_color
 
-    height_title = (
-        text_margin + (title_font_size + text_margin) * 2 + head_margin * 2)
-    lines = split_title(title)
-    if len(lines) == 2:
-        # 分割された場合
-        text_elem = create_text(rect, title_font_size, font_weight='bold', font_color=font_color)
-        text_elem.text = lines[0]
-        text_elem.attrib['y'] = str(
-                rect[0][1] + head_margin + text_margin + title_font_size)
-        text_elems = [text_elem]
+    text_elem = elem
+    text_elem.attrib['fill'] = font_color
+    text_elem.attrib['font-family'] = 'sans-serif'
+    text_elem.attrib['font-size'] = str(title_font_size)
+    text_elem.attrib['font-weight'] = 'bold'
 
-        text_elem = create_text(rect, title_font_size, font_weight='bold', font_color=font_color)
-        text_elem.text = lines[1]
-        text_elem.attrib['y'] = str(
-                rect[0][1] + height_title - text_margin - head_margin)
-        text_elems.append(text_elem)
-    else:
-        text_elem = create_text(rect, title_font_size, font_weight='bold', font_color=font_color)
-        text_elem.text = title
-        text_elem.attrib['y'] = str(
-                rect[0][1] + height_title // 2 + title_font_size // 2)
-        text_elems = [text_elem]
+    text_elems = [elem]
 
     if link:
         text_elems = create_anchor(text_elems, link)
@@ -232,44 +196,6 @@ def insert_title(parent_elem, childpos, rect, title, link):
     else:
         for text_elem in text_elems:
             parent_elem.insert(childpos, text_elem)
-    return len(lines)
-
-def insert_headers(parent_elem, childpos, rect, headers, title_lines):
-    offset_y = (
-        text_margin +
-        (title_font_size + text_margin) * (title_lines + 1) +
-        head_margin * 2 + text_margin)
-    for i, header in enumerate(headers):
-        text_elem = create_text(rect, item_font_size, font_color=text_font_color)
-        text_elem.text = header['text']
-        text_elem.attrib['y'] = str(
-                rect[0][1] + offset_y + (item_font_size + text_margin) * i +
-                item_font_size)
-        parent_elem.insert(childpos, text_elem)
-
-def split_title(title):
-    """titleが特定の区切り文字を含む場合に分割する"""
-    if u'：' in title:
-        return [title[:title.index(u'：') + 1], title[title.index(u'：') + 1:]]
-    elif len(title) >= 15:
-        words = re.split(r'([-(（])', title, 1)
-        ret = words[0:1] + [''.join(x) for x in zip(words[1::2], words[2::2])]
-        return [re.sub(r'^--', '- ', x) for x in ret]
-    else:
-        return [title]
-
-def create_text(rect, font_size, font_color, font_weight='normal', font_style='normal'):
-    text_elem = etree.Element(SVG_TEXT)
-    text_elem.attrib['fill'] = font_color
-    text_elem.attrib['font-family'] = 'sans-serif'
-    text_elem.attrib['font-size'] = str(font_size)
-    text_elem.attrib['font-style'] = font_style
-    text_elem.attrib['font-weight'] = font_weight
-    text_elem.attrib['font-anchor'] = 'middle'
-    text_elem.attrib['x'] = str(rect[0][0] + text_margin)
-    text_elem.attrib['width'] = str(rect[1][0] - text_margin * 2)
-    text_elem.attrib['inline-size'] = '400px'
-    return text_elem
 
 def create_anchor(elems, link):
     a_elem = etree.Element('a')
@@ -277,4 +203,3 @@ def create_anchor(elems, link):
     for elem in elems:
         a_elem.append(elem)
     return a_elem
-

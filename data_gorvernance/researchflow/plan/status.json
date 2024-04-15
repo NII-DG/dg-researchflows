@@ -2,7 +2,7 @@
     "is_completed": false,
     "tasks": [
         {
-            "id": "RF002001",
+            "id": "研究データ管理計画を立てる",
             "name": "make_research_data_management_plan",
             "is_multiple": false,
             "is_required": true,
@@ -13,20 +13,20 @@
             "disabled": false
         },
         {
-            "id": "RF002003",
+            "id": "解析環境を構築する",
             "name": "build_experiment_environment",
             "is_multiple": false,
             "is_required": false,
             "completed_count": 0,
             "dependent_task_ids": [
-                "RF002001"
+                "研究データ管理計画を立てる"
             ],
             "status": "unfeasible",
             "execution_environments": [],
             "disabled": false
         },
         {
-            "id": "RF009001",
+            "id": "ガバナンス状態を検証する",
             "name": "validate",
             "is_multiple": true,
             "is_required": false,
@@ -37,7 +37,7 @@
             "disabled": false
         },
         {
-            "id": "RF009002",
+            "id": "共同研究者を管理する",
             "name": "manage_collaborators",
             "is_multiple": true,
             "is_required": false,
@@ -48,7 +48,7 @@
             "disabled": false
         },
         {
-            "id": "RF009004",
+            "id": "バックアップを設定する",
             "name": "backup",
             "is_multiple": true,
             "is_required": false,
@@ -59,7 +59,7 @@
             "disabled": false
         },
         {
-            "id": "RF009005",
+            "id": "リサーチフローを保存する",
             "name": "save_data",
             "is_multiple": true,
             "is_required": false,

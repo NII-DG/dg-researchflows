@@ -9,8 +9,8 @@ blockdiag {
 
     group {
         dummy-1-1[shape=none, height=1, width=250]
-        RF002001;
-        RF002003;
+        研究データ管理計画を立てる;
+        解析環境を構築する;
     }
 
     group {
@@ -22,15 +22,15 @@ blockdiag {
             shape = line;
             style = none;
             dummy-1-2[shape=none, height=1, width=250]
-            RF009004;
+            バックアップを設定する;
         }
-        RF009002;
-        RF009001;
-        RF009005;
+        共同研究者を管理する;
+        ガバナンス状態を検証する;
+        リサーチフローを保存する;
     }
 
-    RF002001 -> RF002003;
+    研究データ管理計画を立てる -> 解析環境を構築する;
     // 横幅の調整用ダミーを任意の場所に置くため
-    dummy-1-1 -- RF002001[style=none];
-    dummy-1-2 -- RF009004[style=none];
+    dummy-1-1 -- 研究データ管理計画を立てる[style=none];
+    dummy-1-2 -- バックアップを設定する[style=none];
 }

@@ -12,6 +12,8 @@ RUN apt-get install -y expect
 RUN apt-get install -y curl
 RUN apt-get install -y git
 RUN apt-get install -y git-annex
+RUN apt-get install fontconfig
+RUN apt-get install -y fonts-ipafont
 
 # install vault
 RUN apt-get install -y gpg wget lsb-release
@@ -21,6 +23,11 @@ RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/h
 RUN apt-get update -y
 RUN apt-get install -y vault
 RUN setcap -r /usr/bin/vault
+
+# install ansible
+RUN apt-get install -y software-properties-common
+RUN apt-add-repository -y -u ppa:ansible/ansible
+RUN apt-get install -y ansible
 
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*

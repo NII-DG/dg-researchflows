@@ -21,8 +21,8 @@
         {
             "id":"T004",
             "ocs_template_name": "OCSを利用して解析環境を作成する（OnDemand）",
-            "ocs_template_path": "",
-            "is_active": false
+            "ocs_template_path": "/OpenOnDemand/000-解析環境構築.ipynb",
+            "is_active": true
         },
         {
             "id":"T005",

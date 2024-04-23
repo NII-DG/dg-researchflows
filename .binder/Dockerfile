@@ -15,6 +15,14 @@ RUN apt-get install -y git-annex
 RUN apt-get install fontconfig
 RUN apt-get install -y fonts-ipafont
 
+RUN curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+RUN apt-get update -y
+RUN apt-get install nodejs
+RUN npm install -g n
+RUN npm install -g typescript
+RUN npm install -g tslab
+RUN tslab install
+
 # install vault
 RUN apt-get install -y gpg wget lsb-release
 RUN wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg

@@ -29,7 +29,7 @@ RUN tslab install
 
 RUN pip install --no-cache --upgrade pip
 RUN pip install react-in-jupyter
-RUN npm i @widgetti/jupyter-react
+RUN pip install ipyreact
 
 # install vault
 RUN apt-get install -y gpg wget lsb-release

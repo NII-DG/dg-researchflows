@@ -4,6 +4,9 @@ from ..utils.setting import SubflowStatusFile, SubflowTask
 from ..utils import file
 from ..utils.diagram import DiagManager, init_config, update_svg
 from ..utils.config import path_config
+from nbformat import read, NO_CONVERT
+from pathlib import Path
+from itertools import chain, zip_longest
 
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -53,7 +56,10 @@ class SubFlowManager:
         self.svg_config = {}
         for task in self.tasks:
             self.svg_config.update(init_config(task.id, task.name))
+            self.parse_headers(task, display_all)
         self._update(display_all)
+        for task in self.tasks:
+            self.change_id(task, display_all)
         self.diag.generate_svg(tmp_diag, svg_path, font)
         update_svg(svg_path, self.current_dir, self.task_dir, self.svg_config)
 
@@ -93,4 +99,43 @@ class SubFlowManager:
         elif task.status == task.STATUS_DOING:
             self.diag.update_node_icon(task.id, icon_dir + "/loading.png")
             self.svg_config[task.id]['init_nb'] = False
+    
+    def parse_headers(self, task, display_all=True):
+        nb_dir = Path(self.task_dir)
+        for nb_path in nb_dir.glob("**/*.ipynb"):
+            nb = read(str(nb_path), as_version=NO_CONVERT)
+            lines = [
+                line.strip()
+                for line in chain.from_iterable(
+                    cell['source'].split('\n')
+                    for cell in nb.cells
+                    if cell['cell_type'] == 'markdown'
+                )
+                if len(line.strip()) > 0 and not line.startswith('---')
+            ]
+            # h1, h2 の行とその次行の最初の１文を取り出す
+            headers = [
+                (' '.join(line0.split()[1:]),
+                    line1.split("。")[0] if line1 is not None else '')
+                for (line0, line1) in zip_longest(lines, lines[1:])
+                if line0.startswith('# ') or line0.startswith('## ')
+            ]
 
+            title = headers[0][0] if not headers[0][0].startswith('About:') else headers[0][0][6:]
+            if task.name in str(nb_path):
+                self.svg_config[task.id]['path'] = str(nb_path)
+                self.svg_config[task.id]['text'] = title
+                break
+
+    def change_id(self, task, display_all=True):
+        lines = self.diag.content.splitlines()
+        new_lines = []
+        for line in lines:
+            if task.id in line:
+                find = task.id
+                replace = self.svg_config[task.id]['text']
+                update = line.replace(find, replace, 1)
+                new_lines.append(update)
+            else:
+                new_lines.append(line)
+        self.diag.content = '\n'.join(new_lines)

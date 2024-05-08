@@ -15,13 +15,19 @@ RUN apt-get install -y git-annex
 RUN apt-get install fontconfig
 RUN apt-get install -y fonts-ipafont
 
+# install typescript
 RUN curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
 RUN apt-get update -y
 RUN apt-get install nodejs
 RUN npm install -g n
 RUN npm install -g typescript
+# 備忘録：package.jsonのある場所でnpm install
+
+# install tslab
 RUN npm install -g tslab
 RUN tslab install
+
+RUN pip install react-in-jupyter
 
 # install vault
 RUN apt-get install -y gpg wget lsb-release

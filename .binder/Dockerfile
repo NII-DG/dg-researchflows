@@ -25,7 +25,7 @@ RUN apt-get install -y fonts-ipafont
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 RUN apt-get update -y
 RUN apt-get install nodejs
-RUN npm install -g n
+RUN npm install -g n && n 20.13.0
 RUN npm install -g typescript
 RUN npm install -g yarn
 # 備忘録：package.jsonのある場所でnpm install

@@ -22,7 +22,7 @@ RUN apt-get install fontconfig
 RUN apt-get install -y fonts-ipafont
 
 # install typescript
-RUN curl -fsSL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 RUN apt-get update -y
 RUN apt-get install nodejs
 RUN npm install -g n

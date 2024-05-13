@@ -3,7 +3,7 @@ FROM jupyter/scipy-notebook:ubuntu-20.04
 USER root
 RUN apt-get clean
 
-#RUN rm -rf /var/lib/apt/lists/*
+RUN rm -rf /var/lib/apt/lists/*
 RUN apt-get update -y
 RUN apt-get install -y netbase
 RUN apt-get install -y graphviz
@@ -30,27 +30,14 @@ RUN apt-get install -y software-properties-common
 RUN apt-add-repository -y -u ppa:ansible/ansible
 RUN apt-get install -y ansible
 
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get update \
-    && apt-get install -y --no-install-recommends nodejs \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt update && \
+    apt install -y --no-install-recommends \
+    curl \
+    jq \
+    tini && \
+    rm -rf /var/lib/apt/lists/*
 
-# install typescript
-#RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-#RUN apt-get update -y
-#RUN apt-get install nodejs
-RUN npm install -g n
-RUN npm install -g typescript
-RUN npm install -g yarn
-# 備忘録：package.jsonのある場所でnpm install
-
-# install tslab
-RUN npm install -g tslab
-RUN tslab install
-
-RUN pip install --no-cache --upgrade pip
-RUN pip install react-in-jupyter
-RUN pip install ipyreact
+ENTRYPOINT ["tini", "--"]
 
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*

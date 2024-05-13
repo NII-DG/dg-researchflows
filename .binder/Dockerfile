@@ -3,11 +3,6 @@ FROM jupyter/scipy-notebook:ubuntu-20.04
 USER root
 RUN apt-get clean
 
-RUN apt update && \
-    apt install -y --no-install-recommends \
-    tini && \
-    rm -rf /var/lib/apt/lists/*
-
 #RUN rm -rf /var/lib/apt/lists/*
 RUN apt-get update -y
 RUN apt-get install -y netbase
@@ -21,11 +16,16 @@ RUN apt-get install -y git-annex
 RUN apt-get install fontconfig
 RUN apt-get install -y fonts-ipafont
 
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
 # install typescript
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-RUN apt-get update -y
-RUN apt-get install nodejs
-RUN npm install -g n && n 20.13.0
+#RUN curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+#RUN apt-get update -y
+#RUN apt-get install nodejs
+RUN npm install -g n
 RUN npm install -g typescript
 RUN npm install -g yarn
 # 備忘録：package.jsonのある場所でnpm install

@@ -61,6 +61,7 @@ def _embed_info_in_one_rect(elem, current_dir, config):
             continue
         if value['text'] == elem.text:
             link = value['path']
+            link = file.relative_path(link, current_dir).replace("../", "./../")
             if link:
                 font_color = title_font_color
             else:

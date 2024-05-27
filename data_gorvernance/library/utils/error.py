@@ -16,6 +16,9 @@ class MetadataNotExist(Exception):
     """取得したプロジェクトメタデータが空である場合のエラー"""
     pass
 
+class RemoteFileNotExist(Exception):
+    """ファイルが取得できなかったときのエラー"""
+
 
 # vault
 

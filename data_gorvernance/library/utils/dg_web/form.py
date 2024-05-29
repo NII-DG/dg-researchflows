@@ -92,12 +92,12 @@ class Form:
                 )
         elif schema.get("type") == "number":
             if isinstance(value, int):
-                return IntInput(name=title, schema_key=key, value=value,margin=margin)
+                return IntInput(name=title, schema_key=key, value=value, margin=margin)
             else:
                 return IntInput(name=title, schema_key=key, margin=margin)
         elif schema.get("type") == "boolean":
             if isinstance(value, bool):
-                return Checkbox(name=title, schema_key=key, value=value,margin=margin)
+                return Checkbox(name=title, schema_key=key, value=value, margin=margin)
             else:
                 return Checkbox(name=title, schema_key=key, margin=margin)
         elif "string" in schema.get("type", ""):
@@ -259,7 +259,8 @@ class Form:
                         if self.is_not_input_widget(w):
                             continue
                         data.update(self.get_value(w))
-                    value.append(data)
+                    if data:
+                        value.append(data)
                 else:
                     data = self.get_value(target)
                     for v in data.values():

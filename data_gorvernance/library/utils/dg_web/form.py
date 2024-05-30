@@ -1,7 +1,6 @@
 import traceback
 
 import panel as pn
-from IPython.display import display
 
 from library.utils.widgets import MessageBox, Button
 
@@ -49,6 +48,20 @@ class Markdown(pn.pane.Markdown):
         super().__init__(object=object, **params)
 
 
+class ArrayBox(pn.WidgetBox):
+
+    def __init__(self, **params):
+        if 'schema_key' in params:
+            self.schema_key = params.pop('schema_key')
+        super().__init__(**params)
+
+class ObjectBox(pn.WidgetBox):
+
+    def __init__(self, **params):
+        if 'schema_key' in params:
+            self.schema_key = params.pop('schema_key')
+        super().__init__(**params)
+
 class Form:
 
     def __init__(self):
@@ -64,29 +77,37 @@ class Form:
             schema (dict): jsonschema
             data (dict): jsonschemaの形式に沿った初期値
         """
-
+        self.schema = schema
         for key, properties in schema["properties"].items():
             value = data.get(key)
             self.form_box.append(self._create_input_widget(properties, key, value))
 
-    def _create_input_widget(self, schema:dict, key, value):
-        """jsonschemaの設定値からpanelのwidgetを作成する"""
+    def _create_input_widget(self, schema:dict, key:str, value=None):
+        """jsonschemaの設定値からpanelのwidgetを作成する
+
+        Args:
+            schema (dict): jsonschemaにおけるkeyの値
+            key (str): schemaのkey
+            value (Any, optional): keyに対する初期値. Defaults to None.
+
+        Returns:
+            PanelのWidget
+        """
         title = schema.get("title", key)
+        if value is None:
+            value = schema.get("default")
 
         if "enum" in schema and "string" in schema.get("type", ""):
+            options = [""] + schema["enum"]
             if isinstance(value, str):
-                return Select(name=title, schema_key=key, value=value, options=schema["enum"], margin=margin)
+                return Select(name=title, schema_key=key, value=value, options=options, margin=margin)
             else:
-                return Select(name=title, schema_key=key, options=schema["enum"], margin=margin)
+                return Select(name=title, schema_key=key, options=options, margin=margin)
         elif schema.get("type") == "array":
-            if not isinstance(value, list):
-                value = []
             return self._genetate_array_widget(
                     schema=schema, title=title, key=key, values=value
                 )
         elif schema.get("type") == "object":
-            if not isinstance(value, dict):
-                value = {}
             return self._generate_object_widget(
                     schema=schema, title=title, key=key, values=value
                 )
@@ -108,42 +129,56 @@ class Form:
         else:
             self.msg_output.add_warning(f'name: {title}\ntype: {schema.get("type")}')
 
-    def _generate_object_widget(self, schema, title, key, values: dict):
-        """type: objectをwidgetbox化する"""
-        obj_box = pn.WidgetBox()
+    def _generate_object_widget(self, schema:dict, title:str, key:str, values):
+        """type: objectをwidgetbox化する
+
+        Args:
+            schema (dict): jsonschemaにおけるkeyの値
+            title (str): keyに対応する表示名
+            key (str): schemaのkey
+            value (Any): keyに対する初期値
+
+        Returns:
+            ObjectBox
+        """
+        obj_box = ObjectBox(schema_key=key)
         obj_box.append(Markdown(title, schema_key=key))
         for i_key, properties in schema["properties"].items():
-            value = values.get(i_key)
+            if isinstance(values, dict):
+                value = values.get(i_key)
+            else:
+                value = None
             obj_box.append(self._create_input_widget(properties, i_key, value))
         return obj_box
 
-    def _genetate_array_widget(self, schema, title, key, values: list):
-        """type: arrayをwidgetbox化する"""
-        box =  pn.WidgetBox(margin=margin)
+    def _genetate_array_widget(self, schema:dict, title:str, key:str, values):
+        """type: arrayをwidgetbox化する
+
+        Args:
+            schema (dict): jsonschemaにおけるkeyの値
+            title (str): keyに対応する表示名
+            key (str): schemaのkey
+            value (Any): keyに対する初期値
+
+        Returns:
+            ArrayBox
+        """
+        box = ArrayBox(margin=margin, schema_key=key)
         box.append(Markdown(title, schema_key=key))
 
         column = pn.Column(margin=margin)
 
-        def create_items(data=None):
+        def create_items(value=None):
             """arrayのひとつの要素を作成する"""
             column_list = column.objects
             title_num = title + str(len(column_list) + 1)
             items = schema["items"]
+            items["title"] = title_num
+            widget = self._create_input_widget(items, key, value)
             if items.get("type") == "object":
-                obj_box = pn.WidgetBox()
-                obj_box.append(Markdown(title_num, schema_key=key))
-                for i_key, properties in items["properties"].items():
-                    if isinstance(data, dict):
-                        value = data.get(i_key)
-                    else:
-                        value = None
-                    obj_box.append(self._create_input_widget(properties, i_key, value))
-                return pn.Row(obj_box, create_remove_button(obj_box))
+                return pn.Row(widget, create_remove_button(widget))
             else:
-                widget = self._create_input_widget({
-                    "type": items.get("type"),
-                    "title": title_num
-                }, key, data)
+                # TODO: ボタンの位置真ん中にしたい
                 return pn.Row(widget, create_remove_button(widget))
 
         def create_remove_button(widget):
@@ -164,6 +199,7 @@ class Form:
                             break
                     objects.pop(index)
                     # 表示を更新
+                    # TODO: value_inputが引き継げていない
                     for i, obj in enumerate(objects):
                         title_num = title + str(i + 1)
                         w = obj[0]
@@ -184,12 +220,13 @@ class Form:
         def add_item(event):
             column.append(create_items())
 
-        if len(values) < 1:
+        if (not isinstance(values, list)) or (len(values) < 1):
             # 初期値がない場合
             column.append(create_items())
         else:
             for value in values:
                 column.append(create_items(value))
+
         box.append(column)
 
         add_button = Button(name='Add', button_type='primary', button_style='outline')
@@ -199,6 +236,7 @@ class Form:
         return box
 
     def is_not_input_widget(self, widget):
+        """値を取得するwidgetでないかどうかを判定する"""
         result = False
         if isinstance(widget, Markdown):
             result = True
@@ -209,68 +247,92 @@ class Form:
     def get_data(self):
         """入力欄からデータを取得する"""
         widgets = self.form_box.objects
+        schema = self.schema["properties"]
         data = {}
         for widget in widgets:
             if self.is_not_input_widget(widget):
                 continue
-            data.update(self.get_value(widget))
+            data.update(self._get_value(widget, schema))
         return data
 
-    def get_value(self, widget):
-        """各widgetからデータを取得する"""
-        key = ""
-        value = ""
-        try:
-            if isinstance(widget, pn.WidgetBox):
-                objects = widget.objects
-                key = objects[0].schema_key
-                value = self.get_widget_value(objects)
+    def _get_value(self, widget, schema:dict):
+        """各widgetからデータを取得する
 
+        Args:
+            widget (Any): データを取得したいwidget
+            schema (dict): widgetに対応する部分のschema
+        """
+        try:
+            key = widget.schema_key
+            value = ""
+            if isinstance(widget, ArrayBox):
+                value = self._get_array_value(widget, schema)
+            elif isinstance(widget, ObjectBox):
+                value = self._get_object_value(widget, schema)
             elif isinstance(widget, TextInput):
-                key = widget.schema_key
                 value = widget.value_input
             elif isinstance(widget, pn.widgets.Widget):
-                key = widget.schema_key
                 value = widget.value
             else:
                 raise Exception(f'widget: {widget}')
 
-        except Exception:
-            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}\nkey: {key}\nvalue: {value}'
-            self.msg_output.update_error(message)
+        except Exception as e:
+            message = f'{str(e)}\nkey: {key}\nvalue: {value}'
+            raise Exception(message)
 
-        # 値が空の場合はデータを取得しない
         if not value:
-            return {}
+            try:
+                value = schema[key]["default"]
+            except KeyError:
+                # デフォルト値がなく、値が空の場合はデータを取得しない
+                return {}
 
         return {key: value}
 
-    def get_widget_value(self, objects):
-        content = objects[1]
-        value = None
-        if isinstance(content, pn.Column):
-            # type: array
-            value = []
-            for row in content:
+    def _get_array_value(self, widget: ArrayBox, schema: dict):
+        """ArrayBox内のwidgetの値を取得する
+
+        Args:
+            widget (ArrayBox): jsonschemaのtype: arrayの部分のwidget
+            schema (dict): widgetに対応する部分のschema
+
+        Returns:
+            list: arrayのvalue群
+        """
+        objects = widget.objects
+        key = widget.schema_key
+        value = []
+        items = {key: schema[key]["items"]}
+        for w in objects:
+            if not isinstance(w, pn.Column):
+                # タイトルやボタンは取得しない
+                continue
+            # Columnがあったら値を取得する
+            for row in w.objects:
                 target = row[0]
-                if isinstance(target, pn.WidgetBox):
-                    data = {}
-                    for w in target:
-                        if self.is_not_input_widget(w):
-                            continue
-                        data.update(self.get_value(w))
-                    if data:
-                        value.append(data)
-                else:
-                    data = self.get_value(target)
-                    for v in data.values():
-                        value.append(v)
-        else:
-            # type: object
-            value = {}
-            for w in objects:
-                if self.is_not_input_widget(w):
-                    continue
-                value.update(self.get_value(w))
+                data = self._get_value(target, items)
+                for v in data.values():
+                    value.append(v)
+            # Columnの値が取得できたら終わる
+            break
         return value
 
+    def _get_object_value(self, widget: ObjectBox, schema):
+        """ObjectBox内のwidgetの値を取得する
+
+        Args:
+            widget (ObjectBox): jsonschemaのtype: objectの部分のwidget
+            schema (dict): widgetに対応する部分のschema
+
+        Returns:
+            list: arrayのvalue群
+        """
+        objects = widget.objects
+        key = widget.schema_key
+        value = {}
+        properties = schema[key]["properties"]
+        for w in objects:
+            if self.is_not_input_widget(w):
+                continue
+            value.update(self._get_value(w, properties))
+        return value

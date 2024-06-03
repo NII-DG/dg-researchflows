@@ -70,7 +70,7 @@ class Form:
         self.form_box = pn.WidgetBox()
         self.msg_output = MessageBox()
 
-    def create_widgets(self, schema:dict, data: dict):
+    def create_widgets(self, schema:dict, data:dict):
         """jsonchemaの形式にそった入力欄をpanelで作成する
 
         Args:
@@ -80,60 +80,60 @@ class Form:
         self.schema = schema
         for key, properties in schema["properties"].items():
             value = data.get(key)
-            self.form_box.append(self._create_input_widget(properties, key, value))
+            self.form_box.append(self._generate_widget(properties, key, value))
 
-    def _create_input_widget(self, schema:dict, key:str, value=None):
+    def _generate_widget(self, definition:dict, key:str, value=None):
         """jsonschemaの設定値からpanelのwidgetを作成する
 
         Args:
-            schema (dict): jsonschemaにおけるkeyの値
-            key (str): schemaのkey
+            definition (dict): jsonschemaのkeyに対する定義部分. property value.
+            key (str): jsonschemaのproperty key
             value (Any, optional): keyに対する初期値. Defaults to None.
 
         Returns:
             PanelのWidget
         """
-        title = schema.get("title", key)
+        title = definition.get("title", key)
         if value is None:
-            value = schema.get("default")
+            value = definition.get("default")
 
-        if "enum" in schema and "string" in schema.get("type", ""):
-            options = [""] + schema["enum"]
+        if "enum" in definition and "string" in definition.get("type", ""):
+            options = [""] + definition["enum"]
             if isinstance(value, str):
                 return Select(name=title, schema_key=key, value=value, options=options, margin=margin)
             else:
                 return Select(name=title, schema_key=key, options=options, margin=margin)
-        elif schema.get("type") == "array":
+        elif definition.get("type") == "array":
             return self._genetate_array_widget(
-                    schema=schema, title=title, key=key, values=value
+                    definition=definition, title=title, key=key, values=value
                 )
-        elif schema.get("type") == "object":
+        elif definition.get("type") == "object":
             return self._generate_object_widget(
-                    schema=schema, title=title, key=key, values=value
+                    definition=definition, title=title, key=key, values=value
                 )
-        elif schema.get("type") == "number":
+        elif definition.get("type") == "number":
             if isinstance(value, int):
                 return IntInput(name=title, schema_key=key, value=value, margin=margin)
             else:
                 return IntInput(name=title, schema_key=key, margin=margin)
-        elif schema.get("type") == "boolean":
+        elif definition.get("type") == "boolean":
             if isinstance(value, bool):
                 return Checkbox(name=title, schema_key=key, value=value, margin=margin)
             else:
                 return Checkbox(name=title, schema_key=key, margin=margin)
-        elif "string" in schema.get("type", ""):
+        elif "string" in definition.get("type", ""):
             if isinstance(value, str):
                 return TextInput(name=title, schema_key=key, value=value, value_input=value, margin=margin)
             else:
                 return TextInput(name=title, schema_key=key, margin=margin)
         else:
-            self.msg_output.add_warning(f'name: {title}\ntype: {schema.get("type")}')
+            self.msg_output.add_warning(f'name: {title}\ntype: {definition.get("type")}')
 
-    def _generate_object_widget(self, schema:dict, title:str, key:str, values):
+    def _generate_object_widget(self, definition:dict, title:Markdown, key:str, values):
         """type: objectをwidgetbox化する
 
         Args:
-            schema (dict): jsonschemaにおけるkeyの値
+            definition (dict): jsonschemaのkeyに対する定義部分. property value.
             title (str): keyに対応する表示名
             key (str): schemaのkey
             value (Any): keyに対する初期値
@@ -143,19 +143,19 @@ class Form:
         """
         obj_box = ObjectBox(schema_key=key)
         obj_box.append(Markdown(title, schema_key=key))
-        for i_key, properties in schema["properties"].items():
+        for i_key, properties in definition["properties"].items():
             if isinstance(values, dict):
                 value = values.get(i_key)
             else:
                 value = None
-            obj_box.append(self._create_input_widget(properties, i_key, value))
+            obj_box.append(self._generate_widget(properties, i_key, value))
         return obj_box
 
-    def _genetate_array_widget(self, schema:dict, title:str, key:str, values):
+    def _genetate_array_widget(self, definition:dict, title:Markdown, key:str, values):
         """type: arrayをwidgetbox化する
 
         Args:
-            schema (dict): jsonschemaにおけるkeyの値
+            definition (dict): jsonschemaのkeyに対する定義部分. property value.
             title (str): keyに対応する表示名
             key (str): schemaのkey
             value (Any): keyに対する初期値
@@ -172,9 +172,9 @@ class Form:
             """arrayのひとつの要素を作成する"""
             column_list = column.objects
             title_num = title + str(len(column_list) + 1)
-            items = schema["items"]
+            items = definition["items"]
             items["title"] = title_num
-            widget = self._create_input_widget(items, key, value)
+            widget = self._generate_widget(items, key, value)
             if items.get("type") == "object":
                 return pn.Row(widget, create_remove_button(widget))
             else:
@@ -260,7 +260,7 @@ class Form:
 
         Args:
             widget (Any): データを取得したいwidget
-            schema (dict): widgetに対応する部分のschema
+            schema (dict): widgetに対応するプロパティ定義
         """
         try:
             key = widget.schema_key
@@ -293,8 +293,8 @@ class Form:
         """ArrayBox内のwidgetの値を取得する
 
         Args:
-            widget (ArrayBox): jsonschemaのtype: arrayの部分のwidget
-            schema (dict): widgetに対応する部分のschema
+            widget (ArrayBox): データを取得したいArrayBox
+            schema (dict): widgetに対応するプロパティ定義
 
         Returns:
             list: arrayのvalue群
@@ -317,12 +317,12 @@ class Form:
             break
         return value
 
-    def _get_object_value(self, widget: ObjectBox, schema):
+    def _get_object_value(self, widget: ObjectBox, schema: dict):
         """ObjectBox内のwidgetの値を取得する
 
         Args:
-            widget (ObjectBox): jsonschemaのtype: objectの部分のwidget
-            schema (dict): widgetに対応する部分のschema
+            widget (ObjectBox): データを取得したいObjectBox
+            schema (dict): widgetに対応するプロパティ定義
 
         Returns:
             list: arrayのvalue群

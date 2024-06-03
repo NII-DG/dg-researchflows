@@ -5,7 +5,7 @@ from osfclient.utils import norm_remote_path, split_storage, is_path_matched
 from osfclient.exceptions import UnauthorizedException
 
 
-class UpdateArgs:
+class UploadArgs:
 
     def __init__(self, project_id, source, destination, recursive=False, force=False) -> None:
         """アップロード時のパラメータ
@@ -68,16 +68,17 @@ class DownloadArgs:
             """ダウンロード時のパラメータ
 
             Args:
-                project_id (_type_): _description_
-                base_url (_type_): _description_
-                remote_path (_type_): _description_
+                project_id (_type_): プロジェクトID
+                base_url (_type_): API URL (e.g. https://api.osf.io/v2/)
+                remote_path (_type_): ファイルパス
+                base_path (optional): ファイルを探すディレクトリのパス
             """
             self.project = project_id
             self.base_url = base_url
             self.remote = remote_path
             self.base_path = base_path
 
-def download(token, args):
+def download(token, args: DownloadArgs):
     """ファイルの内容を取得する。ファイルに保存はしない
 
     Args:

@@ -2,7 +2,7 @@ import os
 from urllib import parse
 import json
 
-from .client import UpdateArgs, upload, DownloadArgs, download
+from .client import UploadArgs, upload, DownloadArgs, download
 from .api import get_projects, get_project_registrations, get_project_collaborators
 from .metadata import format_metadata
 from ...error import MetadataNotExist, RemoteFileNotExist
@@ -52,7 +52,7 @@ def sync(token, base_url, project_id, abs_source, abs_root="/home/jovyan"):
 
     destination = os.path.relpath(abs_source, abs_root)
 
-    arg = UpdateArgs(
+    arg = UploadArgs(
                 project_id=project_id,
                 source=abs_source,
                 destination=destination,

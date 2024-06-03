@@ -4,8 +4,9 @@ import panel as pn
 
 from library.utils.widgets import MessageBox, Button
 
-
-margin = (10, 10, 5, 10)
+# (vertical, horizontal)
+# (top, right, bottom, and left)
+margin = (0, 15, 5, 15)
 
 
 class TextInput(pn.widgets.TextInput):
@@ -13,6 +14,8 @@ class TextInput(pn.widgets.TextInput):
     def __init__(self, **params):
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
+        if "margin" not in params:
+            params["margin"] = margin
         super().__init__(**params)
 
 
@@ -21,6 +24,8 @@ class Select(pn.widgets.Select):
     def __init__(self, **params):
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
+        if "margin" not in params:
+            params["margin"] = margin
         super().__init__(**params)
 
 
@@ -29,6 +34,8 @@ class Checkbox(pn.widgets.Checkbox):
     def __init__(self, **params):
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
+        if "margin" not in params:
+            params["margin"] = (10, 10, 0, 10)
         super().__init__(**params)
 
 
@@ -37,22 +44,50 @@ class IntInput(pn.widgets.IntInput):
     def __init__(self, **params):
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
+        if "margin" not in params:
+            params["margin"] = margin
         super().__init__(**params)
 
 
-class Markdown(pn.pane.Markdown):
+class Title(pn.pane.Markdown):
 
     def __init__(self, object=None, **params):
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
+        if "margin" not in params:
+            params["margin"] = (10, 10, 0, 10)
+        if object:
+            object = "### " + object
         super().__init__(object=object, **params)
 
+    def set_text(self, text):
+        self.object = f"### {text}"
+
+class Description(pn.pane.Markdown):
+
+    def __init__(self, object=None, **params):
+        if 'schema_key' in params:
+            self.schema_key = params.pop('schema_key')
+        if "margin" not in params:
+            params["margin"] = (0, 20, 0, 10)
+        super().__init__(object=object, **params)
+
+class Column(pn.Column):
+
+    def __init__(self, **params):
+        if 'schema_key' in params:
+            self.schema_key = params.pop('schema_key')
+        if "margin" not in params:
+            params["margin"] = (5, 10, 5, 10)
+        super().__init__(**params)
 
 class ArrayBox(pn.WidgetBox):
 
     def __init__(self, **params):
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
+        if "margin" not in params:
+            params["margin"] = 15
         super().__init__(**params)
 
 class ObjectBox(pn.WidgetBox):
@@ -60,6 +95,8 @@ class ObjectBox(pn.WidgetBox):
     def __init__(self, **params):
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
+        if "margin" not in params:
+            params["margin"] = 10
         super().__init__(**params)
 
 class Form:
@@ -96,13 +133,15 @@ class Form:
         title = definition.get("title", key)
         if value is None:
             value = definition.get("default")
+        form = Column(schema_key=key)
 
+        widget = None
         if "enum" in definition and "string" in definition.get("type", ""):
             options = [""] + definition["enum"]
             if isinstance(value, str):
-                return Select(name=title, schema_key=key, value=value, options=options, margin=margin)
+                widget = Select(schema_key=key, value=value, options=options)
             else:
-                return Select(name=title, schema_key=key, options=options, margin=margin)
+                widget = Select(schema_key=key, options=options)
         elif definition.get("type") == "array":
             return self._genetate_array_widget(
                     definition=definition, title=title, key=key, values=value
@@ -113,23 +152,37 @@ class Form:
                 )
         elif definition.get("type") == "number":
             if isinstance(value, int):
-                return IntInput(name=title, schema_key=key, value=value, margin=margin)
+                widget = IntInput(schema_key=key, value=value)
             else:
-                return IntInput(name=title, schema_key=key, margin=margin)
+                widget = IntInput(schema_key=key)
         elif definition.get("type") == "boolean":
             if isinstance(value, bool):
-                return Checkbox(name=title, schema_key=key, value=value, margin=margin)
+                widget = Checkbox(name=title, schema_key=key, value=value)
             else:
-                return Checkbox(name=title, schema_key=key, margin=margin)
+                widget = Checkbox(name=title, schema_key=key)
+            form.append(widget)
+            description = definition.get("description")
+            if description is not None:
+                form.append(Description(description, schema_key=key))
+            return form
         elif "string" in definition.get("type", ""):
             if isinstance(value, str):
-                return TextInput(name=title, schema_key=key, value=value, value_input=value, margin=margin)
+                widget = TextInput(schema_key=key, value=value, value_input=value)
             else:
-                return TextInput(name=title, schema_key=key, margin=margin)
+                widget = TextInput(schema_key=key)
         else:
             self.msg_output.add_warning(f'name: {title}\ntype: {definition.get("type")}')
 
-    def _generate_object_widget(self, definition:dict, title:Markdown, key:str, values):
+        title = Title(title, schema_key=key)
+        form.append(title)
+        description = definition.get("description")
+        if description is not None:
+            form.append(Description(description, schema_key=key))
+        form.append(widget)
+
+        return form
+
+    def _generate_object_widget(self, definition:dict, title:str, key:str, values):
         """type: objectをwidgetbox化する
 
         Args:
@@ -142,7 +195,10 @@ class Form:
             ObjectBox
         """
         obj_box = ObjectBox(schema_key=key)
-        obj_box.append(Markdown(title, schema_key=key))
+        obj_box.append(Title(title, schema_key=key))
+        description = definition.get("description")
+        if description is not None:
+            obj_box.append(Description(description, schema_key=key))
         for i_key, properties in definition["properties"].items():
             if isinstance(values, dict):
                 value = values.get(i_key)
@@ -151,7 +207,7 @@ class Form:
             obj_box.append(self._generate_widget(properties, i_key, value))
         return obj_box
 
-    def _genetate_array_widget(self, definition:dict, title:Markdown, key:str, values):
+    def _genetate_array_widget(self, definition:dict, title:str, key:str, values):
         """type: arrayをwidgetbox化する
 
         Args:
@@ -163,27 +219,28 @@ class Form:
         Returns:
             ArrayBox
         """
-        box = ArrayBox(margin=margin, schema_key=key)
-        box.append(Markdown(title, schema_key=key))
-
-        column = pn.Column(margin=margin)
+        box = ArrayBox(schema_key=key)
+        box.append(Title(title, schema_key=key))
+        description = definition.get("description")
+        if description is not None:
+            box.append(Description(description, schema_key=key))
+        column = pn.Column()
 
         def create_items(value=None):
             """arrayのひとつの要素を作成する"""
             column_list = column.objects
-            title_num = title + str(len(column_list) + 1)
             items = definition["items"]
+            title_num = title + str(len(column_list) + 1)
             items["title"] = title_num
             widget = self._generate_widget(items, key, value)
             if items.get("type") == "object":
                 return pn.Row(widget, create_remove_button(widget))
             else:
-                # TODO: ボタンの位置真ん中にしたい
-                return pn.Row(widget, create_remove_button(widget))
+                return pn.Row(widget, create_remove_button(widget, align='end'))
 
-        def create_remove_button(widget):
+        def create_remove_button(widget, align='start'):
             """arrayの選択した要素を削除するボタンを生成する"""
-            remove_button = Button(name='Remove', button_type='danger', button_style='outline')
+            remove_button = Button(name='Remove', button_type='danger', button_style='outline', align=align)
             def remove_item(event):
                 try:
                     objects = column.objects
@@ -200,17 +257,15 @@ class Form:
                     objects.pop(index)
                     # 表示を更新
                     # TODO: value_inputが引き継げていない
-                    for i, obj in enumerate(objects):
+                    for i, row in enumerate(objects):
                         title_num = title + str(i + 1)
-                        w = obj[0]
-                        if isinstance(w, pn.WidgetBox):
+                        w = row[0]
+                        if isinstance(w, pn.Column) or isinstance(w, pn.WidgetBox):
                             wb_list = w.objects
-                            wb_list[0].object = title_num
+                            wb_list[0].set_text(title_num)
                             w.clear()
                             w.extend(wb_list)
-                        else:
-                            w.name = title_num
-                        column.append(obj)
+                        column.append(row)
                 except Exception as e:
                     message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
                     self.msg_output.update_error(message)
@@ -238,7 +293,7 @@ class Form:
     def is_not_input_widget(self, widget):
         """値を取得するwidgetでないかどうかを判定する"""
         result = False
-        if isinstance(widget, Markdown):
+        if isinstance(widget, pn.pane.Markdown):
             result = True
         elif isinstance(widget, Button):
             result = True
@@ -252,10 +307,10 @@ class Form:
         for widget in widgets:
             if self.is_not_input_widget(widget):
                 continue
-            data.update(self._get_value(widget, schema))
+            data.update(self._get_property(widget, schema))
         return data
 
-    def _get_value(self, widget, schema:dict):
+    def _get_property(self, widget, schema:dict):
         """各widgetからデータを取得する
 
         Args:
@@ -269,10 +324,8 @@ class Form:
                 value = self._get_array_value(widget, schema)
             elif isinstance(widget, ObjectBox):
                 value = self._get_object_value(widget, schema)
-            elif isinstance(widget, TextInput):
-                value = widget.value_input
-            elif isinstance(widget, pn.widgets.Widget):
-                value = widget.value
+            elif isinstance(widget, pn.Column):
+                value = self._get_value(widget)
             else:
                 raise Exception(f'widget: {widget}')
 
@@ -288,6 +341,39 @@ class Form:
                 return {}
 
         return {key: value}
+
+    def _get_value(self, widget: pn.Column):
+        objects = widget.objects
+        value = None
+        for w in objects:
+            if self.is_not_input_widget(w):
+                continue
+            if isinstance(w, TextInput):
+                value = w.value_input
+            elif isinstance(w, pn.widgets.Widget):
+                value = w.value
+            break
+        return value
+
+    def _get_object_value(self, widget: ObjectBox, schema: dict):
+        """ObjectBox内のwidgetの値を取得する
+
+        Args:
+            widget (ObjectBox): データを取得したいObjectBox
+            schema (dict): widgetに対応するプロパティ定義
+
+        Returns:
+            list: arrayのvalue群
+        """
+        objects = widget.objects
+        key = widget.schema_key
+        value = {}
+        properties = schema[key]["properties"]
+        for w in objects:
+            if self.is_not_input_widget(w):
+                continue
+            value.update(self._get_property(w, properties))
+        return value
 
     def _get_array_value(self, widget: ArrayBox, schema: dict):
         """ArrayBox内のwidgetの値を取得する
@@ -310,29 +396,9 @@ class Form:
             # Columnがあったら値を取得する
             for row in w.objects:
                 target = row[0]
-                data = self._get_value(target, items)
+                data = self._get_property(target, items)
                 for v in data.values():
                     value.append(v)
             # Columnの値が取得できたら終わる
             break
-        return value
-
-    def _get_object_value(self, widget: ObjectBox, schema: dict):
-        """ObjectBox内のwidgetの値を取得する
-
-        Args:
-            widget (ObjectBox): データを取得したいObjectBox
-            schema (dict): widgetに対応するプロパティ定義
-
-        Returns:
-            list: arrayのvalue群
-        """
-        objects = widget.objects
-        key = widget.schema_key
-        value = {}
-        properties = schema[key]["properties"]
-        for w in objects:
-            if self.is_not_input_widget(w):
-                continue
-            value.update(self._get_value(w, properties))
         return value

@@ -10,7 +10,7 @@ from .storage_provider import grdm
 from .error import UnauthorizedError, UnusableVault
 
 
-def get_token():
+def get_grdm_token():
     """トークンを取得する
 
     Raises:

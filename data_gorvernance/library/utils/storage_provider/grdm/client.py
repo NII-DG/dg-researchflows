@@ -16,7 +16,8 @@ def upload(token, base_url, project_id, source, destination, recursive=False, fo
         recursive (bool, optional): 指定したsourceがフォルダかどうか. Defaults to False.
         force (bool, optional): ファイルが存在した場合に上書きするかどうか. Defaults to False.
     """
-    # バグっているのでFalseで固定
+    # Falseで固定
+    # Trueにすると指定したパスを見つけ出せずにRuntimeErrorが返ってくる
     update = False
 
     if source is None or destination is None:

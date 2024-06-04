@@ -1,11 +1,11 @@
 import os
 from urllib import parse
 import json
-import requests
 
-from .client import UpdateArgs, upload
+from .client import upload, download
 from .api import get_projects, get_project_registrations, get_project_collaborators
-from ...error import MetadataNotExist
+from .metadata import format_metadata
+from ...error import MetadataNotExist, RemoteFileNotExist
 
 
 def get_project_id():
@@ -52,14 +52,28 @@ def sync(token, base_url, project_id, abs_source, abs_root="/home/jovyan"):
 
     destination = os.path.relpath(abs_source, abs_root)
 
-    arg = UpdateArgs(
-                project_id=project_id,
-                source=abs_source,
-                destination=destination,
-                recursive=recursive,
-                force=True,
-            )
-    upload(token, base_url, arg)
+    upload(
+        token=token, base_url=base_url, project_id=project_id,
+        source=abs_source, destination=destination,
+        recursive=recursive, force=True
+    )
+
+
+def download_text_file(token, base_url, project_id, remote_path, encoding='utf-8'):
+    """テキストファイルの中身を取得する"""
+    content = download(
+        token=token, project_id=project_id,
+        base_url=base_url, remote_path=remote_path
+    )
+    if content is None:
+        raise RemoteFileNotExist(f'The specified file (path: {remote_path}) does not exist.')
+    return content.decode(encoding)
+
+
+def download_json_file(token, base_url, project_id, remote_path):
+    """jsonファイルの中身を取得する"""
+    content = download_text_file(token, base_url, project_id, remote_path)
+    return json.loads(content)
 
 
 def get_project_metadata(scheme, domain, token, project_id):
@@ -69,88 +83,6 @@ def get_project_metadata(scheme, domain, token, project_id):
         raise MetadataNotExist
 
     return format_metadata(metadata)
-
-
-def format_metadata(metadata):
-    """Gakunin RDMから取得したプロジェクトメタデータを整形する"""
-
-    datas = metadata['data']
-    # {'dmp': first_value}
-    first_value = []
-    for data in datas:
-        url = data["relationships"]["registration_schema"]["links"]["related"]["href"]
-        schema = get_schema(url)
-
-        # first_value = [second_layer, ...]
-        second_layer = {'title': data['attributes']['title']}
-        registration = data['attributes']['registration_responses']
-        for key, value in registration.items():
-            if key != 'grdm-files':
-                second_layer[key] = format_display_name(schema, "page1", key, value)
-
-        files = json.loads(registration['grdm-files'])
-        # grdm-files > value
-        file_values = []
-        for file in files:
-            file_datas = {}
-            file_datas['path'] = file['path']
-            file_metadata = {}
-            for key, item in file['metadata'].items():
-                file_metadata[key] = item['value']
-            file_datas['metadata'] = file_metadata
-            file_values.append(file_datas)
-
-        second_layer['grdm-files'] = format_display_name(schema, "page2", 'grdm-files', file_values)
-        first_value.append(second_layer)
-
-    return {'dmp': first_value}
-
-
-def get_schema(url):
-    """メタデータのテンプレートを取得する"""
-    response = requests.get(url=url)
-    response.raise_for_status()
-    return response.json()
-
-
-def format_display_name(schema: dict, page_id: str, qid: str, value=None):
-    """メタデータをフォーマットして返却する
-
-    Args:
-        schema (dict): メタデータのテンプレート
-        page_id (str): プロジェクトメタデータ("page1")、ファイルメタデータ("page2")
-        qid (str): メタデータのqid
-        value (optional): メタデータに設定された値. Defaults to None.
-
-    Returns:
-        dict: フォーマットされたメタデータの値
-    """
-    pages = schema["data"]["attributes"]["schema"]["pages"]
-    items = {}
-    for page in pages:
-        if page.get("id") != page_id:
-            continue
-
-        questions = page["questions"]
-        for question in questions:
-            if question.get("qid") != qid:
-                continue
-
-            items['label_jp'] = question.get("nav")
-            if value is None:
-                break
-            items['value'] = value
-
-            options = question.get("options", [])
-            for option in options:
-                if option.get("text") != value:
-                    continue
-                items['field_name_jp'] = option.get("tooltip")
-                break
-            break
-        break
-
-    return items
 
 
 def get_collaborator_list(scheme, domain, token, project_id):

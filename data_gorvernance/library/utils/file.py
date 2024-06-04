@@ -73,12 +73,12 @@ class File:
         with self.path.open('w') as file:
             file.write(content)
 
-    def create(self):
-        if not self.path.exists():
-            self.path.parent.mkdir(parents=True, exist_ok=True)
-            self.path.touch()
-        else:
-            raise FileExistsError
+    def create(self, exist_ok=True):
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        self.path.touch(exist_ok=exist_ok)
+
+    def remove(self, missing_ok=False):
+        self.path.unlink(missing_ok)
 
 
 class JsonFile(File):

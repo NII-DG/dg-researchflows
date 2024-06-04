@@ -16,6 +16,7 @@ RUN apt-get install fontconfig
 RUN apt-get install -y fonts-ipafont
 
 # install vault
+RUN apt-get update -y
 RUN apt-get install -y gpg wget lsb-release
 RUN wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 RUN gpg --no-default-keyring --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg --fingerprint

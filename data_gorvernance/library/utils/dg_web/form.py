@@ -29,16 +29,6 @@ class Select(pn.widgets.Select):
         super().__init__(**params)
 
 
-class Checkbox(pn.widgets.Checkbox):
-
-    def __init__(self, **params):
-        if 'schema_key' in params:
-            self.schema_key = params.pop('schema_key')
-        if "margin" not in params:
-            params["margin"] = (10, 10, 0, 10)
-        super().__init__(**params)
-
-
 class IntInput(pn.widgets.IntInput):
 
     def __init__(self, **params):
@@ -46,6 +36,16 @@ class IntInput(pn.widgets.IntInput):
             self.schema_key = params.pop('schema_key')
         if "margin" not in params:
             params["margin"] = margin
+        super().__init__(**params)
+
+
+class Checkbox(pn.widgets.Checkbox):
+
+    def __init__(self, **params):
+        if 'schema_key' in params:
+            self.schema_key = params.pop('schema_key')
+        if "margin" not in params:
+            params["margin"] = (10, 10, 0, 10)
         super().__init__(**params)
 
 
@@ -73,6 +73,7 @@ class Description(pn.pane.Markdown):
         super().__init__(object=object, **params)
 
 class Column(pn.Column):
+    """タイトルや入力欄をまとめる"""
 
     def __init__(self, **params):
         if 'schema_key' in params:
@@ -391,7 +392,6 @@ class Form:
         items = {key: schema[key]["items"]}
         for w in objects:
             if not isinstance(w, pn.Column):
-                # タイトルやボタンは取得しない
                 continue
             # Columnがあったら値を取得する
             for row in w.objects:

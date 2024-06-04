@@ -318,6 +318,10 @@ class Form:
             widget (Any): データを取得したいwidget
             schema (dict): widgetに対応するプロパティ定義
         """
+        key = widget.schema_key
+        value = ""
+        definition:dict = schema[key]
+
         try:
             key = widget.schema_key
             value = ""
@@ -334,14 +338,11 @@ class Form:
             message = f'{str(e)}\nkey: {key}\nvalue: {value}'
             raise Exception(message)
 
-        if not value:
-            try:
-                value = schema[key]["default"]
-            except KeyError:
-                # デフォルト値がなく、値が空の場合はデータを取得しない
-                return {}
-
-        return {key: value}
+        default = definition.get("default")
+        if value or (default is not None):
+            return {key: value}
+        else:
+            return {}
 
     def _get_value(self, widget: pn.Column):
         objects = widget.objects

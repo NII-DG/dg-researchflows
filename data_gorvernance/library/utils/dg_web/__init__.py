@@ -1,6 +1,6 @@
 from .form import Form
 from .runcrate_form import RunCrateForm
-from .schema import (
+from .api import (
     get_govsheet_schema,
     get_metadata_schema
 )

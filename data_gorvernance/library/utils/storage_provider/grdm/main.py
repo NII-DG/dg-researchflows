@@ -2,7 +2,7 @@ import os
 from urllib import parse
 import json
 
-from .client import UploadArgs, upload, DownloadArgs, download
+from .client import upload, download
 from .api import get_projects, get_project_registrations, get_project_collaborators
 from .metadata import format_metadata
 from ...error import MetadataNotExist, RemoteFileNotExist
@@ -52,28 +52,26 @@ def sync(token, base_url, project_id, abs_source, abs_root="/home/jovyan"):
 
     destination = os.path.relpath(abs_source, abs_root)
 
-    arg = UploadArgs(
-                project_id=project_id,
-                source=abs_source,
-                destination=destination,
-                recursive=recursive,
-                force=True,
-            )
-    upload(token, base_url, arg)
+    upload(
+        token=token, base_url=base_url, project_id=project_id,
+        source=abs_source, destination=destination,
+        recursive=recursive, force=True
+    )
 
 
 def download_text_file(token, base_url, project_id, remote_path, encoding='utf-8'):
-    args = DownloadArgs(
-        project_id = project_id,
-        base_url = base_url,
-        remote_path = remote_path
+    """テキストファイルの中身を取得する"""
+    content = download(
+        token=token, project_id=project_id,
+        base_url=base_url, remote_path=remote_path
     )
-    content = download(token, args)
     if content is None:
         raise RemoteFileNotExist(f'The specified file (path: {remote_path}) does not exist.')
     return content.decode(encoding)
 
+
 def download_json_file(token, base_url, project_id, remote_path):
+    """jsonファイルの中身を取得する"""
     content = download_text_file(token, base_url, project_id, remote_path)
     return json.loads(content)
 

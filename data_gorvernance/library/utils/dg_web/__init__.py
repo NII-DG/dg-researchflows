@@ -11,7 +11,7 @@ from .api import (
 from .data import need_govrun_token
 
 SCHEME = 'http'
-DOMAIN = 'dg02.dg.rcos.nii.ac.jp'
+DOMAIN = 'dg02.dg.rcos.nii.ac.jp:3000'
 
 
 GOVSHEET_PATH = '.dg/gov-sheet.json'

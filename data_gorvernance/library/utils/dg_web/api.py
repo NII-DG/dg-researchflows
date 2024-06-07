@@ -31,7 +31,7 @@ def get_validations(scheme, domain, grdmToken: str, projectId: str):
         "grdmToken": grdmToken,
         "grdmProjectId": projectId,
     }
-    response = requests.post(url=api_url, headers=headers)
+    response = requests.post(url=api_url, json=data)
     if response.status_code == HTTPStatus.UNAUTHORIZED:
         raise UnauthorizedError
     response.raise_for_status()
@@ -48,7 +48,7 @@ def get_validations_validationId(scheme, domain, grdmToken: str, projectId: str,
     params = {
         "validationId": validationId
     }
-    response = requests.post(url=api_url, params=params, data=data)
+    response = requests.post(url=api_url, json=data, params=params)
     if response.status_code == HTTPStatus.UNAUTHORIZED:
         raise UnauthorizedError
     response.raise_for_status()

@@ -1,16 +1,14 @@
 import getpass
 
-from IPython.display import clear_output
-
+from . import dg_web
 from .config import message as msg_config
 from .storage_provider import grdm
 from .string import StringManager
 from .vault import Vault
-from .storage_provider import grdm
 from .error import UnauthorizedError, UnusableVault
 
 
-def get_token():
+def get_grdm_token():
     """トークンを取得する
 
     Raises:
@@ -40,7 +38,7 @@ def get_token():
             return token
 
     while True:
-        token = getpass.getpass(msg_config.get('form', 'pls_input_token'))
+        token = getpass.getpass(msg_config.get('form', 'pls_input_grdm_token'))
 
         # 形式確認
         token = StringManager.strip(token)
@@ -75,3 +73,48 @@ def get_project_id():
             continue
         break
     return project_id
+
+
+def get_goveredrun_token():
+    """トークンを取得する
+
+    Raises:
+        UnusableVault: vaultが利用できない
+        requests.exceptions.RequestException: 通信不良
+
+    Returns:
+        str: トークン
+    """
+
+    TOKEN_KEY = 'govrun_token'
+
+    # Vaultからトークンを取得する
+    try:
+        vault = Vault()
+        token = vault.get_value(TOKEN_KEY)
+    except Exception as e:
+        raise UnusableVault from e
+
+    if token:
+        # 有効性確認
+        if dg_web.check_goveredrun_token(grdm.SCHEME, grdm.API_DOMAIN, token):
+            return token
+
+    while True:
+        token = getpass.getpass(msg_config.get('form', 'pls_input_govrun_token'))
+
+        # 形式確認
+        token = StringManager.strip(token)
+        if StringManager.is_empty(token):
+            continue
+        if not StringManager.is_half(token):
+            continue
+
+        # 接続確認
+        if dg_web.check_goveredrun_token(grdm.SCHEME, grdm.API_DOMAIN, token):
+            return token
+
+        break
+
+    vault.set_value(TOKEN_KEY, token)
+    return token

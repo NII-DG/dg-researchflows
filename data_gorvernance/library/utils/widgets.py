@@ -36,23 +36,23 @@ class Button(pn.widgets.Button):
         self.button_style = 'solid'
 
 
-class Alert:
+class Alert(pn.pane.Alert):
 
     @classmethod
     def info(cls, msg=""):
-        return pn.pane.Alert(msg, sizing_mode="stretch_width",alert_type='info')
+        return cls(msg, sizing_mode="stretch_width", alert_type='info')
 
     @classmethod
     def success(cls, msg=""):
-        return pn.pane.Alert(msg, sizing_mode="stretch_width",alert_type='success')
+        return cls(msg, sizing_mode="stretch_width", alert_type='success')
 
     @classmethod
     def warning(cls, msg=""):
-        return pn.pane.Alert(msg, sizing_mode="stretch_width",alert_type='warning')
+        return cls(msg, sizing_mode="stretch_width", alert_type='warning')
 
     @classmethod
     def error(cls, msg=""):
-        return pn.pane.Alert(msg, sizing_mode="stretch_width",alert_type='danger')
+        return cls(msg, sizing_mode="stretch_width", alert_type='danger')
 
 class MessageBox(pn.WidgetBox):
 

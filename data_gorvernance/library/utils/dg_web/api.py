@@ -24,10 +24,10 @@ def get_metadata_schema(scheme, domain):
     return response.json()
 
 
-def check_goveredrun_token(scheme, domain, token:str)->bool:
+def check_governedrun_token(scheme, domain, token:str)->bool:
     """/checkToken
 
-    Govered Runのトークンの有効性を確認する
+    Governed Runのトークンの有効性を確認する
     """
     sub_url = '/checkToken'
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))

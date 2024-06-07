@@ -97,7 +97,7 @@ def get_goveredrun_token():
 
     if token:
         # 有効性確認
-        if dg_web.check_goveredrun_token(grdm.SCHEME, grdm.API_DOMAIN, token):
+        if dg_web.check_governedrun_token(grdm.SCHEME, grdm.API_DOMAIN, token):
             return token
 
     while True:
@@ -111,7 +111,7 @@ def get_goveredrun_token():
             continue
 
         # 接続確認
-        if dg_web.check_goveredrun_token(grdm.SCHEME, grdm.API_DOMAIN, token):
+        if dg_web.check_governedrun_token(grdm.SCHEME, grdm.API_DOMAIN, token):
             return token
 
         break

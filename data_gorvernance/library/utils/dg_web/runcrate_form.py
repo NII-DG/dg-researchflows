@@ -1,10 +1,7 @@
-import traceback
-
 import panel as pn
 
-from library.utils.widgets import MessageBox, Button
-from library.utils.storage_provider import grdm
-from .form import Checkbox, Title, Description, Column
+from library.utils.widgets import MessageBox
+from .form import Checkbox, Title, Description
 
 
 class RunCrateForm:
@@ -15,11 +12,11 @@ class RunCrateForm:
         pn.extension()
         self.form_box = pn.WidgetBox()
         self.msg_output = MessageBox()
-        # 定義
+        # jsonschemaの定義部分。property value
         self.definition = {}
         # runcrateのファイルの情報 {filename: link}
         self.files = {}
-        # 表示するwidget群を保持する
+        # 表示するwidget群を保持する。値の取得に使用する
         self.widgets = {}
 
     def pop_schema(self, schema):

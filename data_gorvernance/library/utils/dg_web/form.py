@@ -69,7 +69,7 @@ class Description(pn.pane.Markdown):
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
         if "margin" not in params:
-            params["margin"] = (0, 20, 0, 10)
+            params["margin"] = (0, 10, 0, 20)
         super().__init__(object=object, **params)
 
 class Column(pn.Column):

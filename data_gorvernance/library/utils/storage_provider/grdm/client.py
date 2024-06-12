@@ -105,7 +105,7 @@ def download(token, project_id, base_url, remote_path, base_path=None):
 
 class ClientFile(File):
     def _update_attributes(self, file):
-        super()._update_attributes(self, file)
+        super()._update_attributes(file)
         self.link = self._get_attribute(file, 'links', 'html')
 
 

@@ -40,8 +40,8 @@ class RunCrateForm:
                 widget = Checkbox(name=filename, value=True)
             else:
                 widget = Checkbox(name=filename, value=False)
-            self.form_box.append(widget)
             column.append(widget)
+        self.form_box.append(column)
         self.widgets[self.key] = column
 
     def get_data(self):

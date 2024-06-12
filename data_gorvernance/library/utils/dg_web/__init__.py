@@ -11,3 +11,7 @@ DOMAIN = 'dg02.dg.rcos.nii.ac.jp'
 
 GOVSHEET_PATH = '.dg/gov-sheet.json'
 METADATA_PATH = '.dg/metadata.json'
+
+# governed run
+GOVRUN_FOLDER = '.crate'
+GOVRUN_INDEX = 'index.json'

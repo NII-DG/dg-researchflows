@@ -2,7 +2,7 @@ import os
 from urllib import parse
 import json
 
-from .client import upload, download
+from .client import upload, download, file_list
 from .api import get_projects, get_project_registrations, get_project_collaborators
 from .metadata import format_metadata
 from ...error import MetadataNotExist, RemoteFileNotExist
@@ -103,3 +103,11 @@ def get_collaborator_url(scheme, domain, project_id):
     """プロジェクトのメンバー一覧のURLを返す"""
     sub_url = f'{project_id}/contributors/'
     return parse.urlunparse((scheme, domain, sub_url, "", "", ""))
+
+
+def get_file_links(token, project_id, base_url, target_folder, recursive=False):
+    links = {}
+    files = file_list(token, project_id, base_url, target_folder, recursive)
+    for file_ in files:
+        links[file_.name] = file_.link
+    return links

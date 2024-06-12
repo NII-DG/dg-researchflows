@@ -3,27 +3,57 @@ import traceback
 import panel as pn
 
 from library.utils.widgets import MessageBox, Button
+from library.utils.storage_provider import grdm
+from .form import Checkbox, Title, Description, Column
 
 
 class RunCrateForm:
 
-    def __init__(self):
+    key = "runCrate"
 
+    def __init__(self):
         pn.extension()
         self.form_box = pn.WidgetBox()
         self.msg_output = MessageBox()
-
+        # 定義
+        self.definition = {}
+        # runcrateのファイルの情報 {filename: link}
+        self.files = {}
+        # 表示するwidget群を保持する
+        self.widgets = {}
 
     def pop_schema(self, schema):
         """schemaのRunCrate選択部分を取得し、schemaから取り除く"""
         properties = schema.get('properties', {})
-        self.schema = properties.pop("runCrate", None)
+        self.definition = properties.pop(self.key, {})
         return schema
 
-    def create_widget(self, data):
+    def create_widget(self, files:dict, data:dict):
         """RunCrate選択の入力欄を生成する"""
-        pass
+        self.files = files
+        title = self.definition.get("title", self.key)
+        self.form_box.append(Title(title))
+        description = self.definition.get("description")
+        if description is not None:
+            self.form_box.append(Description(description))
+        column = pn.Column(margin=(5, 10, 5, 10))
+        for filename, filelink in files.items():
+            widget = None
+            if filelink in data:
+                widget = Checkbox(name=filename, value=True)
+            else:
+                widget = Checkbox(name=filename, value=False)
+            self.form_box.append(widget)
+            column.append(widget)
+        self.widgets[self.key] = column
 
     def get_data(self):
         """RunCrate選択の入力値からデータを生成する"""
-        return {}
+        data = {}
+        for key, contents in self.widgets.items():
+            value = []
+            for widget in contents:
+                if widget.value:
+                    value.append(self.files[widget.name])
+            data[key] = value
+        return data

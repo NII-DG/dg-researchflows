@@ -2,38 +2,32 @@
     "ocs_template": [
         {
             "id":"T001",
-            "ocs_template_name": "Gakunin RDMの解析基盤を利用する",
-            "ocs_template_path": "",
-            "is_active": true
-        },
-        {
-            "id":"T002",
-            "ocs_template_name": "OCSを利用して解析環境を作成する（JupyterHub）",
+            "ocs_template_name": "The Littlest JupyterHub",
             "ocs_template_path": "/TheLittlestJupyterHub/001-JupyterHub環境構築.ipynb",
             "is_active": true
         },
         {
-            "id":"T003",
-            "ocs_template_name": "OCSを利用して解析環境を作成する（JupyterHub with GPU）",
+            "id":"T002",
+            "ocs_template_name": "The Littlest JupyterHub with GPU",
             "ocs_template_path": "/TheLittlestJupyterHub/001-JupyterHub環境構築(GPUあり).ipynb",
             "is_active": true
         },
         {
-            "id":"T004",
-            "ocs_template_name": "OCSを利用して解析環境を作成する（OnDemand）",
+            "id":"T003",
+            "ocs_template_name": "Open OnDemand",
             "ocs_template_path": "/OpenOnDemand/000-解析環境構築.ipynb",
             "is_active": true
         },
         {
-            "id":"T005",
-            "ocs_template_name": "Sapporoの解析環境を構築する",
-            "ocs_template_path": "/Sapporo/001-Sapporo環境構築.ipynb",
-            "is_active": true
+            "id":"T004",
+            "ocs_template_name": "JupyterHub",
+            "ocs_template_path": "/",
+            "is_active": false
         },
         {
-            "id":"T999",
-            "ocs_template_name": "独自の環境(mdx)にポータブル版VCPを構築して解析環境を作成する（サンプル）",
-            "ocs_template_path": "http://163.220.176.50:8888/jupyter/notebooks/templates/TheLittlestJupyterHub/001-JupyterHub%E7%92%B0%E5%A2%83%E6%A7%8B%E7%AF%89.ipynb",
+            "id":"T005",
+            "ocs_template_name": "Sapporo",
+            "ocs_template_path": "/Sapporo/001-Sapporo環境構築.ipynb",
             "is_active": true
         }
     ]

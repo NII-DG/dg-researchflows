@@ -27,6 +27,8 @@ class RunCrateForm:
 
     def create_widget(self, files:dict, data:dict):
         """RunCrate選択の入力欄を生成する"""
+        if not files:
+            return
         self.files = files
         title = self.definition.get("title", self.key)
         self.form_box.append(Title(title))
@@ -36,7 +38,8 @@ class RunCrateForm:
         column = pn.Column(margin=(5, 10, 5, 10))
         for filename, filelink in files.items():
             widget = None
-            if filelink in data:
+            links = data.get(self.key, [])
+            if filelink in links:
                 widget = Checkbox(name=filename, value=True)
             else:
                 widget = Checkbox(name=filename, value=False)

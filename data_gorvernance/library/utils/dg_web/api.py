@@ -23,13 +23,13 @@ def get_metadata_schema(scheme, domain):
     response.raise_for_status()
     return response.json()
 
-def get_validations(scheme, domain, grdmToken: str, projectId: str):
+def get_validations(scheme, domain, grdm_token: str, project_id: str):
     """/validations"""
     sub_url = '/validations'
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     data = {
-        "grdmToken": grdmToken,
-        "grdmProjectId": projectId,
+        "grdmToken": grdm_token,
+        "grdmProjectId": project_id,
     }
     response = requests.post(url=api_url, json=data)
     if response.status_code == HTTPStatus.UNAUTHORIZED:
@@ -37,19 +37,19 @@ def get_validations(scheme, domain, grdmToken: str, projectId: str):
     response.raise_for_status()
     return response.json()
 
-def get_validations_validationId(scheme, domain, grdmToken: str, projectId: str, validationId: str):
-    """/validations/{validationId}"""
-    sub_url = f'/validations/{validationId}'
+def get_validations_validationId(scheme, domain, grdm_token: str, project_id: str, validation_id: str):
+    """/validations/{validation_id}"""
+    sub_url = f'/validations/{validation_id}'
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     data = {
-        "grdmToken": grdmToken,
-        "grdmProjectId": projectId,
+        "grdmToken": grdm_token,
+        "grdmProjectId": project_id,
     }
     params = {
-        "validationId": validationId
+        "validationId": validation_id
     }
     response = requests.post(url=api_url, json=data, params=params)
     if response.status_code == HTTPStatus.UNAUTHORIZED:
         raise UnauthorizedError
     response.raise_for_status()
-    return response.json() 
+    return response.json()

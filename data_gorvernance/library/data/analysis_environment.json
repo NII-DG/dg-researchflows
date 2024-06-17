@@ -1,13 +1,15 @@
 {
-    "const_environment": [
+    "analysis_environment": [
         {
             "id": "E001",
             "env_name": "解析基盤を利用した本環境を解析環境とする",
+            "description": "本タスクは実施する必要がありませんのでサブフローメニューに戻って次のタスクを実行してください",
             "is_active": true
         },
         {
             "id": "E002",
             "env_name": "OCS（学認クラウドオンデマンド構築サービス）で解析環境を構築する",
+            "description": "次の手順に進んでください",
             "is_active": true
         }
     ]

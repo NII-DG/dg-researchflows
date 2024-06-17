@@ -13,5 +13,4 @@ GOVSHEET_PATH = '.dg/gov-sheet.json'
 METADATA_PATH = '.dg/metadata.json'
 
 # governed run
-GOVRUN_FOLDER = '.crates'
-GOVRUN_INDEX = 'index.json'
+GOVRUN_INDEX_PATH = '.crates/index.json'

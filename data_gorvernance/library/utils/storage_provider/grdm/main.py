@@ -103,12 +103,3 @@ def get_collaborator_url(scheme, domain, project_id):
     """プロジェクトのメンバー一覧のURLを返す"""
     sub_url = f'{project_id}/contributors/'
     return parse.urlunparse((scheme, domain, sub_url, "", "", ""))
-
-
-def get_file_links(token, project_id, base_url, target_folder, recursive=False):
-    """指定したディレクトリにあるファイルの名前とリンクを取得する"""
-    links = {}
-    files = file_list(token, project_id, base_url, target_folder, recursive)
-    for file_ in files:
-        links[file_.name] = file_.link
-    return links

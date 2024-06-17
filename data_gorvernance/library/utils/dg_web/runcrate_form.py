@@ -57,3 +57,17 @@ class RunCrateForm:
                     value.append(self.files[widget.name])
             data[key] = value
         return data
+
+    @staticmethod
+    def format_crate_index(index:dict):
+        """index.jsonからnameとweb linkを取得する"""
+        data = {}
+        try:
+            for crate in index:
+                for link in crate["links"]:
+                    if link["rel"] == "web":
+                        data[crate["name"]] = link["href"]
+                        break
+        except KeyError:
+            data = {}
+        return data

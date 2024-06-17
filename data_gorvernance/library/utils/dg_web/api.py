@@ -1,9 +1,6 @@
 from urllib import parse
 import requests
-from requests.exceptions import RequestException
 from http import HTTPStatus
-
-from ..error import UnauthorizedError, NotFoundURLError
 
 
 def get_govsheet_schema(scheme, domain):
@@ -35,7 +32,7 @@ def check_governedrun_token(scheme, domain, token:str)->bool:
         "grdmToken": None,
         "govRunToken": token
     }
-    response = requests.post(url=api_url, data=data)
+    response = requests.post(url=api_url, json=data)
     if response.status_code == HTTPStatus.OK:
         return True
     elif response.status_code == HTTPStatus.UNAUTHORIZED:
@@ -59,6 +56,6 @@ def validate(scheme, domain, grdm_token, project_id, govrun_token=None, govsheet
         "govSheet": govsheet,
         "metadata": metadata
     }
-    response = requests.post(url=api_url, data=data)
+    response = requests.post(url=api_url, json=data)
     response.raise_for_status()
     return response.json()

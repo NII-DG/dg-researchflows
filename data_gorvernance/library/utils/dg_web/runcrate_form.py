@@ -59,7 +59,7 @@ class RunCrateForm:
         return data
 
     @staticmethod
-    def format_crate_index(index:dict):
+    def format_crate_index(index:list):
         """index.jsonからnameとweb linkを取得する"""
         data = {}
         try:

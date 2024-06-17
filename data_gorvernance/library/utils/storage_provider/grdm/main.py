@@ -2,7 +2,7 @@ import os
 from urllib import parse
 import json
 
-from .client import upload, download, file_list
+from .client import upload, download
 from .api import get_projects, get_project_registrations, get_project_collaborators
 from .metadata import format_metadata
 from ...error import MetadataNotExist, RemoteFileNotExist

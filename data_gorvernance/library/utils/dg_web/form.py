@@ -101,24 +101,37 @@ class ObjectBox(pn.WidgetBox):
         super().__init__(**params)
 
 class Form:
-    """入力欄を操作するクラス
+    """入力フォームの操作
 
     jsonschemaから入力欄を生成し、そこからデータを取得する
+
+    Attributes:
+        form_box (pn.WidgetBox): フォームを格納する。
+        msg_output (MessageBox): ユーザーに提示するメッセージを格納する。
+        schema (dict): フォームの元となるjsonschema
+
+    Methods:
+        create_widgets(schema, data): 入力フォームの作成
+        get_data(): 入力されたデータの取得
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
 
         pn.extension()
         self.form_box = pn.WidgetBox()
         self.msg_output = MessageBox()
 
-    def create_widgets(self, schema:dict, data:dict):
+        self.schema = {}
+
+    def create_widgets(self, schema:dict, data:dict) -> None:
         """jsonchemaの形式にそった入力欄をpanelで作成する
 
         Args:
-            schema (dict): jsonschema
+            schema (dict): フォームの元となるjsonschema
             data (dict): jsonschemaの形式に沿った初期値
         """
+        if "properties" not in schema:
+            return
         self.schema = schema
         for key, properties in schema["properties"].items():
             value = data.get(key)
@@ -133,7 +146,7 @@ class Form:
             value (Any, optional): keyに対する初期値. Defaults to None.
 
         Returns:
-            PanelのWidget
+            form (ArrayBox | ObjectBox | Column): 渡されたkeyに対する入力欄
         """
         title = definition.get("title", key)
         if value is None:
@@ -197,7 +210,7 @@ class Form:
             value (Any): keyに対する初期値
 
         Returns:
-            ObjectBox
+            obj_box (ObjectBox): keyに対する入力欄
         """
         obj_box = ObjectBox(schema_key=key)
         obj_box.append(Title(title, schema_key=key))
@@ -222,7 +235,7 @@ class Form:
             value (Any): keyに対する初期値
 
         Returns:
-            ArrayBox
+            box (ArrayBox): keyに対する入力欄
         """
         box = ArrayBox(schema_key=key)
         box.append(Title(title, schema_key=key))
@@ -235,7 +248,7 @@ class Form:
             """arrayのひとつの要素を作成する"""
             column_list = column.objects
             items = definition["items"]
-            title_num = title + str(len(column_list) + 1)
+            title_num = f'{title}{len(column_list) + 1}'
             items["title"] = title_num
             widget = self._generate_widget(items, key, value)
             if items.get("type") == "object":
@@ -306,6 +319,8 @@ class Form:
 
     def get_data(self):
         """入力欄からデータを取得する"""
+        if not self.schema or "properties" not in self.schema:
+            return {}
         widgets = self.form_box.objects
         schema = self.schema["properties"]
         data = {}

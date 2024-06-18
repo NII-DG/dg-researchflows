@@ -22,9 +22,9 @@ class AnalysisEnvironment:
         return [fld[self.__NAME] for fld in self.analysis_environment]
 
     def get_id(self, target_name):
-    	for fld in self.analysis_environment:
-    		if fld[self.__NAME] == target_name:
-    			return fld[self.__ID]
+        for fld in self.analysis_environment:
+            if fld[self.__NAME] == target_name:
+                return fld[self.__ID]
 
     def get_description(self, target_name):
         for fld in self.analysis_environment:

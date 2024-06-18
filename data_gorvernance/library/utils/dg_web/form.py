@@ -210,7 +210,7 @@ class Form:
             value (Any): keyに対する初期値
 
         Returns:
-            obj_box (ObjectBox): keyに対する入力欄
+            obj_box (ObjectBox): 渡されたkeyに対する入力欄
         """
         obj_box = ObjectBox(schema_key=key)
         obj_box.append(Title(title, schema_key=key))
@@ -235,7 +235,7 @@ class Form:
             value (Any): keyに対する初期値
 
         Returns:
-            box (ArrayBox): keyに対する入力欄
+            box (ArrayBox): 渡されたkeyに対する入力欄
         """
         box = ArrayBox(schema_key=key)
         box.append(Title(title, schema_key=key))
@@ -276,7 +276,7 @@ class Form:
                     # 表示を更新
                     # TODO: value_inputが引き継げていない
                     for i, row in enumerate(objects):
-                        title_num = title + str(i + 1)
+                        title_num = f'{title}{i + 1}'
                         w = row[0]
                         if isinstance(w, pn.Column) or isinstance(w, pn.WidgetBox):
                             wb_list = w.objects

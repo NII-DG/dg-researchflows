@@ -13,6 +13,7 @@ class RunCrateForm:
         self.form_box = pn.WidgetBox()
         self.msg_output = MessageBox()
 
+        self.schema = None
 
     def pop_schema(self, schema):
         """schemaのRunCrate選択部分を取得し、schemaから取り除く"""

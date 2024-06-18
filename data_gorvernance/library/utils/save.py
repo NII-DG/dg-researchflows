@@ -10,7 +10,7 @@ from .widgets import Button, MessageBox
 from .storage_provider import grdm
 from .time import TimeDiff
 from .log import TaskLog
-from .input import get_token, get_project_id
+from .input import get_grdm_token, get_project_id
 from .error import UnusableVault
 
 
@@ -60,7 +60,7 @@ class TaskSave(TaskLog):
 
         # config
         try:
-            self.token = get_token()
+            self.token = get_grdm_token()
         except UnusableVault:
             message = msg_config.get('form', 'no_vault')
             self.save_msg_output.update_error(message)

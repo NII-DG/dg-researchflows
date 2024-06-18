@@ -101,6 +101,10 @@ class ObjectBox(pn.WidgetBox):
         super().__init__(**params)
 
 class Form:
+    """入力欄を操作するクラス
+
+    jsonschemaから入力欄を生成し、そこからデータを取得する
+    """
 
     def __init__(self):
 

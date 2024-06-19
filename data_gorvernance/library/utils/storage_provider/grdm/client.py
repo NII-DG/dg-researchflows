@@ -10,9 +10,11 @@ def upload(token, base_url, project_id, source, destination, recursive=False, fo
     """ファイルまたはフォルダをアップロードする
 
     Args:
-        project_id (_type_): プロジェクトID
-        source (_type_): 保存元パス
-        destination (_type_): 保存先パス
+        token (str): GRDMのパーソナルアクセストークン
+        base_url (str): API URL (e.g. https://api.osf.io/v2/)
+        project_id (str): プロジェクトID
+        source (str): 保存元パス
+        destination (str): 保存先パス
         recursive (bool, optional): 指定したsourceがフォルダかどうか. Defaults to False.
         force (bool, optional): ファイルが存在した場合に上書きするかどうか. Defaults to False.
     """
@@ -56,14 +58,15 @@ def upload(token, base_url, project_id, source, destination, recursive=False, fo
             store.create_file(remote_path, fp, force=force,
                                 update=update)
 
+
 def download(token, project_id, base_url, remote_path, base_path=None):
     """ファイルの内容を取得する。ファイルに保存はしない
 
     Args:
-        token (str): OSFのパーソナルアクセストークン
-        project_id (_type_): プロジェクトID
-        base_url (_type_): API URL (e.g. https://api.osf.io/v2/)
-        remote_path (_type_): ファイルパス
+        token (str): GRDMのパーソナルアクセストークン
+        project_id (str): プロジェクトID
+        base_url (str): API URL (e.g. https://api.osf.io/v2/)
+        remote_path (str): ファイルパス
         base_path (optional): ファイルを探すディレクトリのパス
 
     Returns:
@@ -75,7 +78,6 @@ def download(token, project_id, base_url, remote_path, base_path=None):
     osf = OSF(token=token, base_url=base_url)
     project = osf.project(project_id)
     if base_path is not None:
-        base_path = base_path
         if base_path.startswith('/'):
             base_path = base_path[1:]
         base_file_path = base_path[base_path.index('/'):]

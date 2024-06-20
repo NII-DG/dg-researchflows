@@ -1,16 +1,15 @@
 import os
-
-from ..utils.setting import SubflowStatusFile, SubflowTask
-from ..utils import file
-from ..utils.diagram import DiagManager, init_config, update_svg
-from ..utils.config import path_config
-from nbformat import read, NO_CONVERT
-from pathlib import Path
 from itertools import chain, zip_longest
+from pathlib import Path
 
+from nbformat import NO_CONVERT, read
+
+from ..utils import file
+from ..utils.config import path_config
+from ..utils.diagram import DiagManager, init_config, update_svg
+from ..utils.setting import SubflowStatusFile, SubflowTask
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-
 
 class SubFlowManager:
 
@@ -56,10 +55,10 @@ class SubFlowManager:
         self.svg_config = {}
         for task in self.tasks:
             self.svg_config.update(init_config(task.id, task.name))
-            self.parse_headers(task, display_all)
+            self.parse_headers(task)
         self._update(display_all)
         for task in self.tasks:
-            self.change_id(task, display_all)
+            self.change_id(task)
         self.diag.generate_svg(tmp_diag, svg_path, font)
         update_svg(svg_path, self.current_dir, self.task_dir, self.svg_config)
 
@@ -80,6 +79,7 @@ class SubFlowManager:
                 self.svg_config[task.id]['is_link'] = False
 
     def _adjust_by_status(self, task: SubflowTask, display_all=True):
+        """フロー図の見た目を状況によって変える"""
         if task.disable and not display_all:
             return
 
@@ -99,8 +99,9 @@ class SubFlowManager:
         elif task.status == task.STATUS_DOING:
             self.diag.update_node_icon(task.id, icon_dir + "/loading.png")
             self.svg_config[task.id]['init_nb'] = False
-    
-    def parse_headers(self, task, display_all=True):
+
+    def parse_headers(self, task):
+        """タスクタイトルとパスを取得"""
         nb_dir = Path(self.task_dir)
         for nb_path in nb_dir.glob("**/*.ipynb"):
             nb = read(str(nb_path), as_version=NO_CONVERT)
@@ -127,7 +128,8 @@ class SubFlowManager:
                 self.svg_config[task.id]['text'] = title
                 break
 
-    def change_id(self, task, display_all=True):
+    def change_id(self, task):
+        """diagファイルのタスクIDをタスクタイトルに置き換える"""
         lines = self.diag.content.splitlines()
         new_lines = []
         for line in lines:

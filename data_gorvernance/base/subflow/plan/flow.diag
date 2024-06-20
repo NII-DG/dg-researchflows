@@ -1,14 +1,13 @@
 blockdiag {
     node_width = 200;
-    node_height = 130;
-    span_width = 20;
+    node_height = 50;
+    span_width = 30;
     span_height = 30;
     default_fontsize = 10;
     orientation = portrait;
-    default_group_color = "#FFFFCC";
+    default_group_color = "#FFC800";
 
     group {
-        dummy-1-1[shape=none, height=1, width=250]
         RF002001;
         RF002003;
     }
@@ -21,7 +20,6 @@ blockdiag {
             orientation = portrait;
             shape = line;
             style = none;
-            dummy-1-2[shape=none, height=1, width=250]
             RF009004;
         }
         RF009002;
@@ -30,9 +28,5 @@ blockdiag {
         RF009001;
         RF009005;
     }
-
     RF002001 -> RF002003;
-    // 横幅の調整用ダミーを任意の場所に置くため
-    dummy-1-1 -- RF002001[style=none];
-    dummy-1-2 -- RF009004[style=none];
 }

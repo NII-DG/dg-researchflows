@@ -8,7 +8,6 @@ from .. import file
 
 title_font_size = 10
 title_font_color = 'rgb(255,140,0)'
-text_font_color = 'rgb(0,0,0)'
 
 SVG_TEXT = '{http://www.w3.org/2000/svg}text'
 
@@ -21,17 +20,10 @@ def init_config(id, name):
         }
     }
 
-def update_svg(output: str, current_dir:str, notebook_dir:str, config):
-    _embed_detail_information(current_dir, Path(output), Path(notebook_dir), config)
+def update_svg(output: str, current_dir:str, config):
+    _embed_detail_information(current_dir, Path(output), config)
 
-def setup_python_path():
-    ver = sys.version_info
-    lib_path = f'~/.local/lib/python{ver.major}.{ver.minor}/site-packages'
-    lib_path = str(Path(lib_path).expanduser())
-    if lib_path not in sys.path:
-        sys.path.append(lib_path)
-
-def _embed_detail_information(current_dir, skeleton, dir_util, config):
+def _embed_detail_information(current_dir, skeleton, config):
     # 雛形の読み込み
     tree = etree.parse(str(skeleton))
 

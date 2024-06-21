@@ -60,7 +60,7 @@ class SubFlowManager:
         for task in self.tasks:
             self.change_id(task)
         self.diag.generate_svg(tmp_diag, svg_path, font)
-        update_svg(svg_path, self.current_dir, self.task_dir, self.svg_config)
+        update_svg(svg_path, self.current_dir, self.svg_config)
 
     def _update(self, display_all=True):
         for task in self.tasks:

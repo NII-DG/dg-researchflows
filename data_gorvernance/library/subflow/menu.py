@@ -6,7 +6,7 @@ import traceback
 
 import panel as pn
 from IPython.display import display
-from IPython.core.display import Javascript, HTML
+from IPython.core.display import Javascript
 
 from .subflow import SubFlowManager
 from ..utils.config import path_config, message

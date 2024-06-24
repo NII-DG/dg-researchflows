@@ -10,7 +10,7 @@ from IPython.core.display import Javascript, HTML
 
 from .subflow import SubFlowManager
 from ..utils.config import path_config, message
-from ..utils.html import button as html_button
+from ..utils.html.button import create_button
 from ..utils import file
 from ..utils.log import TaskLog
 from ..task_director import get_subflow_type_and_id
@@ -23,13 +23,15 @@ def access_main_menu(working_file: str):
     main_menu = str(root_folder / path_config.MAIN_MENU_PATH)
 
     link = file.relative_path(main_menu, os.path.dirname(working_file))
-    display(HTML(
-        html_button.create_button(
+
+    main_menu_button = pn.pane.HTML()
+    main_menu_button.object = create_button(
             url=f'{link}?init_nb=true',
             msg=message.get('subflow_menu', 'access_main_menu'),
             button_width='500px'
         )
-    ))
+    pn.extension()
+    display(main_menu_button)
     display(Javascript('IPython.notebook.save_checkpoint();'))
 
 

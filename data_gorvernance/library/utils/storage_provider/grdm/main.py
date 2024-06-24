@@ -1,11 +1,20 @@
+import json
 import os
 from urllib import parse
-import json
 
 from .client import upload, download
-from .api import get_projects, get_project_registrations, get_project_collaborators
+from .api import (
+    get_token_profile,
+    get_projects,
+    get_project_registrations,
+    get_project_collaborators
+)
 from .metadata import format_metadata
 from ...error import MetadataNotExist, RemoteFileNotExist
+
+
+ALLOWED_TOKEN_SCOPE = ["osf.full_write"]
+ALLOWED_PERMISSION = ["admin", "write"]
 
 
 def get_project_id():
@@ -18,6 +27,22 @@ def get_project_id():
         return split_path[1]
     else:
         return None
+
+
+def check_authorization(base_url, token, project_id) -> bool:
+    profile = get_token_profile(base_url=base_url, token=token)
+    scope = profile['scope']
+    if not all(element in scope for element in ALLOWED_TOKEN_SCOPE):
+        return False
+    user_id = profile['id']
+    parsed = parse.urlparse(base_url)
+    response = get_project_collaborators(parsed.scheme, parsed.netloc, token, project_id)
+    data = response['data']
+    for user in data:
+        if user['embeds']['users']['data']['id'] == user_id:
+            if user['attributes']['permission'] in ALLOWED_PERMISSION:
+                return True
+    return False
 
 
 def get_projects_list(scheme, domain, token):

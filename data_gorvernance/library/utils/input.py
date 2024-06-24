@@ -69,7 +69,7 @@ def get_token(key:str, func:Callable[[str], bool], message:str):
     return token
 
 
-def get_grdm_token():
+def get_grdm_token(project_id):
     """GRDMのパーソナルアクセストークンを取得する
 
     Raises:
@@ -80,12 +80,7 @@ def get_grdm_token():
         str: パーソナルアクセストークン
     """
     def check_auth(token):
-        try:
-            grdm.get_projects(grdm.SCHEME, grdm.API_DOMAIN, token)
-        except Exception:
-            return False
-        else:
-            return True
+        return grdm.check_authorization(grdm.BASE_URL, token, project_id)
 
     return get_token('grdm_token', check_auth, msg_config.get('form', 'pls_input_grdm_token'))
 

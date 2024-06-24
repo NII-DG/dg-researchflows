@@ -1,9 +1,9 @@
 import os
 import traceback
-from requests.exceptions import RequestException
 
 import panel as pn
 from IPython.display import clear_output
+from requests.exceptions import RequestException
 
 from .config import path_config, message as msg_config
 from .widgets import Button, MessageBox
@@ -59,13 +59,13 @@ class TaskSave(TaskLog):
         self._source = source
 
         # config
+        self.project_id = get_project_id()
         try:
-            self.token = get_grdm_token()
+            self.token = get_grdm_token(self.project_id)
         except UnusableVault:
             message = msg_config.get('form', 'no_vault')
             self.save_msg_output.update_error(message)
             return
-        self.project_id = get_project_id()
         clear_output()
 
         # define form

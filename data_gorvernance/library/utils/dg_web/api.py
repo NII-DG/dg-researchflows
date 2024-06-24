@@ -1,6 +1,9 @@
-from urllib import parse
-import requests
 from http import HTTPStatus
+from urllib import parse
+
+import requests
+
+from ..error import UnauthorizedError
 
 
 def get_govsheet_schema(scheme, domain):

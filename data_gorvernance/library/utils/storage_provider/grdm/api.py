@@ -144,7 +144,7 @@ def get_project_registrations(base_url, token, project_id):
         NotFoundURLError: 指定されたプロジェクトIDが存在しない
         requests.exceptions.RequestException: その他の通信エラー
     """
-    endpoint = f'v2/nodes/{project_id}/registrations/'
+    endpoint = f'/nodes/{project_id}/registrations/'
     api_url = build_api_url(base_url, endpoint)
     headers = {
         'Authorization': 'Bearer {}'.format(token)
@@ -177,7 +177,7 @@ def get_project_collaborators(base_url: str, token: str, project_id: str):
         NotFoundURLError: 指定されたプロジェクトIDが存在しない
         requests.exceptions.RequestException: その他の通信エラー
     """
-    endpoint = f'v2/nodes/{project_id}/contributors/'
+    endpoint = f'/nodes/{project_id}/contributors/'
     api_url = build_api_url(base_url, endpoint)
     headers = {
         'Authorization': 'Bearer {}'.format(token)

@@ -39,10 +39,3 @@ class OCSTemplate:
         for fld in self.ocs_template:
             if fld[self.__FIELD_NAME] == target_name:
                 return fld[self.__OCS_TEMPLATE_PATH]
-
-    def get_active_link(self)->List[str]:
-        links = []
-        for tmp in self.ocs_template:
-            if tmp[self.__IS_ACTIVE]:
-                links.append(tmp[self.__OCS_TEMPLATE_PATH])
-        return links

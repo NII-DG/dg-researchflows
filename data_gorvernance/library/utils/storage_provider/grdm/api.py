@@ -9,7 +9,7 @@ from ...error import UnauthorizedError, NotFoundURLError
 
 
 def build_api_url(base_url: str, endpoint=''):
-    """_summary_
+    """API用のURLを作成する
 
     Args:
         base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
@@ -39,7 +39,7 @@ def build_api_url(base_url: str, endpoint=''):
 
 
 def build_oauth_url(base_url: str, endpoint=''):
-    """_summary_
+    """OAuthのAPI用のURLを作成する
 
     Args:
         base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
@@ -55,36 +55,97 @@ def build_oauth_url(base_url: str, endpoint=''):
     return parse.urlunparse((parsed.scheme, netloc, endpoint, '', '', ''))
 
 
-def get_token_profile(base_url, token):
-    """https://accounts.rdm.nii.ac.jp/oauth2/profile"""
+def get_token_profile(base_url: str, token: str):
+    """https://accounts.rdm.nii.ac.jp/oauth2/profile
+
+    Args:
+        base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+        token (str): パーソナルアクセストークン
+
+    Raises:
+        UnauthorizedError: 認証が通らない
+        requests.exceptions.RequestException: その他の通信エラー
+    """
     endpoint = '/oauth2/profile'
     api_url = build_oauth_url(base_url, endpoint)
     headers = {
         'Authorization': 'Bearer {}'.format(token)
     }
     response = requests.get(url=api_url, headers=headers)
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except RequestException as e:
+        if response.status_code == HTTPStatus.UNAUTHORIZED:
+            raise UnauthorizedError(str(e)) from e
+        raise
+    return response.json()
+
+
+def get_user_info(base_url: str, token: str):
+    """tokenで指定したユーザーの情報を取得する
+
+    https://api.rdm.nii.ac.jp/v2/users/me/
+
+    Args:
+        base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+        token (str): パーソナルアクセストークン
+
+    Raises:
+        UnauthorizedError: 認証が通らない
+        requests.exceptions.RequestException: その他の通信エラー
+
+    Returns:
+        ユーザー情報
+    """
+    endpoint = '/users/me/'
+    api_url = build_api_url(base_url, endpoint)
+    headers = {
+        'Authorization': 'Bearer {}'.format(token)
+    }
+    response = requests.get(url=api_url, headers=headers)
+    try:
+        response.raise_for_status()
+    except RequestException as e:
+        if response.status_code == HTTPStatus.UNAUTHORIZED:
+            raise UnauthorizedError(str(e)) from e
+        raise
     return response.json()
 
 
 def get_projects(scheme, domain, token):
-    """https://api.rdm.nii.ac.jp/v2/nodes/"""
+    """https://api.rdm.nii.ac.jp/v2/nodes/
+
+    Raises:
+        UnauthorizedError: 認証が通らない
+        requests.exceptions.RequestException: その他の通信エラー
+    """
     sub_url = 'v2/nodes/'
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     headers = {
         'Authorization': 'Bearer {}'.format(token)
     }
     response = requests.get(url=api_url, headers=headers)
-    if response.status_code == HTTPStatus.UNAUTHORIZED:
-        raise UnauthorizedError
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except RequestException as e:
+        if response.status_code == HTTPStatus.UNAUTHORIZED:
+            raise UnauthorizedError(str(e)) from e
+        raise
     return response.json()
 
 
-def get_project_registrations(scheme, domain, token, project_id):
-    """https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/registrations"""
-    sub_url = f'v2/nodes/{project_id}/registrations/'
-    api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
+def get_project_registrations(base_url, token, project_id):
+    """プロジェクトメタデータを取得する
+
+    https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/registrations
+
+    Raises:
+        UnauthorizedError: 認証が通らない
+        NotFoundURLError: 指定されたプロジェクトIDが存在しない
+        requests.exceptions.RequestException: その他の通信エラー
+    """
+    endpoint = f'v2/nodes/{project_id}/registrations/'
+    api_url = build_api_url(base_url, endpoint)
     headers = {
         'Authorization': 'Bearer {}'.format(token)
     }
@@ -97,13 +158,27 @@ def get_project_registrations(scheme, domain, token, project_id):
         if response.status_code == HTTPStatus.NOT_FOUND:
             # プロジェクトIDが不正確
             raise NotFoundURLError(str(e)) from e
+        raise
     return response.json()
 
 
-def get_project_collaborators(scheme, domain, token, project_id):
-    """https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/contributors/"""
-    sub_url = f'v2/nodes/{project_id}/contributors/'
-    api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
+def get_project_collaborators(base_url: str, token: str, project_id: str):
+    """プロジェクトメンバーの情報を取得する
+
+    https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/contributors/
+
+    Args:
+        base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+        token (str): パーソナルアクセストークン
+        project_id (str): プロジェクトID
+
+    Raises:
+        UnauthorizedError: 認証が通らない
+        NotFoundURLError: 指定されたプロジェクトIDが存在しない
+        requests.exceptions.RequestException: その他の通信エラー
+    """
+    endpoint = f'v2/nodes/{project_id}/contributors/'
+    api_url = build_api_url(base_url, endpoint)
     headers = {
         'Authorization': 'Bearer {}'.format(token)
     }
@@ -116,5 +191,5 @@ def get_project_collaborators(scheme, domain, token, project_id):
         if response.status_code == HTTPStatus.NOT_FOUND:
             # プロジェクトIDが不正確
             raise NotFoundURLError(str(e)) from e
-    response.raise_for_status()
+        raise
     return response.json()

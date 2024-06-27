@@ -38,7 +38,7 @@ class RunCrateForm:
         self.definition = properties.pop(self.key, {})
         return schema
 
-    def create_widget(self, crates: list, data: dict):
+    def create_widget(self, crates: list, data=None):
         """RunCrate選択の入力欄を生成する
 
         Args:
@@ -66,7 +66,10 @@ class RunCrateForm:
             self.form_box.append(Description(description))
         column = pn.Column(margin=(5, 10, 5, 10))
         for filename, filelink in self.files.items():
-            links = data.get(self.key, [])
+            if isinstance(data, dict):
+                links = data.get(self.key, [])
+            else:
+                links = []
             if filelink in links:
                 column.append(Checkbox(name=filename, value=True))
             else:

@@ -5,15 +5,16 @@ from urllib import parse
 from .client import upload, download
 from .api import (
     get_token_profile,
+    get_user_info,
     get_projects,
     get_project_registrations,
     get_project_collaborators
 )
 from .metadata import format_metadata
-from ...error import MetadataNotExist, RemoteFileNotExist
+from ...error import NotFoundContentsError, UnauthorizedError
 
 
-ALLOWED_TOKEN_SCOPE = ["osf.full_write"]
+NEED_TOKEN_SCOPE = ["osf.full_write"]
 ALLOWED_PERMISSION = ["admin", "write"]
 
 
@@ -29,14 +30,33 @@ def get_project_id():
         return None
 
 
-def check_authorization(base_url, token, project_id) -> bool:
-    profile = get_token_profile(base_url=base_url, token=token)
-    scope = profile['scope']
-    if not all(element in scope for element in ALLOWED_TOKEN_SCOPE):
+def check_authorization(base_url: str, token: str) -> bool:
+    try:
+        profile = get_token_profile(base_url=base_url, token=token)
+        scope = profile['scope']
+        if all(element in scope for element in NEED_TOKEN_SCOPE):
+            return True
+    except UnauthorizedError:
         return False
-    user_id = profile['id']
-    parsed = parse.urlparse(base_url)
-    response = get_project_collaborators(parsed.scheme, parsed.netloc, token, project_id)
+    return False
+
+
+def check_permission(base_url: str, token: str, project_id: str):
+    """_summary_
+
+    Args:
+        base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+        token (str): パーソナルアクセストークン
+        project_id (str): プロジェクトID
+
+    Raises:
+        UnauthorizedError: 認証が通らない
+        NotFoundURLError: 指定されたプロジェクトIDが存在しない
+        requests.exceptions.RequestException: その他の通信エラー
+    """
+    response = get_user_info(base_url, token)
+    user_id = response['data']['id']
+    response = get_project_collaborators(base_url, token, project_id)
     data = response['data']
     for user in data:
         if user['embeds']['users']['data']['id'] == user_id:
@@ -57,10 +77,21 @@ def get_projects_list(scheme, domain, token):
     return {d['id']: d['attributes']['title'] for d in data}
 
 
-def sync(token, base_url, project_id, abs_source, abs_root="/home/jovyan"):
+def sync(token, api_url, project_id, abs_source, abs_root="/home/jovyan"):
     """upload to Gakunin RDM
 
     abs_source must be an absolute path.
+
+    Args:
+        token (str): GRDMのパーソナルアクセストークン
+        api_url (str): API URL (e.g. https://api.osf.io/v2/)
+        project_id (str): プロジェクトID
+        abs_source (str or list): 同期したいファイルまたはディレクトリ
+        abs_root (str, optional): リモートのプロジェクトに対応させたいディレクトリの絶対パス. Defaults to "/home/jovyan".
+
+    Raises:
+        UnauthorizedError: 認証が通らない
+        RuntimeError: RDMClientから上がってくるエラー全般
     """
 
     if os.path.isdir(abs_source):
@@ -78,45 +109,92 @@ def sync(token, base_url, project_id, abs_source, abs_root="/home/jovyan"):
     destination = os.path.relpath(abs_source, abs_root)
 
     upload(
-        token=token, base_url=base_url, project_id=project_id,
+        token=token, base_url=api_url, project_id=project_id,
         source=abs_source, destination=destination,
         recursive=recursive, force=True
     )
 
 
-def download_text_file(token, base_url, project_id, remote_path, encoding='utf-8'):
-    """テキストファイルの中身を取得する"""
+def download_text_file(token, api_url, project_id, remote_path, encoding='utf-8'):
+    """テキストファイルの中身を取得する
+
+    Args:
+        token (str): GRDMのパーソナルアクセストークン
+        api_url (str): API URL (e.g. https://api.osf.io/v2/)
+        project_id (str): プロジェクトID
+        remote_path (str): ファイルパス
+        encoding (optional): The encoding with which to decode the bytes.
+
+    Raises:
+        FileNotFoundError: 指定したファイルが存在しない
+        UnauthorizedError: 認証が通らない
+        requests.exceptions.RequestException: その他の通信エラー
+    """
     content = download(
         token=token, project_id=project_id,
-        base_url=base_url, remote_path=remote_path
+        base_url=api_url, remote_path=remote_path
     )
     if content is None:
-        raise RemoteFileNotExist(f'The specified file (path: {remote_path}) does not exist.')
+        raise FileNotFoundError(f'The specified file (path: {remote_path}) does not exist.')
     return content.decode(encoding)
 
 
-def download_json_file(token, base_url, project_id, remote_path):
-    """jsonファイルの中身を取得する"""
-    content = download_text_file(token, base_url, project_id, remote_path)
+def download_json_file(token, api_url, project_id, remote_path):
+    """jsonファイルの中身を取得する
+
+    Args:
+        token (str): GRDMのパーソナルアクセストークン
+        api_url (str): API URL (e.g. https://api.osf.io/v2/)
+        project_id (str): プロジェクトID
+        remote_path (str): ファイルパス
+
+    Raises:
+        FileNotFoundError: 指定したファイルが存在しない
+        json.JSONDecodeError: 変換元文字列がjson形式でなかった
+        UnauthorizedError: 認証が通らない
+        requests.exceptions.RequestException: その他の通信エラー
+    """
+    content = download_text_file(token, api_url, project_id, remote_path)
     return json.loads(content)
 
 
-def get_project_metadata(scheme, domain, token, project_id):
-    """プロジェクトメタデータを取得する"""
-    metadata = get_project_registrations(scheme, domain, token, project_id)
-    if len(metadata['data']) < 1:
-        raise MetadataNotExist
+def get_project_metadata(base_url: str, token: str, project_id: str):
+    """プロジェクトメタデータを取得する
 
+    Args:
+        base_url (str):Root URL (e.g. https://rdm.nii.ac.jp)
+        token (str): パーソナルアクセストークン
+        project_id (str): プロジェクトID
+
+    Raises:
+        NotFoundContentsError: メタデータが存在しない
+        UnauthorizedError: 認証が通らない
+        NotFoundURLError: 指定されたプロジェクトIDが存在しない
+        requests.exceptions.RequestException: その他の通信エラー
+    """
+    metadata = get_project_registrations(base_url, token, project_id)
+    if len(metadata['data']) < 1:
+        raise NotFoundContentsError(f"Metadata doesn't exist for the project with the specified ID {project_id}.")
     return format_metadata(metadata)
 
 
-def get_collaborator_list(scheme, domain, token, project_id):
+def get_collaborator_list(base_url: str, token: str, project_id: str) -> dict:
     """共同管理者の取得
+
+    Args:
+        base_url (str):Root URL (e.g. https://rdm.nii.ac.jp)
+        token (str): パーソナルアクセストークン
+        project_id (str): プロジェクトID
 
     Returns:
         dict: ユーザー名がkey、権限種別がvalue
+
+    Raises:
+        UnauthorizedError: 認証が通らない
+        NotFoundURLError: 指定されたプロジェクトIDが存在しない
+        requests.exceptions.RequestException: その他の通信エラー
     """
-    response = get_project_collaborators(scheme, domain, token, project_id)
+    response = get_project_collaborators(base_url, token, project_id)
     data = response['data']
     return {
         d['embeds']['users']['data']['attributes']['full_name']: d['attributes']['permission']
@@ -124,7 +202,16 @@ def get_collaborator_list(scheme, domain, token, project_id):
     }
 
 
-def get_collaborator_url(scheme, domain, project_id):
-    """プロジェクトのメンバー一覧のURLを返す"""
-    sub_url = f'{project_id}/contributors/'
-    return parse.urlunparse((scheme, domain, sub_url, "", "", ""))
+def build_collaborator_url(base_url: str, project_id: str):
+    """プロジェクトのメンバー一覧のURLを返す
+
+    Args:
+        base_url (str):Root URL (e.g. https://rdm.nii.ac.jp)
+        project_id (str): プロジェクトID
+
+    Returns:
+        str: 指定されたproject idのプロジェクトメンバー一覧画面のURL
+    """
+    parsed = parse.urlparse(base_url)
+    endpoint = f'{project_id}/contributors/'
+    return parse.urlunparse((parsed.scheme, parsed.netloc, endpoint, '', '', ''))

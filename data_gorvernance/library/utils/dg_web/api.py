@@ -2,8 +2,9 @@ from http import HTTPStatus
 from urllib import parse
 
 import requests
+from requests.exceptions import RequestException
 
-from ..error import UnauthorizedError
+from ..error import UnauthorizedError, NotFoundContentsError
 
 
 def get_govsheet_schema(scheme, domain):
@@ -23,10 +24,14 @@ def get_metadata_schema(scheme, domain):
     response.raise_for_status()
     return response.json()
 
+
 def check_governedrun_token(scheme, domain, token:str)->bool:
     """/checkToken
 
     Governed Runのトークンの有効性を確認する
+
+    Raises:
+        requests.exceptions.RequestException: 通信エラー
     """
     sub_url = '/checkToken'
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
@@ -40,7 +45,6 @@ def check_governedrun_token(scheme, domain, token:str)->bool:
     elif response.status_code == HTTPStatus.UNAUTHORIZED:
         return False
     response.raise_for_status()
-    # Noneが返却される可能性を防ぐため。仕様的にはここまで到達しない
     return False
 
 
@@ -48,6 +52,10 @@ def validate(scheme, domain, grdm_token, project_id, govrun_token=None, govsheet
     """/validations/submit
 
     検証する
+
+    Raises:
+        UnauthorizedError: 認証が通らない
+        requests.exceptions.RequestException: その他の通信エラー
     """
     sub_url = '/validations/submit'
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
@@ -59,11 +67,26 @@ def validate(scheme, domain, grdm_token, project_id, govrun_token=None, govsheet
         "metadata": metadata
     }
     response = requests.post(url=api_url, json=data)
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except RequestException as e:
+        if response.status_code == HTTPStatus.UNAUTHORIZED:
+            raise UnauthorizedError(str(e)) from e
+        raise
     return response.json()
 
+
 def get_validations(scheme, domain, grdm_token: str, project_id: str):
-    """/validations"""
+    """/validations
+
+    Raises:
+        UnauthorizedError: 認証が通らない
+        NotFoundContentsError: 検証結果が存在しない
+        requests.exceptions.RequestException: その他の通信エラー
+
+    Returns:
+        全ての検証結果
+    """
     sub_url = '/validations'
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     data = {
@@ -71,13 +94,28 @@ def get_validations(scheme, domain, grdm_token: str, project_id: str):
         "grdmProjectId": project_id,
     }
     response = requests.post(url=api_url, json=data)
-    if response.status_code == HTTPStatus.UNAUTHORIZED:
-        raise UnauthorizedError
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except RequestException as e:
+        if response.status_code == HTTPStatus.UNAUTHORIZED:
+            raise UnauthorizedError(str(e)) from e
+        if response.status_code == HTTPStatus.NOT_FOUND:
+            raise NotFoundContentsError(str(e)) from e
+        raise
     return response.json()
 
+
 def get_validations_validationId(scheme, domain, grdm_token: str, project_id: str, validation_id: str):
-    """/validations/{validation_id}"""
+    """/validations/{validation_id}
+
+    Raises:
+        UnauthorizedError: 認証が通らない
+        NotFoundContentsError: 検証結果が存在しない
+        requests.exceptions.RequestException: その他の通信エラー
+
+    Returns:
+        指定したidの検証結果
+    """
     sub_url = f'/validations/{validation_id}'
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     data = {
@@ -88,7 +126,12 @@ def get_validations_validationId(scheme, domain, grdm_token: str, project_id: st
         "validationId": validation_id
     }
     response = requests.post(url=api_url, json=data, params=params)
-    if response.status_code == HTTPStatus.UNAUTHORIZED:
-        raise UnauthorizedError
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except RequestException as e:
+        if response.status_code == HTTPStatus.UNAUTHORIZED:
+            raise UnauthorizedError(str(e)) from e
+        if response.status_code == HTTPStatus.NOT_FOUND:
+            raise NotFoundContentsError(str(e)) from e
+        raise
     return response.json()

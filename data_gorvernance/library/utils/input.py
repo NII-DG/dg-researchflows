@@ -6,7 +6,7 @@ from .config import message as msg_config
 from .storage_provider import grdm
 from .string import StringManager
 from .vault import Vault
-from .error import UnusableVault
+from .error import UnusableVault, UnauthorizedError, NotFoundURLError
 
 
 def get_project_id():
@@ -25,7 +25,7 @@ def get_project_id():
     return project_id
 
 
-def get_token(key:str, func:Callable[[str], bool], message:str):
+def get_token(key:str, func:Callable[[str], bool], message:str) -> str:
     """vaultもしくはinputからトークンを取得する
 
     Args:
@@ -69,7 +69,7 @@ def get_token(key:str, func:Callable[[str], bool], message:str):
     return token
 
 
-def get_grdm_token(project_id):
+def get_grdm_token(vault_key):
     """GRDMのパーソナルアクセストークンを取得する
 
     Raises:
@@ -80,9 +80,9 @@ def get_grdm_token(project_id):
         str: パーソナルアクセストークン
     """
     def check_auth(token):
-        return grdm.check_authorization(grdm.BASE_URL, token, project_id)
+        return grdm.check_authorization(grdm.BASE_URL, token)
 
-    return get_token('grdm_token', check_auth, msg_config.get('form', 'pls_input_grdm_token'))
+    return get_token(vault_key, check_auth, msg_config.get('form', 'pls_input_grdm_token'))
 
 
 def get_goveredrun_token():
@@ -99,3 +99,31 @@ def get_goveredrun_token():
         return dg_web.check_governedrun_token(grdm.SCHEME, grdm.API_DOMAIN, token)
 
     return get_token('govrun_token', check_auth, msg_config.get('form', 'pls_input_govrun_token'))
+
+
+def get_grdm_connection_parameters():
+    """GRDMのトークンとプロジェクトIDを取得する
+
+    Raises:
+        NotFoundURLError: プロジェクトIDが存在しない
+        UnusableVault: vaultが利用できない
+        requests.exceptions.RequestException: 通信不良
+    """
+
+    project_id = get_project_id()
+    vault_key = 'grdm_token'
+
+    while True:
+        try:
+            token = get_grdm_token(vault_key)
+            grdm.check_permission(grdm.BASE_URL, token, project_id)
+            break
+        except UnauthorizedError:
+            vault = Vault()
+            vault.set_value(vault_key, '')
+            continue
+        except NotFoundURLError as e:
+            msg = msg_config.get('form', 'project_id_not_exist').format(project_id)
+            raise NotFoundURLError(msg) from e
+
+    return token, project_id

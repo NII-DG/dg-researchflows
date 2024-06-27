@@ -10,8 +10,8 @@ from .widgets import Button, MessageBox
 from .storage_provider import grdm
 from .time import TimeDiff
 from .log import TaskLog
-from .input import get_grdm_token, get_project_id
-from .error import UnusableVault
+from .input import get_grdm_connection_parameters
+from .error import UnusableVault, NotFoundURLError, UnauthorizedError
 
 
 def all_sync_path(abs_root):
@@ -48,6 +48,29 @@ class TaskSave(TaskLog):
         # 確定ボタン
         self._save_submit_button = Button(width=500)
 
+    def get_grdm_params(self):
+        """GRDMのトークンとプロジェクトIDを取得する"""
+        token = ""
+        project_id = ""
+        try:
+            token, project_id = get_grdm_connection_parameters()
+        except UnusableVault as e:
+            message = msg_config.get('form', 'no_vault')
+            self.save_msg_output.update_error(message)
+            self.log.error(str(e))
+        except NotFoundURLError as e:
+            self.save_msg_output.update_error(str(e))
+            self.log.error(traceback.format_exc())
+        except RequestException as e:
+            message = msg_config.get('DEFAULT', 'connection_error')
+            self.save_msg_output.update_error(f'{message}\n{str(e)}')
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+        except Exception:
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self.save_msg_output.update_error(message)
+            self.log.error(message)
+        return token, project_id
+
     def define_save_form(self, source):
         """source is str or list."""
 
@@ -59,13 +82,7 @@ class TaskSave(TaskLog):
         self._source = source
 
         # config
-        self.project_id = get_project_id()
-        try:
-            self.token = get_grdm_token(self.project_id)
-        except UnusableVault:
-            message = msg_config.get('form', 'no_vault')
-            self.save_msg_output.update_error(message)
-            return
+        self.token, self.project_id = self.get_grdm_params()
         clear_output()
 
         # define form
@@ -91,11 +108,16 @@ class TaskSave(TaskLog):
                 self.save_msg_output.update_info(f'{msg} {i+1}/{size}')
                 grdm.sync(
                     token=self.token,
-                    base_url=grdm.API_V2_BASE_URL,
+                    api_url=grdm.API_V2_BASE_URL,
                     project_id=self.project_id,
                     abs_source = path,
                     abs_root=self._abs_root_path
                 )
+        except UnauthorizedError:
+            message = msg_config.get('form', 'token_unauthorized')
+            self.save_msg_output.update_warning(message)
+            self.log.warning(traceback.format_exc())
+            return
         except RequestException as e:
             timediff.end()
             minutes, seconds = timediff.get_diff_minute()
@@ -103,7 +125,7 @@ class TaskSave(TaskLog):
             error_msg = msg_config.get('save', 'connection_error') + "\n" + error_summary
             self.log.error(error_msg)
             self.save_msg_output.add_error(f'経過時間: {minutes}m {seconds}s\n {error_msg}')
-            return False
+            return
         except Exception as e:
             timediff.end()
             minutes, seconds = timediff.get_diff_minute()

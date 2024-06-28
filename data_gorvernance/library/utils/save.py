@@ -11,7 +11,7 @@ from .storage_provider import grdm
 from .time import TimeDiff
 from .log import TaskLog
 from .input import get_grdm_connection_parameters
-from .error import UnusableVault, NotFoundURLError, UnauthorizedError
+from .error import UnusableVault, ProjectNotExist, UnauthorizedError
 
 
 def all_sync_path(abs_root):
@@ -58,7 +58,7 @@ class TaskSave(TaskLog):
             message = msg_config.get('form', 'no_vault')
             self.save_msg_output.update_error(message)
             self.log.error(str(e))
-        except NotFoundURLError as e:
+        except ProjectNotExist as e:
             self.save_msg_output.update_error(str(e))
             self.log.error(traceback.format_exc())
         except RequestException as e:

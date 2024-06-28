@@ -12,23 +12,25 @@ class ExecCmdError(Exception):
     '''コマンド実行エラー'''
     pass
 
-class PermissionError(Exception):
-    """リポジトリのアクセス権限が足りない"""
-
 # vault
 class UnusableVault(Exception):
     """vaultが利用できない"""
     pass
 
 
-# 通信系のエラー
-class UnauthorizedError(Exception):
-    """認証が通らなかった(HTTPStatus.UNAUTHORIZED)"""
+# For GRDM
+class ProjectNotExist(Exception):
+    """指定したプロジェクトが存在しない"""
     pass
 
 
-class NotFoundURLError(Exception):
-    """指定したURLが存在しない(HTTPStatus.NOT_FOUND)"""
+class PermissionError(Exception):
+    """リポジトリのアクセス権限が足りない"""
+
+
+# 通信系のエラー
+class UnauthorizedError(Exception):
+    """認証が通らなかった(HTTPStatus.UNAUTHORIZED)"""
     pass
 
 

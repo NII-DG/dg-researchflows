@@ -5,7 +5,7 @@ from urllib import parse
 import requests
 from requests.exceptions import RequestException
 
-from ...error import UnauthorizedError, NotFoundURLError
+from ...error import UnauthorizedError, ProjectNotExist
 
 
 def build_api_url(base_url: str, endpoint=''):
@@ -139,7 +139,7 @@ def get_project_registrations(base_url, token, project_id):
 
     Raises:
         UnauthorizedError: 認証が通らない
-        NotFoundURLError: 指定されたプロジェクトIDが存在しない
+        ProjectNotExist: 指定されたプロジェクトIDが存在しない
         requests.exceptions.RequestException: その他の通信エラー
     """
     endpoint = f'/nodes/{project_id}/registrations/'
@@ -154,8 +154,11 @@ def get_project_registrations(base_url, token, project_id):
         if response.status_code == HTTPStatus.UNAUTHORIZED:
             raise UnauthorizedError(str(e)) from e
         if response.status_code == HTTPStatus.NOT_FOUND:
-            # プロジェクトIDが不正確
-            raise NotFoundURLError(str(e)) from e
+            # 存在しないプロジェクトID
+            raise ProjectNotExist(str(e)) from e
+        if response.status_code == HTTPStatus.GONE:
+            # プロジェクトが消された
+            raise ProjectNotExist(str(e)) from e
         raise
     return response.json()
 
@@ -172,7 +175,7 @@ def get_project_collaborators(base_url: str, token: str, project_id: str):
 
     Raises:
         UnauthorizedError: 認証が通らない
-        NotFoundURLError: 指定されたプロジェクトIDが存在しない
+        ProjectNotExist: 指定されたプロジェクトIDが存在しない
         requests.exceptions.RequestException: その他の通信エラー
     """
     endpoint = f'/nodes/{project_id}/contributors/'
@@ -187,7 +190,10 @@ def get_project_collaborators(base_url: str, token: str, project_id: str):
         if response.status_code == HTTPStatus.UNAUTHORIZED:
             raise UnauthorizedError(str(e)) from e
         if response.status_code == HTTPStatus.NOT_FOUND:
-            # プロジェクトIDが不正確
-            raise NotFoundURLError(str(e)) from e
+            # 存在しないプロジェクトID
+            raise ProjectNotExist(str(e)) from e
+        if response.status_code == HTTPStatus.GONE:
+            # プロジェクトが消された
+            raise ProjectNotExist(str(e)) from e
         raise
     return response.json()

@@ -51,7 +51,7 @@ def check_permission(base_url: str, token: str, project_id: str):
 
     Raises:
         UnauthorizedError: 認証が通らない
-        NotFoundURLError: 指定されたプロジェクトIDが存在しない
+        ProjectNotExist: 指定されたプロジェクトIDが存在しない
         requests.exceptions.RequestException: その他の通信エラー
     """
     response = get_user_info(base_url, token)
@@ -169,7 +169,7 @@ def get_project_metadata(base_url: str, token: str, project_id: str):
     Raises:
         NotFoundContentsError: メタデータが存在しない
         UnauthorizedError: 認証が通らない
-        NotFoundURLError: 指定されたプロジェクトIDが存在しない
+        ProjectNotExist: 指定されたプロジェクトIDが存在しない
         requests.exceptions.RequestException: その他の通信エラー
     """
     metadata = get_project_registrations(base_url, token, project_id)
@@ -191,7 +191,7 @@ def get_collaborator_list(base_url: str, token: str, project_id: str) -> dict:
 
     Raises:
         UnauthorizedError: 認証が通らない
-        NotFoundURLError: 指定されたプロジェクトIDが存在しない
+        ProjectNotExist: 指定されたプロジェクトIDが存在しない
         requests.exceptions.RequestException: その他の通信エラー
     """
     response = get_project_collaborators(base_url, token, project_id)

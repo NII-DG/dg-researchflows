@@ -6,7 +6,7 @@ from .config import message as msg_config
 from .storage_provider import grdm
 from .string import StringManager
 from .vault import Vault
-from .error import UnusableVault, UnauthorizedError, NotFoundURLError, PermissionError
+from .error import UnusableVault, UnauthorizedError, ProjectNotExist, PermissionError
 
 
 def get_project_id():
@@ -105,7 +105,7 @@ def get_grdm_connection_parameters():
     """GRDMのトークンとプロジェクトIDを取得する
 
     Raises:
-        NotFoundURLError: プロジェクトIDが存在しない
+        ProjectNotExist: プロジェクトIDが存在しない
         UnusableVault: vaultが利用できない
         requests.exceptions.RequestException: 通信不良
     """
@@ -124,8 +124,8 @@ def get_grdm_connection_parameters():
             vault = Vault()
             vault.set_value(vault_key, '')
             continue
-        except NotFoundURLError as e:
+        except ProjectNotExist as e:
             msg = msg_config.get('form', 'project_id_not_exist').format(project_id)
-            raise NotFoundURLError(msg) from e
+            raise ProjectNotExist(msg) from e
 
     return token, project_id

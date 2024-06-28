@@ -56,6 +56,12 @@ class Alert(pn.pane.Alert):
 
 class MessageBox(pn.WidgetBox):
 
+    def has_message(self):
+        if self.objects:
+            return True
+        else:
+            return False
+
     def update_info(self, msg=""):
         self.clear()
         alert = Alert.info(msg)

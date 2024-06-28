@@ -30,8 +30,7 @@ def build_api_url(base_url: str, endpoint=''):
     if not endpoint:
         endpoint = base_path
     else:
-        if endpoint.startswith('/'):
-            endpoint = endpoint[1:]
+        endpoint = endpoint.lstrip('/')
         endpoint = base_path + endpoint
     if not endpoint.endswith('/'):
             endpoint = endpoint + '/'
@@ -50,8 +49,7 @@ def build_oauth_url(base_url: str, endpoint=''):
     """
     parsed = parse.urlparse(base_url)
     netloc = f'accounts.{parsed.netloc}'
-    if not endpoint.endswith('/'):
-            endpoint = endpoint + '/'
+    endpoint = endpoint.rstrip('/')
     return parse.urlunparse((parsed.scheme, netloc, endpoint, '', '', ''))
 
 

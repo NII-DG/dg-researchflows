@@ -6,7 +6,7 @@ from .config import message as msg_config
 from .storage_provider import grdm
 from .string import StringManager
 from .vault import Vault
-from .error import UnusableVault, UnauthorizedError, NotFoundURLError
+from .error import UnusableVault, UnauthorizedError, NotFoundURLError, PermissionError
 
 
 def get_project_id():
@@ -96,7 +96,7 @@ def get_goveredrun_token():
         str: Governed Runのトークン
     """
     def check_auth(token):
-        return dg_web.check_governedrun_token(grdm.SCHEME, grdm.API_DOMAIN, token)
+        return dg_web.check_governedrun_token(dg_web.SCHEME, dg_web.DOMAIN, token)
 
     return get_token('govrun_token', check_auth, msg_config.get('form', 'pls_input_govrun_token'))
 
@@ -116,7 +116,9 @@ def get_grdm_connection_parameters():
     while True:
         try:
             token = get_grdm_token(vault_key)
-            grdm.check_permission(grdm.BASE_URL, token, project_id)
+            if not grdm.check_permission(grdm.BASE_URL, token, project_id):
+                msg = msg_config.get('form', 'insufficient_permission')
+                raise PermissionError(msg)
             break
         except UnauthorizedError:
             vault = Vault()

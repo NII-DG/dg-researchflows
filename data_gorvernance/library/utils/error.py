@@ -12,6 +12,8 @@ class ExecCmdError(Exception):
     '''コマンド実行エラー'''
     pass
 
+class PermissionError(Exception):
+    """リポジトリのアクセス権限が足りない"""
 
 # vault
 class UnusableVault(Exception):

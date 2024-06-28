@@ -8,8 +8,8 @@
         },
         {
             "id": "E002",
-            "env_name": "OCS（学認クラウドオンデマンド構築サービス）で解析環境を構築する",
-            "description": "次の手順に進んでください",
+            "env_name": "OCSで解析環境を構築する",
+            "description": "次の手順に進んでください。",
             "is_active": true
         }
     ]

@@ -90,9 +90,10 @@ class TaskSave(TaskLog):
         clear_output()
 
         # define form
-        self._save_submit_button.set_looks_init(msg_config.get('save', 'submit'))
-        self._save_submit_button.on_click(self._save_submit_callback)
-        self.save_form_box.append(self._save_submit_button)
+        if not self.save_msg_output.has_message():
+            self._save_submit_button.set_looks_init(msg_config.get('save', 'submit'))
+            self._save_submit_button.on_click(self._save_submit_callback)
+            self.save_form_box.append(self._save_submit_button)
 
     @TaskLog.callback_form("input_token")
     def _save_submit_callback(self, event):

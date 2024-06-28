@@ -105,6 +105,7 @@ def get_grdm_connection_parameters():
     """GRDMのトークンとプロジェクトIDを取得する
 
     Raises:
+        PermissionError: プロジェクトの権限が足りない
         ProjectNotExist: プロジェクトIDが存在しない
         UnusableVault: vaultが利用できない
         requests.exceptions.RequestException: 通信不良
@@ -117,8 +118,7 @@ def get_grdm_connection_parameters():
         try:
             token = get_grdm_token(vault_key)
             if not grdm.check_permission(grdm.BASE_URL, token, project_id):
-                msg = msg_config.get('form', 'insufficient_permission')
-                raise PermissionError(msg)
+                raise PermissionError
             break
         except UnauthorizedError:
             vault = Vault()

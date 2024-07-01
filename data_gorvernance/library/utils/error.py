@@ -1,34 +1,45 @@
-
-class ExistSubflowDirError(Exception):
-    pass
-
-class PrepareNewSubflowDataError(Exception):
-    pass
-
 class NotFoundSubflowDataError(Exception):
+    """サブフローのデータが取得できなかった"""
     pass
+
 
 class InputWarning(Exception):
-    """入力値に問題があった場合の例外"""
+    """入力値に問題があった"""
     pass
 
-class MetadataNotExist(Exception):
-    """取得したプロジェクトメタデータが空である場合のエラー"""
+
+class ExecCmdError(Exception):
+    '''コマンド実行エラー'''
     pass
-
-class RemoteFileNotExist(Exception):
-    """ファイルが取得できなかったときのエラー"""
-
 
 # vault
-
 class UnusableVault(Exception):
-    """vaultが利用できないときのエラー"""
+    """vaultが利用できない"""
     pass
+
+
+# For GRDM
+class ProjectNotExist(Exception):
+    """指定したプロジェクトが存在しない"""
+    pass
+
+
+class PermissionError(Exception):
+    """リポジトリのアクセス権限が足りない"""
 
 
 # 通信系のエラー
+class UnauthorizedError(Exception):
+    """認証が通らなかった(HTTPStatus.UNAUTHORIZED)"""
+    pass
 
+
+class NotFoundContentsError(Exception):
+    """取得したいコンテンツが存在しなかった"""
+    pass
+
+
+# GINに対してのみのエラー
 class RepositoryNotExist(Exception):
     """リモートリポジトリの情報が取得できない時のエラー"""
     pass
@@ -38,18 +49,6 @@ class UrlUpdateError(Exception):
     """HTTPとSSHのリモートURLが最新化できなかった時のエラー"""
     pass
 
-
-class UnauthorizedError(Exception):
-    """認証が通らなかった時のエラー(HTTPStatus.UNAUTHORIZED)"""
-    pass
-
-class NotFoundURLError(Exception):
-    """存在しないURLのエラー(HTTPStatus.NOT_FOUND)"""
-    pass
-
-class ExecCmdError(Exception):
-    '''コマンド実行エラー'''
-    pass
 
 class NoValueInDgFileError(Exception):
     '''タスクNotebookのコードセルで例外で処理停止しなければならないエラーが発生した場合'''

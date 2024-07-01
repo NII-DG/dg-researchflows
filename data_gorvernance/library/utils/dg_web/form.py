@@ -123,18 +123,20 @@ class Form:
 
         self.schema = {}
 
-    def create_widgets(self, schema:dict, data:dict) -> None:
+    def create_widgets(self, schema:dict, data=None) -> None:
         """jsonchemaの形式にそった入力欄をpanelで作成する
 
         Args:
             schema (dict): フォームの元となるjsonschema
-            data (dict): jsonschemaの形式に沿った初期値
+            data (dict, optional): jsonschemaの形式に沿った初期値. Defaults to None.
         """
         if "properties" not in schema:
             return
         self.schema = schema
         for key, properties in schema["properties"].items():
-            value = data.get(key)
+            value = {}
+            if isinstance(data, dict):
+                value = data.get(key, {})
             self.form_box.append(self._generate_widget(properties, key, value))
 
     def _generate_widget(self, definition:dict, key:str, value=None):
@@ -218,10 +220,12 @@ class Form:
         if description is not None:
             obj_box.append(Description(description, schema_key=key))
         for i_key, properties in definition["properties"].items():
-            if isinstance(values, dict):
-                value = values.get(i_key)
-            else:
+            if values is None:
                 value = None
+            elif isinstance(values, dict):
+                value = values.get(i_key, {})
+            else:
+                value = {}
             obj_box.append(self._generate_widget(properties, i_key, value))
         return obj_box
 

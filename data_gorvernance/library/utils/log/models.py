@@ -15,6 +15,7 @@ class BaseLogger:
         self.date = datetime.datetime.now().strftime('%Y%m%d')
         self.log_dir = output_dir
         self._update_handler()
+        self.logger.propagate = False
 
     def reset_file(self, fmt):
         now_date = datetime.datetime.now().strftime('%Y%m%d')
@@ -25,8 +26,9 @@ class BaseLogger:
 
     def _update_handler(self):
         if self.logger.hasHandlers():
-            handler = self.logger.handlers[0]
-            self.logger.removeHandler(handler)
+            handlers = self.logger.handlers
+            for handler in handlers:
+                self.logger.removeHandler(handler)
         log_file = self.date + ".log"
         log_file = os.path.join(self.log_dir, log_file)
         self.handler = FileHandler(log_file)

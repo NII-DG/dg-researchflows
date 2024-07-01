@@ -13,7 +13,7 @@ def create_button(
             button_height='30px',
             button_border_radius='5px',
             border:List[str] = [],
-            button_background_color='#2185d0',
+            button_background_color='#0072B5',
 ):
     border_value = ''
     if len(border) == 0:

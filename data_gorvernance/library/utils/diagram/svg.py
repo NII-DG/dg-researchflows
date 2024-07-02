@@ -8,6 +8,7 @@ from .. import file
 
 title_font_size = 10
 title_font_color = 'rgb(255,140,0)'
+text_font_color = 'rgb(0,0,0)'
 
 SVG_TEXT = '{http://www.w3.org/2000/svg}text'
 
@@ -37,26 +38,28 @@ def _embed_detail_information(current_dir, skeleton, config):
 
 def _embed_info_in_one_rect(elem, current_dir, config):
     for key, value in config.items():
-        # is_linkがFalseの場合、リンク付与せず処理をスキップする
-        if not value['is_link']:
-            text_elem = elem
-            text_elem.attrib['font-weight'] = 'bold'
+        """タスクタイトルと一致していない場合処理をスキップする"""
+        if value['text'] != elem.text:
             continue
-        if value['text'] == elem.text:
-            # タスクタイトルと一致したらリンクを付与する
+
+        parent_elem = elem.getparent()
+        childpos = elem.getparent().index(elem)
+
+        text_elem = elem
+        text_elem.attrib['font-family'] = 'sans-serif'
+        text_elem.attrib['font-size'] = str(title_font_size)
+        text_elem.attrib['font-weight'] = 'bold'
+        inseet_elem = None
+        """is_linkがTrueだった場合、リンクを付与する処理に進む"""
+        if value['is_link']:
+            text_elem.attrib['fill'] = title_font_color
             link = value['path']
             link = file.relative_path(link, current_dir).replace("../", "./../")
-
-            parent_elem = elem.getparent()
-            childpos = elem.getparent().index(elem)
-
-            text_elem = elem
-            text_elem.attrib['fill'] = title_font_color
-            text_elem.attrib['font-family'] = 'sans-serif'
-            text_elem.attrib['font-size'] = str(title_font_size)
-            text_elem.attrib['font-weight'] = 'bold'
-            text_elems = create_anchor([text_elem], link)
-            parent_elem.insert(childpos, text_elems)
+            inseet_elem = create_anchor([text_elem], link)
+        else:
+            text_elem.attrib['fill'] = text_font_color
+            inseet_elem = text_elem
+        parent_elem.insert(childpos, inseet_elem)
 
 def create_anchor(elems, link):
     """リンクを付与する"""

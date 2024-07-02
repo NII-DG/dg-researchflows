@@ -134,7 +134,7 @@ class Form:
             return
         self.schema = schema
         for key, properties in schema["properties"].items():
-            value = {}
+            value = None
             if isinstance(data, dict):
                 value = data.get(key, {})
             self.form_box.append(self._generate_widget(properties, key, value))

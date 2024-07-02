@@ -38,7 +38,7 @@ def _embed_detail_information(current_dir, skeleton, config):
 
 def _embed_info_in_one_rect(elem, current_dir, config):
     for key, value in config.items():
-        """タスクタイトルと一致していない場合処理をスキップする"""
+        # タスクタイトルと一致していない場合処理をスキップする
         if value['text'] != elem.text:
             continue
 
@@ -50,7 +50,7 @@ def _embed_info_in_one_rect(elem, current_dir, config):
         text_elem.attrib['font-size'] = str(title_font_size)
         text_elem.attrib['font-weight'] = 'bold'
         inseet_elem = None
-        """is_linkがTrueだった場合、リンクを付与する処理に進む"""
+        # is_linkがTrueだった場合、リンクを付与する処理に進む
         if value['is_link']:
             text_elem.attrib['fill'] = title_font_color
             link = value['path']

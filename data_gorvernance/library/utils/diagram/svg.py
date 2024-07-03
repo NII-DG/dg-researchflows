@@ -16,8 +16,7 @@ def init_config(id, name):
     return {
         id : {
             'name': name,
-            'is_link': True,
-            'init_nb': True
+            'is_link': True
         }
     }
 

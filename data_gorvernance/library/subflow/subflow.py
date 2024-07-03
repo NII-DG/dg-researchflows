@@ -101,7 +101,6 @@ class SubFlowManager:
             self.svg_config[task.id]['path'] += "?init_nb=true"
         elif task.status == task.STATUS_DOING:
             self.diag.update_node_icon(task.id, icon_dir + "/loading.png")
-            self.svg_config[task.id]['init_nb'] = False
 
     def parse_headers(self, task):
         """タスクタイトルとパスを取得"""
@@ -127,8 +126,8 @@ class SubFlowManager:
 
             title = headers[0][0] if not headers[0][0].startswith('About:') else headers[0][0][6:]
             if task.name in str(nb_path):
-                self.svg_config[task.id]['text'] = title
                 self.svg_config[task.id]['path'] = str(nb_path)
+                self.svg_config[task.id]['text'] = title
                 break
 
     def change_id(self, task):

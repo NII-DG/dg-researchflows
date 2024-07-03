@@ -86,14 +86,16 @@ class SubFlowManager:
         if task.is_multiple:
             self.diag.update_node_stacked(task.id)
 
-        if task.status == task.STATUS_UNFEASIBLE:
-            self.diag.update_node_color(task.id, "#e6e5e3")
-            self.svg_config[task.id]['is_link'] = False
-            return
-
         icon_dir = "../data/icon"
         icon_dir = os.path.abspath(os.path.join(script_dir, icon_dir))
         icon_dir = file.relative_path(icon_dir, self.current_dir)
+
+        if task.status == task.STATUS_UNFEASIBLE:
+            self.diag.update_node_color(task.id, "#e6e5e3")
+            self.diag.update_node_icon(task.id, icon_dir + "/lock.png")
+            self.svg_config[task.id]['is_link'] = False
+            return
+
         if task.status == task.STATUS_DONE:
             self.diag.update_node_icon(task.id, icon_dir + "/check_mark.png")
         elif task.status == task.STATUS_DOING:

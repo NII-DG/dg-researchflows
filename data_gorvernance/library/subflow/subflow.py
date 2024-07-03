@@ -126,7 +126,7 @@ class SubFlowManager:
 
             title = headers[0][0] if not headers[0][0].startswith('About:') else headers[0][0][6:]
             if task.name in str(nb_path):
-                self.svg_config[task.id]['path'] = str(nb_path)
+                self.svg_config[task.id]['path'] = str(nb_path) + "?init_nb=true"
                 self.svg_config[task.id]['text'] = title
                 break
 

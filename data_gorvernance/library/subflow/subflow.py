@@ -98,9 +98,9 @@ class SubFlowManager:
 
         if task.status == task.STATUS_DONE:
             self.diag.update_node_icon(task.id, icon_dir + "/check_mark.png")
+            self.svg_config[task.id]['path'] += "?init_nb=true"
         elif task.status == task.STATUS_DOING:
             self.diag.update_node_icon(task.id, icon_dir + "/loading.png")
-            self.svg_config[task.id]['init_nb'] = False
 
     def parse_headers(self, task):
         """タスクタイトルとパスを取得"""

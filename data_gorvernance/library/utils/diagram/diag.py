@@ -40,7 +40,7 @@ class DiagManager:
         self.add_node_property(node_id, f'color="{color}"')
 
     def update_node_icon(self, node_id: str, path: str):
-        self.add_node_property(node_id, f'icon="{path}"')
+        self.add_node_property(node_id, f'background="{path}"')
 
     def update_node_style(self, node_id, style):
         self.add_node_property(node_id, f'style={style}')

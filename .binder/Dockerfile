@@ -72,7 +72,7 @@ RUN jupyter nbextension install --py lc_multi_outputs --user
 RUN jupyter nbextension enable --py lc_multi_outputs --user
 
 # TODO: リリース時にはdg-nb-extensionsのタグを変更する(@Rel20230929のようにする)
-RUN pip install --no-cache git+https://github.com/NII-DG/dg-nb-extensions.git@20240704
+RUN pip install --no-cache git+https://github.com/NII-DG/dg-nb-extensions.git@2024-07-04
 RUN jupyter nbextension install --py dg_nb_extensions --user
 RUN jupyter nbextension enable --py dg_nb_extensions --user
 

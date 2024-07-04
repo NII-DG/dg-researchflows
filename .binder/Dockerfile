@@ -63,7 +63,7 @@ RUN jupyter contrib nbextension install --user
 RUN jupyter nbextensions_configurator enable --user
 RUN jupyter nbextension enable codefolding/main
 
-# TODO: リリース時にはdg_Jupyter-LC_run_throughのブランチを変更する(@Rel20230929のようにする)
+# TODO: リリース時にはdg_Jupyter-LC_run_throughのタグを変更する(@Rel20230929のようにする)
 RUN pip install --no-cache git+https://github.com/NII-DG/dg_Jupyter-LC_run_through.git@20240216
 RUN jupyter run-through quick-setup --user
 
@@ -71,7 +71,8 @@ RUN pip install --no-cache git+https://github.com/NII-DG/dg_Jupyter-multi_output
 RUN jupyter nbextension install --py lc_multi_outputs --user
 RUN jupyter nbextension enable --py lc_multi_outputs --user
 
-RUN pip install --no-cache git+https://github.com/NII-DG/dg-nb-extensions.git@master
+# TODO: リリース時にはdg-nb-extensionsのタグを変更する(@Rel20230929のようにする)
+RUN pip install --no-cache git+https://github.com/NII-DG/dg-nb-extensions.git@20240704
 RUN jupyter nbextension install --py dg_nb_extensions --user
 RUN jupyter nbextension enable --py dg_nb_extensions --user
 

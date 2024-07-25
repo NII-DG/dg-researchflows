@@ -1,3 +1,6 @@
+"""このモジュールは初期セットアップを行います。
+    セットアップを行うクラスがあり、セットアップを行うための認証を確認したり、設定を行う関数などがあります。
+"""
 import os
 import re
 from ..utils.config import path_config, message as msg_config
@@ -17,8 +20,23 @@ SELECT_DEFAULT_VALUE = '--'
 
 SETUP_COMPLETED_FILE = 'setup_completed.txt'
 class ContainerSetter():
+    """セットアップを行うクラスです。
+    
+    Attributes:
+        nb_working_file_path (str): 実行Notebookパス
+        _abs_root_path:絶対rootディレクトリを取得・設定する
+        working_fdir_path:非同期フォルダーパス
+        setup_completed_file_path:初期セットアップ完了ステータスファイルパス
+
+    
+    """
 
     def __init__(self, nb_working_file_path:str) -> None:
+        """インスタンスを初期化する関数です。
+
+        Args:
+            nb_working_file_path (str): 実行Notebookパス
+        """
         # 実行Notebookパス
         self.nb_working_file_path = nb_working_file_path
         # 絶対rootディレクトリを取得・設定する
@@ -34,15 +52,25 @@ class ContainerSetter():
         os.makedirs(self.working_fdir_path, exist_ok=True)
 
     def del_setup_completed_file(self):
+        """セットアップが完了したファイルを削除する関数です。"""
         if os.path.exists(self.setup_completed_file_path):
             os.remove(self.setup_completed_file_path)
         else:
             pass
     def display_main_menu(self,nb_working_file_path:str):
+        """メインメニューの画面を表示する関数です。
+
+        Args:
+            nb_working_file_path (str): 実行Notebookパス
+        """
         display()
         access_main_menu(nb_working_file_path)
 
     def define_setup_form(self):
+        """セットアップフォームを定義する関数です。
+            ユーザー名とパスワードを入力し、送信ボタンを押すことでそのフォームを定義できる。
+        
+        """
         # ユーザ名
         self._user_name_form = pn.widgets.TextInput(name=msg_config.get('user_auth','username_title'), placeholder=msg_config.get('user_auth','username_help'), width=DEFAULT_WIDTH)
         # パスワード
@@ -57,6 +85,20 @@ class ContainerSetter():
         self._msg_output.width = 900
 
     def callback_submit_user_auth(self, event):
+        """ボタンが押された時、ユーザーに権限があるかどうかを認証する関数です。
+                ユーザー名とパスワードを確認し、それが間違っていなければ権限があるかどうかの認証を行う。
+        Returns:
+            ユーザー名が入力されていない警告メッセージ（値はNone）
+            大文字のA-Z、小文字のa-z、数字の0-9、ハイフン、アンダースコア、ピリオドのいずれか一文字が一回以上繰り返されていない警告メッセージ。（値はNone）
+            パスワードが入力されていない警告メッセージ（値はNone）
+
+        Raises:
+            UnauthorizedError:認証が通らなかったエラー
+            Exception:内部エラー
+
+
+        
+        """
         # 入力値を取得する
         user_name = self._user_name_form.value_input
         password = self._password_form.value_input
@@ -112,41 +154,78 @@ class ContainerSetter():
 
 
     def validate_format_username(self, user_name:str):
+        """ユーザー名の正規表現を解析する関数です。
+            ユーザー名が正しく入力されたか確認するための関数です。
+        Args:
+            user_name(str):ユーザー名
+        
+        """
         validation = re.compile(r'^[a-zA-Z0-9\-_.]+$')
         return validation.fullmatch(user_name)
 
 
     def already_setup(self):
+        """セットアップが完了していることを画面に表示する関数です"""
         alert = pn.pane.Alert(msg_config.get('setup', 'setup_completed'),sizing_mode="stretch_width",alert_type='warning')
         display(alert)
 
     def change_submit_button_init(self, name):
+        """処理関数ボタンの関数です。
+
+        Args:
+            name (_type_): メッセージ
+        """
         self._submit_button.name = name
         self._submit_button.button_type = 'primary'
         self._submit_button.button_style = 'solid'
 
     def change_submit_button_processing(self, name):
+        """ボタンを処理中ステータスに更新する関数です。
+
+        Args:
+            name (_type_): 実行中のメッセージ
+        """
         self._submit_button.name = name
         self._submit_button.button_type = 'primary'
         self._submit_button.button_style = 'outline'
 
     def change_submit_button_success(self, name):
+        """ボタンが押されて成功した時のメッセージを返す関数です。
+
+        Args:
+            name (_type_): 成功したメッセージ
+        """
         self._submit_button.name = name
         self._submit_button.button_type = 'success'
         self._submit_button.button_style = 'solid'
 
     def change_submit_button_warning(self, name):
+        """ボタンが押されて認証が失敗した時の警告メッセージを返す関数です。
+
+        Args:
+            name (_type_): 警告メッセージ
+        """
         self._submit_button.name = name
         self._submit_button.button_type = 'warning'
         self._submit_button.button_style = 'solid'
 
     def change_submit_button_error(self, name):
+        """ボタンが押されて内部エラーが発生した時のエラーを返す関数です。
+
+        Args:
+            name (_type_): エラーメッセージ
+        """
         self._submit_button.name = name
         self._submit_button.button_type = 'danger'
         self._submit_button.button_style = 'solid'
 
     @classmethod
     def setup_form(cls,nb_working_file_path:str):
+        """セットアップフォームを表示する関数です。
+
+        Args:
+            nb_working_file_path (str): 実行Notebookパス
+        """
         pn.extension()
         cs = ContainerSetter(nb_working_file_path)
 
@@ -172,6 +251,11 @@ class ContainerSetter():
 
     @classmethod
     def delete_build_token(cls):
+        """トークンを削除する関数です。
+
+        Raises:
+            Exception: トークン削除失敗
+        """
         pn.extension()
         cls.check_imcomplete_auth()
 
@@ -198,6 +282,14 @@ class ContainerSetter():
 
     @classmethod
     def datalad_create(cls, nb_working_file_path:str):
+        """dataladを設定する関数です。
+
+        Args:
+            nb_working_file_path (str): 実行Notebookパス
+
+        Raises:
+            e: 予期しないエラーが発生した
+        """
         pn.extension()
         cls.check_imcomplete_auth()
         cs = ContainerSetter(nb_working_file_path)
@@ -219,6 +311,14 @@ class ContainerSetter():
 
     @classmethod
     def ssh_create_key(cls, nb_working_file_path:str):
+        """SSHキーを作成する関数です。
+
+        Args:
+            nb_working_file_path (str): 実行Notebookパス
+
+        Raises:
+            e: 予期しないエラーが発生した
+        """
         pn.extension()
         cls.check_imcomplete_auth()
         cs = ContainerSetter(nb_working_file_path)
@@ -236,6 +336,14 @@ class ContainerSetter():
 
     @classmethod
     def upload_ssh_key(cls, nb_working_file_path:str):
+        """GIN-forkへの公開鍵の登録を行う関数です。
+
+        Args:
+            nb_working_file_path (str): 実行Notebookパス
+
+        Raises:
+            e: 予期しないエラーが発生した
+        """
         pn.extension()
         cls.check_imcomplete_auth()
         cs = ContainerSetter(nb_working_file_path)
@@ -251,6 +359,14 @@ class ContainerSetter():
 
     @classmethod
     def ssh_trust_gin(cls, nb_working_file_path:str):
+        """SSHホスト（GIN-fork）を信頼することを設定する関数です。
+
+        Args:
+            nb_working_file_path (str): 実行Notebookパス
+
+        Raises:
+            e: 予期しないエラーが発生した
+        """
         pn.extension()
         cls.check_imcomplete_auth()
         cs = ContainerSetter(nb_working_file_path)
@@ -266,6 +382,14 @@ class ContainerSetter():
 
     @classmethod
     def prepare_sync(cls, nb_working_file_path:str):
+        """GIN-forkへの同期調整を行う関数です。
+
+        Args:
+            nb_working_file_path (str): 実行Notebookパス
+
+        Raises:
+            e: 予期しないエラーが発生した
+        """
         pn.extension()
         cls.check_imcomplete_auth()
         cs = ContainerSetter(nb_working_file_path)
@@ -282,7 +406,15 @@ class ContainerSetter():
     @classmethod
     def setup_sibling(cls, nb_working_file_path:str):
         pn.extension()
-        """siblingの登録"""
+        """siblingの登録をする関数です。
+
+        Args:
+            nb_working_file_path (str): 実行Notebookパス
+
+        Raises:
+            e: 予期しないエラーが発生した
+
+        """
         cls.check_imcomplete_auth()
 
         cs = ContainerSetter(nb_working_file_path)
@@ -302,6 +434,14 @@ class ContainerSetter():
 
     @classmethod
     def completed_setup(cls,nb_working_file_path:str):
+        """初期セットアップ完了を記録する関数です。
+
+        Args:
+            nb_working_file_path (str): 実行Notebookパス
+
+        Raises:
+            Exception: 初期セットアップが完了していないため実行できませんというエラーが表示される。
+        """
         pn.extension()
         cls.check_imcomplete_auth()
         # 初期セットアップ完了ステータスファイルを作成する
@@ -326,7 +466,15 @@ class ContainerSetter():
     @classmethod
     def syncs_config(cls, nb_working_file_path:str):
         pn.extension()
-        """同期のためにファイルとメッセージの設定"""
+        """同期のためにファイルとメッセージの設定
+        
+         Args:
+            nb_working_file_path (str): 実行Notebookパス
+
+        Returns:
+            Gitのパス、コミットメッセージ
+        
+        """
         cls.check_imcomplete_auth()
         display(Javascript('IPython.notebook.save_checkpoint();'))
         cs = ContainerSetter(nb_working_file_path)
@@ -354,6 +502,15 @@ class ContainerSetter():
     @classmethod
     def sync(cls, nb_working_file_path:str, git_path:list[str], commit_message:str):
         pn.extension()
+        """Gin_forkに実行結果を同期する関数です。
+
+        Args:
+            nb_working_file_path (str): 実行Notebookパス
+            git_path(list[str]):Gitのパス
+            commit_message(str):コミットメッセージ
+
+
+        """
         cs = ContainerSetter(nb_working_file_path)
 
         gin.syncs_with_repo(
@@ -367,6 +524,11 @@ class ContainerSetter():
 
     @classmethod
     def check_imcomplete_auth(cls):
+        """ユーザーの認証が完了しているかを確認する関数です。
+
+        Raises:
+            Exception: 認証が完了していない
+        """
         if not gin.exist_user_info():
             alert = pn.pane.Alert(msg_config.get('user_auth', 'imcomplete_auth'),sizing_mode="stretch_width",alert_type='warning')
             display(alert)
@@ -376,6 +538,11 @@ class ContainerSetter():
 
     @classmethod
     def return_main_menu(cls,nb_working_file_path:str):
+        """メインメニューに戻るための関数です。
+
+        Args:
+            nb_working_file_path (str): 実行Notebookパス
+        """
         pn.extension()
         cs = ContainerSetter(nb_working_file_path)
         cs.display_main_menu(cs.nb_working_file_path)

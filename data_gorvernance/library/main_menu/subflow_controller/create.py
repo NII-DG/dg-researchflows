@@ -1,3 +1,6 @@
+"""このモジュールはサブフローの新規作成を行います。
+    サブフロー新規作成クラスを始め、新しいサブフローのデータを用意したり、データの検証を行う関数などがあります。
+"""
 import shutil
 import os
 import traceback
@@ -15,14 +18,37 @@ from ...utils.error import InputWarning
 
 
 class CreateSubflowForm(BaseSubflowForm):
-    """サブフロー新規作成クラス"""
+    """サブフロー新規作成クラスです。
+        CreateSubflowFormクラスはBaseSubflowFormクラスを継承しています。
+
+    Attributes:
+        abs_root (_type_): サブフローの絶対パス
+        message_box (_type_): メッセージを格納する。
+    
+    """
 
     def __init__(self, abs_root, message_box) -> None:
+        """CreateSubflowForm コンストラクタの関数です
+            親クラス__init__メソッドを呼び出しています。
+
+        Args:
+            abs_root (_type_): サブフローの絶対パス
+            message_box (_type_): メッセージを格納する。
+
+        """
         super().__init__(abs_root, message_box)
         # 処理開始ボタン
         self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
 
     def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus])->Dict[str, int]:
+        """サブフロー種別(フェーズ)を表示する関数です。
+
+        Args:
+            research_flow_status (List[PhaseStatus]): リサーチフローステータス管理情報
+
+        Returns:
+            Dict[str, int]: フェーズ表示名を返す。
+        """
     # サブフロー種別(フェーズ)オプション(表示名をKey、順序値をVauleとする)
         pahse_options = {}
         pahse_options['--'] = 0
@@ -35,11 +61,22 @@ class CreateSubflowForm(BaseSubflowForm):
         return pahse_options
 
     def change_submit_button_init(self, name):
+        """処理関数ボタンの関数です。
+
+        Args:
+            name (_type_): メッセージ
+        """
         self.submit_button.set_looks_init(name)
         self.submit_button.icon = 'plus'
 
     # overwrite
     def callback_sub_flow_type_selector(self, event):
+        """サブフロー種別(フェーズ)のボタンが操作できるように有効化する関数です。
+              リサーチフローステータス管理情報の取得し、シングルセレクトの更新をして新規作成ボタンのボタンの有効化チェックを行います。
+
+        Raises:
+            Exception: 内部エラーが発生した。
+        """
         # サブフロー種別(フェーズ):シングルセレクトコールバックファンクション
         try:
             # リサーチフローステータス管理情報の取得
@@ -58,6 +95,20 @@ class CreateSubflowForm(BaseSubflowForm):
 
     # overwrite
     def change_disable_submit_button(self):
+        """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する関数です。
+        Returns:
+            Noneの値を返す。(サブフロー種別(フェーズ)の選択肢の値がない場合)
+            Noneの値を返す。(サブフロー種別(フェーズ)の選択肢の値が0の場合)
+            Noneの値を返す。(サブフロー名称の値がない場合)
+            Noneの値を返す。(サブフロー名称の長さが1未満の場合)
+            Noneの値を返す。(サブフローのデータディレクトリ名フォームの値がない場合)
+            Noneの値を返す。(サブフローのデータディレクトリ名フォームの値の長さが1未満の場合)
+            Noneの値を返す。(親サブフロー種別(フェーズ)の選択肢の値がない場合)
+            Noneの値を返す。(親サブフロー種別(フェーズ)の選択肢の値が0の場合)
+            Noneの値を返す。(親サブフローの選択肢の値がない場合)
+            Noneの値を返す。(親サブフローの選択肢の値の長さが1未満の場合)
+
+        """
         # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
         self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
 
@@ -104,7 +155,12 @@ class CreateSubflowForm(BaseSubflowForm):
         self.submit_button.disabled = False
 
     def define_input_form(self):
-        """サブフロー新規作成フォーム"""
+        """サブフロー新規作成フォームの関数です。
+        
+        Returns:
+            サブフロー新規作成フォームに必要な値を返す。
+
+        """
         return pn.Column(
             f'### {msg_config.get("main_menu", "create_sub_flow_title")}',
             self._sub_flow_type_selector,
@@ -116,7 +172,19 @@ class CreateSubflowForm(BaseSubflowForm):
             )
 
     def main(self):
-        """サブフロー新規作成処理"""
+        """サブフロー新規作成処理の関数です。
+                入力情報を取得し、その値を検証してリサーチフローステータス管理JSONの更新、新規サブフローデータの用意を行う。
+
+        Raises:
+            InputWarning:入力値の不備によるエラー
+            Exception:リサーチフローステータス管理JSONの更新が失敗したエラー
+            Exception:ディレクトリ名が存在した場合のエラー
+            InputWarning:ディレクトリ名が存在した場合のエラー
+            Exception:新規サブフローデータの用意に失敗したエラー
+
+        
+        
+        """
 
         # 新規作成ボタンを処理中ステータスに更新する
         self.change_submit_button_processing(msg_config.get('main_menu', 'creating_sub_flow'))
@@ -181,6 +249,18 @@ class CreateSubflowForm(BaseSubflowForm):
         self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
 
     def create_data_dir(self, phase_name:str, data_dir_name:str):
+        """データディレクトリを作成する関数です。
+
+        Args:
+            phase_name (str): フェーズ名
+            data_dir_name (str): データディレクトリ名
+
+        Raises:
+            Exception: 既にファイルが存在しているエラー
+
+        Returns:
+            _type_: データディレクトリを作成するパスの値を返す。
+        """
         path = path_config.get_task_data_dir(self.abs_root, phase_name, data_dir_name)
         if os.path.exists(path):
             raise Exception(f'{path} is already exist.')
@@ -188,6 +268,19 @@ class CreateSubflowForm(BaseSubflowForm):
         return path
 
     def prepare_new_subflow_data(self, phase_name:str, new_sub_flow_id:str, sub_flow_name):
+        """新しいサブフローのデータを用意する関数です。
+                新規サブフローデータを取得し、コピー先フォルダパスを指定してフォルダを作成し、データを用意します。
+
+        Args:
+            phase_name (str): フェーズ名
+            new_sub_flow_id (str): 新しいサブフローのID
+            sub_flow_name (_type_): サブフロー名
+
+        Raises:
+            Exception:新規サブフローデータのコピーに失敗したエラー
+
+
+        """
 
         # 新規サブフローデータの用意
         # data_gorvernance\researchflowを取得

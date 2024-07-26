@@ -21,6 +21,7 @@ class BaseSubflowForm():
 
     Attributes:
         abs_root:サブフローの絶対パス
+        research_flow_status:リサーチフローステータス管理情報
         _err_output:エラーの出力
         _sub_flow_type_selector:サブフロー種別(フェーズ)
         _sub_flow_name_selector:サブフロー名称
@@ -29,18 +30,15 @@ class BaseSubflowForm():
         _parent_sub_flow_type_selector: 親サブフロー種別(フェーズ)
         _parent_sub_flow_selector:親サブフロー選択
 
-
-    
-    
     
     """
 
     def __init__(self, abs_root, message_box: MessageBox) -> None:
-        """インスタンスを初期化する関数です。
+        """BaseSubflowForm コンストラクタの関数です。
 
         Args:
             abs_root (_type_): サブフローの絶対パス
-            message_box (MessageBox): サブフローのメッセージボックス
+            message_box (MessageBox): メッセージを格納する。
         """
         self.abs_root = abs_root
 
@@ -271,6 +269,7 @@ class BaseSubflowForm():
 
     def callback_sub_flow_type_selector(self, event):
         """サブフロー種別(フェーズ)のボタンが操作できるように有効化する関数です。
+                リサーチフローステータス管理情報の取得し、シングルセレクトの更新をして  新規作成ボタンのボタンの有効化チェックを行います。
 
 
         Raises:
@@ -334,7 +333,7 @@ class BaseSubflowForm():
     ############
 
     def change_disable_submit_button(self):
-        """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する"""
+        """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する関数です。"""
         # 継承した先で実装する
 
     def validate_sub_flow_name(self, sub_flow_name):

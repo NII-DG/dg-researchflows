@@ -59,9 +59,10 @@ class MainMenu(TaskLog):
     """
 
     def __init__(self, working_file) -> None:
-        """インスタンスを初期化し、親クラスの__init__メソッドを呼び出す関数です。
+        """MainMenu　コンストラクタの関数です
+            親クラスの__init__メソッドを呼び出す関数です。
             Args:
-                working_file:作業ファイルのパス
+                working_file:[実行Notebookファイルパス]
         
         """
         super().__init__(working_file, 'main.ipynb')

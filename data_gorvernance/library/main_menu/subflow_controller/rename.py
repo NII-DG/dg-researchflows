@@ -1,3 +1,6 @@
+"""このモジュールはサブフローの名将を変更します。
+    サブフロー名称変更クラスを始め、新しいサブフローの名称を変更したりする関数などがあります。
+"""
 import os
 import traceback
 
@@ -11,15 +14,40 @@ from ...utils.error import InputWarning
 
 
 class RenameSubflowForm(BaseSubflowForm):
-    """サブフロー名称変更クラス"""
+    """サブフロー名称変更クラスです。
+        RenameSubflowFormクラスはBaseSubflowFormクラスを継承しています。
+
+        Attributes:
+        abs_root (_type_): サブフローの絶対パス
+        message_box (_type_): メッセージを格納する。
+    
+    """
 
     def __init__(self, abs_root, message_box) -> None:
+        """RenameSubflowForm コンストラクタの関数です
+            親クラス__init__メソッドを呼び出しています。
+
+        Args:
+            abs_root (_type_): サブフローの絶対パス
+            message_box (_type_): メッセージを格納する。
+
+        """
         super().__init__(abs_root, message_box)
         # 処理開始ボタン
         self.change_submit_button_init(msg_config.get('main_menu', 'rename_sub_flow'))
 
     # overwrite
     def callback_sub_flow_name_selector(self, event):
+        """サブフロー種別(フェーズ)を表示する関数です。
+
+        Returns:
+            Dict[str, int]: フェーズ表示名を返す。
+
+        Raises:
+            Exception: サブフロー種別(フェーズ)がないエラー
+            Exception: サブフロー名がないエラー
+            Exception:内部エラーが発生した。
+        """
         # サブフロー名称：シングルセレクトコールバックファンクション
         try:
             selected_sub_flow_type = self._sub_flow_type_selector.value
@@ -48,6 +76,19 @@ class RenameSubflowForm(BaseSubflowForm):
 
     # overwrite
     def change_disable_submit_button(self):
+        """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する関数です。
+        Returns:
+            Noneの値を返す。(サブフロー種別(フェーズ)の選択肢の値がない場合)
+            Noneの値を返す。(サブフロー種別(フェーズ)の選択肢の値が0の場合)
+            Noneの値を返す。(サブフローの名称の選択肢の値がない場合)
+            Noneの値を返す。(サブフローの名称の選択肢の値が0の場合)
+            Noneの値を返す。(サブフローの名称の値がない場合)
+            Noneの値を返す。(サブフローの名称の値の長さが1未満の場合)
+            Noneの値を返す。(サブフローのデータディレクトリ名フォームの値がない場合)
+            Noneの値を返す。(サブフローのデータディレクトリ名フォームの値の長さが1未満の場合)
+            
+
+        """
         # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
         self.change_submit_button_init(msg_config.get('main_menu', 'rename_sub_flow'))
 
@@ -86,7 +127,12 @@ class RenameSubflowForm(BaseSubflowForm):
         self.submit_button.disabled = False
 
     def define_input_form(self):
-        """サブフロー名称変更フォーム"""
+        """サブフロー名称変更フォームの関数です。
+        
+        Returns:
+            サブフロー名称変更フォームに必要な値を返す。
+
+        """
         sub_flow_type_list = self._sub_flow_type_selector.options
         if len(sub_flow_type_list) < 2:
             # defaultがあるため2未満にする
@@ -101,7 +147,16 @@ class RenameSubflowForm(BaseSubflowForm):
             )
 
     def main(self):
-        """サブフロー名称変更処理"""
+        """サブフロー名称変更処理の関数です。
+                入力情報を取得し、サブフロー名称を変更する。
+        
+        Raises:
+            InputWarning:入力値に不備があったエラー
+            InputWarning:同じファイルが存在している時のエラー
+            Exception:ファイル名の変更に失敗した時のエラー
+
+        
+        """
 
         # 新規作成ボタンを処理中ステータスに更新する
         self.change_submit_button_processing(msg_config.get('main_menu', 'update_rename_sub_flow'))

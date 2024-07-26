@@ -32,7 +32,7 @@ class ContainerSetter():
     """
 
     def __init__(self, nb_working_file_path:str) -> None:
-        """インスタンスを初期化する関数です。
+        """ContainerSetter　コンストラクタの関数です。。
 
         Args:
             nb_working_file_path (str): 実行Notebookパス

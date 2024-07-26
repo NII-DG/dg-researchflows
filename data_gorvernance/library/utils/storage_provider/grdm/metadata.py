@@ -1,8 +1,20 @@
+"""このモジュールはメタデータを取得します。
+    プロジェクトメタデータを整形したり、メタデータのテンプレートを取得したり、メタデータをフォーマットして返却する関数があります。
+"""
 import json
 import requests
 
 def format_metadata(metadata):
-    """Gakunin RDMから取得したプロジェクトメタデータを整形する"""
+    """Gakunin RDMから取得したプロジェクトメタデータを整形する関数です。
+    
+    Args:メタデータの値
+
+    Returns:
+        Dmpの値を返す。
+
+    
+    
+    """
 
     datas = metadata['data']
     # {'dmp': first_value}
@@ -37,7 +49,14 @@ def format_metadata(metadata):
 
 
 def get_schema(url):
-    """メタデータのテンプレートを取得する"""
+    """メタデータのテンプレートを取得する関数です
+            リクエストされたURLに接続し、その接続に問題がないかを確認してテンプレートを取得する。
+    Args:メタデータのURL
+
+    Returns:
+        メタデータのテンプレートの値を返す。
+    
+    """
     response = requests.get(url=url)
     response.raise_for_status()
     return response.json()

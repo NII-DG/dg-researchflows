@@ -8,7 +8,7 @@ class DMPManager(JsonFile):
     """DMPデータの操作を行うクラスです。
 
     DMPデータの検索や並べ替えを行うメソッドを記載しています。
-       
+
     """
     def __init__(self, file_path: str):
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
@@ -17,12 +17,6 @@ class DMPManager(JsonFile):
 
         Args:
             file_path (str): ファイルパスを表す文字列
-        
-        Example:
-            >>> DMPManager.__init__()
-        
-        Note:
-            特にありません。
 
         """
         super().__init__(file_path)
@@ -38,14 +32,7 @@ class DMPManager(JsonFile):
 
         Returns:
             dict:dmpのタイトル一覧
-        
-        Example:
-            >>> DMPManager.create_dmp_options(contents)
-            dict
 
-        Note:
-            特にありません。
-        
         """
         dmps = contents['dmp']
         options = {}
@@ -66,13 +53,6 @@ class DMPManager(JsonFile):
 
         Returns:
             dict[str, list]:Indexで指定したdmpのデータ
-        
-        Example:
-            >>> DMPManager.get_dmp(contents, index)
-            dict
-
-        Note:
-            特にありません。
 
         """
         return {"dmp": [contents['dmp'][index]]}
@@ -89,15 +69,7 @@ class DMPManager(JsonFile):
         Returns:
             str:表示する際のフォーマットに整えたdmpデータ
 
-        Example:
-            >>> DMPManager.display_format(content)
-            dmp_str
-
-        Note:
-            特にありません。
-        
         """
-    
         dmp = content['dmp'][0]
         dmp_str = f"### {dmp['title']}<br><hr><br>"
         for key, value in dmp.items():

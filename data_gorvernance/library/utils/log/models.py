@@ -168,7 +168,7 @@ class UserActivityLog(BaseLogger):
         フォーマッターを設定する際に基となるフォーマットを定義しています。
 
         Returns:
-            Literal['%(levelname)s\t%(asctime)s\t%(username)s\t%(subflow_id)s\t%(subflow_type)s\t%(ipynb_name)s\t%(cell_id)s\t%(message)s']:フォーマットの定義を返す
+           str:フォーマットの定義
 
         """
         return '%(levelname)s\t%(asctime)s\t%(username)s\t%(subflow_id)s\t%(subflow_type)s\t%(ipynb_name)s\t%(cell_id)s\t%(message)s'

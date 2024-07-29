@@ -1,5 +1,5 @@
 """ocs_template.jsonのファイルのデータを扱うモジュールです。
-OCSテンプレートデータの操作を行うクラスを記載しています。  
+OCSテンプレートデータの操作を行うクラスを記載しています。
 """
 import os
 from pathlib import Path
@@ -39,12 +39,6 @@ class OCSTemplate:
 
         ocs_template.jsonのファイルを読み出し、フィールドのデータを自身のインスタンスに保存します。
 
-        Example:
-            >>> OCSTemplate.__init__()
-        
-        Note:
-            特にありません。
-    
         """
         contents = JsonFile(str(ocs_template_json_file)).read()
         self.ocs_template = contents[self.__FIELD]
@@ -56,32 +50,18 @@ class OCSTemplate:
 
         Returns:
             list:OCSテンプレート名のリスト
-        
-        Example:
-            >>> OCSTemplate.get_name()
-            list
-        
-        Note:
-            特にありません。
 
         """
         return [fld[self.__FIELD_NAME] for fld in self.ocs_template]
 
     def get_disabled_ids(self)->List[str]:
         """アクティブでないデータのリストを作成するメソッドです。
-        
+
         OCSテンプレートデータがアクティブな状態かを判別し、アクティブでないデータの名前をリストして返します。
 
         Returns:
             list[str]:アクティブでないOCSテンプレート名のリスト
 
-        Example:
-            >>> OCSTemplate.get_disabled_ids()
-            list[str]
-        
-        Note:
-            特にありません。
-        
         """
         disabled = []
         for fld in self.ocs_template:
@@ -99,13 +79,6 @@ class OCSTemplate:
 
         Returns:
             戻り値の型が分かりませんでした。:目的のOCSテンプレートID
-        
-        Example:
-            >>> OCSTemplate.get_id(target_name)
-            Any
-        
-        Note:
-            特にありません。
 
         """
         for fld in self.ocs_template:
@@ -122,13 +95,6 @@ class OCSTemplate:
 
         Returns:
             戻り値の型が分かりませんでした。:目的のOCSテンプレート名
-        
-        Example:
-            >>> OCSTemplate.get_template_path(target_name)
-            Any
-        
-        Note:
-            特にありません。
 
         """
         for fld in self.ocs_template:

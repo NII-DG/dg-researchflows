@@ -24,12 +24,6 @@ class TestNbFile(TestCase):
 
         このメソッドではノートブックファイルのコピーを作成し、期待通りにメソッドが機能しているかを確認しています。
 
-        exsample:
-            >>> TestNbFil.test_embed_subflow_name_on_header
-        
-        Note:
-            特にありません。
-
         """
         path = Path(abs_script_dir_path)
         nb_file_path = path.joinpath('..', 'test_data/embed_subflow_name_on_header.ipynb').resolve()

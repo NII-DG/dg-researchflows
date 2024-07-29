@@ -22,13 +22,6 @@ def get_server_info(scheme, domain):
     Raises:
         Exception:APIリクエストの送信に失敗した
 
-    exsample:
-        >>> get_server_info(scheme, domain)
-        response:Response
-        
-    Note:
-        特にありません。
-        
     """
     sub_url = "api/v1/gin"
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
@@ -49,16 +42,6 @@ def get_token_for_auth(scheme, domain, user_name, password):
         user_name (Any):ユーザー名
         password (Any):パスワード
 
-    Returns:
-        Response:認証トークンを含むAPIリクエストのレスポンス
-    
-    exsample:
-        >>> get_token_for_auth(scheme, domain, user_name, password)
-        response:Response
-        
-    Note:
-        特にありません。
-
     """
     sub_url = os.path.join('api/v1/users', user_name, 'tokens')
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
@@ -78,13 +61,6 @@ def create_token_for_auth(scheme, domain, user_name, password):
 
     Returns:
         Response:作成した認証トークンを含むAPIリクエストのレスポンス
-    
-    exsample:
-        >>> create_token_for_auth(scheme, domain, user_name, password)
-        response:Response
-        
-    Note:
-        特にありません。
 
     """
     sub_url = os.path.join('api/v1/users', user_name, 'tokens')
@@ -106,13 +82,6 @@ def get_user_info(scheme, domain, token):
     Returns:
         Response:指定されたトークンを持つユーザの情報
 
-    exsample:
-        >>> get_user_info(scheme, domain, token)
-        response:Response
-        
-    Note:
-        特にありません。  
-
     """
     sub_url = "api/v1/user"
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
@@ -132,13 +101,6 @@ def delete_access_token(scheme, domain, token):
     Returns:
         Response:APIリクエストのレスポンス
 
-    exsample:
-        >>> delete_access_token(scheme, domain, token)
-        response:Response
-    
-    Note:
-        特にありません。
-
     """
     sub_url = "api/v1/user/token/delete"
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
@@ -157,14 +119,7 @@ def upload_key(scheme:str, domain:str, token:str, pubkey:str):
         pubkey (str):SSHの公開鍵
 
     Returns:
-        Response:APIリクエストのレスポンス  
-    
-    exsample:
-        >>> upload_key(scheme, domain, token, pubkey)
-        response:Response
-    
-    Note:
-        特にありません。
+        Response:APIリクエストのレスポンス
 
     """
 
@@ -192,14 +147,8 @@ def search_repo(scheme, domain, repo_id, user_id, token):
     Returns:
         Response:APIリクエストのレスポンス
 
-    exsample:
-        >>> search_repo(scheme, domain, repo_id, user_id, token)
-        response:Response
-    
-    Note:
-        特にありません。
     """
-    
+
     sub_url = "/api/v1/repos/search/user"
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     params = {
@@ -224,13 +173,6 @@ def patch_container(scheme, domain, token, server_name, user_id):
     Returns:
         Response:APIリクエストのレスポンス
 
-    exsample:
-        >>> patch_container(scheme, domain, token, server_name, user_id)
-        response:Response
-    
-    Note:
-        特にありません。
-
     """
     sub_url = "/api/v1/container"
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
@@ -254,15 +196,8 @@ def search_public_repo(scheme, domain, repo_id,):
     Returns:
         Response:APIリクエストのレスポンス
 
-    exsample:
-        >>> search_public_repo(scheme, domain, repo_id)
-        response:Response
-    
-    Note:
-        特にありません。
-
     """
-    
+
     sub_url = "/api/v1/repos/search"
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     params = {

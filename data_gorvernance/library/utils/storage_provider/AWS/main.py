@@ -16,12 +16,6 @@ def download(access_key:str, secret_key:str, bucket_name:str, aws_path:str, loca
         bucket_name (str):バケット名
         aws_path (str):ダウンロードするファイル、ディレクトリへのパス
         local_path (str):ダウンロードしたファイル、ディレクトリの保存先を指定するパス
-    
-    exsample:
-        >>> download(access_key, secret_key, bucket_name, aws_path, local_path)
-        
-    Note:
-        特にありません。
 
     """
     s3_client = boto3.client(

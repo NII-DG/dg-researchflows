@@ -24,7 +24,7 @@ class AnalysisEnvironment:
             __IS_ACTIVE:アクティブかの判定を行う
         instance:
             analysis_environment:解析環境
-    
+
     """
     __FIELD = 'analysis_environment'
     __ID = 'id'
@@ -37,12 +37,6 @@ class AnalysisEnvironment:
 
         パスで指定したジェイソンファイルを読み出し、そこから特定のフィールドの値を取り出しています。
 
-        Example:
-            >>> AnalysisEnvironment.__init__()
-
-        Note:
-            特にありません。
-
         """
         contents = JsonFile(str(json_path)).read()
         self.analysis_environment = contents[self.__FIELD]
@@ -54,14 +48,7 @@ class AnalysisEnvironment:
 
         Returns:
             list: 環境名のリスト
-        
-        Example:
-            >>> AnalysisEnvironment.get_name()
-            list
-        
-        Note:
-            特にありません。
-        
+
         """
         return [fld[self.__NAME] for fld in self.analysis_environment]
 
@@ -75,13 +62,7 @@ class AnalysisEnvironment:
 
         Returns:
             戻り値のidの型がわかりませんでした。:target_nameに対応したid
-        
-        Example:
-            >>> AnalysisEnvironment.get_id(target_name)
-        
-        Note:
-            特にありません。
-            
+
         """
         for fld in self.analysis_environment:
             if fld[self.__NAME] == target_name:
@@ -97,13 +78,7 @@ class AnalysisEnvironment:
 
         Returns:
             戻り値のdescriptionの型がわかりませんでした。:target_nameに対応した化石環境の説明
-        
-        Example:
-            >>> AnalysisEnvironment.get_description(target_name)
-        
-        Note:
-            特にありません。
-            
+
         """
         for fld in self.analysis_environment:
             if fld[self.__NAME] == target_name:

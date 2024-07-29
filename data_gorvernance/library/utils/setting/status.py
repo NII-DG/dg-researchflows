@@ -29,7 +29,7 @@ class SubflowTask:
             STATUS_DOING :実行状況（実行中）
             STATUS_DONE:実行状況（実行完了）
             allowed_statuses:許可されたステータス
-        
+
         instance:
             id (str):不明
             name (str): 不明
@@ -73,12 +73,6 @@ class SubflowTask:
             status (str):実行状況
             execution_environments (list[str]): 実行環境リスト
             disabled (bool):不明
-        
-        exsample:
-            >>> SubflowTask.__init__(id, name, is_multiple, is_required, completed_count, dependent_task_ids, status, execution_environments, disabled)
-        
-        Note:
-            特にありません。
 
         """
         self._id = id
@@ -101,13 +95,7 @@ class SubflowTask:
 
         Raises:
             ValueError:強化されたステータスに含まれていない
-        
-        exsample:
-            >>> SubflowTask._set_status(status)
-        
-        Note:
-            特にありません。
-        
+
         """
         if status in self.allowed_statuses:
             self._status = status
@@ -121,12 +109,6 @@ class SubflowTask:
 
         Args:
             id (str): ID
-        
-        exsample:
-            >>> SubflowTask.add_execution_environments(id)
-        
-        Note:
-            特にありません。
 
         """
         if id not in self._execution_environments:
@@ -140,14 +122,7 @@ class SubflowTask:
 
         Returns:
             str: ID
-        
-        exsample:
-            >>> SubflowTask.id
-            _id:str
-        
-        Note:
-            特にありません。
-        
+
         """
         return self._id
 
@@ -159,14 +134,7 @@ class SubflowTask:
 
         Returns:
             str: 名前
-        
-        exsample:
-            >>> SubflowTask.id
-            _name:str
-        
-        Note:
-            特にありません。
-        
+
         """
         return self._name
 
@@ -178,14 +146,7 @@ class SubflowTask:
 
         Returns:
             bool: 不明
-        
-        exsample:
-            >>> SubflowTask.is_multiple
-            _is_multiple:bool
-        
-        Note:
-            特にありません。
-        
+
         """
         return self._is_multiple
 
@@ -197,14 +158,7 @@ class SubflowTask:
 
         Returns:
             bool: 不明
-        
-        exsample:
-            >>> SubflowTask.is_required
-            _is_required:bool
-        
-        Note:
-            特にありません。
-        
+
         """
         return self._is_required
 
@@ -216,14 +170,7 @@ class SubflowTask:
 
         Returns:
             bool: 不明
-        
-        exsample:
-            >>> SubflowTask.completed_count
-            _completed_count:bool
-        
-        Note:
-            特にありません。
-        
+
         """
         return self._completed_count
 
@@ -231,12 +178,6 @@ class SubflowTask:
         """_completed_countを増加させるメソッドです。
 
         呼び出されることで_completed_countの値を1増やします。
-
-        exsample:
-            >>> SubflowTask.increme_completed_count()
-        
-        Note:
-            特にありません。
 
         """
         self._completed_count += 1
@@ -249,14 +190,7 @@ class SubflowTask:
 
         Returns:
             list[str]: 不明
-        
-        exsample:
-            >>> SubflowTask.dependent_task_ids
-           _dependent_task_ids:list[str]
-        
-        Note:
-            特にありません。
-        
+
         """
         return self._dependent_task_ids
 
@@ -268,14 +202,7 @@ class SubflowTask:
 
         Returns:
             str: 不明
-        
-        exsample:
-            >>> SubflowTask.status
-            _status:str
-        
-        Note:
-            特にありません。
-        
+
         """
         return self._status
 
@@ -287,12 +214,7 @@ class SubflowTask:
 
         Args:
             status (str):_statusにセットする値
-        
-        exsample:
-            >>> SubflowTask.status = 'status'
-            
-        Note:
-            特にありません。
+
 
         """
         self._set_status(status)
@@ -305,14 +227,7 @@ class SubflowTask:
 
         Returns:
             bool: 不明
-        
-        exsample:
-            >>> SubflowTask.disable
-            _disable:bool
-        
-        Note:
-            特にありません。
-        
+
         """
         return self._disable
 
@@ -324,12 +239,6 @@ class SubflowTask:
 
         Args:
             is_disable (bool):_disableにセットする値
-        
-        exsample:
-            >>> SubflowTask.disable = True
-            
-        Note:
-            特にありません。
 
         """
         self._disable = is_disable
@@ -342,14 +251,7 @@ class SubflowTask:
 
         Returns:
             list[str]: 不明
-        
-        exsample:
-            >>> SubflowTask.execution_environments
-            _execution_environments:list[str]
-        
-        Note:
-            特にありません。
-        
+
         """
         return self._execution_environments
 
@@ -360,12 +262,7 @@ class SubflowTask:
 
         Returns:
             _dict[str, Any]:サブフロータスクの辞書型データ
-        
-        exsample:
-            >>> SubflowTask.to_dict()
-            subflowTask_dict:dict[str, Any]
-        
-        Note:
+
             特にありません。
 
         """
@@ -384,7 +281,7 @@ class SubflowTask:
 
 class SubflowStatus:
     """サブフローステータス管理JSON(status.json)の各項目を管理する
-    
+
     サブフローステータス管理JSON(status.json)の各項目に対する操作を行うメソッドを記載したクラスです。
     """
 
@@ -396,12 +293,6 @@ class SubflowStatus:
         Args:
             is_completed (bool): 不明
             tasks (list[dict]): 不明
-
-        exsample:
-            >>> SubflowStatus.__init__(is_completed, tasks)
-        
-        Note:
-            特にありません。
 
         """
         self._is_completed = is_completed
@@ -415,14 +306,7 @@ class SubflowStatus:
 
         Returns:
             bool: 不明
-        
-        exsample:
-            >>> SubflowStatus.is_completed
-            _is_completed:bool
-        
-        Note:
-            特にありません。
-        
+
         """
         return self._is_completed
 
@@ -434,14 +318,7 @@ class SubflowStatus:
 
         Returns:
            list[SubflowTask]: 不明
-        
-        exsample:
-            >>> SubflowStatus.tasks
-            _tasks:list[SubflowTask]
-        
-        Note:
-            特にありません。
-        
+
         """
         return self._tasks
 
@@ -453,12 +330,6 @@ class SubflowStatus:
 
         Args:
             is_completed (bool):_is_completedにセットする値
-        
-        exsample:
-            >>> SubflowStatus.is_completed = True
-            
-        Note:
-            特にありません。
 
         """
         self._is_completed = is_completed
@@ -471,13 +342,6 @@ class SubflowStatus:
 
         Returns:
             dict[str, Any]:サブフロータスクを含む辞書型データ
-        
-        exsample:
-            >>> SubflowStatus.to_dict()
-            SubflowStatus_dict: dict[str, Any]
-            
-        Note:
-            特にありません。
 
         """
         return {
@@ -499,14 +363,7 @@ class SubflowStatus:
             SubflowTask:サブフロータスク
 
         Raises:
-            Exception:idの一致するタスクが存在しない 
-        
-        exsample:
-            >>> SubflowStatus.get_task_by_task_id(id)
-            task:SubflowTask
-            
-        Note:
-            特にありません。
+            Exception:idの一致するタスクが存在しない
 
         """
         for task in self._tasks:
@@ -522,12 +379,6 @@ class SubflowStatus:
         Args:
             task_name (str): 対象となるタスクの名前
             environment_id (str): 実行環境のリストに追加するid
-        
-        exsample:
-            >>> SubflowStatus.doing_task_by_task_name(task_name, environment_id)
-                
-        Note:
-            特にありません。
 
         """
         for task in self._tasks:
@@ -544,12 +395,6 @@ class SubflowStatus:
         Args:
             task_name (str):対象のタスク名
             environment_id (str): 実行環境リストのid
-
-        exsample:
-            >>> SubflowStatus.completed_task_by_task_name(task_name, environment_id)
-                
-        Note:
-            特にありません。
 
         """
 
@@ -608,12 +453,6 @@ class SubflowStatusFile(JsonFile):
         Args:
             file_path (str): 対象ファイルのパス
 
-        exsample:
-            >>> SubflowStatusFile.__init__( file_path)
-                
-        Note:
-            特にありません。
-
         """
         super().__init__(file_path)
 
@@ -624,13 +463,7 @@ class SubflowStatusFile(JsonFile):
 
         Returns:
             SubflowStatus:作成したSubflowStatusクラスのインスタンス
-        
-        exsample:
-            >>> SubflowStatusFile.read()
-            subflow_status:SubflowStatus
 
-        Note:
-            特にありません。    
 
         """
         content = super().read()
@@ -643,12 +476,6 @@ class SubflowStatusFile(JsonFile):
 
         Args:
             subflow_status (SubflowStatus): SubflowStatus型のデータ
-
-        exsample:
-            >>> SubflowStatusFile.write(subflow_status)
-
-        Note:
-            特にありません。
 
         """
         data = subflow_status.to_dict()

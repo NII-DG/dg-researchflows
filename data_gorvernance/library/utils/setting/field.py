@@ -1,5 +1,5 @@
 """field.jsonのファイルのデータを扱うモジュールです。
-フィールドデータの操作を行うクラスを記載しています。  
+フィールドデータの操作を行うクラスを記載しています。
 """
 import os
 from pathlib import Path
@@ -39,12 +39,6 @@ class Field:
 
         field.jsonのファイルを読み出し、フィールドのデータを自身のインスタンスに保存します。
 
-        Example:
-            >>> Field.__init__()
-        
-        Note:
-            特にありません。
-
         """
         contents = JsonFile(str(field_json_file)).read()
         self.field = contents[self.__FIELD]
@@ -56,32 +50,18 @@ class Field:
 
         Returns:
             list:フィールド名のリスト
-        
-        Example:
-            >>> Field.get_name()
-            list
-        
-        Note:
-            特にありません。
 
         """
         return [fld[self.__FIELD_NAME] for fld in self.field]
 
     def get_disabled_ids(self)->List[str]:
         """アクティブでないデータのリストを作成するメソッドです。
-        
+
         フィールドデータがアクティブな状態かを判別し、アクティブでないデータの名前をリストして返します。
 
         Returns:
             list[str]:アクティブでないフィールド名のリスト
 
-        Example:
-            >>> Field.get_disabled_ids()
-            list[str]
-        
-        Note:
-            特にありません。
-        
         """
         disabled = []
         for fld in self.field:
@@ -99,13 +79,6 @@ class Field:
 
         Returns:
             戻り値の型が分かりませんでした。:目的の実験パッケージ
-        
-        Example:
-            >>> Field.get_template_path(target_name)
-            Any
-        
-        Note:
-            特にありません。
 
         """
         for fld in self.field:

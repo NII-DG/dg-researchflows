@@ -18,12 +18,6 @@ class TestMessageConfig(TestCase):
 
         このメソッドではgetメソッドでメッセージを取得し、期待通りの値が返ってくるか確認します。
 
-        exsample:
-            >>> TestMessageConfig.test_get()
-        
-        Note:
-            特にありません。
-
         """
         research_preparation = message.get('research_flow_phase_display_name', 'plan')
         self.assertEqual('研究準備', research_preparation)

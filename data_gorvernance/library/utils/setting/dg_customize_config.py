@@ -33,16 +33,10 @@ class AlphaProperty:
         """クラスのインスタンスを初期化するメソッドです。コンストラクタ
 
         引数として受け取ったデータから新たにSubFlowRule型のリストを作成します。
-        
+
         Args:
             data (Dict[str, Dict]): subFlowの情報が格納されたデータ
 
-        Example:
-            >>> AlphaProperty.__init__(date)
-        
-        Note:
-            特にありません。
-           
         """
         self._id = data[self.__ID]
         self._customize:List[SubFlowRule] = []
@@ -62,25 +56,18 @@ class SubFlowRule:
         instance:
             _subflow_type_name:サブフローの型名
 
-
     """
     __TASK_IDS = 'task_ids'
     __VERIFICATION_IDS = 'verification_ids'
 
     def __init__(self, subflow_type_name:str, data:Dict[str, Any]) -> None:
         """クラスのインスタンスを初期化するメソッドです。コンストラクタ
-    
+
         引数として受け取ったデータを自身のインスタンスに保存します。
 
         Args:
             subflow_type_name (str): サブフローの型名
             data (Dict[str, Any]): subFlowの情報が格納されたデータ
-
-        Example:
-            >>> SubFlowRule.__init__(subflow_type_name, date)
-        
-        Note:
-            特にありません。
 
         """
         self._subflow_type_name = subflow_type_name
@@ -94,13 +81,7 @@ def get_dg_customize_config():
 
     Returns:
         list[AlphaProperty]:DGカスタマイズJSON定義書のインスタンス
-    
-    xample:
-        >>> SubFlowRule.get_dg_customize_config()
-        list[AlphaProperty]
-    
-    Note:
-            特にありません。
+
     """
     jf = JsonFile(str(data_governance_customize_file))
     dg_customize_data = jf.read()

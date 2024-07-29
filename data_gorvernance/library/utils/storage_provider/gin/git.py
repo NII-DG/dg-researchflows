@@ -127,7 +127,7 @@ def git_pull(cwd):
 
     Returns:
         str:コマンドの実行結果
-        
+
     """
     stdout, stderr, rt = Cmd.exec_subprocess('git pull', cwd=cwd, raise_error=False)
     result = stdout.decode('utf-8')

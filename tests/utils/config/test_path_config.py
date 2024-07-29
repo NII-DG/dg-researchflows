@@ -18,12 +18,6 @@ class TestPathConfig(TestCase):
 
         このメソッドではget_prepare_file_name_list_for_subflowを呼び出すことででファイル名のリストを取得し、期待通りの値が入っているか確認します。
 
-        exsample:
-            >>> TestPathConfig.test_get_prepare_file_name_list_for_subflow()
-        
-        Note:
-            特にありません。
-
         """
         file_names = path_config.get_prepare_file_name_list_for_subflow()
         self.assertEqual('menu.ipynb', file_names[0])

@@ -70,13 +70,6 @@ def extract_url_and_auth_info_from_git_url(git_url):
         Any:元のurl
         str:空のユーザー名
         str:空のパスワード
-    
-    exsample:
-        >>> extract_url_and_auth_info_from_git_url(git_url)
-        new_url, username, password:str, str, str
-    
-    Note:
-        特にありません。
 
     """
     pattern = r"(http[s]?://)([^:]+):([^@]+)@(.+)"
@@ -102,13 +95,6 @@ def get_gin_base_url_from_git_config()->str:
     Returns:
         str:ベースurl
 
-    exsample:
-        >>> get_gin_base_url_from_git_config()
-        gin_base_url:str
-    
-    Note:
-        特にありません。
-
     """
     git_url = git.get_remote_url()
     url, username, password = extract_url_and_auth_info_from_git_url(git_url)
@@ -127,13 +113,6 @@ def get_gin_base_url_and_auth_info_from_git_config():
         str:ユーザー名
         str:パスワード
 
-    exsample:
-        >>> get_gin_base_url_and_auth_info_from_git_config()
-        gin_base_url, username, password:str, str, str
-    
-    Note:
-        特にありません。
-
     """
     git_url = git.get_remote_url()
     url, username, password = extract_url_and_auth_info_from_git_url(git_url)
@@ -145,13 +124,10 @@ def init_param_url():
     """パラメーター設定の初期化を行うメソッドです。
 
     新たにベースurlを取得し、それを用いてparam.jsonのsiblings.ginHttpとsiblings.ginSshの更新を行います。
-    
+
     Raises:
         Exception: GIN-Forkサーバーの情報が見つからない
 
-    exsample:
-        >>> init_param_url()
-    
     Note:
         EXCEPTION
         ---------------
@@ -208,13 +184,6 @@ def setup_local(user_name, password):
     Raises:
         UnauthorizedError:認証情報が無効である
 
-    exsample:
-        >>> setup_local(user_name, password)
-        
-    Note:
-        特にありません。
-
-    
     """
     pr = parse.urlparse(ParamConfig.get_siblings_ginHttp())
     response = gin_api.get_token_for_auth(pr.scheme, pr.netloc, user_name, password)
@@ -256,12 +225,6 @@ def set_ginfork_token(token:str):
     Args:
         token (str): 保存するトークン
 
-    exsample:
-        >>> set_ginfork_token(token)
-        
-    Note:
-        特にありません。
-
     """
     token_dict = {"ginfork_token": token}
     os.makedirs(os.path.dirname(TOKEN_FILE_PATH), exist_ok=True)
@@ -276,13 +239,6 @@ def get_ginfork_token():
     Returns:
         Any:取得したトークン
 
-    exsample:
-        >>> get_ginfork_token()
-        date:Any
-        
-    Note:
-        特にありません。
-
     """
     with TOKEN_FILE_PATH.open('r') as f:
         data = json.loads(f.read())
@@ -295,12 +251,6 @@ def set_user_info(user_id):
 
     Args:
         user_id (Any):ユーザーID
-
-    exsample:
-        >>> set_user_info(user_id)
-        
-    Note:
-        特にありません。   
 
     """
     user_info = {"user_id":user_id}
@@ -316,13 +266,6 @@ def get_user_id_from_user_info():
     Returns:
         Any: 取得したユーザーID
 
-    exsample:
-        >>> get_user_id_from_user_info()
-        date:Any
-
-    Note:
-        特にありません。 
-
     """
     with USER_INFO_PATH.open('r') as f:
         data = json.loads(f.read())
@@ -336,13 +279,6 @@ def exist_user_info()->bool:
     Returns:
         bool: ユーザー情報が保存されているファイルが存在しているかの結果
 
-    exsample:
-        >>> exist_user_info()
-        True:bool
-
-    Note:
-        特にありません。 
-
     """
     return os.path.exists(USER_INFO_PATH)
 
@@ -354,13 +290,6 @@ def del_build_token():
     Returns:
         bool:トークンが存在しているかの判定
         str:トークンの削除処理がどのように行われたかのメッセージ
-
-    exsample:
-        >>> del_build_token()
-        True, '':bool, str
-
-    Note:
-        特にありません。 
 
     """
     gin_base_url, username, token = get_gin_base_url_and_auth_info_from_git_config()
@@ -390,13 +319,6 @@ def datalad_create(dir_path:str):
     Returns:
         bool:既にdataladのデータセットであるかの判定を行う
 
-    exsample:
-        >>> datalad_create(dir_path)
-        True
-
-    Note:
-        特にありません。
-
     """
     if not os.path.isdir(os.path.join(dir_path, ".datalad")):
         datalad_api.create(path=dir_path, force=True) # type: ignore
@@ -414,13 +336,6 @@ def create_key(root_path):
 
     Returns:
         bool:SSHキーを作成したかの判定を行う
-
-    exsample:
-        >>> create_key(root_path)
-        True
-
-    Note:
-        特にありません。
 
     """
     ssh_key_path = os.path.join(root_path, __SSH_KEY_PATH)
@@ -443,13 +358,6 @@ def upload_ssh_key(root_path):
 
     Returns:
         str:実行した処理に対応したメッセージ
-    
-    exsample:
-        >>> upload_ssh_key(root_path)
-        "message":str
-
-    Note:
-        特にありません。
 
     """
     ssh_pub_key_path = os.path.join(root_path, __SSH_PUB_KEY_PATH)
@@ -476,26 +384,20 @@ def trust_gin(root_path):
     Args:
         root_path (Any):設定ファイルの保存されているディレクトリのルートパス
 
-    exsample:
-        >>> trust_gin(root_path)
-
-    Note:
-        特にありません。
-
     """
     ginHttp = ParamConfig.get_siblings_ginHttp()
     config_GIN(root_path, ginHttp)
 
 def config_GIN(root_path, ginHttp):
     """ドメインを信頼するための設定を行うメソッドです。
-    
-    引数として受け取ったリポジトリホスティングサーバのURL(ginHttp)からドメイン名を抽出し、コンテナに対してSHH通信を信頼させます。    
+
+    引数として受け取ったリポジトリホスティングサーバのURL(ginHttp)からドメイン名を抽出し、コンテナに対してSHH通信を信頼させます。
     この時、/home/jovyan/.ssh/configファイルに設定値を出力します。
 
     Args:
         root_path(Any):設定値を出力するファイルのルートパス
         ginHttp(Any):リポジトリホスティングサーバのURL  ex : http://dg01.dg.rcos.nii.ac.jp
-    
+
     """
     # SSHホスト（＝GIN）を信頼する設定
     ssh_config_path = os.path.join(root_path, __SSH_CONFIG)
@@ -541,7 +443,7 @@ def prepare_sync(root):
 
     Args:
         root(Any):ルートパス
-    
+
     """
 
     # S3にあるデータをGIN-forkに同期しないための設定
@@ -585,12 +487,12 @@ def setup_sibling_to_local():
 
 def push_annex_branch(cwd):
     """git-annexブランチをプッシュするメソッドです。
-    
+
     引数で指定した現在の作業ディレクトリ(cwd)でプルした後、git-annexブランチがリモートに存在しない場合のみプッシュします。
 
     Args:
         cwd(Any):現在の作業ディレクトリ
-    
+
     """
     git.git_pull(cwd)
     if git.is_annex_branch_in_repote(cwd):
@@ -1021,7 +923,7 @@ def display_msg(msg='', back=None):
     Args:
         msg (str): メッセージ
         back (Any):背背景
-    
+
     """
     display_html_msg(msg, None, back, default_tag)
 

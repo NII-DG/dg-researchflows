@@ -4,7 +4,7 @@ from urllib import parse
 import requests
 from requests.exceptions import RequestException
 
-from ..error import UnauthorizedError, NotFoundContentsError
+from library.utils.error import UnauthorizedError, NotFoundContentsError
 
 
 def get_govsheet_schema(scheme, domain):

@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
-import sys
 from pathlib import Path
 
 from lxml import etree
 
-from .. import file
+from library.utils import file
+
 
 title_font_size = 10
 title_font_color = 'rgb(255,140,0)'
 text_font_color = 'rgb(0,0,0)'
 
 SVG_TEXT = '{http://www.w3.org/2000/svg}text'
+
 
 def init_config(id, name):
     return {
@@ -20,8 +21,10 @@ def init_config(id, name):
         }
     }
 
+
 def update_svg(output: str, current_dir:str, config):
     _embed_detail_information(current_dir, Path(output), config)
+
 
 def _embed_detail_information(current_dir, skeleton, config):
     # 雛形の読み込み
@@ -34,6 +37,7 @@ def _embed_detail_information(current_dir, skeleton, config):
     # svgファイルを上書き
     with skeleton.open(mode='wb') as f:
         f.write(etree.tostring(tree, method='xml', pretty_print=True))
+
 
 def _embed_info_in_one_rect(elem, current_dir, config):
     for key, value in config.items():
@@ -59,6 +63,7 @@ def _embed_info_in_one_rect(elem, current_dir, config):
             text_elem.attrib['fill'] = text_font_color
             inseet_elem = text_elem
         parent_elem.insert(childpos, inseet_elem)
+
 
 def create_anchor(elems, link):
     """リンクを付与する"""

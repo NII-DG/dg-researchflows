@@ -1,5 +1,5 @@
-import os
 from collections import OrderedDict
+import os
 
 from cookiecutter.main import (
     cookiecutter,

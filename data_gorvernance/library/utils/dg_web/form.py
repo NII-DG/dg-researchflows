@@ -4,6 +4,7 @@ import panel as pn
 
 from library.utils.widgets import MessageBox, Button
 
+
 # (vertical, horizontal)
 # (top, right, bottom, and left)
 margin = (0, 15, 5, 15)
@@ -63,6 +64,7 @@ class Title(pn.pane.Markdown):
     def set_text(self, text):
         self.object = f"### {text}"
 
+
 class Description(pn.pane.Markdown):
 
     def __init__(self, object=None, **params):
@@ -71,6 +73,7 @@ class Description(pn.pane.Markdown):
         if "margin" not in params:
             params["margin"] = (0, 10, 0, 20)
         super().__init__(object=object, **params)
+
 
 class Column(pn.Column):
     """タイトルや入力欄をまとめる"""
@@ -82,6 +85,7 @@ class Column(pn.Column):
             params["margin"] = (5, 10, 5, 10)
         super().__init__(**params)
 
+
 class ArrayBox(pn.WidgetBox):
 
     def __init__(self, **params):
@@ -91,6 +95,7 @@ class ArrayBox(pn.WidgetBox):
             params["margin"] = 15
         super().__init__(**params)
 
+
 class ObjectBox(pn.WidgetBox):
 
     def __init__(self, **params):
@@ -99,6 +104,7 @@ class ObjectBox(pn.WidgetBox):
         if "margin" not in params:
             params["margin"] = 10
         super().__init__(**params)
+
 
 class Form:
     """入力フォームの操作

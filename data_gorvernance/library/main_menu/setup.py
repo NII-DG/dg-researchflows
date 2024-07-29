@@ -1,21 +1,24 @@
 import os
 import re
-from ..utils.config import path_config, message as msg_config
-from ..utils.storage_provider.gin import gin
-from ..subflow.menu import access_main_menu
+import traceback
 from pathlib import Path
+
 import panel as pn
 from IPython.display import display, clear_output
 from IPython.core.display import Javascript
-import traceback
-from ..utils.error import UnauthorizedError
 
+from library.subflow.menu import access_main_menu
+from library.utils.config import path_config, message as msg_config
+from library.utils.error import UnauthorizedError
+from library.utils.storage_provider.gin import gin
 
 
 DEFAULT_WIDTH = 600
 SELECT_DEFAULT_VALUE = '--'
 
 SETUP_COMPLETED_FILE = 'setup_completed.txt'
+
+
 class ContainerSetter():
 
     def __init__(self, nb_working_file_path:str) -> None:
@@ -108,7 +111,6 @@ class ContainerSetter():
             self.change_submit_button_success(msg_config.get('user_auth','success'))
             self._msg_output.clear()
             return
-
 
 
     def validate_format_username(self, user_name:str):
@@ -371,7 +373,6 @@ class ContainerSetter():
             alert = pn.pane.Alert(msg_config.get('user_auth', 'imcomplete_auth'),sizing_mode="stretch_width",alert_type='warning')
             display(alert)
             raise Exception('Authentication not completed')
-
 
 
     @classmethod

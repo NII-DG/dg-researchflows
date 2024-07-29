@@ -1,6 +1,7 @@
 import json
 import requests
 
+
 def format_metadata(metadata):
     """Gakunin RDMから取得したプロジェクトメタデータを整形する"""
 

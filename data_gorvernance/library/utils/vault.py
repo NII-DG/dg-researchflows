@@ -1,11 +1,13 @@
-import hvac
 import os
 import requests
 import subprocess
 import threading
 import time
 
+import hvac
+
 from .error import UnusableVault
+
 
 VAULT_ADDR = 'http://127.0.0.1:8200'
 TOKEN_PATH = '/home/jovyan/.vault/token'

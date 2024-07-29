@@ -3,6 +3,7 @@
 from IPython.display import display
 from IPython.core.display import HTML
 
+
 def creat_html_msg(msg='', fore=None, back=None, tag='p'):
     """HTMLを生成するメソッド
 
@@ -35,29 +36,37 @@ def creat_html_msg(msg='', fore=None, back=None, tag='p'):
     else:
         return "<" + tag + " style='" + style + "'>" + msg + "</" + tag + ">"
 
+
 def creat_html_msg_info(msg='', tag='p'):
     return creat_html_msg(msg=msg, back='#9eff9e', tag=tag)
+
 
 def creat_html_msg_warm(msg='', tag='p'):
     return creat_html_msg(msg=msg, back='#ffff93', tag=tag)
 
+
 def creat_html_msg_err(msg='', tag='p'):
     return creat_html_msg(msg=msg, back='#ffa8a8', tag=tag)
 
+
 def creat_html_msg_log(msg='', tag='p'):
     return creat_html_msg(msg=msg, tag=tag)
+
 
 def display_msg_info(msg='', tag='p'):
      """Infoメッセージの表示"""
      display(HTML(creat_html_msg_info(msg, tag)))
 
+
 def display_msg_warm(msg='', tag='p'):
      """Warningメッセージの表示"""
      display(HTML(creat_html_msg_warm(msg, tag)))
 
+
 def display_msg_err(msg='', tag='p'):
      """Errorsメッセージの表示"""
      display(HTML(creat_html_msg_err(msg, tag)))
+
 
 def display_msg_log(msg='', tag='p'):
      """標準メッセージの表示"""

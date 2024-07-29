@@ -1,5 +1,6 @@
 """サブフローステータス管理JSON(status.json)マネージャー"""
-from ..file import JsonFile
+from library.utils.file import JsonFile
+
 
 _IS_COMPLETED = 'is_completed'
 _TASKS = 'tasks'
@@ -24,7 +25,8 @@ class SubflowTask:
     STATUS_DONE = "done"
     allowed_statuses = [STATUS_UNFEASIBLE, STATUS_UNEXECUTED, STATUS_DOING, STATUS_DONE]
 
-    def __init__(self, id: str, name: str, is_multiple: bool, is_required: bool, completed_count: int, dependent_task_ids: list[str], status: str, execution_environments: list[str], disabled: bool) -> None:
+    def __init__(self, id: str, name: str, is_multiple: bool, is_required: bool, completed_count: int,
+                 dependent_task_ids: list[str], status: str, execution_environments: list[str], disabled: bool) -> None:
         self._id = id
         self._name = name
         self._is_multiple = is_multiple

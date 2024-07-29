@@ -1,25 +1,27 @@
+import hashlib
+from http import HTTPStatus
+import json
+import os
+from pathlib import Path
 import re
 import shutil
 import subprocess
 import traceback
-import os
-import json
 from urllib import parse
-from pathlib import Path
-from http import HTTPStatus
-from ..gin import api as gin_api, git
-from ....utils.config.param import ParamConfig
-from ...error import UnauthorizedError, RepositoryNotExist, UrlUpdateError, NoValueInDgFileError
-from ...config import path_config, message as msg_config
-from ....utils.cmd import Cmd
+
 from datalad import api as datalad_api
-from datalad.api import Dataset
-import requests
-import hashlib
-import magic
 from IPython.display import clear_output, display
 from IPython.core.display import HTML
+import magic
+import requests
+
+from library.utils.config.param import ParamConfig
+from library.utils.error import UnauthorizedError, RepositoryNotExist, UrlUpdateError, NoValueInDgFileError
+from library.utils.config import path_config, message as msg_config
+from library.utils.cmd import Cmd
+from . import api as gin_api, git
 clear_output()
+
 
 SIBLING = 'gin'
 
@@ -66,6 +68,7 @@ def extract_url_and_auth_info_from_git_url(git_url):
 
     return git_url, "", "" # Returns the original URL if it cannot be converted
 
+
 def get_gin_base_url_from_git_config()->str:
     git_url = git.get_remote_url()
     url, username, password = extract_url_and_auth_info_from_git_url(git_url)
@@ -73,13 +76,13 @@ def get_gin_base_url_from_git_config()->str:
     gin_base_url = parse.urlunparse((pr.scheme, pr.netloc, "", "", "", ""))
     return gin_base_url
 
+
 def get_gin_base_url_and_auth_info_from_git_config():
     git_url = git.get_remote_url()
     url, username, password = extract_url_and_auth_info_from_git_url(git_url)
     pr = parse.urlparse(url)
     gin_base_url = parse.urlunparse((pr.scheme, pr.netloc, "", "", "", ""))
     return gin_base_url, username, password
-
 
 
 def init_param_url():
@@ -100,7 +103,6 @@ def init_param_url():
 
     gin_base_url = get_gin_base_url_from_git_config()
 
-
     pr = parse.urlparse(gin_base_url)
     retry_num = 6
     flg = True
@@ -111,7 +113,6 @@ def init_param_url():
 
             pc = ParamConfig.get_param_data()
 
-
             response_data = response.json()
             http_url = response_data["http"]
             if http_url[-1] == '/':
@@ -119,7 +120,6 @@ def init_param_url():
 
             pc._siblings._ginHttp = http_url
             pc._siblings._ginSsh = response_data["ssh"]
-
 
             with open(REPOSITORY_ID_FILE_PATH, 'r') as file:
                 repo_id = file.read()
@@ -133,6 +133,7 @@ def init_param_url():
             if retry_num == 0:
                 flg = False
                 raise Exception('Not Found GIN-Fork Server Info')
+
 
 def setup_local(user_name, password):
     pr = parse.urlparse(ParamConfig.get_siblings_ginHttp())
@@ -167,16 +168,19 @@ def setup_local(user_name, password):
     Cmd.exec_subprocess(cmd='git config --global user.name {}'.format(res_data['username']))
     Cmd.exec_subprocess(cmd='git config --global user.email {}'.format(res_data['email']))
 
+
 def set_ginfork_token(token:str):
     token_dict = {"ginfork_token": token}
     os.makedirs(os.path.dirname(TOKEN_FILE_PATH), exist_ok=True)
     with TOKEN_FILE_PATH.open('w') as f:
         json.dump(token_dict, f, indent=4)
 
+
 def get_ginfork_token():
     with TOKEN_FILE_PATH.open('r') as f:
         data = json.loads(f.read())
     return data['ginfork_token']
+
 
 def set_user_info(user_id):
     user_info = {"user_id":user_id}
@@ -184,13 +188,16 @@ def set_user_info(user_id):
     with USER_INFO_PATH.open( 'w') as f:
         json.dump(user_info, f, indent=4)
 
+
 def get_user_id_from_user_info():
     with USER_INFO_PATH.open('r') as f:
         data = json.loads(f.read())
     return data['user_id']
 
+
 def exist_user_info()->bool:
     return os.path.exists(USER_INFO_PATH)
+
 
 def del_build_token():
     gin_base_url, username, token = get_gin_base_url_and_auth_info_from_git_config()
@@ -209,6 +216,7 @@ def del_build_token():
     else:
         return True , None
 
+
 def datalad_create(dir_path:str):
     """dataladのデータセット化する
 
@@ -221,6 +229,7 @@ def datalad_create(dir_path:str):
     else:
         return False
 
+
 def create_key(root_path):
     """SSHキーを作成"""
     ssh_key_path = os.path.join(root_path, __SSH_KEY_PATH)
@@ -229,6 +238,7 @@ def create_key(root_path):
         return True
     else:
         return False
+
 
 def upload_ssh_key(root_path):
     """GIN-forkへ公開鍵を登録"""
@@ -248,9 +258,11 @@ def upload_ssh_key(root_path):
     else:
         raise Exception(f'Fial Upload pub-SSH key. Response Code [{response.status_code}]')
 
+
 def trust_gin(root_path):
     ginHttp = ParamConfig.get_siblings_ginHttp()
     config_GIN(root_path, ginHttp)
+
 
 def config_GIN(root_path, ginHttp):
     """リポジトリホスティングサーバのURLからドメイン名を抽出してコンテナに対してSHH通信を信頼させるメソッド
@@ -280,11 +292,13 @@ def config_GIN(root_path, ginHttp):
         with open(ssh_config_path, mode='w') as f:
             write_GIN_config(mode='w', ginDomain=ginDomain, ssh_config_path=ssh_config_path)
 
+
 def write_GIN_config(mode, ginDomain, ssh_config_path):
     with open(ssh_config_path, mode) as f:
         f.write('\nhost ' + ginDomain + '\n')
         f.write('\tStrictHostKeyChecking no\n')
         f.write('\tUserKnownHostsFile=/dev/null\n')
+
 
 def prepare_sync(root):
     """同期するコンテンツの調整"""
@@ -299,6 +313,7 @@ def prepare_sync(root):
     if not os.path.isfile(file_path):
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         shutil.copyfile(orig_file_path, file_path)
+
 
 def setup_sibling_to_local():
     ginfork_token = get_ginfork_token()
@@ -320,6 +335,7 @@ def setup_sibling_to_local():
     datalad_api.siblings(action='configure', name='origin', url=http_url)
     datalad_api.siblings(action='configure', name=SIBLING, url=ssh_url)
 
+
 def push_annex_branch(cwd):
     """git-annexブランチをpushする"""
     git.git_pull(cwd)
@@ -327,6 +343,7 @@ def push_annex_branch(cwd):
         pass
     else:
         Cmd.exec_subprocess(cmd=f'git push {SIBLING} git-annex:git-annex', cwd=cwd)
+
 
 def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str], gitannex_files :list[str], message:str, get_paths:list[str],):
     """synchronize with the repository
@@ -483,6 +500,7 @@ def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str], gitann
             display_log(datalad_error)
             return False
 
+
 def save_annex_and_register_metadata(cwd, gitannex_path :list[str], gitannex_files:list[str], message:str):
     """datalad save and metadata assignment (content_size, sha256, mime_type) to git annex files
 
@@ -522,6 +540,7 @@ def save_annex_and_register_metadata(cwd, gitannex_path :list[str], gitannex_fil
             # if gitannex_files is not defined as a single file path (str) or multiple file paths (list), no metadata is given.
             pass
 
+
 def register_metadata_for_annexdata(cwd:str, file_path):
     """register_metadata(content_size, sha256, mime_type) for specified file
 
@@ -554,12 +573,15 @@ def register_metadata_for_annexdata(cwd:str, file_path):
     else:
         pass
 
+
 def save_git(git_path:list[str], message:str):
     if len(git_path) > 0:
         datalad_api.save(message=message + ' (git)', path=git_path, to_git=True)
 
+
 def update():
     datalad_api.update(sibling=SIBLING, how='merge')
+
 
 def push():
     datalad_api.push(to=SIBLING, data='auto')
@@ -585,9 +607,11 @@ def is_should_annex_content_path(file_path : str)->bool:
     else:
         return False
 
+
 def get_filepaths_from_dalalad_error(err_info: str):
     pattern = r"'\\t(.+?)\\n'"
     return re.findall(pattern, err_info)
+
 
 def extract_info_from_datalad_update_err(raw_msg:str)->str:
     start_index = raw_msg.find("[") + 1
@@ -599,9 +623,6 @@ def extract_info_from_datalad_update_err(raw_msg:str)->str:
     start_index = err_detail_info.find("[") + 1
     end_index= err_detail_info.find("]")
     return err_detail_info[start_index:end_index]
-
-
-
 
 
 def creat_html_msg(msg='', fore=None, back=None, tag='h1'):
@@ -636,8 +657,10 @@ def creat_html_msg(msg='', fore=None, back=None, tag='h1'):
     else:
         return "<" + tag + " style='" + style + "'>" + msg + "</" + tag + ">"
 
+
 def creat_html_msg_info_p(msg=''):
     return creat_html_msg(msg=msg, back='#9eff9e', tag='p')
+
 
 def creat_html_msg_err_p(msg=''):
     return creat_html_msg(msg=msg, back='#ffa8a8', tag='p')
@@ -739,6 +762,7 @@ def display_warm(msg=''):
     back = "#ffff93"
     display_html_msg(msg, None, back, default_tag)
 
+
 def display_debug(msg=''):
     """デバッグ用出力メソッド(pタグの背景色(#dcdcdc))
 
@@ -750,6 +774,7 @@ def display_debug(msg=''):
     """
     back = "#dcdcdc"
     display_html_msg(msg, None, back, default_tag)
+
 
 def update_repo_url():
     """HTTPとSSHのリモートURLを最新化する

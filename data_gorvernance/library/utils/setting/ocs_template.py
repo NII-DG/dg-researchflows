@@ -2,12 +2,14 @@ import os
 from pathlib import Path
 from typing import List
 
-from ..file import JsonFile
+from library.utils.file import JsonFile
+
 
 # ocs_template.jsonのファイルパス
 script_dir_path = os.path.dirname(__file__)
 p = Path(script_dir_path)
 ocs_template_json_file = p.joinpath('../../data/ocs-template.json').resolve()
+
 
 class OCSTemplate:
     __FIELD = "ocs_template"

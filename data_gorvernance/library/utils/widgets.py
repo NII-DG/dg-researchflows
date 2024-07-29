@@ -2,6 +2,7 @@ import panel as pn
 
 from .config import message as msg_config
 
+
 class Button(pn.widgets.Button):
 
     def set_looks_init(self, name=""):
@@ -53,6 +54,7 @@ class Alert(pn.pane.Alert):
     @classmethod
     def error(cls, msg=""):
         return cls(msg, sizing_mode="stretch_width", alert_type='danger')
+
 
 class MessageBox(pn.WidgetBox):
 

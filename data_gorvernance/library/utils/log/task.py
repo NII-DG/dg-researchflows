@@ -2,6 +2,7 @@ import functools
 
 from .models import UserActivityLog
 
+
 class TaskLog:
 
     def __init__(self, nb_working_file_path, notebook_name) -> None:

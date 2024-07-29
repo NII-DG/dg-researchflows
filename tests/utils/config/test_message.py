@@ -1,4 +1,5 @@
 from unittest import TestCase
+
 from data_gorvernance.library.utils.config import message
 
 class TestMessageConfig(TestCase):

@@ -1,5 +1,7 @@
 import subprocess
-from ..utils.error import ExecCmdError
+
+from .error import ExecCmdError
+
 
 class Cmd():
 

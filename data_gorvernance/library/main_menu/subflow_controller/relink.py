@@ -1,12 +1,13 @@
-from typing import Dict, List
 import traceback
+from typing import Dict, List
 
 import panel as pn
 from dg_drawer.research_flow import PhaseStatus
 
-from ...utils.config import message as msg_config
+from library.utils.config import message as msg_config
+from library.utils.widgets import Alert
 from .base import BaseSubflowForm
-from ...utils.widgets import Alert
+
 
 class RelinkSubflowForm(BaseSubflowForm):
     """サブフロー間接続編集クラス"""
@@ -182,4 +183,3 @@ class RelinkSubflowForm(BaseSubflowForm):
         # フォームの初期化
         self._sub_flow_type_selector.value = 0
         self.change_submit_button_init(msg_config.get('main_menu', 'relink_sub_flow'))
-

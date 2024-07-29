@@ -1,7 +1,8 @@
 import os
 from pathlib import Path
 
-from ...utils.file import JsonFile
+from library.utils.file import JsonFile
+
 
 # param.jsonのファイルパス
 script_dir_path = os.path.dirname(__file__)
@@ -48,7 +49,6 @@ class ParamConfig():
         return pc._repository._id
 
 
-
 class Siblings():
     __GINHTTP = 'ginHttp'
     __GINSSH = 'ginSsh'
@@ -69,6 +69,7 @@ class Siblings():
         data[self.__GITHUBSSH] = self._gitHubSsh
         return data
 
+
 class GgCore():
     __SCHEME = 'Scheme'
     __NETLOC = 'Netloc'
@@ -82,6 +83,7 @@ class GgCore():
         data[self.__SCHEME] = self._scheme
         data[self.__NETLOC] = self._netloc
         return data
+
 
 class Repository():
     __ID = 'id'

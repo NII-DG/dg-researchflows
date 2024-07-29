@@ -2,7 +2,7 @@ import json
 import os
 from urllib import parse
 
-from .client import upload, download
+from library.utils.error import NotFoundContentsError, UnauthorizedError
 from .api import (
     get_token_profile,
     get_user_info,
@@ -10,8 +10,8 @@ from .api import (
     get_project_registrations,
     get_project_collaborators
 )
+from .client import upload, download
 from .metadata import format_metadata
-from ...error import NotFoundContentsError, UnauthorizedError
 
 
 NEED_TOKEN_SCOPE = ["osf.full_write"]

@@ -1,16 +1,14 @@
 import os
 from pathlib import Path
 
-import panel as pn
 from IPython.display import display
 from IPython.core.display import Javascript
+import panel as pn
 
-from .html.button import create_button
-from .config import path_config, message as msg_config
-from library.utils.setting import get_data_dir
 from . import file
-
-
+from .config import path_config, message as msg_config
+from .html import create_button
+from .setting import get_data_dir
 
 
 def open_main_menu(working_file):
@@ -57,5 +55,3 @@ def open_data_folder(working_file):
     pn.extension()
     display(pn.pane.HTML(obj, width=button_width))
     display(Javascript('IPython.notebook.save_checkpoint();'))
-
-

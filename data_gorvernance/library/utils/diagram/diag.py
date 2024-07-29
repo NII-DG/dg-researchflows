@@ -1,11 +1,11 @@
-from pathlib import Path
 import traceback
+from pathlib import Path
 from subprocess import run
 
 from blockdiag.command import BlockdiagApp
 from blockdiag.utils.logging import error
 
-from ..file import File
+from library.utils.file import File
 
 
 class DiagManager:

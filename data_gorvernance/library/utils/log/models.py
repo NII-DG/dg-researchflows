@@ -1,11 +1,11 @@
+import datetime
+import os
 import logging
 from logging import FileHandler
-import os
 from pathlib import Path
-import datetime
 
-from ..config import path_config
-from ..setting import get_subflow_type_and_id
+from library.utils.config import path_config
+from library.utils.setting import get_subflow_type_and_id
 
 
 class BaseLogger:
@@ -49,6 +49,7 @@ class BaseLogger:
             self.logger.setLevel(logging.ERROR)
         elif level == 'critical':
             self.logger.setLevel(logging.CRITICAL)
+
 
 class UserActivityLog(BaseLogger):
 
@@ -110,4 +111,3 @@ class UserActivityLog(BaseLogger):
             'ipynb_name': self.ipynb_file,
             'cell_id': self.cell_id
         }
-

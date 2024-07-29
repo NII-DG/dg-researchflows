@@ -3,9 +3,10 @@ from typing import Dict, List
 import panel as pn
 from dg_drawer.research_flow import PhaseStatus
 
-from ...utils.config import path_config, message as msg_config
+from library.utils.config import path_config, message as msg_config
+from library.utils.widgets import Alert
 from .base import BaseSubflowForm
-from ...utils.widgets import Alert
+
 
 class DeleteSubflowForm(BaseSubflowForm):
     """サブフロー削除クラス"""

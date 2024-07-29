@@ -1,4 +1,5 @@
-""" パッケージを作成するモジュール
+""" パッケージを作成するモジュールです。
+cookiecutterテンプレートを使用してパッケージを作成するクラスが記載されています。
 """
 import os
 from collections import OrderedDict
@@ -42,7 +43,7 @@ class MakePackage:
             checkout (str): クローン後にチェックアウトするブランチ、タグ、コミット IDを設定します。
 
         Returns:
-            dict:
+            dict: テンプレートを返す。
         """
         config_dict = get_user_config()
         self.template_dir, cleanup = determine_repo_dir(

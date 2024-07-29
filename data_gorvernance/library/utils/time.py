@@ -17,8 +17,7 @@ class TimeDiff:
         self.time_diff = None
 
     def start(self):
-        """ パフォーマンスカウンタの開始時間を記録するメソッドです。
-        """
+        """ パフォーマンスカウンタの開始時間を記録するメソッドです。"""
         self.start_time = time.perf_counter()
 
     def end(self):

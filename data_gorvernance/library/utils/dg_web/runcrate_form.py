@@ -40,7 +40,7 @@ class RunCrateForm:
             schema (dict): スキーマを設定します。
 
         Returns:
-            _type_: RunCrate選択部分を取り除いたスキーマを返す。
+            dict: RunCrate選択部分を取り除いたスキーマを返す。
         """
         properties = schema.get('properties', {})
         self.definition = properties.pop(self.key, {})

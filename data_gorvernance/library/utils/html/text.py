@@ -1,5 +1,4 @@
-"""メッセージ用HTML生成モジュールです。
-"""
+"""メッセージ用HTML生成モジュールです。"""
 from IPython.display import display
 from IPython.core.display import HTML
 
@@ -42,7 +41,7 @@ def creat_html_msg_info(msg='', tag='p'):
     return creat_html_msg(msg=msg, back='#9eff9e', tag=tag)
 
 def creat_html_msg_warm(msg='', tag='p'):
-    """ infoメッセージの生成
+    """ warnメッセージの生成
 
     Args:
         msg (str, optional):メッセージ文字列を設定します。
@@ -54,7 +53,7 @@ def creat_html_msg_warm(msg='', tag='p'):
     return creat_html_msg(msg=msg, back='#ffff93', tag=tag)
 
 def creat_html_msg_err(msg='', tag='p'):
-    """ infoメッセージの生成
+    """ errメッセージの生成
 
     Args:
         msg (str, optional):メッセージ文字列を設定します。
@@ -66,7 +65,7 @@ def creat_html_msg_err(msg='', tag='p'):
     return creat_html_msg(msg=msg, back='#ffa8a8', tag=tag)
 
 def creat_html_msg_log(msg='', tag='p'):
-    """ infoメッセージの生成
+    """ 標準メッセージの生成
 
     Args:
         msg (str, optional):メッセージ文字列を設定します。
@@ -79,6 +78,7 @@ def creat_html_msg_log(msg='', tag='p'):
 
 def display_msg_info(msg='', tag='p'):
      """Infoメッセージの表示
+     
      Args:
         msg (str, optional):メッセージ文字列を設定します。
         tag (str, optional): HTMLタグを設定します。
@@ -87,6 +87,7 @@ def display_msg_info(msg='', tag='p'):
 
 def display_msg_warm(msg='', tag='p'):
      """Warningメッセージの表示
+     
      Args:
         msg (str, optional):メッセージ文字列を設定します。
         tag (str, optional): HTMLタグを設定します。
@@ -95,6 +96,7 @@ def display_msg_warm(msg='', tag='p'):
 
 def display_msg_err(msg='', tag='p'):
      """Errorsメッセージの表示
+     
      Args:
         msg (str, optional):メッセージ文字列を設定します。
         tag (str, optional): HTMLタグを設定します。
@@ -103,6 +105,7 @@ def display_msg_err(msg='', tag='p'):
 
 def display_msg_log(msg='', tag='p'):
      """標準メッセージの表示
+     
      Args:
         msg (str, optional):メッセージ文字列を設定します。
         tag (str, optional): HTMLタグを設定します。

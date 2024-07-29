@@ -1,5 +1,5 @@
 """ ファイル操作のモジュールです。
-
+JSONファイルを操作するためのクラスやファイルをコピーする関数が記載されています。
 """
 import os
 import shutil
@@ -25,7 +25,9 @@ def copy_file(source_path, destination_path):
 
 
 def copy_dir(src, dst, overwrite=False):
-    """ src から dst へディレクトリをコピーする関数です。
+    """ ディレクトリをコピーする関数です。
+
+    src から dst へディレクトリをコピーします。
 
     Args:
         src(str): コピー元ディレクトリを設定します。
@@ -37,25 +39,25 @@ def copy_dir(src, dst, overwrite=False):
 
     """
     def f_exists(base, dst):
-        """ わかりません
+        """ 指定したベースディレクトリと目的のディレクトリの間で存在するファイル名を返す関数です。
 
         Args:
-            base(str):
-            dst(str):
+            base(str): ベースとなるディレクトリのパス
+            dst(str): 比較対象のディレクトリのパス
 
         Returns:
-            str:
+            set: _ignore関数を返す
         """
         base, dst = Path(base), Path(dst)
         def _ignore(path, names):   # サブディレクトリー毎に呼び出される
-            """ わかりません
+            """ 指定したパスと名前で存在するファイル名のセットを返す関数です。
 
             Args:
-                path(str):
-                names(str):
+                path(str): サブディレクトリのパス
+                names(str): サブディレクトリの名前
 
             Returns:
-                set[str]:
+                set[str]: ベースディレクトリと目的ディレクトリの間で存在するファイル名のセット
             """
             names = set(names)
             rel = Path(path).relative_to(base)
@@ -91,10 +93,11 @@ def relative_path(target_path, start_dir):
 class File:
     """ ファイル操作のクラスです。
 
+    ファイルの読み書きや作成、削除をします。
+
     Attributes:
         instance:
             path(Path): ファイルのパス
-
 
     """
 
@@ -110,6 +113,8 @@ class File:
     def read(self):
         """ ファイルから内容を読み込み、その内容を返すメソッドです。
 
+        self.pathのファイルを読み込み、その内容を返します。
+
         Returns:
             str: ファイルの内容を返す。
 
@@ -120,6 +125,8 @@ class File:
 
     def write(self, content: str):
         """ 指定された内容をファイルに書き込むメソッドです。
+
+        self.pathのファイルにcontentの内容を書き込みます。
 
         Args:
             content(str): 書き込む内容を設定します。
@@ -132,6 +139,8 @@ class File:
     def create(self, exist_ok=True):
         """ 新しいファイルを作成するメソッドです。
 
+        self.pathに新しいファイルを作成します。
+
         Args:
             exist_ok(bool): 既存のディレクトリを指定してエラーにならないかを設定します。
 
@@ -142,6 +151,8 @@ class File:
     def remove(self, missing_ok=False):
         """ ファイルを削除するメソッドです。
 
+        self.pathのファイルを削除します。
+
         Args:
             missing_ok(bool): 存在しないファイルを指定してエラーにならないかを設定します。
 
@@ -150,7 +161,9 @@ class File:
 
 
 class JsonFile(File):
-    """ JSONファイルを読み書きするクラスです。
+    """ JSONファイルのクラスです。
+
+    JSONファイルの読み込みや書き込みをします。
 
     """
     def __init__(self, file_path: str):
@@ -164,6 +177,8 @@ class JsonFile(File):
     def read(self):
         """ ファイルの内容をjsonとして読み込むメソッドです。
 
+        self.pathのファイルの内容をJSONとして読み込みます。
+
         Returns:
             dict: ファイルの内容を返す。
         """
@@ -172,6 +187,8 @@ class JsonFile(File):
 
     def write(self, data:dict):
         """ 与えられた内容をjsonとしてファイルに書き込むメソッドです。
+
+        self.pathのファイルにdataを書き込みます。
 
         Args:
             data(dict): 書き込む内容を設定します。

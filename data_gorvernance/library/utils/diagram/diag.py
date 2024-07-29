@@ -111,8 +111,8 @@ class DiagManager:
 
         Args:
             output (str): 出力するパスを設定します。
-            diag (_type_): ダイアグラムを設定します。
-            font (_type_): フォントを設定します。
+            diag (str): ダイアグラムを設定します。
+            font (str): フォントを設定します。
 
         Returns:
             int: 実行結果を返す。

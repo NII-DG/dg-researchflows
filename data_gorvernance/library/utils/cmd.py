@@ -1,5 +1,5 @@
 """ コマンドを実行するモジュールです。
-
+シェルコマンド実行するクラスが記載されています。
 """
 import subprocess
 from ..utils.error import ExecCmdError

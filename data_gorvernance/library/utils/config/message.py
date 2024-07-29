@@ -13,10 +13,10 @@ def get(section:str, option:str) -> str:
     """ メッセージを取得する関数です。
 
     Args:
-        section (str): section of message.ini
-        key (str): key of message.ini
+        section (str): message.iniのセクション
+        key (str): message.iniのキー
     Returns:
-        str: message for user
+        str: メッセージを返す。
     """
     config = configparser.ConfigParser()
     config.read(message_ini_path, encoding='utf-8')

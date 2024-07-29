@@ -97,6 +97,7 @@ class Title(pn.pane.Markdown):
 
     def __init__(self, object=None, **params):
         """ クラスのインスタンス初期化処理を実行するメソッドです。
+
         Args:
             object(str): Markdownを含む文字列を設定する。
             **params(dict): pn.pane.Markdownのその他のパラメータを設定する。
@@ -207,7 +208,7 @@ class Form:
 
     Methods:
         create_widgets(schema, data): 入力フォームの作成
-        get_data(): 入力されたデータの取得
+        get_data(Any): 入力されたデータの取得
     """
 
     def __init__(self) -> None:
@@ -377,7 +378,7 @@ class Form:
                 """ ウィジェットを削除するメソッドです。
 
                 Args:
-                    event (): ボタンクリックイベントを設定します。
+                    event (Event): ボタンクリックイベントを設定します。
                 """
                 try:
                     objects = column.objects
@@ -413,7 +414,7 @@ class Form:
             """ Columnに要素を追加するメソッドです。
 
             Args:
-                event (): ボタンクリックイベントを設定します。
+                event (Event): ボタンクリックイベントを設定します。
             """
             column.append(create_items())
 
@@ -436,7 +437,7 @@ class Form:
         """ 値を取得するwidgetでないかどうかを判定する関数です。
 
         Args:
-            widget (): 判定対象のウィジェットを設定します。
+            widget (Any): 判定対象のウィジェットを設定します。
 
         Returns:
             bool: 値を取得するwidgetでないかどうかを返す。
@@ -534,7 +535,7 @@ class Form:
             schema (dict): widgetに対応するプロパティ定義
 
         Returns:
-            dict: arrayのvalue群
+            dict: objectのvalue群
         """
         objects = widget.objects
         key = widget.schema_key

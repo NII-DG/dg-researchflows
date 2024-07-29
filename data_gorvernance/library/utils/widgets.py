@@ -122,8 +122,7 @@ class Alert(pn.pane.Alert):
         return cls(msg, sizing_mode="stretch_width", alert_type='danger')
 
 class MessageBox(pn.WidgetBox):
-    """ メッセージを表示するためのwidgetBoxのクラスです。
-    """
+    """ メッセージを表示するためのwidgetBoxのクラスです。"""
     def has_message(self):
         """ MessageBoxにメッセージが存在するかを判定するメソッドです。
 

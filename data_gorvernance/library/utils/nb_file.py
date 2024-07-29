@@ -1,6 +1,4 @@
-""" Notebookファイル操作のモジュールです。
-
-"""
+""" Notebookファイル操作のモジュールです。"""
 import os
 from typing import Any
 
@@ -10,9 +8,7 @@ from .file import File
 from .html import security
 
 class NbFile(File):
-    """ Notebookファイル操作のクラスです。
-
-    """
+    """ Notebookファイル操作のクラスです。"""
 
     def __init__(self, file_path: str):
         """ クラスのインスタンスの初期化処理を実行するメソッドです。

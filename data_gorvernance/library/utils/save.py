@@ -1,5 +1,4 @@
-""" わかりません
-"""
+""" タスクを保存するモジュールです。"""
 import os
 import traceback
 
@@ -43,7 +42,7 @@ def all_sync_path(abs_root):
 
 
 class TaskSave(TaskLog):
-    """ わかりません
+    """ タスクを保存するクラスです。
 
     Attributes:
         instance:
@@ -105,9 +104,10 @@ class TaskSave(TaskLog):
         return token, project_id
 
     def define_save_form(self, source):
-        """_summary_
+        """ GRDMに保存するフォームを作成するメソッドです。
+
         Args:
-            source (str or list):
+            source (str or list): 保存するファイルを設定します。
 
         Raises:
             TypeError: sourceがstrまたはlistでない
@@ -132,15 +132,15 @@ class TaskSave(TaskLog):
 
     @TaskLog.callback_form("input_token")
     def _save_submit_callback(self, event):
-        """ わかりません
+        """ ボタン押下時に保存するメソッドです。
 
         Args:
-            event (_type_):
+            event (Event): ボタンクリックイベント。
         """
         self._save()
 
     def _save(self):
-        """ わかりません
+        """ 保存を実行するメソッドです。
         """
         size = len(self._source)
         timediff = TimeDiff()

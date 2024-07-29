@@ -1,4 +1,4 @@
-"""このパッケージはCreateSubflowForm、DeleteSubflowForm、RenameSubflowForm、RelinkSubflowFormのimportのクラスを行います。
+"""このパッケージはCreateSubflowForm、DeleteSubflowForm、RenameSubflowForm、RelinkSubflowFormのクラスをimportします。
     CreateSubflowForm:サブフロー新規作成クラスです。
         generate_sub_flow_type_options:サブフロー種別(フェーズ)を表示する関数です。
         change_submit_button_init:処理関数ボタンの関数です。

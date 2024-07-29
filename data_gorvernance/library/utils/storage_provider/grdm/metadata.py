@@ -1,4 +1,4 @@
-"""このモジュールはメタデータを取得します。
+"""このモジュールはメタデータに必要な値を用意します。
     プロジェクトメタデータを整形したり、メタデータのテンプレートを取得したり、メタデータをフォーマットして返却する関数があります。
 """
 import json
@@ -49,12 +49,12 @@ def format_metadata(metadata):
 
 
 def get_schema(url):
-    """メタデータのテンプレートを取得する関数です
-            リクエストされたURLに接続し、その接続に問題がないかを確認してテンプレートを取得する。
+    """メタデータのプロトコル名を取得する関数です。
+            リクエストされたURLに接続し、その接続に問題がないかを確認してプロトコル名を取得する。
     Args:メタデータのURL
 
     Returns:
-        メタデータのテンプレートの値を返す。
+        メタデータのプロトコル名の値を返す。
     
     """
     response = requests.get(url=url)
@@ -63,10 +63,10 @@ def get_schema(url):
 
 
 def format_display_name(schema: dict, page_id: str, qid: str, value=None):
-    """メタデータをフォーマットして返却する
+    """メタデータをフォーマットして返却する関数です。
 
     Args:
-        schema (dict): メタデータのテンプレート
+        schema (dict): メタデータのプロトコル名
         page_id (str): プロジェクトメタデータ("page1")、ファイルメタデータ("page2")
         qid (str): メタデータのqid
         value (optional): メタデータに設定された値. Defaults to None.

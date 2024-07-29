@@ -1,3 +1,7 @@
+"""このモジュールはVaultサーバーに接続します。
+    Vaultサーバーに接続するために必要な値の設定とチェックを行い、キーやポリシーを作成してサーバーを起動させ、接続確認を行う関数があります。
+
+"""
 import hvac
 import os
 import requests
@@ -21,6 +25,8 @@ MAX_RETRY_COUNT = 5
 
 
 def start_server():
+    """サーバーを起動させるためにパスなどの値を用意する関数です。
+    """
     config_path = os.path.join(
         os.environ['HOME'], 'data_gorvernance/library/data/vault-config.hcl')
     subprocess.Popen(
@@ -31,10 +37,23 @@ def start_server():
 
 
 class Vault():
-    """Vault Server操作クラス"""
-
+    """Vault Server操作クラスです
+    
+    Attributes:
+        __read_token:ルートトークンを読み取る。
+        __start_server:Vaultサーバー起動する。
+        __create_dg_engine:シークレットエンジン(kv)作成。
+        __create_dg_policy:ポリシーを作成。
+    
+    """
+        
     def initialize(self):
-        """Vault初期化"""
+        """Vault初期化を行う関数です
+        
+        Raises:
+            UnusableVault:Vaultが使用できない
+        
+        """
 
         try:
             self.__read_token()
@@ -48,7 +67,12 @@ class Vault():
         self.__create_dg_policy()
 
     def set_value(self, key, value):
-        """値の設定"""
+        """値の設定をする関数です
+        Args:
+            key(str):トークンをvaultで保存するときのキー
+            value(str):パーソナルトークン
+        
+        """
         client = self.__get_client()
         client.secrets.kv.v1.create_or_update_secret(
             path=key,
@@ -57,7 +81,17 @@ class Vault():
         )
 
     def has_value(self, key):
-        """値の存在チェック"""
+        """値の存在チェックをする関数です
+        Args:
+            key(str):トークンをvaultで保存するときのキー
+
+        Raises:
+            InvalidPath:無効なパスによるエラー
+
+        Returns:
+            キーが存在した場合は秘密鍵の値を返し、存在しない場合はFalseの値を返す。
+        
+        """
         client = self.__get_client()
         try:
             secrets = client.secrets.kv.v1.list_secrets(
@@ -70,7 +104,15 @@ class Vault():
         return key in secrets['data']['keys']
 
     def get_value(self, key):
-        """値の取得"""
+        """値の取得をする関数です
+        
+        Args:
+            key(str):トークンをvaultで保存するときのキー
+
+        Returns:
+            取得した値を返す。値がない場合はNoneを返す。
+        
+        """
         if not self.has_value(key):
             return None
 
@@ -82,7 +124,13 @@ class Vault():
         return read_res['data']['secret']
 
     def __start_server(self):
-        """Vaultサーバー起動"""
+        """Vaultサーバー起動する関数です。
+
+        Raises:
+            requests.ConnectionError:接続ができないエラー
+            UnusableVault:値が利用できないエラー
+        
+        """
 
         # vaultサーバー起動
         thread = threading.Thread(target=start_server)
@@ -118,7 +166,7 @@ class Vault():
         self.__write_token(root_token)
 
     def __create_dg_engine(self):
-        """シークレットエンジン(kv)作成"""
+        """シークレットエンジン(kv)作成をする関数です"""
 
         token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=token)
@@ -132,7 +180,7 @@ class Vault():
             )
 
     def __create_dg_policy(self):
-        """ポリシー作成"""
+        """ポリシー作成をする関数です"""
 
         token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=token)
@@ -145,12 +193,18 @@ class Vault():
             )
 
     def __write_token(self, token):
-        """ルートトークン保存"""
+        """ルートトークン保存の関数です"""
         with open(TOKEN_PATH, 'w') as f:
             f.write(token)
 
     def __read_token(self):
-        """ルートトークン取得"""
+        """ルートトークン取得の関数です
+        
+        Raises:
+            UnusableVault:値が利用できないエラー
+        Returns:
+            ルートトークンの値を返す。
+        """
         if not os.path.isfile(TOKEN_PATH):
             raise UnusableVault
 
@@ -159,6 +213,11 @@ class Vault():
         return root_token
 
     def __get_client(self):
+        """接続の確認を行う関数です
+        
+        Returns:
+               接続先のページを表示する。     
+        """
         root_token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=root_token)
         token_res = client.auth.token.create(

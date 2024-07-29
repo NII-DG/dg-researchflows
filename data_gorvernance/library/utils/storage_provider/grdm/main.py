@@ -1,3 +1,7 @@
+"""このモジュールはデータの取得やアップロード、権限やアクセス許可のチェックを行います。
+    プロジェクトID、プロジェクトの一覧、テキストファイルの中身やjsonファイルの中身、メタデータを取得したり、
+    GRDMにアップロードしたり、"URLの権限やアクセス許可のチェックを行います。
+"""
 import json
 import os
 from urllib import parse
@@ -19,6 +23,14 @@ ALLOWED_PERMISSION = ["admin", "write"]
 
 
 def get_project_id():
+    """プロジェクトIDを取得する関数です。
+
+    Returns:
+        Noneの値を返す。（URLがない場合)
+        分割したパスの要素の値を返す。
+        Noneの値を返す。（指定した値が含まれていない場合）
+        
+    """
     # url: https://rdm.nii.ac.jp/vz48p/osfstorage
     url = os.environ.get("BINDER_REPO_URL", "")
     if not url:
@@ -31,6 +43,18 @@ def get_project_id():
 
 
 def check_authorization(base_url: str, token: str) -> bool:
+    """URLの権限のチェックをする関数です。
+
+    Args:
+        base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+        token (str): パーソナルアクセストークン
+
+    Raises:
+        UnauthorizedError:認証が通らない
+
+    Returns:
+        bool: 権限に問題が無ければTrue、問題があればFalseを返す。
+    """
     try:
         profile = get_token_profile(base_url=base_url, token=token)
         scope = profile['scope']
@@ -42,7 +66,7 @@ def check_authorization(base_url: str, token: str) -> bool:
 
 
 def check_permission(base_url: str, token: str, project_id: str):
-    """_summary_
+    """アクセス許可のチェックを行う関数です。
 
     Args:
         base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
@@ -53,6 +77,9 @@ def check_permission(base_url: str, token: str, project_id: str):
         UnauthorizedError: 認証が通らない
         ProjectNotExist: 指定されたプロジェクトIDが存在しない
         requests.exceptions.RequestException: その他の通信エラー
+
+    Returns:
+        パーミッションに問題なければTrue、問題があればFalseの値を返す。
     """
     response = get_user_info(base_url, token)
     user_id = response['data']['id']
@@ -66,11 +93,19 @@ def check_permission(base_url: str, token: str, project_id: str):
 
 
 def get_projects_list(scheme, domain, token):
-    """プロジェクトの一覧を取得する
+    """プロジェクトの一覧を取得する関数です。
+
+    Args:
+        scheme(str): プロトコル名(http, https, ssh)
+        domain(str):ドメイン名
+        token(str):パーソナルトークン
 
     Raises:
         UnauthorizedError: 認証エラー
         requests.exceptions.RequestException: 通信エラー
+
+    Returns:
+        プロジェクトの一覧のデータの値を返す。
     """
     response = get_projects(scheme, domain, token)
     data = response['data']
@@ -78,9 +113,8 @@ def get_projects_list(scheme, domain, token):
 
 
 def sync(token, api_url, project_id, abs_source, abs_root="/home/jovyan"):
-    """upload to Gakunin RDM
-
-    abs_source must be an absolute path.
+    """GRDMにアップロードする関数です。
+            abs_source は絶対パスでなければならない。
 
     Args:
         token (str): GRDMのパーソナルアクセストークン
@@ -90,7 +124,8 @@ def sync(token, api_url, project_id, abs_source, abs_root="/home/jovyan"):
         abs_root (str, optional): リモートのプロジェクトに対応させたいディレクトリの絶対パス. Defaults to "/home/jovyan".
 
     Raises:
-        UnauthorizedError: 認証が通らない
+        FileNotFoundError: 指定したファイルが存在しないエラー
+        ValueError:絶対パスではないエラー
         RuntimeError: RDMClientから上がってくるエラー全般
     """
 
@@ -116,15 +151,14 @@ def sync(token, api_url, project_id, abs_source, abs_root="/home/jovyan"):
 
 
 def download_text_file(token, api_url, project_id, remote_path, encoding='utf-8'):
-    """テキストファイルの中身を取得する
+    """テキストファイルの中身を取得する関数です。
 
     Args:
         token (str): GRDMのパーソナルアクセストークン
         api_url (str): API URL (e.g. https://api.osf.io/v2/)
         project_id (str): プロジェクトID
         remote_path (str): ファイルパス
-        encoding (optional): The encoding with which to decode the bytes.
-
+        encoding (optional): バイトを解析するエンコーディング
     Raises:
         FileNotFoundError: 指定したファイルが存在しない
         UnauthorizedError: 認証が通らない
@@ -140,7 +174,7 @@ def download_text_file(token, api_url, project_id, remote_path, encoding='utf-8'
 
 
 def download_json_file(token, api_url, project_id, remote_path):
-    """jsonファイルの中身を取得する
+    """jsonファイルの中身を取得する関数です。
 
     Args:
         token (str): GRDMのパーソナルアクセストークン
@@ -159,7 +193,7 @@ def download_json_file(token, api_url, project_id, remote_path):
 
 
 def get_project_metadata(base_url: str, token: str, project_id: str):
-    """プロジェクトメタデータを取得する
+    """プロジェクトメタデータを取得する関数です。
 
     Args:
         base_url (str):Root URL (e.g. https://rdm.nii.ac.jp)
@@ -179,7 +213,7 @@ def get_project_metadata(base_url: str, token: str, project_id: str):
 
 
 def get_collaborator_list(base_url: str, token: str, project_id: str) -> dict:
-    """共同管理者の取得
+    """共同管理者の取得する関数です。
 
     Args:
         base_url (str):Root URL (e.g. https://rdm.nii.ac.jp)
@@ -203,7 +237,7 @@ def get_collaborator_list(base_url: str, token: str, project_id: str) -> dict:
 
 
 def build_collaborator_url(base_url: str, project_id: str):
-    """プロジェクトのメンバー一覧のURLを返す
+    """プロジェクトのメンバー一覧のURLを返す関数です。
 
     Args:
         base_url (str):Root URL (e.g. https://rdm.nii.ac.jp)

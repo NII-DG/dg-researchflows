@@ -1,3 +1,5 @@
+""" わかりません
+"""
 import os
 import traceback
 
@@ -15,6 +17,14 @@ from .error import UnusableVault, ProjectNotExist, UnauthorizedError, Permission
 
 
 def all_sync_path(abs_root):
+    """ 指定されたルートディレクトリから特定のディレクトリのパスを返す関数です。
+
+    Args:
+        abs_root (str): 絶対パスのルートディレクトリを設定します。
+
+    Returns:
+        list: ルートディレクトリからdataと、data_governanceのworking以外のパスのリストを返す。
+    """
     paths = []
 
     # /home/jovyan/data
@@ -33,8 +43,22 @@ def all_sync_path(abs_root):
 
 
 class TaskSave(TaskLog):
+    """ わかりません
 
+    Attributes:
+        instance:
+            _abs_root_path(str): 
+            save_msg_output(MessageBox): 
+            save_form_box(WidgetBox): 
+            _save_submit_button(Button): 
+    """
     def __init__(self, nb_working_file_path, notebook_name) -> None:
+        """ クラスのインスタンスの初期化処理を実行するメソッドです。
+
+        Args:
+            nb_working_file_path (str): 実行Notebookのファイルパス
+            notebook_name (str): 実行Notebookのファイル名
+        """
         super().__init__(nb_working_file_path, notebook_name)
         self._abs_root_path = path_config.get_abs_root_form_working_dg_file_path(nb_working_file_path)
 
@@ -49,7 +73,12 @@ class TaskSave(TaskLog):
         self._save_submit_button = Button(width=500)
 
     def get_grdm_params(self):
-        """GRDMのトークンとプロジェクトIDを取得する"""
+        """ GRDMのトークンとプロジェクトIDを取得するメソッドです。
+
+        Returns:
+            str: GRDMのトークンを返す。
+            str: プロジェクトIDを返す。
+        """
         token = ""
         project_id = ""
         try:
@@ -76,7 +105,13 @@ class TaskSave(TaskLog):
         return token, project_id
 
     def define_save_form(self, source):
-        """source is str or list."""
+        """_summary_
+        Args:
+            source (str or list):
+
+        Raises:
+            TypeError: sourceがstrまたはlistでない
+        """
 
         # validate source path
         if isinstance(source, str):
@@ -97,9 +132,16 @@ class TaskSave(TaskLog):
 
     @TaskLog.callback_form("input_token")
     def _save_submit_callback(self, event):
+        """ わかりません
+
+        Args:
+            event (_type_):
+        """
         self._save()
 
     def _save(self):
+        """ わかりません
+        """
         size = len(self._source)
         timediff = TimeDiff()
 

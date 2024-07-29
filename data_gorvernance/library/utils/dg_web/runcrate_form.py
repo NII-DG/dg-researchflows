@@ -1,3 +1,6 @@
+""" RunCrateの入力フォームのモジュールです。
+RunCrateの入力フォームの操作するクラスが記載されています。
+"""
 import panel as pn
 
 from library.utils.widgets import MessageBox
@@ -8,22 +11,20 @@ class RunCrateForm:
     """RunCrateの入力フォームの操作
 
     Attributes:
-        key (str): クラス属性。metadataのRunCrateの情報をもつ部分のキー値
-        definition (dict): jsonschemaの定義部分。property value
-        files (dict): runcrateのファイルの情報。{filename: link}
-        widgets (dict): 表示するwidget群を保持する。値の取得に使用する。
-        form_box (pn.WidgetBox): フォームを格納する。
-        msg_output (MessageBox): ユーザーに提示するメッセージを格納する。
-
-    Methods:
-        pop_schema(schema): jsonschemaから該当する部分を取得する
-        create_widgets(crates, data): 入力フォームの作成
-        get_data(): 入力されたデータの取得
+        class:
+            key (str):metadataのRunCrateの情報をもつ部分のキー値
+        instance
+            definition (dict): jsonschemaの定義部分。property value
+            files (dict): runcrateのファイルの情報。{filename: link}
+            widgets (dict): 表示するwidget群を保持する。値の取得に使用する。
+            form_box (pn.WidgetBox): フォームを格納する。
+            msg_output (MessageBox): ユーザーに提示するメッセージを格納する。
     """
 
     key = "runCrate"
 
     def __init__(self):
+        """ インスタンスの初期化処理を実行するメソッドです。"""
         self.definition = {}
         self.files = {}
         self.widgets = {}
@@ -33,7 +34,14 @@ class RunCrateForm:
         self.msg_output = MessageBox()
 
     def pop_schema(self, schema):
-        """schemaのRunCrate選択部分を取得し、schemaから取り除く"""
+        """schemaのRunCrate選択部分を取得し、schemaから取り除く
+
+        Args:
+            schema (dict): スキーマを設定します。
+
+        Returns:
+            _type_: RunCrate選択部分を取り除いたスキーマを返す。
+        """
         properties = schema.get('properties', {})
         self.definition = properties.pop(self.key, {})
         return schema
@@ -78,7 +86,12 @@ class RunCrateForm:
         self.widgets[self.key] = column
 
     def get_data(self):
-        """RunCrate選択の入力値からデータを生成する"""
+        """ RunCrate選択の入力値からデータを生成する
+
+        Returns:
+            dict: 生成したデータを返す。
+
+        """
         data = {}
         for key, contents in self.widgets.items():
             value = []

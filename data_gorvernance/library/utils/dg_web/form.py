@@ -1,3 +1,5 @@
+""" 入力フォーム用のモジュールです。
+入力フォーム生成や操作のためのクラスが記載されています。"""
 import traceback
 
 import panel as pn
@@ -10,8 +12,17 @@ margin = (0, 15, 5, 15)
 
 
 class TextInput(pn.widgets.TextInput):
+    """ テキスト入力ウィジェットのクラスです。
 
+    Attributes:
+        instance:
+            schema_key: JSONスキーマのproperty key
+    """
     def __init__(self, **params):
+        """ クラスのインスタンス初期化処理を実行するメソッドです。
+        Args:
+            **params(dict): pn.widgets.TextInputのその他のパラメータ。
+        """
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
         if "margin" not in params:
@@ -20,8 +31,17 @@ class TextInput(pn.widgets.TextInput):
 
 
 class Select(pn.widgets.Select):
+    """ 選択ウィジェットのクラスです。
 
+    Attributes:
+        instance:
+            schema_key: JSONスキーマのproperty key
+    """
     def __init__(self, **params):
+        """ クラスのインスタンス初期化処理を実行するメソッドです。
+        Args:
+            **params(dict): pn.widgets.Selectのその他のパラメータ。
+        """
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
         if "margin" not in params:
@@ -30,8 +50,17 @@ class Select(pn.widgets.Select):
 
 
 class IntInput(pn.widgets.IntInput):
+    """ 整数入力ウィジェットのクラスです。
 
+    Attributes:
+        instance:
+            schema_key: JSONスキーマのproperty key
+    """
     def __init__(self, **params):
+        """ クラスのインスタンス初期化処理を実行するメソッドです。
+        Args:
+            **params(dict): pn.widgets.IntInputのその他のパラメータ。
+        """
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
         if "margin" not in params:
@@ -40,8 +69,17 @@ class IntInput(pn.widgets.IntInput):
 
 
 class Checkbox(pn.widgets.Checkbox):
+    """ チェックボックスウィジェットのクラスです。
 
+    Attributes:
+        instance:
+            schema_key: JSONスキーマのproperty key
+    """
     def __init__(self, **params):
+        """ クラスのインスタンス初期化処理を実行するメソッドです。
+        Args:
+            **params(dict): pn.widgets.Checkboxのその他のパラメータ。
+        """
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
         if "margin" not in params:
@@ -50,8 +88,19 @@ class Checkbox(pn.widgets.Checkbox):
 
 
 class Title(pn.pane.Markdown):
+    """ マークダウン形式のタイトルのクラスです。
+
+    Attributes:
+        instance:
+            schema_key: JSONスキーマのproperty key
+    """
 
     def __init__(self, object=None, **params):
+        """ クラスのインスタンス初期化処理を実行するメソッドです。
+        Args:
+            object(str): Markdownを含む文字列を設定する。
+            **params(dict): pn.pane.Markdownのその他のパラメータを設定する。
+        """
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
         if "margin" not in params:
@@ -61,11 +110,27 @@ class Title(pn.pane.Markdown):
         super().__init__(object=object, **params)
 
     def set_text(self, text):
+        """ タイトルを設定するメソッドです。
+
+        Args:
+            text (str): タイトルのテキストを設定する。
+        """
         self.object = f"### {text}"
 
 class Description(pn.pane.Markdown):
+    """ マークダウン形式の説明のクラスです。
 
+    Attributes:
+        instance:
+            schema_key: JSONスキーマのproperty key
+    """
     def __init__(self, object=None, **params):
+        """ クラスのインスタンス初期化処理を実行するメソッドです。
+
+        Args:
+            object(str): Markdownを含む文字列を設定する。
+            **params(dict): pn.pane.Markdownのその他のパラメータを設定する。
+        """
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
         if "margin" not in params:
@@ -73,9 +138,18 @@ class Description(pn.pane.Markdown):
         super().__init__(object=object, **params)
 
 class Column(pn.Column):
-    """タイトルや入力欄をまとめる"""
+    """ タイトルや入力欄をまとめるクラスです。
 
+    Attributes:
+        instance:
+            schema_key: JSONスキーマのproperty key
+    """
     def __init__(self, **params):
+        """ クラスのインスタンス初期化処理を実行するメソッドです。
+
+        Args:
+            **params(dict): pn.Columnのその他のパラメータを設定する。
+        """
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
         if "margin" not in params:
@@ -83,8 +157,18 @@ class Column(pn.Column):
         super().__init__(**params)
 
 class ArrayBox(pn.WidgetBox):
+    """ わかりません
 
+    Attributes:
+        instance:
+            schema_key: スキーマのkey
+    """
     def __init__(self, **params):
+        """ クラスのインスタンス初期化処理を実行するメソッドです。
+
+        Args:
+            **params(dict): pn.WidgetBoxのその他のパラメータを設定する。
+        """
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
         if "margin" not in params:
@@ -92,8 +176,18 @@ class ArrayBox(pn.WidgetBox):
         super().__init__(**params)
 
 class ObjectBox(pn.WidgetBox):
+    """ わかりません
 
+    Attributes:
+        instance:
+            schema_key: スキーマのkey
+    """
     def __init__(self, **params):
+        """ クラスのインスタンス初期化処理を実行するメソッドです。
+
+        Args:
+            **params(dict): pn.WidgetBoxのその他のパラメータを設定する。
+        """
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
         if "margin" not in params:
@@ -101,14 +195,15 @@ class ObjectBox(pn.WidgetBox):
         super().__init__(**params)
 
 class Form:
-    """入力フォームの操作
+    """入力フォームの操作のクラスです。
 
     jsonschemaから入力欄を生成し、そこからデータを取得する
 
     Attributes:
-        form_box (pn.WidgetBox): フォームを格納する。
-        msg_output (MessageBox): ユーザーに提示するメッセージを格納する。
-        schema (dict): フォームの元となるjsonschema
+        instance:
+            form_box (pn.WidgetBox): フォームを格納する。
+            msg_output (MessageBox): ユーザーに提示するメッセージを格納する。
+            schema (dict): フォームの元となるjsonschema
 
     Methods:
         create_widgets(schema, data): 入力フォームの作成
@@ -249,7 +344,14 @@ class Form:
         column = pn.Column()
 
         def create_items(value=None):
-            """arrayのひとつの要素を作成する"""
+            """arrayのひとつの要素を作成する
+
+            Args:
+                value (Any, optional): 項目の初期値
+
+            Returns:
+                pn.Row: 生成されたウィジェットと削除ボタンを含むパネルの行を返す。
+            """
             column_list = column.objects
             items = definition["items"]
             title_num = f'{title}{len(column_list) + 1}'
@@ -261,9 +363,22 @@ class Form:
                 return pn.Row(widget, create_remove_button(widget, align='end'))
 
         def create_remove_button(widget, align='start'):
-            """arrayの選択した要素を削除するボタンを生成する"""
+            """ arrayの選択した要素を削除するボタンを生成するメソッドです。
+
+            Args:
+                widget (ArrayBox | ObjectBox | Column): 削除するウィジェットを設定します。
+                align (str, optional): ボタンの配置を設定します。
+
+            Returns:
+                Button: 生成した削除ボタンを返す。
+            """
             remove_button = Button(name='Remove', button_type='danger', button_style='outline', align=align)
             def remove_item(event):
+                """ ウィジェットを削除するメソッドです。
+
+                Args:
+                    event (): ボタンクリックイベントを設定します。
+                """
                 try:
                     objects = column.objects
                     column.clear()
@@ -295,6 +410,11 @@ class Form:
             return remove_button
 
         def add_item(event):
+            """ Columnに要素を追加するメソッドです。
+
+            Args:
+                event (): ボタンクリックイベントを設定します。
+            """
             column.append(create_items())
 
         if (not isinstance(values, list)) or (len(values) < 1):
@@ -313,7 +433,14 @@ class Form:
         return box
 
     def is_not_input_widget(self, widget):
-        """値を取得するwidgetでないかどうかを判定する"""
+        """ 値を取得するwidgetでないかどうかを判定する関数です。
+
+        Args:
+            widget (): 判定対象のウィジェットを設定します。
+
+        Returns:
+            bool: 値を取得するwidgetでないかどうかを返す。
+        """
         result = False
         if isinstance(widget, pn.pane.Markdown):
             result = True
@@ -322,7 +449,11 @@ class Form:
         return result
 
     def get_data(self):
-        """入力欄からデータを取得する"""
+        """ 入力欄からデータを取得するメソッドです。
+
+        Returns:
+            dict: 入力欄から取得したデータを返す。
+        """
         if not self.schema or "properties" not in self.schema:
             return {}
         widgets = self.form_box.objects
@@ -335,11 +466,18 @@ class Form:
         return data
 
     def _get_property(self, widget, schema:dict):
-        """各widgetからデータを取得する
+        """ 各widgetからデータを取得する
 
         Args:
             widget (Any): データを取得したいwidget
             schema (dict): widgetに対応するプロパティ定義
+
+        Returns:
+            dict: 取得したデータを含む辞書を返す。
+
+        Raises:
+            Exception: ウィジェットがサポートされていないタイプの場合
+
         """
         key = widget.schema_key
         value = ""
@@ -368,6 +506,14 @@ class Form:
             return {}
 
     def _get_value(self, widget: pn.Column):
+        """Column内のwidgetの値を取得するメソッドです。
+
+        Args:
+            widget (pn.Column): データを取得したいColumnを設定します。
+
+        Returns:
+            Any: widgetの値を返す。
+        """
         objects = widget.objects
         value = None
         for w in objects:
@@ -381,14 +527,14 @@ class Form:
         return value
 
     def _get_object_value(self, widget: ObjectBox, schema: dict):
-        """ObjectBox内のwidgetの値を取得する
+        """ObjectBox内のwidgetの値を取得するメソッドです。
 
         Args:
             widget (ObjectBox): データを取得したいObjectBox
             schema (dict): widgetに対応するプロパティ定義
 
         Returns:
-            list: arrayのvalue群
+            dict: arrayのvalue群
         """
         objects = widget.objects
         key = widget.schema_key

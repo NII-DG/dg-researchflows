@@ -1,3 +1,6 @@
+""" エラーのモジュールです。
+各種エラーのクラスが記載されています。
+"""
 class NotFoundSubflowDataError(Exception):
     """サブフローのデータが取得できなかった"""
     pass
@@ -9,7 +12,7 @@ class InputWarning(Exception):
 
 
 class ExecCmdError(Exception):
-    '''コマンド実行エラー'''
+    """コマンド実行エラー"""
     pass
 
 # vault
@@ -51,5 +54,5 @@ class UrlUpdateError(Exception):
 
 
 class NoValueInDgFileError(Exception):
-    '''タスクNotebookのコードセルで例外で処理停止しなければならないエラーが発生した場合'''
+    """タスクNotebookのコードセルで例外で処理停止しなければならないエラーが発生した場合"""
     pass

@@ -1,3 +1,6 @@
+""" タブを開くボタンを表示するモジュールです。
+別タブでメインメニューやデータフォルダを開くためのボタンを作成する関数が記載されています。
+"""
 import os
 from pathlib import Path
 
@@ -14,10 +17,12 @@ from . import file
 
 
 def open_main_menu(working_file):
-    """別タブでメインメニューを開くボタンを表示する
+    """ 別タブでメインメニューを開くボタンを表示する関数です。
+
+    指定されたファイルから相対的なパスを計算し、そのパスを使用して新しいタブでメインメニューを開くボタンを作成します。
 
     Args:
-        working_file (str): 移動元のファイルパス
+        working_file(str): 移動元のファイルパスを設定します。
     """
     button_width = 500
     root_folder = Path(
@@ -38,6 +43,13 @@ def open_main_menu(working_file):
 
 
 def open_data_folder(working_file):
+    """ 別タブでデータフォルダを開くボタンを表示する関数です。
+
+    指定されたファイルから相対的なパスを計算し、そのパスを使用して新しいタブでデータフォルダを開くボタンを作成します。
+
+    Args:
+        working_file(str) : 移動元のファイルパスを設定します。
+    """
     home = os.environ['HOME']
     # homeからdataディレクトリまで
     data_dir = get_data_dir(working_file)

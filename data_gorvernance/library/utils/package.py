@@ -1,3 +1,5 @@
+""" パッケージを作成するモジュール
+"""
 import os
 from collections import OrderedDict
 
@@ -16,13 +18,32 @@ from cookiecutter.exceptions import OutputDirExistsException, RepositoryNotFound
 
 
 class MakePackage:
+    """ cookiecutterテンプレートを使用してパッケージを作成するためのクラスです。
 
+    Attributes:
+        instance:
+            template_context(OrderedDict): テンプレートのコンテキストを保持する辞書
+            rendered_context(OrderedDict): レンダリングされたコンテキストを保持する辞書
+            prompts(dict): プロンプトの情報を保持する辞書
+            template_dir(str): cookiecutterテンプレートのディレクトリ
+    """
     def __init__(self) -> None:
+        """ クラスのインスタンスの初期化処理を実行するメソッドです。
+        """
         self.template_context = OrderedDict([])
         self.rendered_context = OrderedDict([])
         self.prompts = {}
 
     def get_template(self, template, checkout=None):
+        """ 指定されたテンプレートを取得するメソッドです。
+
+        Args:
+            template (str): クローンするリポジトリのURLまたはパスを指定する
+            checkout (str): クローン後にチェックアウトするブランチ、タグ、コミット IDを設定します。
+
+        Returns:
+            dict:
+        """
         config_dict = get_user_config()
         self.template_dir, cleanup = determine_repo_dir(
             template=template,
@@ -37,6 +58,14 @@ class MakePackage:
         return self.get_default_context(context)
 
     def get_default_context(self, context):
+        """ わかりません
+
+        Args:
+            context (dict): コンテキスト情報
+
+        Returns:
+            OrderedDict:
+        """
         cookiecutter_dict = OrderedDict([])
         env = StrictEnvironment(context=context)
 
@@ -53,6 +82,14 @@ class MakePackage:
         return cookiecutter_dict
 
     def get_title(self, var_name):
+        """ わかりません
+
+        Args:
+            var_name (str):
+
+        Returns:
+            _type_:
+        """
         prompts = self.prompts
         return (
             prompts[var_name]
@@ -61,4 +98,10 @@ class MakePackage:
         )
 
     def create_package(self, context_dict=None, output_dir='.'):
+        """ cookiecutterテンプレートを使用してパッケージを作成する
+
+        Args:
+            context_dict (dict): デフォルトおよびユーザー設定を上書きするコンテキストの辞書を設定します。
+            output_dir (str): パッケージを作成するディレクトリを設定します。
+        """
         cookiecutter(self.template_dir, no_input=True, extra_context=context_dict, output_dir=output_dir)

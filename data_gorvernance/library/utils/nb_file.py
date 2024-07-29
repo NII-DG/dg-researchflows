@@ -1,3 +1,6 @@
+""" Notebookファイル操作のモジュールです。
+
+"""
 import os
 from typing import Any
 
@@ -7,8 +10,19 @@ from .file import File
 from .html import security
 
 class NbFile(File):
+    """ Notebookファイル操作のクラスです。
+
+    """
 
     def __init__(self, file_path: str):
+        """ クラスのインスタンスの初期化処理を実行するメソッドです。
+
+        Args:
+            file_path (str): ファイルのパスを設定します。
+
+        Raises:
+            FileNotFoundError: ファイルが存在しない
+        """
         if not os.path.isfile(file_path):
             raise FileNotFoundError(f'Not Found File. file path : {file_path}')
         super().__init__(file_path)
@@ -27,7 +41,17 @@ class NbFile(File):
 
 
     def read(self):
+        """ ファイルからNotebookを読み込むメソッドです。
+
+        Returns:
+            Any: 読み込んだNotebookを返す。
+        """
         return nbformat.read(self.path, as_version=4)
 
     def write(self, notebook_data: Any):
+        """ ファイルにNotebookを書き込むメソッドです。
+
+        Args:
+            notebook_data (Any): 書き込むNotebookを設定します。
+        """
         nbformat.write(notebook_data, self.path)

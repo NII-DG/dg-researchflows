@@ -1,3 +1,6 @@
+""" メッセージ取得ののモジュールです。
+メッセージ取得の関数が記載されています。
+"""
 import configparser
 import os
 
@@ -7,7 +10,7 @@ message_ini_path = os.path.abspath(os.path.join(script_dir, MESSAGE_CONFIG_PATH)
 
 
 def get(section:str, option:str) -> str:
-    """メッセージを取得する
+    """ メッセージを取得する関数です。
 
     Args:
         section (str): section of message.ini

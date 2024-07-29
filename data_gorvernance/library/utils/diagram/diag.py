@@ -1,3 +1,8 @@
+""" ダイアグラムの管理を行うモジュールです。
+
+ダイアグラムのノードにプロパティを追加したり、ノードの色やアイコンを更新したり、SVGを生成したりするためのクラスが記載されています。
+
+"""
 from pathlib import Path
 import traceback
 from subprocess import run
@@ -9,13 +14,30 @@ from ..file import File
 
 
 class DiagManager:
+    """ダイアグラムの管理を行うクラスです。
 
+    Attributes:
+        instance:
+            path(Path): ファイルのパス
+            content(str): ファイルの内容
+    """
     def __init__(self, file_path: str) -> None:
+        """ クラスのインスタンスの初期化処理を実行するメソッドです。
+
+        Args:
+            file_path (str): ファイルパスを設定します。
+        """
         self.path = Path(file_path)
         # 以下暫定措置としてファイル書き変えのために用いる
         self.content = File(str(self.path)).read()
 
     def add_node_property(self, node_id: str, custom: str):
+        """ノードに属性を追加するメソッドです。
+
+        Args:
+            node_id (str): ノードIDを設定します。
+            custom (str): 追加する属性を設定します。
+        """
         lines = self.content.splitlines()
         new_lines = []
         is_replaced = True
@@ -37,25 +59,64 @@ class DiagManager:
 
 
     def update_node_color(self, node_id: str, color: str):
+        """ ノードの色を更新するメソッドです。
+
+        Args:
+            node_id (str): ノードIDを設定します。
+            color (str): 追加する色を設定します。
+        """
         self.add_node_property(node_id, f'color="{color}"')
 
     def update_node_icon(self, node_id: str, path: str):
+        """ ノードのアイコンを更新するメソッドです。
+
+        Args:
+            node_id (str): ノードIDを設定します。
+            path (str): アイコンのパスを設定します。
+        """
         self.add_node_property(node_id, f'background="{path}"')
 
     def update_node_style(self, node_id, style):
+        """ ノードのスタイルを更新するメソッドです。。
+
+        Args:
+            node_id (str): ノードIDを設定します。
+            style (str): 新しいスタイル
+        """
         self.add_node_property(node_id, f'style={style}')
 
     def update_node_stacked(self, node_id):
-        """ノードの重ね合わせ"""
+        """ ノードの重ね合わせのメソッドです。
+
+        Args:
+            node_id (str): ノードIDを設定します。
+        """
         self.add_node_property(node_id, f'stacked')
 
     def generate_svg(self, tmp_diag: str, output: str, font: str):
+        """ SVGを生成するメソッドです。
+
+        Args:
+            tmp_diag (str): 一時的なダイアグラムのパスを設定します。
+            output (str): 出力するパスを設定します。
+            font (str): フォントを設定します。
+        """
         File(str(tmp_diag)).write(self.content)
         diag = tmp_diag
         run(['blockdiag', '-f', font, '-Tsvg', '-o', output, diag], check=True)
 
     # 仮置き
     def run(self, output, diag, font):
+        """ 新しいプロセスでなくダイアグラムを生成する関数。
+
+        Args:
+            output (str): 出力するパスを設定します。
+            diag (_type_): ダイアグラムを設定します。
+            font (_type_): フォントを設定します。
+
+        Returns:
+            int: 実行結果を返す。
+        """
         app = BlockdiagApp()
         args = ['-f', font, '-Tsvg', '-o', output, diag]
 

@@ -1,3 +1,6 @@
+"""dg-webと接続するモジュールです。
+dg-webからガバナンスシートやメタデータのスキーマの取得する関数や検証を行う関数が記載されています。
+"""
 from http import HTTPStatus
 from urllib import parse
 
@@ -8,7 +11,16 @@ from ..error import UnauthorizedError, NotFoundContentsError
 
 
 def get_govsheet_schema(scheme, domain):
-    """/schemas/govSheet"""
+    """ ガバナンスシートのスキーマを取得する関数です。
+
+    Args:
+        scheme (str): スキームを設定します。
+        domain (str): ドメインを設定します。
+
+    Returns:
+        dict: ガバナンスシートのスキーマ
+
+    """
     sub_url = '/schemas/govSheet'
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     response = requests.get(url=api_url)
@@ -17,7 +29,16 @@ def get_govsheet_schema(scheme, domain):
 
 
 def get_metadata_schema(scheme, domain):
-    """/schemas/metadata"""
+    """ メタデータのスキーマを取得する関数です。
+
+    Args:
+        scheme (str): スキームを設定します。
+        domain (_type_): ドメインを設定します。
+
+    Returns:
+        dict: メタデータのスキーマ
+
+    """
     sub_url = '/schemas/metadata'
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     response = requests.get(url=api_url)
@@ -26,9 +47,15 @@ def get_metadata_schema(scheme, domain):
 
 
 def check_governedrun_token(scheme, domain, token:str)->bool:
-    """/checkToken
+    """ Governed Runのトークンの有効性を確認する
 
-    Governed Runのトークンの有効性を確認する
+    Args:
+        scheme (str): スキームを設定します。
+        domain (str): ドメインを設定します。
+        token (str): Governed Runのトークンを設定します。
+
+    Returns:
+        bool: Governed Runのトークンが有効であればTrue、有効でなければFalseを返す。
 
     Raises:
         requests.exceptions.RequestException: 通信エラー
@@ -49,9 +76,19 @@ def check_governedrun_token(scheme, domain, token:str)->bool:
 
 
 def validate(scheme, domain, grdm_token, project_id, govrun_token=None, govsheet=None, metadata=None):
-    """/validations/submit
+    """ 検証する関数です。
 
-    検証する
+    Args:
+        scheme(str): スキームを設定します。
+        domain(str): ドメインを設定します。
+        grdm_token(str): GRDMのトークンを設定します。
+        project_id(str): プロジェクトidを設定します。
+        govrun_token(str|None): Governed Runのトークンを設定します。
+        govsheet(): ガバナンスシートを設定します。
+        metadata(): メアデータを設定します。
+
+    Returns:
+        dict: 検証結果を返す。
 
     Raises:
         UnauthorizedError: 認証が通らない
@@ -77,15 +114,22 @@ def validate(scheme, domain, grdm_token, project_id, govrun_token=None, govsheet
 
 
 def get_validations(scheme, domain, grdm_token: str, project_id: str):
-    """/validations
+    """ 検証結果を取得する関数です。
+
+    Args:
+        scheme (str): スキームを設定します。
+        domain (str): ドメインを設定します。
+        grdm_token (str): GRDMのトークンを設定します。
+        project_id (str): プロジェクトidを設定します。
+
+    Returns:
+        dict: 全ての検証結果
 
     Raises:
         UnauthorizedError: 認証が通らない
         NotFoundContentsError: 検証結果が存在しない
         requests.exceptions.RequestException: その他の通信エラー
 
-    Returns:
-        全ての検証結果
     """
     sub_url = '/validations'
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
@@ -106,15 +150,22 @@ def get_validations(scheme, domain, grdm_token: str, project_id: str):
 
 
 def get_validations_validationId(scheme, domain, grdm_token: str, project_id: str, validation_id: str):
-    """/validations/{validation_id}
+    """ idを指定して検証結果を取得する関数です。
+
+    Args:
+        scheme (_type_): スキームを設定します。
+        domain (_type_): ドメインを設定します。
+        grdm_token (str): GRDMのトークンを設定します。
+        project_id (str): プロジェクトidを設定します。
+        validation_id (str): 検証のidを設定します。
+
+    Returns:
+        dict: 指定したidの検証結果
 
     Raises:
         UnauthorizedError: 認証が通らない
         NotFoundContentsError: 検証結果が存在しない
         requests.exceptions.RequestException: その他の通信エラー
-
-    Returns:
-        指定したidの検証結果
     """
     sub_url = f'/validations/{validation_id}'
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))

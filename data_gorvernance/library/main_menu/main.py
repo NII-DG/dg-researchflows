@@ -30,27 +30,21 @@ from ..utils.error import InputWarning
 class MainMenu(TaskLog):
     """メインメニューのクラスです。
 
-        MainMenuクラスはTaskLogを継承したクラスです。
-
-    FUNCTION:
-
-    1. Display the Research Flow Main Menu
-    2. View Research Flow Image
-    3. When the initial setup has not been performed, the user is guided to the initial setup.
 
     Attributes:
-        abs_root: リサーチフロー図の絶対パス
-        _research_flow_status_file_path: リサーチフロー図の生成
-        _research_flow_image: リサーチフロー図オブジェクトの定義
-        _err_output:エラーの出力
-        _menu_tabs:メニュータブ
-        _project_menu:プロジェクトメニュー
-        _project_widget_box:サブフロー操作コントローラーウェジットボックス
-        _sub_flow_menu:サブフローメニュー
-        _sub_flow_widget_box:サブフロー操作コントローラーウェジットボックス
+        class:
+            なし
 
-
-
+        instance:
+            abs_root(str): リサーチフロー図の絶対パス
+            _research_flow_status_file_path(str): リサーチフロー図の生成
+            _research_flow_image(pn.pane.HTML): リサーチフロー図オブジェクトの定義
+            _err_output(MessageBox):エラーの出力
+            _menu_tabs(pn.Tabs):メニュータブ
+            _project_menu(pn.pane.HTML):プロジェクトメニュー
+            _project_widget_box(pn.WidgetBox):サブフロー操作コントローラーウェジットボックス
+            _sub_flow_menu(pn.widgets.Select):サブフローメニュー
+            _sub_flow_widget_box(pn.WidgetBox):サブフロー操作コントローラーウェジットボックス
 
 
     NOTE:
@@ -59,10 +53,10 @@ class MainMenu(TaskLog):
     """
 
     def __init__(self, working_file) -> None:
-        """MainMenu　コンストラクタの関数です
+        """MainMenu コンストラクタの関数です
             親クラスの__init__メソッドを呼び出す関数です。
             Args:
-                working_file:[実行Notebookファイルパス]
+                working_file(str):[実行Notebookファイルパス]
         
         """
         super().__init__(working_file, 'main.ipynb')
@@ -304,7 +298,7 @@ class MainMenu(TaskLog):
     def generate(cls, working_path:str):
         """メインメニューを生成する関数です。
 
-        working_path : Notebookのファイルの位置
+        working_path(str) : Notebookのファイルのパス
         """
         # panel activation
         pn.extension()

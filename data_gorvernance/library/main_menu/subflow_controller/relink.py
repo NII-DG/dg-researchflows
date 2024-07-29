@@ -13,11 +13,15 @@ from ...utils.widgets import Alert
 
 class RelinkSubflowForm(BaseSubflowForm):
     """サブフロー間接続編集クラスです。
-        RelinkSubflowFormクラスはBaseSubflowFormクラスを継承しています。
+        
+    
+    Attributes:
+        class:
+            なし
 
-        Attributes:
-        abs_root (_type_): サブフローの絶対パス
-        message_box (_type_): メッセージを格納する。
+        instance:
+            abs_root (str): サブフローの絶対パス
+            message_box (MessageBox): メッセージを格納する。
     
     
     """
@@ -27,8 +31,8 @@ class RelinkSubflowForm(BaseSubflowForm):
             親クラス__init__メソッドを呼び出しています。
 
         Args:
-            abs_root (_type_): サブフローの絶対パス
-            message_box (_type_): メッセージを格納する。
+            abs_root (str): サブフローの絶対パス
+            message_box (MessageBox): メッセージを格納する。
 
         """
 
@@ -65,12 +69,13 @@ class RelinkSubflowForm(BaseSubflowForm):
         """親サブフロー種別(フェーズ)と親サブフローIDを取得する関数です。
 
         Args:
-            phase_seq_number (_type_): フェーズ番号
-            sub_flow_id (_type_): サブフローID
+            phase_seq_number (int): フェーズ番号
+            sub_flow_id (Select): サブフローID
             research_flow_status (List[PhaseStatus]): リサーチフローステータス管理情報
 
         Returns:
-            _type_: 親サブフロー種別(フェーズ)と親サブフローIDの値を返す。
+            parent_sub_flow_type(Literal): 親サブフロー種別(フェーズ)
+            parent_ids(list):親サブフローIDの値を返す。
         """
         parent_ids = []
         parent_sub_flow_type = 0
@@ -132,7 +137,6 @@ class RelinkSubflowForm(BaseSubflowForm):
             Exception: サブフロー種別(フェーズ)がないエラー
             Exception: サブフロー名がないエラー
             Exception: 親サブフロー種別(フェーズ)がないエラー
-            Exception: 内部エラーが発生した。
         """
         # 親サブフロー種別(フェーズ)のコールバックファンクション
         try:
@@ -167,15 +171,6 @@ class RelinkSubflowForm(BaseSubflowForm):
     # overwrite
     def change_disable_submit_button(self):
         """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する関数です。
-        Returns:
-            Noneの値を返す。(サブフロー種別(フェーズ)の選択肢の値がない場合)
-            Noneの値を返す。(サブフロー種別(フェーズ)の選択肢の値が0の場合)
-            Noneの値を返す。(サブフローの名称の値がない場合)
-            Noneの値を返す。(サブフローの名称の値が1未満の場合)
-            Noneの値を返す。(親サブフロー種別(フェーズ)の選択肢の値がない場合)
-            Noneの値を返す。(親サブフロー種別(フェーズ)の選択肢の値が0の場合)
-            Noneの値を返す。(親サブフローの選択肢の値がない場合)
-            Noneの値を返す。(親サブフローの選択肢の値の長さが1未満の場合)
 
         """
         # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
@@ -219,7 +214,7 @@ class RelinkSubflowForm(BaseSubflowForm):
         """サブフロー間接続編集フォームの関数です。
         
         Returns:
-            サブフロー間接続編集フォームに必要な値を返す。
+            pn.Column:サブフロー間接続編集フォームに必要な値を返す。
 
         
         """
@@ -239,7 +234,6 @@ class RelinkSubflowForm(BaseSubflowForm):
 
     def main(self):
         """サブフロー間接続編集処理の関数です。
-                入力情報を取得し、編集したいサブフローを編集する。
         
         Raises:
             Exception:編集失敗した場合のエラー

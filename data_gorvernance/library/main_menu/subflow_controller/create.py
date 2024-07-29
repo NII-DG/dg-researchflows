@@ -19,11 +19,14 @@ from ...utils.error import InputWarning
 
 class CreateSubflowForm(BaseSubflowForm):
     """サブフロー新規作成クラスです。
-        CreateSubflowFormクラスはBaseSubflowFormクラスを継承しています。
 
     Attributes:
-        abs_root (_type_): サブフローの絶対パス
-        message_box (_type_): メッセージを格納する。
+        class:
+            なし
+
+        instance:
+            abs_root (str): サブフローの絶対パス
+            message_box (MessageBox): メッセージを格納する。
     
     """
 
@@ -32,8 +35,8 @@ class CreateSubflowForm(BaseSubflowForm):
             親クラス__init__メソッドを呼び出しています。
 
         Args:
-            abs_root (_type_): サブフローの絶対パス
-            message_box (_type_): メッセージを格納する。
+            abs_root (str): サブフローの絶対パス
+            message_box (MessageBox): メッセージを格納する。
 
         """
         super().__init__(abs_root, message_box)
@@ -64,7 +67,7 @@ class CreateSubflowForm(BaseSubflowForm):
         """処理関数ボタンの関数です。
 
         Args:
-            name (_type_): メッセージ
+            name (str): メッセージ
         """
         self.submit_button.set_looks_init(name)
         self.submit_button.icon = 'plus'
@@ -72,7 +75,6 @@ class CreateSubflowForm(BaseSubflowForm):
     # overwrite
     def callback_sub_flow_type_selector(self, event):
         """サブフロー種別(フェーズ)のボタンが操作できるように有効化する関数です。
-              リサーチフローステータス管理情報の取得し、シングルセレクトの更新をして新規作成ボタンのボタンの有効化チェックを行います。
 
         Raises:
             Exception: 内部エラーが発生した。
@@ -96,17 +98,6 @@ class CreateSubflowForm(BaseSubflowForm):
     # overwrite
     def change_disable_submit_button(self):
         """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する関数です。
-        Returns:
-            Noneの値を返す。(サブフロー種別(フェーズ)の選択肢の値がない場合)
-            Noneの値を返す。(サブフロー種別(フェーズ)の選択肢の値が0の場合)
-            Noneの値を返す。(サブフロー名称の値がない場合)
-            Noneの値を返す。(サブフロー名称の長さが1未満の場合)
-            Noneの値を返す。(サブフローのデータディレクトリ名フォームの値がない場合)
-            Noneの値を返す。(サブフローのデータディレクトリ名フォームの値の長さが1未満の場合)
-            Noneの値を返す。(親サブフロー種別(フェーズ)の選択肢の値がない場合)
-            Noneの値を返す。(親サブフロー種別(フェーズ)の選択肢の値が0の場合)
-            Noneの値を返す。(親サブフローの選択肢の値がない場合)
-            Noneの値を返す。(親サブフローの選択肢の値の長さが1未満の場合)
 
         """
         # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
@@ -158,7 +149,7 @@ class CreateSubflowForm(BaseSubflowForm):
         """サブフロー新規作成フォームの関数です。
         
         Returns:
-            サブフロー新規作成フォームに必要な値を返す。
+            pn.Column:サブフロー新規作成フォームに必要な値を返す。
 
         """
         return pn.Column(
@@ -259,7 +250,7 @@ class CreateSubflowForm(BaseSubflowForm):
             Exception: 既にファイルが存在しているエラー
 
         Returns:
-            _type_: データディレクトリを作成するパスの値を返す。
+            path(str): データディレクトリを作成するパスの値を返す。
         """
         path = path_config.get_task_data_dir(self.abs_root, phase_name, data_dir_name)
         if os.path.exists(path):
@@ -269,12 +260,11 @@ class CreateSubflowForm(BaseSubflowForm):
 
     def prepare_new_subflow_data(self, phase_name:str, new_sub_flow_id:str, sub_flow_name):
         """新しいサブフローのデータを用意する関数です。
-                新規サブフローデータを取得し、コピー先フォルダパスを指定してフォルダを作成し、データを用意します。
 
         Args:
             phase_name (str): フェーズ名
             new_sub_flow_id (str): 新しいサブフローのID
-            sub_flow_name (_type_): サブフロー名
+            sub_flow_name (str): サブフロー名
 
         Raises:
             Exception:新規サブフローデータのコピーに失敗したエラー

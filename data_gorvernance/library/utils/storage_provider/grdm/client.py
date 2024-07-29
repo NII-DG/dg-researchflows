@@ -80,7 +80,6 @@ def upload(token, base_url, project_id, source, destination, recursive=False, fo
 
 def download(token, project_id, base_url, remote_path, base_path=None):
     """ファイルの内容を取得する関数です。
-                ファイルの内容を取得する。ファイルに保存はしない
 
     Args:
         token (str): GRDMのパーソナルアクセストークン

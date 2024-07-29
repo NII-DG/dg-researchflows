@@ -12,12 +12,14 @@ from ...utils.widgets import Alert
 
 class DeleteSubflowForm(BaseSubflowForm):
     """サブフロー削除クラスです。
-        DeleteSubflowFormクラスはBaseSubflowFormクラスを継承しています。
 
-        Attributes:
-        abs_root (_type_): サブフローの絶対パス
-        message_box (_type_): メッセージを格納する。
-    
+    Attributes:
+        class:
+            なし
+
+        instance:
+            abs_root (str): サブフローの絶対パス
+            message_box (MessageBox): メッセージを格納する。
     
     """
 
@@ -26,8 +28,8 @@ class DeleteSubflowForm(BaseSubflowForm):
             親クラス__init__メソッドを呼び出しています。
 
         Args:
-            abs_root (_type_): サブフローの絶対パス
-            message_box (_type_): メッセージを格納する。
+            abs_root (str): サブフローの絶対パス
+            message_box (MessageBox): メッセージを格納する。
 
         """
         super().__init__(abs_root, message_box)
@@ -74,11 +76,7 @@ class DeleteSubflowForm(BaseSubflowForm):
     # overwrite
     def change_disable_submit_button(self):
         """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する関数です。
-        Returns:
-            Noneの値を返す。(サブフロー種別(フェーズ)の選択肢の値がない場合)
-            Noneの値を返す。(サブフロー種別(フェーズ)の選択肢の値が0の場合)
-            Noneの値を返す。(サブフロー名称の選択肢の値がない場合)
-            Noneの値を返す。(サブフロー名称の選択肢の値が0の場合)
+        
         """
         # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
         self.change_submit_button_init(msg_config.get('main_menu', 'delete_sub_flow'))
@@ -106,8 +104,8 @@ class DeleteSubflowForm(BaseSubflowForm):
             サブフローの削除が可能になるかどうかを表示する。
         
         Retunes:
-                「操作可能なサブフローがありません」というメッセージを返す。（リストの値の長さが2未満である場合）
-                「サブフロー削除」というメッセージを返し、ボタンを押せるようにする。
+                str:「操作可能なサブフローがありません」というメッセージを返す。（リストの値の長さが2未満である場合）
+                pn.Column:「サブフロー削除」というメッセージを返し、ボタンを押せるようにする。
         
         """
         sub_flow_type_list = self._sub_flow_type_selector.options

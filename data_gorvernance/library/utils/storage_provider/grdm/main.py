@@ -28,9 +28,7 @@ def get_project_id():
     """プロジェクトIDを取得する関数です。
 
     Returns:
-        Noneの値を返す。（URLがない場合)
-        分割したパスの要素の値を返す。
-        Noneの値を返す。（指定した値が含まれていない場合）
+        split_path(list(str)):分割したパスの要素の値を返す。
         
     """
     # url: https://rdm.nii.ac.jp/vz48p/osfstorage
@@ -50,9 +48,6 @@ def check_authorization(base_url: str, token: str) -> bool:
     Args:
         base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
         token (str): パーソナルアクセストークン
-
-    Raises:
-        UnauthorizedError:認証が通らない
 
     Returns:
         bool: 権限に問題が無ければTrue、問題があればFalseを返す。
@@ -74,11 +69,6 @@ def check_permission(base_url: str, token: str, project_id: str):
         base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
         token (str): パーソナルアクセストークン
         project_id (str): プロジェクトID
-
-    Raises:
-        UnauthorizedError: 認証が通らない
-        ProjectNotExist: 指定されたプロジェクトIDが存在しない
-        requests.exceptions.RequestException: その他の通信エラー
 
     Returns:
         パーミッションに問題なければTrue、問題があればFalseの値を返す。
@@ -102,9 +92,6 @@ def get_projects_list(scheme, domain, token):
         domain(str):ドメイン名
         token(str):パーソナルトークン
 
-    Raises:
-        UnauthorizedError: 認証エラー
-        requests.exceptions.RequestException: 通信エラー
 
     Returns:
         プロジェクトの一覧のデータの値を返す。
@@ -128,7 +115,7 @@ def sync(token, api_url, project_id, abs_source, abs_root="/home/jovyan"):
     Raises:
         FileNotFoundError: 指定したファイルが存在しないエラー
         ValueError:絶対パスではないエラー
-        RuntimeError: RDMClientから上がってくるエラー全般
+        
     """
 
     if os.path.isdir(abs_source):

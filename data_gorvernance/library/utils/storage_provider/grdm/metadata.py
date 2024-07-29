@@ -9,10 +9,11 @@ import requests
 def format_metadata(metadata):
     """Gakunin RDMから取得したプロジェクトメタデータを整形する関数です。
     
-    Args:メタデータの値
+    Args:
+        metadata(list):メタデータの値
 
     Returns:
-        Dmpの値を返す。
+        list:Dmpの値を返す。
 
     
     
@@ -53,7 +54,9 @@ def format_metadata(metadata):
 def get_schema(url):
     """メタデータのプロトコル名を取得する関数です。
             リクエストされたURLに接続し、その接続に問題がないかを確認してプロトコル名を取得する。
-    Args:メタデータのURL
+            
+    Args:
+        url(str):メタデータのURL
 
     Returns:
         メタデータのプロトコル名の値を返す。

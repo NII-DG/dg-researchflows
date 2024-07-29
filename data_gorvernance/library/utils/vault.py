@@ -40,18 +40,19 @@ class Vault():
     """Vault Server操作クラスです
     
     Attributes:
-        __read_token:ルートトークンを読み取る。
-        __start_server:Vaultサーバー起動する。
-        __create_dg_engine:シークレットエンジン(kv)作成。
-        __create_dg_policy:ポリシーを作成。
+        class:
+            なし
+
+        instance:
+            __read_token(method):ルートトークンを読み取る。
+            __start_server(method):Vaultサーバー起動する。
+            __create_dg_engine(method):シークレットエンジン(kv)作成。
+            __create_dg_policy(method):ポリシーを作成。
     
     """
         
     def initialize(self):
         """Vault初期化を行う関数です
-        
-        Raises:
-            UnusableVault:Vaultが使用できない
         
         """
 
@@ -68,6 +69,7 @@ class Vault():
 
     def set_value(self, key, value):
         """値の設定をする関数です
+
         Args:
             key(str):トークンをvaultで保存するときのキー
             value(str):パーソナルトークン
@@ -82,14 +84,13 @@ class Vault():
 
     def has_value(self, key):
         """値の存在チェックをする関数です
+
         Args:
             key(str):トークンをvaultで保存するときのキー
 
-        Raises:
-            InvalidPath:無効なパスによるエラー
 
         Returns:
-            キーが存在した場合は秘密鍵の値を返し、存在しない場合はFalseの値を返す。
+            key(SecretsEngines):キーが存在した場合は秘密鍵の値を返し、存在しない場合はFalseの値を返す。
         
         """
         client = self.__get_client()
@@ -110,7 +111,7 @@ class Vault():
             key(str):トークンをvaultで保存するときのキー
 
         Returns:
-            取得した値を返す。値がない場合はNoneを返す。
+            read_res(SecretsEngines):取得した値を返す。値がない場合はNoneを返す。
         
         """
         if not self.has_value(key):
@@ -127,7 +128,6 @@ class Vault():
         """Vaultサーバー起動する関数です。
 
         Raises:
-            requests.ConnectionError:接続ができないエラー
             UnusableVault:値が利用できないエラー
         
         """
@@ -202,8 +202,9 @@ class Vault():
         
         Raises:
             UnusableVault:値が利用できないエラー
+            
         Returns:
-            ルートトークンの値を返す。
+            root_token(str):ルートトークンの値を返す。
         """
         if not os.path.isfile(TOKEN_PATH):
             raise UnusableVault
@@ -216,7 +217,7 @@ class Vault():
         """接続の確認を行う関数です
         
         Returns:
-               接続先のページを表示する。     
+            hvac.Client:接続先のページを表示する。     
         """
         root_token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=root_token)

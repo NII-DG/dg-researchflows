@@ -15,11 +15,15 @@ from ...utils.error import InputWarning
 
 class RenameSubflowForm(BaseSubflowForm):
     """サブフロー名称変更クラスです。
-        RenameSubflowFormクラスはBaseSubflowFormクラスを継承しています。
+        
+    
+    Attributes:
+        class:
+            なし
 
-        Attributes:
-        abs_root (_type_): サブフローの絶対パス
-        message_box (_type_): メッセージを格納する。
+        instance:
+            abs_root (str): サブフローの絶対パス
+            message_box (MessageBox): メッセージを格納する。
     
     """
 
@@ -28,8 +32,8 @@ class RenameSubflowForm(BaseSubflowForm):
             親クラス__init__メソッドを呼び出しています。
 
         Args:
-            abs_root (_type_): サブフローの絶対パス
-            message_box (_type_): メッセージを格納する。
+            abs_root (str): サブフローの絶対パス
+            message_box (MessageBox): メッセージを格納する。
 
         """
         super().__init__(abs_root, message_box)
@@ -46,7 +50,6 @@ class RenameSubflowForm(BaseSubflowForm):
         Raises:
             Exception: サブフロー種別(フェーズ)がないエラー
             Exception: サブフロー名がないエラー
-            Exception:内部エラーが発生した。
         """
         # サブフロー名称：シングルセレクトコールバックファンクション
         try:
@@ -77,16 +80,7 @@ class RenameSubflowForm(BaseSubflowForm):
     # overwrite
     def change_disable_submit_button(self):
         """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する関数です。
-        Returns:
-            Noneの値を返す。(サブフロー種別(フェーズ)の選択肢の値がない場合)
-            Noneの値を返す。(サブフロー種別(フェーズ)の選択肢の値が0の場合)
-            Noneの値を返す。(サブフローの名称の選択肢の値がない場合)
-            Noneの値を返す。(サブフローの名称の選択肢の値が0の場合)
-            Noneの値を返す。(サブフローの名称の値がない場合)
-            Noneの値を返す。(サブフローの名称の値の長さが1未満の場合)
-            Noneの値を返す。(サブフローのデータディレクトリ名フォームの値がない場合)
-            Noneの値を返す。(サブフローのデータディレクトリ名フォームの値の長さが1未満の場合)
-            
+    
 
         """
         # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
@@ -130,7 +124,7 @@ class RenameSubflowForm(BaseSubflowForm):
         """サブフロー名称変更フォームの関数です。
         
         Returns:
-            サブフロー名称変更フォームに必要な値を返す。
+            pn.Column:サブフロー名称変更フォームに必要な値を返す。
 
         """
         sub_flow_type_list = self._sub_flow_type_selector.options
@@ -148,7 +142,6 @@ class RenameSubflowForm(BaseSubflowForm):
 
     def main(self):
         """サブフロー名称変更処理の関数です。
-                入力情報を取得し、サブフロー名称を変更する。
         
         Raises:
             InputWarning:入力値に不備があったエラー

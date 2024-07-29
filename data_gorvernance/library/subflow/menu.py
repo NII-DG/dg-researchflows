@@ -21,7 +21,6 @@ from ..utils.widgets import MessageBox
 
 def access_main_menu(working_file: str):
     """メインメニューにアクセスする関数です。
-        メインメニューにアクセスするためのボタンを表示し、そのボタンに入っているパスを使用してメインメニューに遷移す
 
     Args:
         working_file (str): [実行Notebookファイルパス]
@@ -46,16 +45,18 @@ def access_main_menu(working_file: str):
 
 class SubflowMenu(TaskLog):
     """サブフローメニューのクラスです。
-            SubflowMenuクラスはTaskLogクラスを継承しています。
-
+    
     Attributes:
-        menu_widgetbox:表示するウィジェットを格納する
-        diagram:サブフロー図
-        title:サブフロー図のタイトル
-        diagram_widgetbox:サブフロー図をHTMLとして埋め込む
-        selector:ラジオボタン
-        selector_options:ラジオボタンのオプション
+        class:
+            なし
 
+        instance:
+            menu_widgetbox(pn.WidgetBox):表示するウィジェットを格納する
+            diagram(pn.pane.HTML):サブフロー図
+            title(pn.pane.Markdown):サブフロー図のタイトル
+            diagram_widgetbox(pn.WidgetBox):サブフロー図をHTMLとして埋め込む
+            selector(pn.widgets.RadioBoxGroup):ラジオボタン
+            selector_options(list[str]):ラジオボタンのオプション
 
 
     """
@@ -64,7 +65,7 @@ class SubflowMenu(TaskLog):
         """SubflowMenu コンストラクタの関数です
 
         Args:
-            working_file (_type_): [実行Notebookファイルパス]
+            working_file (str): [実行Notebookファイルパス]
         """
         super().__init__(working_file, path_config.MENU_NOTEBOOK)
 
@@ -107,7 +108,7 @@ class SubflowMenu(TaskLog):
             font_folder (Path): フォントフォルダのパス
 
         Returns:
-            サブフロー図を表示する。
+            callback(function):サブフロー図を表示する。
 
         """
         def callback(event):
@@ -143,9 +144,9 @@ class SubflowMenu(TaskLog):
         """フロー図の生成と表示設定の関数です。
         
         Args:
-            subflow:サブフロー図
-            font_folder:フォントフォルダー
-            display_all:全ての画面を表示させるかどうか
+            subflow(SubFlowManager):サブフロー図
+            font_folder(Path):フォントフォルダー
+            display_all(bool):全ての画面を表示させるかどうか
         
         
         """
@@ -167,7 +168,7 @@ class SubflowMenu(TaskLog):
         """画面を表示させるかどうかを判断する関数です。
 
         Returns:
-            TrueまたはFalseの値を返す。
+            display_all(bool):TrueまたはFalseの値を返す。
         """
         display_all = True
         if self.selector.value == self.selector_options[0]:
@@ -181,7 +182,7 @@ class SubflowMenu(TaskLog):
             svg_file_path (str): svgファイルのパス
 
         Returns:
-            svgファイルを返す。
+            File:svgファイルを返す。
         """
         return file.File(svg_file_path).read()
 
@@ -192,7 +193,7 @@ class SubflowMenu(TaskLog):
             svg_file_path (str): svgファイルのパス
 
         Returns:
-            svgの画像の横幅の値を返す
+            viewbox_width(int):svgの画像の横幅の値を返す
         
         """
         # SVGファイルをパース
@@ -223,9 +224,6 @@ class SubflowMenu(TaskLog):
             working_file (str): [実行Notebookファイルパス]
             is_selected (bool, optional): サブフローメニューを表示させるかどうか。 デフォルトでは False.
 
-        Raises:
-            ValueError: サブフロー種別(フェーズ)が取得できなかったエラー
-            Exception:内部エラーが発生した。
         """
         subflow_menu = cls(working_file)
         pn.extension()

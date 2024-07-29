@@ -23,16 +23,20 @@ class ContainerSetter():
     """セットアップを行うクラスです。
     
     Attributes:
-        nb_working_file_path (str): 実行Notebookパス
-        _abs_root_path:絶対rootディレクトリを取得・設定する
-        working_fdir_path:非同期フォルダーパス
-        setup_completed_file_path:初期セットアップ完了ステータスファイルパス
+        class:
+            なし
+
+        instance:
+            nb_working_file_path (str): 実行Notebookパス
+            _abs_root_path(str):絶対rootディレクトリを取得・設定する
+            working_fdir_path(str):非同期フォルダーパス
+            setup_completed_file_path(str):初期セットアップ完了ステータスファイルパス
 
     
     """
 
     def __init__(self, nb_working_file_path:str) -> None:
-        """ContainerSetter　コンストラクタの関数です。。
+        """ContainerSetter コンストラクタの関数です。
 
         Args:
             nb_working_file_path (str): 実行Notebookパス
@@ -68,7 +72,6 @@ class ContainerSetter():
 
     def define_setup_form(self):
         """セットアップフォームを定義する関数です。
-            ユーザー名とパスワードを入力し、送信ボタンを押すことでそのフォームを定義できる。
         
         """
         # ユーザ名
@@ -86,17 +89,6 @@ class ContainerSetter():
 
     def callback_submit_user_auth(self, event):
         """ボタンが押された時、ユーザーに権限があるかどうかを認証する関数です。
-                ユーザー名とパスワードを確認し、それが間違っていなければ権限があるかどうかの認証を行う。
-        Returns:
-            ユーザー名が入力されていない警告メッセージ（値はNone）
-            大文字のA-Z、小文字のa-z、数字の0-9、ハイフン、アンダースコア、ピリオドのいずれか一文字が一回以上繰り返されていない警告メッセージ。（値はNone）
-            パスワードが入力されていない警告メッセージ（値はNone）
-
-        Raises:
-            UnauthorizedError:認証が通らなかったエラー
-            Exception:内部エラー
-
-
         
         """
         # 入力値を取得する
@@ -155,7 +147,6 @@ class ContainerSetter():
 
     def validate_format_username(self, user_name:str):
         """ユーザー名の正規表現を解析する関数です。
-            ユーザー名が正しく入力されたか確認するための関数です。
         Args:
             user_name(str):ユーザー名
         
@@ -173,7 +164,7 @@ class ContainerSetter():
         """処理関数ボタンの関数です。
 
         Args:
-            name (_type_): メッセージ
+            name (str): メッセージ
         """
         self._submit_button.name = name
         self._submit_button.button_type = 'primary'
@@ -183,7 +174,7 @@ class ContainerSetter():
         """ボタンを処理中ステータスに更新する関数です。
 
         Args:
-            name (_type_): 実行中のメッセージ
+            name (str): 実行中のメッセージ
         """
         self._submit_button.name = name
         self._submit_button.button_type = 'primary'
@@ -193,7 +184,7 @@ class ContainerSetter():
         """ボタンが押されて成功した時のメッセージを返す関数です。
 
         Args:
-            name (_type_): 成功したメッセージ
+            name (str): 成功したメッセージ
         """
         self._submit_button.name = name
         self._submit_button.button_type = 'success'
@@ -203,7 +194,7 @@ class ContainerSetter():
         """ボタンが押されて認証が失敗した時の警告メッセージを返す関数です。
 
         Args:
-            name (_type_): 警告メッセージ
+            name (str): 警告メッセージ
         """
         self._submit_button.name = name
         self._submit_button.button_type = 'warning'
@@ -213,7 +204,7 @@ class ContainerSetter():
         """ボタンが押されて内部エラーが発生した時のエラーを返す関数です。
 
         Args:
-            name (_type_): エラーメッセージ
+            name (str): エラーメッセージ
         """
         self._submit_button.name = name
         self._submit_button.button_type = 'danger'
@@ -472,7 +463,8 @@ class ContainerSetter():
             nb_working_file_path (str): 実行Notebookパス
 
         Returns:
-            Gitのパス、コミットメッセージ
+            git_path(list):Gitのパス
+            commit_message(str):コミットメッセージ
         
         """
         cls.check_imcomplete_auth()

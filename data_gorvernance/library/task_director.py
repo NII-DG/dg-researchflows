@@ -17,11 +17,12 @@ from .utils.setting import get_subflow_type_and_id, SubflowStatusFile, SubflowSt
 
 def get_return_sub_flow_menu_relative_url_path(working_file_path: str)->str:
     """サブフローメニューNotebookへのパス、ファイルパスを取得する関数です。
+    
     Args:
         working_file_path:作業ファイルのパス
 
     Returns:
-        サブフローメニューのパスを返す。
+        os.path.join:サブフローメニューのパスを返す。
     
     """
 
@@ -38,8 +39,17 @@ def get_return_sub_flow_menu_relative_url_path(working_file_path: str)->str:
 
 class TaskDirector(TaskSave):
     """サブフローメニューへの接続、サブフローステータス更新を行うクラスです。
-            サブフローメニューへ接続するボタンなどを表示し、ステータスの更新などを行います。
-    
+
+    Attributes:
+        class:
+            なし
+
+        instance:
+            nb_working_file_path (str): [実行Notebookのファイルパス]
+            _abs_root_path(str):サブフローの絶対パス
+            _script_file_name(str):絶対rootディレクトリ
+            _sub_flow_status_file_path(str):サブフローステータスファイルのパス
+
     """
 
     def __init__(self, nb_working_file_path:str, notebook_name:str) -> None:

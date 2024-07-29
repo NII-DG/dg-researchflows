@@ -1,3 +1,6 @@
+"""field.jsonのファイルのデータを扱うモジュールです。
+フィールドデータの操作を行うクラスを記載しています。  
+"""
 import os
 from pathlib import Path
 from typing import List
@@ -10,6 +13,21 @@ p = Path(script_dir_path)
 field_json_file = p.joinpath('../../data/field.json').resolve()
 
 class Field:
+    """field.jsonのファイルのデータを扱うクラスです。
+
+    フィールド名のリスト作成や実験パッケージの取り出しなどフィールドデータの操作を行うメソッドを記載しています。
+
+    Attributes:
+        class:
+            __FIELD:フィールドデータ
+            __ID:id
+            __FIELD_NAME:フィールド名
+            __EXPERIMENT_PACKAGE:実験パッケージ
+            __IS_ACTIVE:アクティブかの判定を行う
+        instance:
+            field:フィールドデータを保存する。
+
+    """
     __FIELD = "field"
     __ID = "id"
     __FIELD_NAME = "field_name"
@@ -17,13 +35,54 @@ class Field:
     __IS_ACTIVE = "is_active"
 
     def __init__(self) -> None:
+        """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
+
+        field.jsonのファイルを読み出し、フィールドのデータを自身のインスタンスに保存します。
+
+        Example:
+            >>> Field.__init__()
+        
+        Note:
+            特にありません。
+
+        """
         contents = JsonFile(str(field_json_file)).read()
         self.field = contents[self.__FIELD]
 
     def get_name(self):
+        """フィールド名のリストを作成するメソッドです。
+
+        コンストラクタでインスタンスに保存したデータからfield_nameに対応するデータをリストとして取り出します。
+
+        Returns:
+            list:フィールド名のリスト
+        
+        Example:
+            >>> Field.get_name()
+            list
+        
+        Note:
+            特にありません。
+
+        """
         return [fld[self.__FIELD_NAME] for fld in self.field]
 
     def get_disabled_ids(self)->List[str]:
+        """アクティブでないデータのリストを作成するメソッドです。
+        
+        フィールドデータがアクティブな状態かを判別し、アクティブでないデータの名前をリストして返します。
+
+        Returns:
+            list[str]:アクティブでないフィールド名のリスト
+
+        Example:
+            >>> Field.get_disabled_ids()
+            list[str]
+        
+        Note:
+            特にありません。
+        
+        """
         disabled = []
         for fld in self.field:
             if not fld[self.__IS_ACTIVE]:
@@ -31,6 +90,24 @@ class Field:
         return disabled
 
     def get_template_path(self, target_name):
+        """指定した実験パッケージを取得するメソッドです。
+
+        引数として受けとったtarget_nameと一致するフィールド名の実験パッケージを取得し、戻り値として返します。
+
+        Args:
+            target_name (Any):目的の実験パッケージを指定するフィールド名
+
+        Returns:
+            戻り値の型が分かりませんでした。:目的の実験パッケージ
+        
+        Example:
+            >>> Field.get_template_path(target_name)
+            Any
+        
+        Note:
+            特にありません。
+
+        """
         for fld in self.field:
             if fld[self.__FIELD_NAME] == target_name:
                 return fld[self.__EXPERIMENT_PACKAGE]

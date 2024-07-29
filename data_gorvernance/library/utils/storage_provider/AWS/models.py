@@ -1,7 +1,31 @@
+"""AWS S3バケットからのダウンロードを行うモジュールです。
+AWS S3バケットからディレクトリまたはファイルをダウンロードする関数が記載されています。  
+"""
 import os
 
 
 def download_file(s3_client, bucket_name:str, aws_path:str, local_path:str):
+    """AWS S3バケットからファイルをダウンロードする関数です。
+
+    指定されたAWS S3バケットにアクセスし、ファイルをダウンロードしてローカルに保存します。
+
+    Args:
+        s3_client (_type_):AWS S3にアクセスするためのクライアント
+        bucket_name (str):バケット名
+        aws_path (str):ダウンロードするファイルへのパス
+        local_path (str):ダウンロードしたファイルの保存先を指定するパス
+
+    Raises:
+        FileNotFoundError:指定したパスのファイルが存在しない
+        FileExistsError:ダウンロード先のローカルパスが既に存在している
+    
+    exsample:
+        >>> download_file(s3_client, bucket_name, aws_path, local_path)
+        
+    Note:
+        特にありません。
+
+    """
     response = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=aws_path)
     try:
         # キーの確認
@@ -16,7 +40,27 @@ def download_file(s3_client, bucket_name:str, aws_path:str, local_path:str):
 
 
 def download_dir(s3_client, bucket_name:str, aws_dir:str, local_dir:str):
+    """AWS S3バケットからディレクトリをダウンロードする関数です。
 
+    指定されたAWS S3バケットにアクセスし、ディレクトリをダウンロードしてローカルに保存します。
+
+    Args:
+        s3_client (_type_):AWS S3にアクセスするためのクライアント
+        bucket_name (str):バケット名
+        aws_dir (str):ダウンロードするディレクトリへのパス
+        local_dir (str):ダウンロードしたディレクトリの保存先を指定するパス
+
+    Raises:
+        FileNotFoundError:指定したパスのファイルが存在しない
+        FileExistsError:ダウンロード先のローカルパスが既に存在している
+    
+    exsample:
+        >>> download_dir(s3_client, bucket_name, aws_dir, local_dir)
+        
+    Note:
+        特にありません。
+
+    """
     paths = {}
     next_token = None
     while True:

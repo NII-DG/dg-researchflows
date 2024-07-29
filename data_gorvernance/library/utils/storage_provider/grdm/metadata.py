@@ -53,7 +53,9 @@ def format_metadata(metadata):
 def get_schema(url):
     """メタデータのプロトコル名を取得する関数です。
             リクエストされたURLに接続し、その接続に問題がないかを確認してプロトコル名を取得する。
-    Args:メタデータのURL
+            
+    Args:
+        url(str):メタデータのURL
 
     Returns:
         メタデータのプロトコル名の値を返す。

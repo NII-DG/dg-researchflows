@@ -68,6 +68,7 @@ class Vault():
 
     def set_value(self, key, value):
         """値の設定をする関数です
+
         Args:
             key(str):トークンをvaultで保存するときのキー
             value(str):パーソナルトークン
@@ -82,6 +83,7 @@ class Vault():
 
     def has_value(self, key):
         """値の存在チェックをする関数です
+
         Args:
             key(str):トークンをvaultで保存するときのキー
 
@@ -202,6 +204,7 @@ class Vault():
         
         Raises:
             UnusableVault:値が利用できないエラー
+            
         Returns:
             ルートトークンの値を返す。
         """

@@ -14,15 +14,14 @@ from library.utils.setting import get_data_dir
 from . import file
 
 
-
-
-def open_main_menu(working_file):
+def open_main_menu(working_file: str):
     """ 別タブでメインメニューを開くボタンを表示する関数です。
 
     指定されたファイルから相対的なパスを計算し、そのパスを使用して新しいタブでメインメニューを開くボタンを作成します。
 
     Args:
         working_file(str): 移動元のファイルパスを設定します。
+
     """
     button_width = 500
     root_folder = Path(
@@ -42,13 +41,14 @@ def open_main_menu(working_file):
     display(Javascript('IPython.notebook.save_checkpoint();'))
 
 
-def open_data_folder(working_file):
+def open_data_folder(working_file: str):
     """ 別タブでデータフォルダを開くボタンを表示する関数です。
 
     指定されたファイルから相対的なパスを計算し、そのパスを使用して新しいタブでデータフォルダを開くボタンを作成します。
 
     Args:
         working_file(str) : 移動元のファイルパスを設定します。
+
     """
     home = os.environ['HOME']
     # homeからdataディレクトリまで

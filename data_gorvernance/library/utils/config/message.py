@@ -1,6 +1,4 @@
-""" メッセージ取得ののモジュールです。
-メッセージ取得の関数が記載されています。
-"""
+""" メッセージ取得ののモジュールです。"""
 import configparser
 import os
 
@@ -17,6 +15,7 @@ def get(section:str, option:str) -> str:
         key (str): message.iniのキー
     Returns:
         str: メッセージを返す。
+
     """
     config = configparser.ConfigParser()
     config.read(message_ini_path, encoding='utf-8')

@@ -10,6 +10,7 @@ def escape_html_text(original_string)->str:
         original_string (str): HTMLエンティティエスケープを行う文字列
 
     Returns:
-        str: HTMLエンティティエスケープを行った文字列
+        str: HTMLエンティティエスケープを行った文字列を返す。
+
     """
     return html.escape(original_string)

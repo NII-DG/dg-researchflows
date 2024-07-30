@@ -7,10 +7,8 @@ import json
 from pathlib import Path
 
 
-def copy_file(source_path, destination_path):
+def copy_file(source_path: str, destination_path: str):
     """ ファイルをコピーする関数です。
-
-    引数1のファイルを引数2へコピーする関数です。
 
     Args:
         source_path(str): コピー元ファイルパスを設定します。
@@ -24,10 +22,8 @@ def copy_file(source_path, destination_path):
     shutil.copyfile(source_path, destination_path)
 
 
-def copy_dir(src, dst, overwrite=False):
+def copy_dir(src: str, dst: str, overwrite: bool=False):
     """ ディレクトリをコピーする関数です。
-
-    src から dst へディレクトリをコピーします。
 
     Args:
         src(str): コピー元ディレクトリを設定します。
@@ -38,26 +34,26 @@ def copy_dir(src, dst, overwrite=False):
         指定したディレクトリがなければ作成される。
 
     """
-    def f_exists(base, dst):
+    def f_exists(base: str, dst: str):
         """ 指定したベースディレクトリと目的のディレクトリの間で存在するファイル名を返す関数です。
 
         Args:
-            base(str): ベースとなるディレクトリのパス
-            dst(str): 比較対象のディレクトリのパス
+            base(str): ベースとなるディレクトリのパスを設定します。
+            dst(str): 比較対象のディレクトリのパスを設定します。
 
         Returns:
-            set: _ignore関数を返す
+            function: _ignore関数を返す。
         """
         base, dst = Path(base), Path(dst)
-        def _ignore(path, names):   # サブディレクトリー毎に呼び出される
+        def _ignore(path: str, names: str):   # サブディレクトリー毎に呼び出される
             """ 指定したパスと名前で存在するファイル名のセットを返す関数です。
 
             Args:
-                path(str): サブディレクトリのパス
-                names(str): サブディレクトリの名前
+                path(str): サブディレクトリのパスを設定します。
+                names(str): サブディレクトリの名前を設定します。
 
             Returns:
-                set[str]: ベースディレクトリと目的ディレクトリの間で存在するファイル名のセット
+                set[str]: ベースディレクトリと目的ディレクトリの間で存在するファイル名のセットを返す。
             """
             names = set(names)
             rel = Path(path).relative_to(base)
@@ -70,7 +66,7 @@ def copy_dir(src, dst, overwrite=False):
         shutil.copytree(src, dst, ignore=f_exists(src, dst), dirs_exist_ok=True)
 
 
-def relative_path(target_path, start_dir):
+def relative_path(target_path: str, start_dir: str):
     """ target_pathをstart_dirからの相対パスに変換する関数です。
 
     Args:
@@ -78,7 +74,7 @@ def relative_path(target_path, start_dir):
         start_dir (str): 基準となるディレクトリのパスを設定します。
 
     Returns:
-        str: start_dirからtarget_pathまでの相対パス
+        str: start_dirからtarget_pathまでの相対パスを返す。
 
     """
     if target_path and start_dir:
@@ -113,8 +109,6 @@ class File:
     def read(self):
         """ ファイルから内容を読み込み、その内容を返すメソッドです。
 
-        self.pathのファイルを読み込み、その内容を返します。
-
         Returns:
             str: ファイルの内容を返す。
 
@@ -125,8 +119,6 @@ class File:
 
     def write(self, content: str):
         """ 指定された内容をファイルに書き込むメソッドです。
-
-        self.pathのファイルにcontentの内容を書き込みます。
 
         Args:
             content(str): 書き込む内容を設定します。
@@ -139,10 +131,8 @@ class File:
     def create(self, exist_ok=True):
         """ 新しいファイルを作成するメソッドです。
 
-        self.pathに新しいファイルを作成します。
-
         Args:
-            exist_ok(bool): 既存のディレクトリを指定してエラーにならないかを設定します。
+            exist_ok(bool, optional): 既存のディレクトリを指定してエラーにならないかを設定します。
 
         """
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -151,17 +141,15 @@ class File:
     def remove(self, missing_ok=False):
         """ ファイルを削除するメソッドです。
 
-        self.pathのファイルを削除します。
-
         Args:
-            missing_ok(bool): 存在しないファイルを指定してエラーにならないかを設定します。
+            missing_ok(bool, optional): 存在しないファイルを指定してエラーにならないかを設定します。
 
         """
         self.path.unlink(missing_ok)
 
 
 class JsonFile(File):
-    """ JSONファイルのクラスです。
+    """ JSONファイル操作のクラスです。
 
     JSONファイルの読み込みや書き込みをします。
 
@@ -177,8 +165,6 @@ class JsonFile(File):
     def read(self):
         """ ファイルの内容をjsonとして読み込むメソッドです。
 
-        self.pathのファイルの内容をJSONとして読み込みます。
-
         Returns:
             dict: ファイルの内容を返す。
         """
@@ -187,8 +173,6 @@ class JsonFile(File):
 
     def write(self, data:dict):
         """ 与えられた内容をjsonとしてファイルに書き込むメソッドです。
-
-        self.pathのファイルにdataを書き込みます。
 
         Args:
             data(dict): 書き込む内容を設定します。

@@ -12,6 +12,7 @@ class StringManager:
 
         Returns:
             bool: 空文字もしくは空白文字かどうかを返す。
+
         """
         return bool(not text or text.isspace())
 
@@ -24,6 +25,7 @@ class StringManager:
 
         Returns:
             bool: 空白文字が含まれるかどうかを返す。
+
         """
         return any(char.isspace() for char in text)
 
@@ -36,6 +38,7 @@ class StringManager:
 
         Returns:
             bool: 半角英数記号かどうかを返す
+
         """
         return bool(re.match(r'^[\x20-\x7E]*$', text))
 
@@ -51,6 +54,7 @@ class StringManager:
 
         Returns:
             str: 両端の空白文字を削除した文字列を返す。
+
         """
         if not text.strip() and not remove_empty:
             return text

@@ -15,7 +15,7 @@ from .input import get_grdm_connection_parameters
 from .error import UnusableVault, ProjectNotExist, UnauthorizedError, PermissionError
 
 
-def all_sync_path(abs_root):
+def all_sync_path(abs_root: str):
     """ 指定されたルートディレクトリから特定のディレクトリのパスを返す関数です。
 
     Args:
@@ -23,6 +23,7 @@ def all_sync_path(abs_root):
 
     Returns:
         list: ルートディレクトリからdataと、data_governanceのworking以外のパスのリストを返す。
+
     """
     paths = []
 
@@ -46,17 +47,19 @@ class TaskSave(TaskLog):
 
     Attributes:
         instance:
-            _abs_root_path(str): 
-            save_msg_output(MessageBox): 
-            save_form_box(WidgetBox): 
-            _save_submit_button(Button): 
+            _abs_root_path(str): 実行ファイルの絶対パス
+            save_msg_output(MessageBox): メッセージ出力
+            save_form_box(WidgetBox): フォーム用ボックス
+            _save_submit_button(Button): 確定ボタン
+
     """
-    def __init__(self, nb_working_file_path, notebook_name) -> None:
+    def __init__(self, nb_working_file_path: str, notebook_name: str) -> None:
         """ クラスのインスタンスの初期化処理を実行するメソッドです。
 
         Args:
             nb_working_file_path (str): 実行Notebookのファイルパス
             notebook_name (str): 実行Notebookのファイル名
+
         """
         super().__init__(nb_working_file_path, notebook_name)
         self._abs_root_path = path_config.get_abs_root_form_working_dg_file_path(nb_working_file_path)
@@ -77,6 +80,7 @@ class TaskSave(TaskLog):
         Returns:
             str: GRDMのトークンを返す。
             str: プロジェクトIDを返す。
+
         """
         token = ""
         project_id = ""
@@ -111,6 +115,7 @@ class TaskSave(TaskLog):
 
         Raises:
             TypeError: sourceがstrまたはlistでない
+
         """
 
         # validate source path
@@ -136,12 +141,12 @@ class TaskSave(TaskLog):
 
         Args:
             event (Event): ボタンクリックイベント。
+
         """
         self._save()
 
     def _save(self):
-        """ 保存を実行するメソッドです。
-        """
+        """ 保存を実行するメソッドです。"""
         size = len(self._source)
         timediff = TimeDiff()
 

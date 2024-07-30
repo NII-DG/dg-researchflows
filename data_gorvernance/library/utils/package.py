@@ -27,10 +27,10 @@ class MakePackage:
             rendered_context(OrderedDict): レンダリングされたコンテキストを保持する辞書
             prompts(dict): プロンプトの情報を保持する辞書
             template_dir(str): cookiecutterテンプレートのディレクトリ
+
     """
     def __init__(self) -> None:
-        """ クラスのインスタンスの初期化処理を実行するメソッドです。
-        """
+        """ クラスのインスタンスの初期化処理を実行するメソッドです。"""
         self.template_context = OrderedDict([])
         self.rendered_context = OrderedDict([])
         self.prompts = {}
@@ -40,10 +40,11 @@ class MakePackage:
 
         Args:
             template (str): クローンするリポジトリのURLまたはパスを指定する
-            checkout (str): クローン後にチェックアウトするブランチ、タグ、コミット IDを設定します。
+            checkout (str, optional): クローン後にチェックアウトするブランチ、タグ、コミット IDを設定します。
 
         Returns:
             dict: テンプレートを返す。
+
         """
         config_dict = get_user_config()
         self.template_dir, cleanup = determine_repo_dir(
@@ -66,6 +67,7 @@ class MakePackage:
 
         Returns:
             OrderedDict:
+
         """
         cookiecutter_dict = OrderedDict([])
         env = StrictEnvironment(context=context)
@@ -90,6 +92,7 @@ class MakePackage:
 
         Returns:
             _type_:
+
         """
         prompts = self.prompts
         return (
@@ -102,7 +105,8 @@ class MakePackage:
         """ cookiecutterテンプレートを使用してパッケージを作成する
 
         Args:
-            context_dict (dict): デフォルトおよびユーザー設定を上書きするコンテキストの辞書を設定します。
-            output_dir (str): パッケージを作成するディレクトリを設定します。
+            context_dict (dict, optional): デフォルトおよびユーザー設定を上書きするコンテキストの辞書を設定します。
+            output_dir (str, optional): パッケージを作成するディレクトリを設定します。
+
         """
         cookiecutter(self.template_dir, no_input=True, extra_context=context_dict, output_dir=output_dir)

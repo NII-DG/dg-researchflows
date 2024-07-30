@@ -1,8 +1,4 @@
-""" ダイアグラムの管理を行うモジュールです。
-
-ダイアグラムのノードにプロパティを追加したり、ノードの色やアイコンを更新したり、SVGを生成したりするためのクラスが記載されています。
-
-"""
+""" ダイアグラムの管理を行うモジュールです。"""
 from pathlib import Path
 import traceback
 from subprocess import run
@@ -20,12 +16,14 @@ class DiagManager:
         instance:
             path(Path): ファイルのパス
             content(str): ファイルの内容
+
     """
     def __init__(self, file_path: str) -> None:
         """ クラスのインスタンスの初期化処理を実行するメソッドです。
 
         Args:
             file_path (str): ファイルパスを設定します。
+
         """
         self.path = Path(file_path)
         # 以下暫定措置としてファイル書き変えのために用いる
@@ -37,6 +35,7 @@ class DiagManager:
         Args:
             node_id (str): ノードIDを設定します。
             custom (str): 追加する属性を設定します。
+
         """
         lines = self.content.splitlines()
         new_lines = []
@@ -64,6 +63,7 @@ class DiagManager:
         Args:
             node_id (str): ノードIDを設定します。
             color (str): 追加する色を設定します。
+
         """
         self.add_node_property(node_id, f'color="{color}"')
 
@@ -73,6 +73,7 @@ class DiagManager:
         Args:
             node_id (str): ノードIDを設定します。
             path (str): アイコンのパスを設定します。
+
         """
         self.add_node_property(node_id, f'background="{path}"')
 
@@ -81,7 +82,8 @@ class DiagManager:
 
         Args:
             node_id (str): ノードIDを設定します。
-            style (str): 新しいスタイル
+            style (str): 新しいスタイルを設定します。
+
         """
         self.add_node_property(node_id, f'style={style}')
 
@@ -90,6 +92,7 @@ class DiagManager:
 
         Args:
             node_id (str): ノードIDを設定します。
+
         """
         self.add_node_property(node_id, f'stacked')
 
@@ -100,6 +103,7 @@ class DiagManager:
             tmp_diag (str): 一時的なダイアグラムのパスを設定します。
             output (str): 出力するパスを設定します。
             font (str): フォントを設定します。
+
         """
         File(str(tmp_diag)).write(self.content)
         diag = tmp_diag
@@ -116,6 +120,7 @@ class DiagManager:
 
         Returns:
             int: 実行結果を返す。
+
         """
         app = BlockdiagApp()
         args = ['-f', font, '-Tsvg', '-o', output, diag]

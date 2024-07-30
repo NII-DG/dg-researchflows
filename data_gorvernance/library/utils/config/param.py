@@ -34,8 +34,7 @@ class ParamConfig():
     __REPOSITORY = 'repository'
 
     def __init__(self):
-        """ インスタンスの初期化処理を実行するメソッドです。
-        """
+        """ インスタンスの初期化処理を実行するメソッドです。"""
         self._param_file = JsonFile(str(param_json_file))
         data = self._param_file.read()
 
@@ -45,8 +44,7 @@ class ParamConfig():
         self._repository = Repository(data[self.__REPOSITORY])
 
     def update(self):
-        """ JSONファイルを書き換えるメソッドです。
-        """
+        """ JSONファイルを書き換えるメソッドです。"""
         data = {}
         data[self.__SIBLINGS] = self._siblings.to_dict()
         data[self.__RCOSBINDERURL] = self._rcosBinderUrl
@@ -59,7 +57,8 @@ class ParamConfig():
         """ 各種データを取得する
 
         Returns:
-            ParamConfig: 各種パラメータを持つオブジェクト
+            ParamConfig: 各種パラメータを持つオブジェクトを返す。
+
         """
         pc = ParamConfig()
         return pc
@@ -69,7 +68,8 @@ class ParamConfig():
         """ ginHTTPを取得するメソッドです。
 
         Returns:
-            str: ginHttpの値
+            str: ginHttpの値を返す。
+
         """
         pc = ParamConfig()
         return pc._siblings._ginHttp
@@ -79,7 +79,8 @@ class ParamConfig():
         """ リポジトリのIDを取得するメソッドです。
 
         Returns:
-            str: リポジトリのID
+            str: リポジトリのIDを返す。
+
         """
         pc = ParamConfig()
         return pc._repository._id
@@ -111,6 +112,7 @@ class Siblings():
 
         Args:
             siblings_data (dict): 設定する値を含む辞書
+
         """
         self._ginHttp = siblings_data[self.__GINHTTP]
         self._ginSsh = siblings_data[self.__GINSSH]
@@ -122,6 +124,7 @@ class Siblings():
 
         Returns:
             dict: インスタンス変数の値を持つ辞書
+
         """
         data = {}
         data[self.__GINHTTP] = self._ginHttp
@@ -140,6 +143,7 @@ class GgCore():
         instance:
             _scheme(str): スキーマの値
             _netloc8str): ネットワークロケーションの値
+
     """
     __SCHEME = 'Scheme'
     __NETLOC = 'Netloc'
@@ -149,6 +153,7 @@ class GgCore():
 
         Args:
             dg_core_data (dict): インスタンス変数に設定する値を持つ辞書
+
         """
         self._scheme = dg_core_data[self.__SCHEME]
         self._netloc = dg_core_data[self.__NETLOC]
@@ -158,6 +163,7 @@ class GgCore():
 
         Returns:
             dict: インスタンス変数の値を持つ辞書
+
         """
         data = {}
         data[self.__SCHEME] = self._scheme
@@ -172,6 +178,7 @@ class Repository():
             __ID(str): リポジトリidのキー
         instance:
             _id(str): リポジトリidの値
+
     """
     __ID = 'id'
 
@@ -180,6 +187,7 @@ class Repository():
 
         Args:
             repo_data (dict): 設定する値を含む辞書
+
         """
         self._id = repo_data[self.__ID]
 
@@ -187,7 +195,8 @@ class Repository():
         """ インスタンス変数を辞書に変換するメソッドです。
 
         Returns:
-            dict: インスタンス変数の値を持つ辞
+            dict: インスタンス変数の値を持つ辞書
+
         """
         data = {}
         data[self.__ID] = self._id

@@ -8,6 +8,7 @@ def need_govrun_token(govsheet:dict, metadata:dict):
 
     Returns:
         bool: Governed Runのトークンが必要かを返す。
+
     """
     if govsheet.get("rerun", {}).get("rerunLevel") == "設定しない":
         return False

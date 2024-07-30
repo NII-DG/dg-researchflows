@@ -18,16 +18,18 @@ class NbFile(File):
 
         Raises:
             FileNotFoundError: ファイルが存在しない
+
         """
         if not os.path.isfile(file_path):
             raise FileNotFoundError(f'Not Found File. file path : {file_path}')
         super().__init__(file_path)
 
-    def embed_subflow_name_on_header(self, subflow_name:str):
+    def embed_subflow_name_on_header(self, subflow_name: str):
         """サブフローメニュNotebookのヘッダーサブフロー名を埋める
 
         Args:
-            subflow_name (str): [サブフロー名]
+            subflow_name (str): サブフロー名を設定します。
+
         """
         notebook = self.read()
         for cell in notebook.cells:
@@ -41,6 +43,7 @@ class NbFile(File):
 
         Returns:
             Any: 読み込んだNotebookを返す。
+
         """
         return nbformat.read(self.path, as_version=4)
 
@@ -49,5 +52,6 @@ class NbFile(File):
 
         Args:
             notebook_data (Any): 書き込むNotebookを設定します。
+
         """
         nbformat.write(notebook_data, self.path)

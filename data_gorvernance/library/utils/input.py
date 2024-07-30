@@ -95,7 +95,7 @@ def get_grdm_token(vault_key):
             token (str): パーソナルアクセストークン
 
         Returns:
-            bool: トークンの有効性を返します。
+            bool: トークンの有効性を返す。
         """
         return grdm.check_authorization(grdm.BASE_URL, token)
 

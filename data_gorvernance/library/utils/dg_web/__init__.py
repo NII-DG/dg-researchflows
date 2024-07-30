@@ -1,8 +1,4 @@
-""" dg-webのパッケージです。
-
-dg-webと接続するための関数やクラスを集めたパッケージです。
-
-"""
+""" dg-webと接続するためのパッケージです。"""
 from .form import Form
 from .runcrate_form import RunCrateForm
 from .api import (

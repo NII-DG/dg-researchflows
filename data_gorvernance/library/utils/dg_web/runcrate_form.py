@@ -1,6 +1,4 @@
-""" RunCrateの入力フォームのモジュールです。
-RunCrateの入力フォームの操作するクラスが記載されています。
-"""
+""" RunCrateの入力フォームのモジュールです。"""
 import panel as pn
 
 from library.utils.widgets import MessageBox
@@ -8,7 +6,7 @@ from .form import Checkbox, Title, Description
 
 
 class RunCrateForm:
-    """RunCrateの入力フォームの操作
+    """RunCrateの入力フォームの操作のクラスです。
 
     Attributes:
         class:
@@ -19,6 +17,7 @@ class RunCrateForm:
             widgets (dict): 表示するwidget群を保持する。値の取得に使用する。
             form_box (pn.WidgetBox): フォームを格納する。
             msg_output (MessageBox): ユーザーに提示するメッセージを格納する。
+
     """
 
     key = "runCrate"
@@ -34,24 +33,26 @@ class RunCrateForm:
         self.msg_output = MessageBox()
 
     def pop_schema(self, schema):
-        """schemaのRunCrate選択部分を取得し、schemaから取り除く
+        """schemaのRunCrate選択部分を取得し、schemaから取り除くメソッドです。
 
         Args:
             schema (dict): スキーマを設定します。
 
         Returns:
             dict: RunCrate選択部分を取り除いたスキーマを返す。
+
         """
         properties = schema.get('properties', {})
         self.definition = properties.pop(self.key, {})
         return schema
 
     def create_widget(self, crates: list, data=None):
-        """RunCrate選択の入力欄を生成する
+        """RunCrate選択の入力欄を生成するメソッドです。
 
         Args:
             crates (list): index.jsonの内容
             data (dict): metadata
+
         """
         # データの整形
         files = {}
@@ -86,7 +87,7 @@ class RunCrateForm:
         self.widgets[self.key] = column
 
     def get_data(self):
-        """ RunCrate選択の入力値からデータを生成する
+        """ RunCrate選択の入力値からデータを生成するメソッドです。
 
         Returns:
             dict: 生成したデータを返す。

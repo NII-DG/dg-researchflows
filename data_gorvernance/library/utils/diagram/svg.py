@@ -21,7 +21,8 @@ def init_config(id, name):
         name (str): 名前を設定します。
 
     Returns:
-        dict: 初期設定を含む辞書。
+        dict: 初期設定を含む辞書を返す。
+
     """
     return {
         id : {
@@ -37,6 +38,7 @@ def update_svg(output: str, current_dir:str, config):
         output (str): 出力先のパスを設定します。
         current_dir (str): 現在のディレクトリを設定します。
         config (dict): 設定情報の辞書を設定します。
+
     """
     _embed_detail_information(current_dir, Path(output), config)
 
@@ -47,6 +49,7 @@ def _embed_detail_information(current_dir, skeleton, config):
         current_dir (str): 現在のディレクトリを設定します。
         skeleton (Path): 雛形のパスを設定します。
         config (dict): 設定情報を含む辞書を設定します。
+
     """
     # 雛形の読み込み
     tree = etree.parse(str(skeleton))
@@ -66,6 +69,7 @@ def _embed_info_in_one_rect(elem, current_dir, config):
         elem (etree.Element): わかりません
         current_dir (str): 現在のディレクトリ
         config (dict): 設定情報を含む辞書を設定します。
+
     """
     for key, value in config.items():
         # タスクタイトルと一致していない場合処理をスキップする
@@ -100,6 +104,7 @@ def create_anchor(elems, link):
 
     Returns:
         etree.Element: リンクを付与した要素。
+
     """
     a_elem = etree.Element('a')
     a_elem.attrib['{http://www.w3.org/1999/xlink}href'] = link

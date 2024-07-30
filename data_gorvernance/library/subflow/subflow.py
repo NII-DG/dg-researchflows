@@ -1,5 +1,4 @@
-""" サブフローを管理するモジュールです。
-"""
+""" サブフローを管理するモジュールです。"""
 import os
 from itertools import chain, zip_longest
 from pathlib import Path
@@ -24,6 +23,7 @@ class SubFlowManager:
             task_dir(str): タスクが格納されているディレクトリ
             diag(DiagManager): ダイアグラムを管理するインスタンス
             svg_config(dict): SVGの設定用の辞書
+
     """
 
     def __init__(self, current_dir: str, status_file :str, diag_file :str, using_task_dir: str) -> None:
@@ -34,6 +34,7 @@ class SubFlowManager:
             status_file(str) : ステータスファイルへのパスを設定します。
             diag_file(str) : ダイアグラムのファイルへのパスを設定します。
             using_task_dir(str) : タスクが格納されているディレクトリを設定します。
+
         """
         self.current_dir = current_dir
         self.tasks = SubflowStatusFile(status_file).read().tasks
@@ -45,6 +46,7 @@ class SubFlowManager:
 
         Args:
             souce_task_dir(str) : ソースタスクディレクトリのパスを設定します。
+
         """
         if os.path.isdir(souce_task_dir):
             for task in self.tasks:
@@ -57,6 +59,7 @@ class SubFlowManager:
             target_file(str) : コピーするファイルを設定します。
             search_directory(str) : ファイルを検索するディレクトリを設定します。
             destination_directory(str) : ファイルをコピーするディレクトリを設定します。
+
         """
         for root, dirs, files in os.walk(search_directory):
             for filename in files:
@@ -81,14 +84,15 @@ class SubFlowManager:
                     os.symlink(source_images, destination_images, target_is_directory=True)
 
 
-    def generate(self, svg_path: str, tmp_diag: str, font: str, display_all=True):
+    def generate(self, svg_path: str, tmp_diag: str, font: str, display_all:bool = True):
         """ ダイアグラムを生成するメソッドです。
 
         Args:
             svg_path (str): SVGファイルの出力パスを設定します。
             tmp_diag (str): 一時的なダイアグラムファイルへのパスを設定します。
             font (str): ダイアグラムに使用するフォントを設定します。
-            display_all (bool): 無効なタスクを表示するかどうかを設定します。
+            display_all (bool, optional): 無効なタスクを表示するかどうかを設定します。デフォルト値はTrueです。
+
         """
         # 毎回元ファイルを読み込む
         self.diag = DiagManager(self.diag_file)
@@ -103,22 +107,24 @@ class SubFlowManager:
         self.diag.generate_svg(tmp_diag, svg_path, font)
         update_svg(svg_path, self.current_dir, self.svg_config)
 
-    def _update(self, display_all=True):
+    def _update(self, display_all: bool = True):
         """ タスクの状態に基づいてダイアグラムを更新するメソッドです。
 
         Args:
-            display_all (bool): 無効なタスクを表示するかどうかを設定します。
+            display_all (bool, optional): 無効なタスクを表示するかどうかを設定します。デフォルト値はTrueです。
+
         """
         for task in self.tasks:
             self._adjust_by_status(task, display_all)
             self._adjust_by_optional(task, display_all)
 
-    def _adjust_by_optional(self, task: SubflowTask, display_all=True):
+    def _adjust_by_optional(self, task: SubflowTask, display_all: bool = True):
         """ タスクが無効な場合にダイアグラムを調整するメソッドです。
 
         Args:
-            task (SubflowTask): 調整するタスク
-            display_all (bool, optional): 無効なタスクを表示するかどうかを設定します。
+            task (SubflowTask): 調整するタスクを設定します。
+            display_all (bool, optional): 無効なタスクを表示するかどうかを設定します。デフォルト値はTrueです。
+
         """
         if task.disable:
             if display_all:
@@ -130,12 +136,13 @@ class SubFlowManager:
                 self.diag.update_node_color(task.id, "#77787B")
                 self.svg_config[task.id]['is_link'] = False
 
-    def _adjust_by_status(self, task: SubflowTask, display_all=True):
+    def _adjust_by_status(self, task: SubflowTask, display_all: bool = True):
         """ フロー図の見た目を状況によって変えるメソッドです。
 
         Args:
-            task (SubflowTask): 調整するタスク
-            display_all (bool, optional): 無効なタスクも表示するかどうかを設定します。
+            task (SubflowTask): 調整するタスクを設定します。
+            display_all (bool, optional): 無効なタスクも表示するかどうかを設定します。デフォルト値はTrueです。
+
         """
         if task.disable and not display_all:
             return
@@ -159,11 +166,12 @@ class SubFlowManager:
         elif task.status == task.STATUS_DOING:
             self.diag.update_node_icon(task.id, icon_dir + "/loading.png")
 
-    def parse_headers(self, task):
+    def parse_headers(self, task: SubflowTask):
         """ タスクタイトルとパスを取得するメソッドです。
 
         Args:
             task (SubflowTask): 対象とするタスクを設定します。
+
         """
         nb_dir = Path(self.task_dir)
         for nb_path in nb_dir.glob("**/*.ipynb"):
@@ -191,11 +199,12 @@ class SubFlowManager:
                 self.svg_config[task.id]['text'] = title
                 break
 
-    def change_id(self, task):
+    def change_id(self, task: SubflowTask):
         """diagファイルのタスクIDをタスクタイトルに置き換えるメソッドです。
 
         Args:
             task (SubflowTask): タスクIDをタスクタイトルに置き換えるタスクを設定します。
+
         """
         lines = self.diag.content.splitlines()
         new_lines = []

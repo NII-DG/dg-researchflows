@@ -10,7 +10,7 @@ from requests.exceptions import RequestException
 from ..error import UnauthorizedError, NotFoundContentsError
 
 
-def get_govsheet_schema(scheme, domain):
+def get_govsheet_schema(scheme:str, domain:str):
     """ ガバナンスシートのスキーマを取得する関数です。
 
     Args:
@@ -28,15 +28,15 @@ def get_govsheet_schema(scheme, domain):
     return response.json()
 
 
-def get_metadata_schema(scheme, domain):
+def get_metadata_schema(scheme:str, domain:str):
     """ メタデータのスキーマを取得する関数です。
 
     Args:
         scheme (str): スキームを設定します。
-        domain (_type_): ドメインを設定します。
+        domain (str): ドメインを設定します。
 
     Returns:
-        dict: メタデータのスキーマ
+        dict: メタデータのスキーマを返す。
 
     """
     sub_url = '/schemas/metadata'
@@ -46,7 +46,7 @@ def get_metadata_schema(scheme, domain):
     return response.json()
 
 
-def check_governedrun_token(scheme, domain, token:str)->bool:
+def check_governedrun_token(scheme:str, domain:str, token:str)->bool:
     """ Governed Runのトークンの有効性を確認する
 
     Args:
@@ -59,6 +59,7 @@ def check_governedrun_token(scheme, domain, token:str)->bool:
 
     Raises:
         requests.exceptions.RequestException: 通信エラー
+
     """
     sub_url = '/checkToken'
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
@@ -75,7 +76,7 @@ def check_governedrun_token(scheme, domain, token:str)->bool:
     return False
 
 
-def validate(scheme, domain, grdm_token, project_id, govrun_token=None, govsheet=None, metadata=None):
+def validate(scheme:str, domain:str, grdm_token:str, project_id:str, govrun_token:str=None, govsheet=None, metadata=None):
     """ 検証する関数です。
 
     Args:
@@ -93,6 +94,7 @@ def validate(scheme, domain, grdm_token, project_id, govrun_token=None, govsheet
     Raises:
         UnauthorizedError: 認証が通らない
         requests.exceptions.RequestException: その他の通信エラー
+
     """
     sub_url = '/validations/submit'
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
@@ -113,7 +115,7 @@ def validate(scheme, domain, grdm_token, project_id, govrun_token=None, govsheet
     return response.json()
 
 
-def get_validations(scheme, domain, grdm_token: str, project_id: str):
+def get_validations(scheme:str, domain:str, grdm_token: str, project_id: str):
     """ 検証結果を取得する関数です。
 
     Args:
@@ -123,7 +125,7 @@ def get_validations(scheme, domain, grdm_token: str, project_id: str):
         project_id (str): プロジェクトidを設定します。
 
     Returns:
-        dict: 全ての検証結果
+        dict: 全ての検証結果を返す。
 
     Raises:
         UnauthorizedError: 認証が通らない
@@ -149,23 +151,24 @@ def get_validations(scheme, domain, grdm_token: str, project_id: str):
     return response.json()
 
 
-def get_validations_validationId(scheme, domain, grdm_token: str, project_id: str, validation_id: str):
+def get_validations_validationId(scheme:str, domain:str, grdm_token: str, project_id: str, validation_id: str):
     """ idを指定して検証結果を取得する関数です。
 
     Args:
-        scheme (_type_): スキームを設定します。
-        domain (_type_): ドメインを設定します。
+        scheme (str): スキームを設定します。
+        domain (str): ドメインを設定します。
         grdm_token (str): GRDMのトークンを設定します。
         project_id (str): プロジェクトidを設定します。
         validation_id (str): 検証のidを設定します。
 
     Returns:
-        dict: 指定したidの検証結果
+        dict: 指定したidの検証結果を返す。
 
     Raises:
         UnauthorizedError: 認証が通らない
         NotFoundContentsError: 検証結果が存在しない
         requests.exceptions.RequestException: その他の通信エラー
+
     """
     sub_url = f'/validations/{validation_id}'
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))

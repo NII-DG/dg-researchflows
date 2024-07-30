@@ -19,13 +19,13 @@ class Field:
 
     Attributes:
         class:
-            __FIELD:フィールドデータ
-            __ID:id
-            __FIELD_NAME:フィールド名
-            __EXPERIMENT_PACKAGE:実験パッケージ
-            __IS_ACTIVE:アクティブかの判定を行う
+            __FIELD(str):フィールドデータ
+            __ID(str):id
+            __FIELD_NAME(str):フィールド名
+            __EXPERIMENT_PACKAGE(str):実験パッケージ
+            __IS_ACTIVE(str):アクティブかの判定を行う
         instance:
-            field:フィールドデータを保存する。
+            field(Any):フィールドデータを保存する。
 
     """
     __FIELD = "field"
@@ -78,7 +78,7 @@ class Field:
             target_name (Any):目的の実験パッケージを指定するフィールド名
 
         Returns:
-            戻り値の型が分かりませんでした。:目的の実験パッケージ
+            Any:目的の実験パッケージ
 
         """
         for fld in self.field:

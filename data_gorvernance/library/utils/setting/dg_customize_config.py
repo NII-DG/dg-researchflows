@@ -20,10 +20,11 @@ class AlphaProperty:
 
     Attributes:
         class:
-           __ID:id
-           __CUSTOMIZE:カスタマイズデータ
+           __ID(str):サブフローid
+           __CUSTOMIZE(str):カスタマイズデータ
         instance:
-            _customize:取り出したデータで初期化したリスト
+            _id(dict):サブフローid
+            _customize(List[SubFlowRule]):取り出したデータで初期化したリスト
 
     """
     __ID = 'id'
@@ -51,10 +52,12 @@ class SubFlowRule:
 
     Attributes:
         class:
-            __TASK_IDS:タスクのid群
-            __VERIFICATION_IDS:検証用のid群
+            __TASK_IDS(str):タスクのid群
+            __VERIFICATION_IDS(str):検証用のid群
         instance:
-            _subflow_type_name:サブフローの型名
+            _subflow_type_name(str):サブフローの型名
+            _task_ids(Any):タスクのID群
+            _verification_ids(Any):検証用のid群
 
     """
     __TASK_IDS = 'task_ids'

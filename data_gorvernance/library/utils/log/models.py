@@ -1,5 +1,4 @@
-"""ロギング機能のモジュールです。
-ログの生成に関するクラスや関数が記載されています。
+"""ログの生成に関するクラスや関数が記載されています。
 """
 import logging
 from logging import FileHandler
@@ -30,7 +29,7 @@ class BaseLogger:
         ロガーの生成や時刻の記録などロギング機能における基本の処理を行います。
 
         Args:
-            output_dir(str):ログファイルの出力ディレクトリ。デフォルトはカレントディレクトリ。
+            output_dir(str, optional):ログファイルの出力ディレクトリ。デフォルトはカレントディレクトリ。
 
         """
         self.logger = logging.getLogger(__name__)
@@ -114,7 +113,7 @@ class UserActivityLog(BaseLogger):
             ipynb_file(Any):ノートブックファイルへのパス
             subflow_id(str):サブフローのID
             subflow_type(str):サブフローの種別
-            cell_id(Literal['']):ノートブックのセルID
+            cell_id(str):ノートブックのセルID
 
     """
 
@@ -151,7 +150,7 @@ class UserActivityLog(BaseLogger):
             nb_working_file (Any): ノートブック名を含む絶対パス
 
         Returns:
-            String:ログファイルを保存するディレクトリへのパス
+            str:ログファイルを保存するディレクトリへのパス
 
         """
         root_folder = Path(
@@ -215,8 +214,8 @@ class UserActivityLog(BaseLogger):
         引数として処理内容の詳細と注記を受け取り、それを基にINFOレベルのログを出力します。
 
         Args:
-            detail(str):処理の詳細。デフォルトは空文字
-            note(str):処理の注記。デフォルトは空文字
+            detail(str, optional):処理の詳細。デフォルトは空文字
+            note(str, optional):処理の注記。デフォルトは空文字
 
         """
         self.info("-- " + detail + "処理開始 --" + note)
@@ -227,8 +226,8 @@ class UserActivityLog(BaseLogger):
         引数として処理内容の詳細と注記を受け取り、それを基にINFOレベルのログを出力します。
 
         Args:
-            detail(str):処理の詳細。デフォルトは空文字
-            note(str):処理の注記。デフォルトは空文字
+            detail(str, optional):処理の詳細。デフォルトは空文字
+            note(str, optional):処理の注記。デフォルトは空文字
 
         """
         self.info("-- " + detail + "処理終了 --" + note)

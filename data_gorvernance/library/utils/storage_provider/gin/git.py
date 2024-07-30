@@ -107,7 +107,7 @@ def git_commmit(msg:str, cwd):
 
     Args:
         msg (str):コミットメッセージ
-        cwd (_type_):現在の作業ディレクトリ
+        cwd (Any):現在の作業ディレクトリ
 
     Returns:
         str:コマンドの実行結果
@@ -123,7 +123,7 @@ def git_pull(cwd):
     引数で指定されたディレクトリ内でgit pullコマンドを実行します。
 
     Args:
-        cwd (_type_):現在の作業ディレクトリ
+        cwd (Any):現在の作業ディレクトリ
 
     Returns:
         str:コマンドの実行結果
@@ -140,11 +140,12 @@ def git_branch(cwd, option=''):
     引数で指定されたディレクトリ内でgit branchコマンドを実行します。
 
     Args:
-        cwd (_type_):現在の作業ディレクトリ
+        cwd (Any):現在の作業ディレクトリ
         option (str):git branchコマンドに追加で渡すオプション
 
     Returns:
         str:コマンドの実行結果
+
     """
     if len(option) > 0:
         stdout, stderr, rt = Cmd.exec_subprocess(f'git branch {option}', cwd=cwd,raise_error=False)
@@ -159,7 +160,7 @@ def git_branch_for_remote(cwd):
     git_branch()を現在の作業ディレクトリと'-r'を引数に呼び出します。
 
     Args:
-        cwd (_type_):現在の作業ディレクトリ
+        cwd (Any):現在の作業ディレクトリ
 
     Returns:
         str:コマンドの実行結果
@@ -173,7 +174,7 @@ def is_annex_branch_in_repote(cwd):
     リモートブランチの一覧にorigin/git-annexが存在するか調べ、結果をbool型で返します。
 
     Args:
-        cwd (_type_):現在の作業ディレクトリ
+        cwd (Any):現在の作業ディレクトリ
 
     Returns:
         bool:origin/git-annexが存在するかの判定結果
@@ -192,10 +193,11 @@ def exec_git_status(cwd):
      引数で指定されたディレクトリ内でgit statusコマンドを実行します。
 
     Args:
-        cwd (_type_):現在の作業ディレクトリ
+        cwd (Any):現在の作業ディレクトリ
 
     Returns:
         str:コマンドの実行結果
+
     """
     stdout, stderr, rt = Cmd.exec_subprocess('git status', cwd)
     result = stdout.decode('utf-8')
@@ -207,10 +209,11 @@ def is_conflict(cwd) -> bool:
     gitリポジトリの状態を取得し、衝突しているものがないかをbool型で返します。
 
     Args:
-        cwd (_type_):現在の作業ディレクトリ
+        cwd (Any):現在の作業ディレクトリ
 
     Returns:
         bool:衝突しているものがないかの判定
+
     """
     result = exec_git_status(cwd)
     lines = result.split('\n')

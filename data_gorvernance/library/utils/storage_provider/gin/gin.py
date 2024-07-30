@@ -1,7 +1,5 @@
-"""GINのモジュールです。
-GINを用いた通信に関連する関数を記載しています。
-   
- """
+"""GINを用いた通信に関連する関数を記載しています。
+"""
 import re
 import shutil
 import subprocess
@@ -430,7 +428,6 @@ def write_GIN_config(mode, ginDomain, ssh_config_path):
         ssh_config_path (Any):SSH設定ファイルへのパス
 
     """
-
     with open(ssh_config_path, mode) as f:
         f.write('\nhost ' + ginDomain + '\n')
         f.write('\tStrictHostKeyChecking no\n')
@@ -445,7 +442,6 @@ def prepare_sync(root):
         root(Any):ルートパス
 
     """
-
     # S3にあるデータをGIN-forkに同期しないための設定
     git.git_annex_untrust(root)
     git.git_annex_trust(root)
@@ -501,28 +497,23 @@ def push_annex_branch(cwd):
         Cmd.exec_subprocess(cmd=f'git push {SIBLING} git-annex:git-annex', cwd=cwd)
 
 def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str], gitannex_files :list[str], message:str, get_paths:list[str],):
-    """synchronize with the repository
+    """Git Annexリポジトリの同期を行うメソッドです。
 
-    ARG
-    ---------------
-    git_path : str or list(str)
-        Description : Define directories and files to be managed by git.
-    gitannex_path : str or list(str)
-        Description : Define directories and files to be managed by git-annex.
-    gitannex_files : str or list(str) or None
-        Description : Specify the file to which metadata(content_size, sha256, mime_type) is to be added. Specify None if metadata is not to be added.
-    message : str
-        Description : Commit message
+    Args:
+        cwd (str):現在の作業ディレクトリ
+        git_path (list[str]):gitで管理するディレクトリとファイルのパス
+        gitannex_path (list[str]):git Annexで管理するディレクトリとファイルのパス
+        gitannex_files (list[str]):メタデータ(content_size, sha256, mime_type)を追加するファイル(メタデータを追加しない場合は None を指定)
+        message (str):コミットメッセージ
+        get_paths (list[str]):取得するデータセットへのパス
 
-    RETURN
-    ---------------
-    bool
-        Description : 同期の成功判定
+    Returns:
+        bool:同期の成功判定
 
-    memo:
+    note:
         update()を最初にするとgit annex lockができない。addをする必要がある。
-    """
 
+    """
     success_message = ''
     warm_message = ''
     error_message = ''
@@ -656,31 +647,20 @@ def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str], gitann
             return False
 
 def save_annex_and_register_metadata(cwd, gitannex_path :list[str], gitannex_files:list[str], message:str):
-    """datalad save and metadata assignment (content_size, sha256, mime_type) to git annex files
+    """detaladの保存とメタデータの登録を行うメソッドです。
 
-    ARG
-    ---------------
-    git_path : str or list(str)
-        Description : Define directories and files to be managed by git.
-    gitannex_path : str or list(str)
-        Description : Define directories and files to be managed by git-annex.
-    gitannex_files : str or list(str) or None
-        Description : Specify the file to which metadata(content_size, sha256, mime_type) is to be added. Specify None if metadata is not to be added.
-    message : str
-        Description : Commit message
+    引数で指定されたファイルに対してdetaladへの保存を行った後、メタデータの登録を行うメソッドです。
 
-    RETURN
-    ---------------
-    Returns nothing.
+    Args:
+        cwd (Any):現在の作業ディレクトリ
+        gitannex_path (list[str]):git-annexに追加するファイルパスのリスト
+        gitannex_files (list[str]):メタデータを登録するファイルパスのリスト
+        message (str):コミットメッセージ
 
-    EXCEPTION
-    ---------------
-
-    NOTE
-    ----------------
+    note:
         in the unlocked state, the entity of data downloaded from outside is also synchronized, so it should be locked.
-    """
 
+    """
     # *The git annex metadata command can only be run on files that have already had a git annex add command run on them
     if len(gitannex_path) > 0:
         datalad_api.save(message=message + ' (git-annex)', path=gitannex_path)
@@ -695,21 +675,15 @@ def save_annex_and_register_metadata(cwd, gitannex_path :list[str], gitannex_fil
             pass
 
 def register_metadata_for_annexdata(cwd:str, file_path):
-    """register_metadata(content_size, sha256, mime_type) for specified file
+    """指定したファイルにメタデータの登録を行うメソッドです。
 
-    ARG
-    ---------------
-    file_path : str
-        Description : File path to which metadata is to be added.
+    引数で指定したファイルに対してメタデータ(content_size, sha256, mime_type)の登録を行います。
 
-    RETURN
-    ---------------
-    Returns nothing.
+    Args:
+        cwd (str):現在の作業ディレクトリ
+        file_path (Any):メタデータを登録するファイルパス
 
-    EXCEPTION
-    ---------------
     """
-
     if os.path.isfile(file_path):
         # generate metadata
         # os.system('git annex unlock')
@@ -795,10 +769,9 @@ def get_filepaths_from_dalalad_error(err_info: str):
         err_info (str):エラー情報の文字列
 
     Returns:
-        list[Any]:抽出した文字列のリスト
+        list:抽出した文字列のリスト
 
     """
-
     pattern = r"'\\t(.+?)\\n'"
     return re.findall(pattern, err_info)
 
@@ -981,7 +954,7 @@ def update_repo_url():
     APIからリポジトリの最新のSSHのリモートURLを取得し、リモート設定を更新します。
 
     Returns:
-        bool: プライベートリポジトリかどうかの判定を行う
+        Any: プライベートリポジトリかどうかの判定を行う
 
     Raises:
         requests.exceptions.RequestException: 接続の確立不良

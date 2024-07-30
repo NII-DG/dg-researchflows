@@ -1,5 +1,4 @@
-"""タスクログ関するモジュールです。
-タスク処理の前後でログを出力する機能に関するクラスが記載されています。
+"""タスク処理の前後でログを出力する機能に関するクラスが記載されています。
 """
 import functools
 
@@ -39,8 +38,8 @@ class TaskLog:
 
         Args:
             cell_id(str):ノートブックのセル番号
-            start_message(str):タスクの開始時に出力するメッセージ。デフォルトは空文字。
-            finish_message(str):タスクの終了時に出力するメッセージ。デフォルトは空文字。
+            start_message(str, optional):タスクの開始時に出力するメッセージ。デフォルトは空文字。
+            finish_message(str, optional):タスクの終了時に出力するメッセージ。デフォルトは空文字。
 
         Return:
            Callable:wrapper関数

@@ -19,13 +19,13 @@ class OCSTemplate:
 
     Attributes:
         class:
-            __FIELD:OCSテンプレートデータ
-            __ID:id
-            __FIELD_NAME:OCSテンプレート名
-            __OCS_TEMPLATE_PATH:OCSテンプレートパス
-            __IS_ACTIVE:アクティブかの判定を行う
+            __FIELD(str):OCSテンプレートデータ
+            __ID(str):id
+            __FIELD_NAME(str):OCSテンプレート名
+            __OCS_TEMPLATE_PATH(str):OCSテンプレートパス
+            __IS_ACTIVE(str):アクティブかの判定を行う
         instance:
-           ocs_template:OCSテンプレートデータを保存する。
+           ocs_template(Any):OCSテンプレートデータを保存する。
 
     """
     __FIELD = "ocs_template"
@@ -78,7 +78,7 @@ class OCSTemplate:
             target_name (Any):目的のOCSテンプレートIDを指定するOCSテンプレート名
 
         Returns:
-            戻り値の型が分かりませんでした。:目的のOCSテンプレートID
+            Any:目的のOCSテンプレートID
 
         """
         for fld in self.ocs_template:
@@ -94,7 +94,7 @@ class OCSTemplate:
             target_name (Any):目的のOCSテンプレートパスを指定するOCSテンプレート名
 
         Returns:
-            戻り値の型が分かりませんでした。:目的のOCSテンプレート名
+            Any:目的のOCSテンプレート名
 
         """
         for fld in self.ocs_template:

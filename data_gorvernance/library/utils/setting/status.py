@@ -14,21 +14,21 @@ class SubflowTask:
 
     Attributes:
         class:
-            __ID:不明
-            __NAME:不明
-            __IS_MULTIPLE:不明
-            __IS_REQURED :不明'
-            __COMPLETED_COUNT:不明
-            __DEPENDENT_TASK_IDS:実行依存先ID
-            __STATUS :実行状況
-            __EXECUTION_ENVIRONMENTS:実行環境リスト
-            __DISABLED:不明'
+            __ID(str):不明
+            __NAME(str):不明
+            __IS_MULTIPLE(str):不明
+            __IS_REQURED(str) :不明
+            __COMPLETED_COUNT(str):不明
+            __DEPENDENT_TASK_IDS(str):実行依存先ID
+            __STATUS(str):実行状況
+            __EXECUTION_ENVIRONMENTS(str):実行環境リスト
+            __DISABLED(str):不明
 
-            STATUS_UNFEASIBLE:実行状況（実行不可能）
-            STATUS_UNEXECUTED:実行状況（未実行）
-            STATUS_DOING :実行状況（実行中）
-            STATUS_DONE:実行状況（実行完了）
-            allowed_statuses:許可されたステータス
+            STATUS_UNFEASIBLE(str):実行状況（実行不可能）
+            STATUS_UNEXECUTED(str):実行状況（未実行）
+            STATUS_DOING(str):実行状況（実行中）
+            STATUS_DONE(str):実行状況（実行完了）
+            allowed_statuses(str):許可されたステータス
 
         instance:
             id (str):不明
@@ -215,7 +215,6 @@ class SubflowTask:
         Args:
             status (str):_statusにセットする値
 
-
         """
         self._set_status(status)
 
@@ -262,8 +261,6 @@ class SubflowTask:
 
         Returns:
             _dict[str, Any]:サブフロータスクの辞書型データ
-
-            特にありません。
 
         """
         return {
@@ -463,7 +460,6 @@ class SubflowStatusFile(JsonFile):
 
         Returns:
             SubflowStatus:作成したSubflowStatusクラスのインスタンス
-
 
         """
         content = super().read()

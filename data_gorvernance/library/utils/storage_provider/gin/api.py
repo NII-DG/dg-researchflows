@@ -1,7 +1,5 @@
-"""APIのモジュールです。
-APIリクエストを行う関数が記載されています。
+"""APIリクエストを行う関数が記載されています。
 """
-
 from urllib import parse
 import requests
 import time
@@ -41,6 +39,9 @@ def get_token_for_auth(scheme, domain, user_name, password):
         domain (Any):ドメイン
         user_name (Any):ユーザー名
         password (Any):パスワード
+
+    Returns:
+        Response:認証トークンを含むHTTPレスポンス
 
     """
     sub_url = os.path.join('api/v1/users', user_name, 'tokens')
@@ -122,7 +123,6 @@ def upload_key(scheme:str, domain:str, token:str, pubkey:str):
         Response:APIリクエストのレスポンス
 
     """
-
     sub_url = "api/v1/user/keys"
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     params = {'token' : token}
@@ -148,7 +148,6 @@ def search_repo(scheme, domain, repo_id, user_id, token):
         Response:APIリクエストのレスポンス
 
     """
-
     sub_url = "/api/v1/repos/search/user"
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     params = {
@@ -197,7 +196,6 @@ def search_public_repo(scheme, domain, repo_id,):
         Response:APIリクエストのレスポンス
 
     """
-
     sub_url = "/api/v1/repos/search"
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     params = {

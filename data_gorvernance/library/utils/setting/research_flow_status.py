@@ -343,11 +343,10 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         引数として受け取った情報を基に新たなサブフローを作成し、リサーチフローステータスに追加します。
 
         Args:
-            creating_phase_seq_number (int):サブフローを作成するフェーズのシーケンス番号
-
-            sub_flow_name (str): 新規サブフロー名
-
-            parent_sub_flow_ids (list[str]):親サブフローID
+            creating_phase_seq_number(Any):サブフローを作成するフェーズのシーケンス番号
+            sub_flow_name(Any): 新規サブフロー名
+            date_dir_name(Any):作成するディレクトリ名
+            parent_sub_flow_ids(Any):親サブフローID
 
         Returns:
             Any:新規のサブフローを作成したフェーズの名前
@@ -450,10 +449,10 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         引数で指定されたサブフローデータのサブフロー名とディレクトリ名をそれぞれ引数で渡されたものに変更します。
 
         Args:
-            phase_seq_number (_type_):対象のフェーズシーケンス番号
-            sub_flow_id (_type_):対象のサブフローID
-            sub_flow_name (_type_):変更後のサブフロー名
-            data_dir_name (_type_):変更後のディレクトリ名
+            phase_seq_number (Any):対象のフェーズシーケンス番号
+            sub_flow_id (Any):対象のサブフローID
+            sub_flow_name (Any):変更後のサブフロー名
+            data_dir_name (Any):変更後のディレクトリ名
 
         Raises:
             NotFoundSubflowDataError:IDが一致するサブフローデータが存在しない
@@ -532,7 +531,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         引数として受け取った phase_seq_numberから対応するフェーズ名を取得し、戻り値として返します。
 
         Args:
-            phase_seq_number (_type_):対象のフェーズシーケンス番号
+            phase_seq_number (Any):対象のフェーズシーケンス番号
 
         Returns:
             Any:フェーズ名

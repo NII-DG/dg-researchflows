@@ -1,4 +1,4 @@
-"""解析環境の取得に関するモジュールです。
+"""解析環境に関するモジュールです。
 特定の解析環境の情報を取得するためのメソッドが記載されています。
 """
 import os
@@ -17,13 +17,13 @@ class AnalysisEnvironment:
 
     Attributes:
         class:
-            __FIELD:解析環境
-            __ID:解析環境のid
-            __NAME:解析環境の名前
-            __DESCRIPTION:解析環境の説明
-            __IS_ACTIVE:アクティブかの判定を行う
+            __FIELD(str):解析環境
+            __ID(str):解析環境のid
+            __NAME(str):解析環境の名前
+            __DESCRIPTION(str):解析環境の説明
+            __IS_ACTIVE(str):アクティブかの判定を行う
         instance:
-            analysis_environment:解析環境
+            analysis_environment(Any):解析環境
 
     """
     __FIELD = 'analysis_environment'
@@ -58,10 +58,10 @@ class AnalysisEnvironment:
         引数として渡された名前と一致する解析環境のidを取得して返します。
 
         Args:
-            target_name (_type_): 目的の解析環境の名前
+            target_name (Any): 目的の解析環境の名前
 
         Returns:
-            戻り値のidの型がわかりませんでした。:target_nameに対応したid
+            Any:target_nameに対応したid
 
         """
         for fld in self.analysis_environment:
@@ -74,10 +74,10 @@ class AnalysisEnvironment:
         引数として渡された名前と一致する解析環境の説明を取得して返します。
 
         Args:
-            target_name (_type_): 目的の解析環境の名前
+            target_name (Any): 目的の解析環境の名前
 
         Returns:
-            戻り値のdescriptionの型がわかりませんでした。:target_nameに対応した化石環境の説明
+            Any:target_nameに対応した化石環境の説明
 
         """
         for fld in self.analysis_environment:

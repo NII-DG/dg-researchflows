@@ -1,5 +1,4 @@
-"""GINを用いた通信に関連する関数を記載しています。
-"""
+"""GINを用いた通信に関連する関数を記載しています。"""
 import re
 import shutil
 import subprocess

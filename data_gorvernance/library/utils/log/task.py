@@ -1,5 +1,4 @@
-"""タスク処理の前後でログを出力する機能に関するクラスが記載されています。
-"""
+"""タスク処理の前後でログを出力する機能に関するクラスが記載されています。"""
 import functools
 
 from .models import UserActivityLog

@@ -1,5 +1,4 @@
-"""ログの生成に関するクラスや関数が記載されています。
-"""
+"""ログの生成に関するクラスや関数が記載されています。"""
 import logging
 from logging import FileHandler
 import os

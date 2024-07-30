@@ -1,3 +1,4 @@
+"""gitの設定や操作を行う関数を記載しています。"""
 from ...cmd import Cmd
 
 def get_remote_url():

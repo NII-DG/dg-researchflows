@@ -1,5 +1,4 @@
-"""APIリクエストを行う関数が記載されています。
-"""
+"""APIリクエストを行う関数が記載されています。"""
 from urllib import parse
 import requests
 import time

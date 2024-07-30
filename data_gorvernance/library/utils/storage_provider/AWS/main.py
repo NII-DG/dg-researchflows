@@ -1,5 +1,4 @@
-"""AWS S3バケットからディレクトリまたはファイルをダウンロードするための関数が記載されています。
-"""
+"""AWS S3バケットからディレクトリまたはファイルをダウンロードするための関数が記載されています。"""
 import boto3
 
 from .models import download_dir, download_file

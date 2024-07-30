@@ -16,8 +16,6 @@ data_governance_customize_file = p.joinpath('../../', 'data/data_governance_cust
 class AlphaProperty:
     """受け取ったサブフローに関するデータを解析し、保持するためのクラスです。
 
-    このクラスでは受け取ったデータの解析を行い、idの取得と新たにSubFlowRule型のリストを作成します。
-
     Attributes:
         class:
            __ID(str):サブフローid
@@ -33,8 +31,6 @@ class AlphaProperty:
     def __init__(self, data:Dict[str, Dict]) -> None:
         """クラスのインスタンスを初期化するメソッドです。コンストラクタ
 
-        引数として受け取ったデータから新たにSubFlowRule型のリストを作成します。
-
         Args:
             data (Dict[str, Dict]): subFlowの情報が格納されたデータ
 
@@ -47,8 +43,6 @@ class AlphaProperty:
 
 class SubFlowRule:
     """DGカスタマイズJSON定義書のインスタンス作成に関するメソッドを記載したクラスです。
-
-    このクラスではデータを解析し、インスタンスを作成する処理を行います。
 
     Attributes:
         class:
@@ -66,8 +60,6 @@ class SubFlowRule:
     def __init__(self, subflow_type_name:str, data:Dict[str, Any]) -> None:
         """クラスのインスタンスを初期化するメソッドです。コンストラクタ
 
-        引数として受け取ったデータを自身のインスタンスに保存します。
-
         Args:
             subflow_type_name (str): サブフローの型名
             data (Dict[str, Any]): subFlowの情報が格納されたデータ
@@ -79,8 +71,6 @@ class SubFlowRule:
 
 def get_dg_customize_config():
     """DGカスタマイズJSON定義書のインスタンスを取得するメソッドです。
-
-    ジェイソンファイルを読み出し、AlphaProperty型のリストを作成し、戻り値として返します。
 
     Returns:
         list[AlphaProperty]:DGカスタマイズJSON定義書のインスタンス

@@ -1,6 +1,4 @@
-"""リサーチフローステータスのモジュールです。
-リサーチフロー関連の処理を行う関数やクラスが記載されています。
-"""
+"""リサーチフローステータス関連の処理を行う関数やクラスが記載されたモジュールです。"""
 import os
 from typing import List
 from datetime import datetime
@@ -16,8 +14,6 @@ from ..file import JsonFile
 
 def get_subflow_type_and_id(working_file_path: str):
     """サブフローの種別とidを取得するメソッドです。
-
-    ノートブックのパスを受け取ってサブフローの種別とidを返す。
 
     Args:
         working_file_path (str): researchflowディレクトリ配下のノートブックのファイルパス
@@ -62,8 +58,6 @@ def get_subflow_type_and_id(working_file_path: str):
 def get_data_dir(working_file_path: str):
     """該当するデータディレクトリまでの絶対パスを取得するメソッドです。
 
-    受け取ったファイルパスから該当するデータディレクトリまでの絶対パスを取得し、戻り値として返します。
-
     Args:
         working_file_path (str): データディレクトリを指定する作業ディレクトリのファイルパス
 
@@ -91,15 +85,12 @@ def get_data_dir(working_file_path: str):
     return path_config.get_task_data_dir(abs_root, subflow_type, data_dir_name)
 
 class ResearchFlowStatusFile(JsonFile):
-    """リサーチフローステータスの関連処理を行うクラスです。
+    """リサーチフローステータスの参照や操作を行うクラスです。"""
 
-    リサーチフローステータスの読み書きや照合などの処理を記載しています。
-
-    """
     def __init__(self, file_path: str):
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
-        引数として受け取ったファイルパスが存在している場合のみ親クラス(JsonFile)のコンストラクタを呼び出します。
+        引数として受け取ったファイルパスが存在している場合のみ、親クラスのコンストラクタを用いてpathオブジェクトに変換します。
 
         Args:
             file_path (str):ファイルパス
@@ -116,8 +107,6 @@ class ResearchFlowStatusFile(JsonFile):
     def load_research_flow_status(self)->List[PhaseStatus]:
         """リサーチフローステータス管理JSONからリサーチフローステータスのインスタンスを取得するメソッドです。
 
-        自身のインスタンスに保存されているパスを用いてload_from_jsonメソッドを実行し、Listを受け取ります。
-
         Returns:
             List[PhaseStatus]:リサーチフローステータスのリスト
 
@@ -126,8 +115,6 @@ class ResearchFlowStatusFile(JsonFile):
 
     def update_file(self, research_flow_status:List[PhaseStatus]):
         """リサーチフローステータス管理JSONの更新を行うメソッドです。
-
-        引数としてして受け取ったresearch_flow_statusに基づいてリサーチフローステータス管理JSONの更新を行います。
 
         Args:
             research_flow_status (List[PhaseStatus]): 更新に用いるリサーチフローステータス管理情報
@@ -161,14 +148,11 @@ class ResearchFlowStatusFile(JsonFile):
         Returns:
             str:発行したUUIDを文字列に変換したもの
 
-
         """
         return str(uuid.uuid4())
 
     def exist_sub_flow_id_in_research_flow_status(self, research_flow_status:List[PhaseStatus], target_id:str)->bool:
-        """リサーチフローステータス管理情報に同一のサブフローIDが存在するかチェックするメソッドです。
-
-        引数として受け取ったresearch_flow_statusのサブフローIDにtarget_idと一致するものがあるかを調べ、結果を返します。
+        """リサーチフローステータス管理情報に同一のサブフローIDが存在するか確認するメソッドです。
 
         Args:
             research_flow_status (List[PhaseStatus]): リサーチフローステータス管理情報
@@ -177,7 +161,6 @@ class ResearchFlowStatusFile(JsonFile):
             bool:target_idと一致するサブフローIDが存在するかの判定
 
         """
-
         for phase in research_flow_status:
             for sub_flow in phase._sub_flow_data:
                 if sub_flow._id == target_id:
@@ -185,13 +168,10 @@ class ResearchFlowStatusFile(JsonFile):
         return False
 
     def issue_unique_sub_flow_id(self)->str:
-        """ユニークなサブフローIDを発行するメソッドです。
-
-        新たなサブフローID(UUIDv4)を発行し、同一のIDが存在しない場合、そのIDを返します。
-        存在する場合は再発行を行います。
+        """固有のサブフローIDを発行するメソッドです。
 
         Returns:
-            str: 新たに発行したユニークなサブフローID
+            str: 新たに発行した固有のサブフローID
 
         """
         while True:
@@ -205,9 +185,7 @@ class ResearchFlowStatusFile(JsonFile):
                 return candidate_id
 
     def is_unique_subflow_name(self, phase_seq_number, sub_flow_name)->bool:
-        """サブフロー名のユニークチェックを行うメソッドです。
-
-        research_flow_statusからphase_seq_numberが一致するものを検索し、sub_flow_nameが同じものがないか調べます。
+        """フェーズ内に同じ名前のサブフローが存在しないかの確認を行うメソッドです。
 
         Args:
             phase_seq_number:フェーズシーケンス番号
@@ -237,9 +215,7 @@ class ResearchFlowStatusFile(JsonFile):
         return True
 
     def is_unique_data_dir(self, phase_seq_number, data_dir_name)->bool:
-        """データフォルダ名のユニークチェックを行うメソッドです。
-
-         research_flow_statusからphase_seq_numberが一致するものを検索し、data_dir_nameが同じものがないか調べます。
+        """フェーズ内に同じ名前のデータフォルダが存在しないかの確認を行うメソッドです。
 
         Args:
             phase_seq_number (_type_):フェーズシーケンス番号
@@ -269,16 +245,10 @@ class ResearchFlowStatusFile(JsonFile):
         return True
 
 class ResearchFlowStatusOperater(ResearchFlowStatusFile):
-    """リサーチフローステータスの操作をおこなうクラスです。
-
-    リサーチフローステータスの更新やデータの検索を行うメソッドを記載しています。
-
-    """
+    """リサーチフローステータスの参照や操作をおこなうクラスです。"""
 
     def get_svg_of_research_flow_status(self)->str:
         """リサーチフローイメージのSVGデータを取得するメソッドです。
-
-        リサーチフローステータス管理情報を用いてリサーチフローイメージを生成するメソッドを呼び出します。
 
         Returns:
             str:リサーチフローイメージのSVGデータ
@@ -292,9 +262,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         return fd.draw()
 
     def update_display_object(self, research_flow_status:List[PhaseStatus])-> List[PhaseStatus]:
-        """画面表示用の調整を行うメソッドです。
-
-        リサーチフローステータス管理情報に対してフェーズ名の更新やHTMLエスケープを行うことで画面表示用に調整を行います。
+        """  リサーチフローステータス管理情報を画面表示用に調整するメソッドです。
 
         Args:
             research_flow_status (List[PhaseStatus]):リサーチフローステータス管理情報
@@ -313,8 +281,6 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
 
     def init_research_preparation(self, file_path:str):
         """研究準備ステータスの初期化を行うメソッドです。
-
-        研究準備のサブフローデータの作成時間が-1(初回アクセス)の場合、現在の時刻を入力し、リサーチフローステータス管理JSONを更新します。
 
         Args:
             file_path (str):使用されていないので詳細は不明です。
@@ -338,9 +304,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         self.update_file(research_flow_status)
 
     def create_sub_flow(self, creating_phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids):
-        """新規のサブフローを作成するメソッドです。
-
-        引数として受け取った情報を基に新たなサブフローを作成し、リサーチフローステータスに追加します。
+        """新規のサブフローを作成し、リサーチフローステータスに追加するメソッドです。
 
         Args:
             creating_phase_seq_number(Any):サブフローを作成するフェーズのシーケンス番号
@@ -387,9 +351,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         return phase_name, new_sub_flow_id
 
     def del_sub_flow_data_by_sub_flow_id(self, sub_flow_id):
-        """サブフローデータの削除を行うメソッドです。
-
-        引数として受け取ったsub_flow_idと一致するIDのサブフローデータを削除します。
+        """指定したサブフローデータの削除を行うメソッドです。
 
         Args:
             sub_flow_id (Any):削除対象となるサブフローデータのID
@@ -417,9 +379,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         self.update_file(research_flow_status)
 
     def relink_sub_flow(self, phase_seq_number, sub_flow_id, parent_sub_flow_ids):
-        """親サブフローを変更する変更するメソッドです。
-
-        引数で指定されたサブフローデータの親サブフローIDをparent_sub_flow_idsに変更します。
+        """親サブフローを変更するメソッドです。
 
         Args:
             phase_seq_number (Any):対象のフェーズシーケンス番号
@@ -445,8 +405,6 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
 
     def rename_sub_flow(self, phase_seq_number, sub_flow_id, sub_flow_name, data_dir_name):
         """サブフロー名とディレクトリ名を変更するメソッドです。
-
-        引数で指定されたサブフローデータのサブフロー名とディレクトリ名をそれぞれ引数で渡されたものに変更します。
 
         Args:
             phase_seq_number (Any):対象のフェーズシーケンス番号
@@ -475,8 +433,6 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
     def get_flow_name_and_dir_name(self, phase_seq_number, id):
         """指定したサブフローデータのサブフロー名とディレクトリ名を取得するメソッドです。
 
-        引数で指定したサブフローデータのサブフロー名とディレクトリ名を取得し、戻り値として返します。
-
         Args:
             phase_seq_number (Any):対象のフェーズシーケンス番号
             id (Any):対象のサブフローID
@@ -502,8 +458,6 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
     def get_data_dir(self, phase_name, id):
         """指定したサブフローデータのディレクトリ名を取得するメソッドです。
 
-        引数で指定したサブフローデータのディレクトリ名を取得し、戻り値として返します。
-
         Args:
             phase_name (Any):対象のフェーズ名
             id (Any):対象のサブフローID
@@ -526,9 +480,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
             raise NotFoundSubflowDataError(f'There Is No Data Directory Name. sub_flow_id : {id}')
 
     def get_subflow_phase(self, phase_seq_number):
-        """指定したフェーズ名を取得するメソッドです。
-
-        引数として受け取った phase_seq_numberから対応するフェーズ名を取得し、戻り値として返します。
+        """指定したフェーズの名前を取得するメソッドです。
 
         Args:
             phase_seq_number (Any):対象のフェーズシーケンス番号
@@ -550,8 +502,6 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
     def get_subflow_phases(self)->List[str]:
         """リーサーチフローステータスに存在する全てのフェーズ名を取得するメソッドです。
 
-        リーサーチフローステータスから全てのフェーズ名を取得し、リストにして返します。
-
         Returns:
             List[str]:全フェーズ名のリスト
 
@@ -564,8 +514,6 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
 
     def get_subflow_ids(self, phase_name: str)->List[str]:
         """指定したフェーズの全サブフローIDを取得するメソッドです。
-
-        引数で指定したフェーズに存在する全てのサブフローIDを取得し、リストにして返します。
 
         Args:
             phase_name (str):対象のフェーズ名

@@ -1,13 +1,11 @@
-"""APIリクエストを行う関数が記載されています。"""
+"""APIリクエストを行う関数が記載されたモジュールです。"""
 from urllib import parse
 import requests
 import time
 import os
 
 def get_server_info(scheme, domain):
-    """APIから情報を取得するための関数です。
-
-    引数として受け取ったスキームとドメインを使用して、指定したAPIエンドポイントから情報を取得します。
+    """指定したAPIエンドポイントから情報を取得するための関数です。
 
     Args:
         scheme (Any):スキーマ
@@ -29,9 +27,7 @@ def get_server_info(scheme, domain):
         raise Exception(f'Fail Request to GIN fork url:{api_url}') from e
 
 def get_token_for_auth(scheme, domain, user_name, password):
-    """指定されたユーザー名とパスワードから認証トークンを取得するメソッドです。
-
-    引数として受け取った情報からurlを作成し、GETリクエストを送ることで認証トークンを取得します。
+    """指定したユーザー名とパスワードから認証トークンを取得するメソッドです。
 
     Args:
         scheme (Any):スキーマ
@@ -49,9 +45,7 @@ def get_token_for_auth(scheme, domain, user_name, password):
     return requests.get(url=api_url, auth=auth)
 
 def create_token_for_auth(scheme, domain, user_name, password):
-    """指定されたユーザー名とパスワードから認証トークンを作成するメソッドです。
-
-    引数として受け取った情報からurlを作成し、POSTリクエストを送ることで認証トークンを作成します。
+    """指定したユーザー名とパスワードから認証トークンを作成するメソッドです。
 
     Args:
         scheme (Any):スキーマ
@@ -70,9 +64,7 @@ def create_token_for_auth(scheme, domain, user_name, password):
     return requests.post(url=api_url, auth=auth, data=data)
 
 def get_user_info(scheme, domain, token):
-    """指定されたユーザーの情報を取得するためのメソッドです。
-
-    引数として受け取った情報からurlを作成し、GETリクエストを送ることで指定されたトークンを持つユーザの情報を取得します。
+    """指定したユーザーの情報を取得するためのメソッドです。
 
     Args:
         scheme (Any):スキーマ
@@ -89,9 +81,7 @@ def get_user_info(scheme, domain, token):
     return requests.get(url=api_url, params=params)
 
 def delete_access_token(scheme, domain, token):
-    """指定されたアクセストークンを削除するメソッドです。
-
-    引数として受け取った情報からurlを作成し、DELEATEリクエストを送ることで指定されたアクセストークンを削除します。
+    """指定したアクセストークンを削除するメソッドです。
 
     Args:
         scheme (Any):スキーマ
@@ -108,9 +98,7 @@ def delete_access_token(scheme, domain, token):
     return requests.delete(url=api_url, params=params)
 
 def upload_key(scheme:str, domain:str, token:str, pubkey:str):
-    """指定された公開鍵をアップロードするメソッドです。
-
-    引数として受け取った情報からurlを作成し、POSTリクエストを送ることで指定された公開鍵をアプロードします。
+    """指定した公開鍵をアップロードするメソッドです。
 
     Args:
         scheme (str):スキーマ
@@ -132,9 +120,7 @@ def upload_key(scheme:str, domain:str, token:str, pubkey:str):
     return requests.post(url=api_url, params=params, data=data)
 
 def search_repo(scheme, domain, repo_id, user_id, token):
-    """リポジトリの検索を行うメソッドです。
-
-    引数として受け取った情報からurlを作成し、GETリクエストを送ることで指定されたリポジトリの検索を行います。
+    """指定したリポジトリの検索を行うメソッドです。
 
     Args:
         scheme (Any):スキーマ
@@ -157,9 +143,7 @@ def search_repo(scheme, domain, repo_id, user_id, token):
     return requests.get(url=api_url, params=params)
 
 def patch_container(scheme, domain, token, server_name, user_id):
-    """指定されたコンテナの更新を行うメソッドです。
-
-    引数として受け取った情報からurlを作成し、PATCHリクエストを送ることで指定されたコンテナの更新を行います。
+    """指定したコンテナの更新を行うメソッドです。
 
     Args:
         scheme (Any):スキーマ
@@ -182,9 +166,7 @@ def patch_container(scheme, domain, token, server_name, user_id):
     return requests.patch(url=api_url, params=params)
 
 def search_public_repo(scheme, domain, repo_id,):
-    """指定された公開リポジトリの検索を行うメソッドです。
-
-    引数として受け取った情報からurlを作成し、GETリクエストを送ることで指定された公開リポジトリの検索を行います。
+    """指定した公開リポジトリの検索を行うメソッドです。
 
     Args:
         scheme (Any):スキーマ

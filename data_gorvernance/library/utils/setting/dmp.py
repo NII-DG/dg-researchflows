@@ -1,19 +1,15 @@
-"""DMPを操作する機能のモジュールです。
-DMPデータの検索や並べ替えを行うクラスが記載されています。
-"""
+"""DMPデータを操作するクラスが記載されたモジュールです。"""
 from ..file import JsonFile
 
 
 class DMPManager(JsonFile):
     """DMPデータの操作を行うクラスです。
 
-    DMPデータの検索や並べ替えを行うメソッドを記載しています。
-
     """
     def __init__(self, file_path: str):
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
-        引数として受け取ったファイルパスで親クラスのコンストラクタを呼び出します。
+        親クラスのコンストラクタを用いてpathオブジェクトに変換しています。
 
         Args:
             file_path (str): ファイルパスを表す文字列
@@ -23,9 +19,7 @@ class DMPManager(JsonFile):
 
     @staticmethod
     def create_dmp_options(contents):
-        """データを解析し、オプションの辞書を作成する静的なメソッドです。
-
-        引数として受け取ったデータからdmpのタイトルを抽出し、その辞書を作成します。
+        """dmpのタイトルを抽出し、オプションの辞書を作成するメソッドです。
 
         Args:
             contents (_type_): dmpデータを含むデータ群
@@ -43,9 +37,7 @@ class DMPManager(JsonFile):
 
     @staticmethod
     def get_dmp(contents, index):
-        """指定したdmpを取得するための静的なメソッドです。
-
-        引数として受け取ったcontentsから同じく引数であるindexに対応したdmpを取得し、辞書型で返します。
+        """指定したdmpを取得するためのメソッドです。
 
         Args:
             contents (Any):dmpデータを含むデータ群
@@ -59,9 +51,7 @@ class DMPManager(JsonFile):
 
     @staticmethod
     def display_format(content):
-        """dmpデータの表示フォーマットを作成する静的メソッドです。
-
-        引数として受けとったデータからdmpの情報を取り出し、表示する際のフォーマットに合うよう成形します。
+        """dmpデータの表示フォーマットを作成するメソッドです。
 
         Args:
             content (Any):dmpデータを含むデータ群

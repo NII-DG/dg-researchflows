@@ -1,11 +1,9 @@
-"""AWS S3バケットからディレクトリまたはファイルをダウンロードする関数が記載されています。"""
+"""AWS S3バケットからディレクトリまたはファイルをダウンロードする関数が記載されたモジュールです。"""
 import os
 
 
 def download_file(s3_client, bucket_name:str, aws_path:str, local_path:str):
-    """AWS S3バケットからファイルをダウンロードする関数です。
-
-    指定されたAWS S3バケットにアクセスし、ファイルをダウンロードしてローカルに保存します。
+    """指定したAWS S3バケットからファイルをダウンロードする関数です。
 
     Args:
         s3_client (Any):AWS S3にアクセスするためのクライアント
@@ -32,9 +30,7 @@ def download_file(s3_client, bucket_name:str, aws_path:str, local_path:str):
 
 
 def download_dir(s3_client, bucket_name:str, aws_dir:str, local_dir:str):
-    """AWS S3バケットからディレクトリをダウンロードする関数です。
-
-    指定されたAWS S3バケットにアクセスし、ディレクトリをダウンロードしてローカルに保存します。
+    """指定したAWS S3バケットからディレクトリをダウンロードする関数です。
 
     Args:
         s3_client(Any):AWS S3にアクセスするためのクライアント

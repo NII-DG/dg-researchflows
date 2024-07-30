@@ -1,6 +1,4 @@
-"""ocs_template.jsonのファイルのデータを扱うモジュールです。
-OCSテンプレートデータの操作を行うクラスを記載しています。
-"""
+"""ocs_template.jsonのファイルのデータを扱うモジュールです。"""
 import os
 from pathlib import Path
 from typing import List
@@ -13,9 +11,7 @@ p = Path(script_dir_path)
 ocs_template_json_file = p.joinpath('../../data/ocs-template.json').resolve()
 
 class OCSTemplate:
-    """ocs_template.jsonのファイルのデータを扱うクラスです。
-
-    OCSテンプレートのリスト作成やパスの取り出しなどOCSテンプレートデータの操作を行うメソッドを記載しています。
+    """ocs_template.jsonファイルのデータを操作するメソッドを記載したクラスです。
 
     Attributes:
         class:
@@ -37,7 +33,7 @@ class OCSTemplate:
     def __init__(self) -> None:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
-        ocs_template.jsonのファイルを読み出し、フィールドのデータを自身のインスタンスに保存します。
+        ocs_template.jsonファイルのデータを扱う際に共通となる処理を行います。
 
         """
         contents = JsonFile(str(ocs_template_json_file)).read()
@@ -46,8 +42,6 @@ class OCSTemplate:
     def get_name(self):
         """OCSテンプレート名のリストを作成するメソッドです。
 
-        コンストラクタでインスタンスに保存したデータからocs_template_nameに対応するデータをリストとして取り出します。
-
         Returns:
             list:OCSテンプレート名のリスト
 
@@ -55,12 +49,11 @@ class OCSTemplate:
         return [fld[self.__FIELD_NAME] for fld in self.ocs_template]
 
     def get_disabled_ids(self)->List[str]:
-        """アクティブでないデータのリストを作成するメソッドです。
+        """アクティブ状態でないデータのリストを作成するメソッドです。
 
-        OCSテンプレートデータがアクティブな状態かを判別し、アクティブでないデータの名前をリストして返します。
 
         Returns:
-            list[str]:アクティブでないOCSテンプレート名のリスト
+            list[str]:アクティブ状態でないOCSテンプレート名のリスト
 
         """
         disabled = []
@@ -71,8 +64,6 @@ class OCSTemplate:
 
     def get_id(self, target_name):
         """指定したOCSテンプレートのIDを取得するメソッドです。
-
-        引数として受けとったtarget_nameと一致するOCSテンプレート名のOCSテンプレートのIDを取得し、戻り値として返します。
 
         Args:
             target_name (Any):目的のOCSテンプレートIDを指定するOCSテンプレート名
@@ -86,9 +77,7 @@ class OCSTemplate:
                 return fld[self.__ID]
 
     def get_template_path(self, target_name):
-        """指定したOCSテンプレートパスを取得するメソッドです。
-
-        引数として受けとったtarget_nameと一致するOCSテンプレート名のOCSテンプレートパスを取得し、戻り値として返します。
+        """指定したOCSテンプレートのパスを取得するメソッドです。
 
         Args:
             target_name (Any):目的のOCSテンプレートパスを指定するOCSテンプレート名

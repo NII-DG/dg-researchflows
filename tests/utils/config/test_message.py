@@ -6,11 +6,7 @@ from unittest import TestCase
 from data_gorvernance.library.utils.config import message
 
 class TestMessageConfig(TestCase):
-    """data_gorvernance.library.utils.config.messageモジュールのテストを行います。
-
-    getメソッドが正しく機能するかをテストするためのメソッドを記載しています。
-
-    """
+    """data_gorvernance.library.utils.config.messageモジュールのテストを行うクラスです。"""
     # test exec : python -m unittest tests.utils.config.test_message
 
     def test_get(self):

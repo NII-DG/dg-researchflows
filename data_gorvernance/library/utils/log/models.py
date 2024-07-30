@@ -1,4 +1,4 @@
-"""ログの生成に関するクラスや関数が記載されています。"""
+"""ログの生成に関するクラスや関数が記載されたモジュールです。"""
 import logging
 from logging import FileHandler
 import os
@@ -12,8 +12,6 @@ from ..setting import get_subflow_type_and_id
 class BaseLogger:
     """ロギング機能の基本となるメソッドを記載したクラスです。
 
-    ハンドラーやフォーマッターの設定などロガーに関する基本的な処理を行うメソッドを記載しています。
-
     Attributes:
         instance:
             logger(logging.Logger):ロガー
@@ -22,6 +20,7 @@ class BaseLogger:
             handler(FileHandler):ログを特定のファイルに出力するためのハンドラー
 
     """
+
     def __init__(self, output_dir="."):
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
@@ -40,7 +39,7 @@ class BaseLogger:
     def reset_file(self, fmt):
         """ファイルのリセットを行うメソッドです。
 
-       フォーマッターの設定を行う他、 日付が変わっていた場合のみ日付とログハンドラーの更新を行います。
+       ログファイルは日付で分割されるため、日付が変わっていた場合のみログハンドラーを更新します。
 
         Args:
             fmt(Any):フォーマッターを設定
@@ -55,8 +54,7 @@ class BaseLogger:
     def _update_handler(self):
         """ロガーのハンドラーを更新するメソッドです。
 
-        ロガーに既にハンドラーが存在している場合、全てのハンドラーを取り除きます。
-        その後、新たにハンドラーを生成し、ロガーに加えます。
+        ログが複数出力されるのを防ぐため既存のハンドラーを削除した後、新たにハンドラーを生成します。
 
         """
         if self.logger.hasHandlers():
@@ -71,8 +69,6 @@ class BaseLogger:
     def set_formatter(self, fmt:str):
         """フォーマッターを設定するためのメソッドです。
 
-        引数として受け取ったフォーマットからフォーマッターを生成し、それをハンドラーに設定します。
-
         Args:
             fmt(str):フォーマッターを生成
 
@@ -83,10 +79,8 @@ class BaseLogger:
     def set_log_level(self, level):
         """ロガーのログレベルを設定するためのメソッドです。
 
-        引数として渡されたものと対応したログレベルをロガーに設定します。
-
         Args:
-            level(Any):ログレベルを設定
+            level(str):ログレベルを設定
 
         """
         if level == 'debug':
@@ -103,8 +97,7 @@ class BaseLogger:
 class UserActivityLog(BaseLogger):
     """BaseLoggerクラスを継承し、実際にユーザーがロギング機能を用いることができるよう実装したクラスです。
 
-    パスやメッセージを受け取り、それに対応したログを出力するためのメソッドを記載したクラスです。
-    BaseLoggerクラスのメソッドを呼び出すことでロガーやフォーマッターの設定を行います。
+    親クラスのメソッドを利用してロガーやフォーマッターの設定を行います。
 
     Attributes:
         instance:
@@ -118,8 +111,6 @@ class UserActivityLog(BaseLogger):
 
     def __init__(self, nb_working_file, notebook_name):
         """ クラスのインスタンスを初期化するメソッドです。コンストラクタ
-
-        引数としてパスとノートブック名を受け取り,対応したログを生成し、インスタンスに保存します。
 
         Args:
             nb_working_file (Any): ノートブック名を含む絶対パス
@@ -143,8 +134,6 @@ class UserActivityLog(BaseLogger):
     def _get_log_dir(self, nb_working_file):
         """ログファイルを保存するディレクトリを生成するためのメソッドです。
 
-        引数として受け取ったパスに対応したログファイルを保存するためのディレクトリを生成し、そこへのパスを返します。
-
         Args:
             nb_working_file (Any): ノートブック名を含む絶対パス
 
@@ -161,9 +150,7 @@ class UserActivityLog(BaseLogger):
         return str(log_dir)
 
     def _get_format(self):
-        """フォーマットを定義するためのメソッドです。
-
-        フォーマッターを設定する際に基となるフォーマットを定義しています。
+        """フォーマットの定義を行うメソッドです。
 
         Returns:
            str:フォーマットの定義
@@ -172,9 +159,7 @@ class UserActivityLog(BaseLogger):
         return '%(levelname)s\t%(asctime)s\t%(username)s\t%(subflow_id)s\t%(subflow_type)s\t%(ipynb_name)s\t%(cell_id)s\t%(message)s'
 
     def info(self, message):
-        """ログレベルがINFOのログを出力するするためのメソッドです。
-
-        ファイルのリセットを行った後、引数として受け取ったメッセージとコンストラクタの値を引数にINFOレベルのログを出力します。
+        """INFOレベルのログを出力するするためのメソッドです。
 
         Args:
             message(Any):ログメッセージを設定
@@ -184,9 +169,7 @@ class UserActivityLog(BaseLogger):
         self.logger.info(message, extra=self.record())
 
     def warning(self, message):
-        """ログレベルがWARNINGのログを出力するするためのメソッドです。
-
-        ファイルのリセットを行った後、引数として受け取ったメッセージとコンストラクタの値を引数にWARNINGレベルのログを出力します。
+        """WARNINGレベルのログを出力するするためのメソッドです。
 
         Args:
             message(Any):ログメッセージを設定
@@ -196,9 +179,7 @@ class UserActivityLog(BaseLogger):
         self.logger.warning(message, extra=self.record())
 
     def error(self, message):
-        """ログレベルがERRORのログを出力するするためのメソッドです。
-
-        ファイルのリセットを行った後、引数として受け取ったメッセージとコンストラクタの値を引数にERRORレベルのログを出力します。
+        """ERRORレベルのログを出力するするためのメソッドです。
 
         Args:
             message(Any):ログメッセージを設定
@@ -210,8 +191,6 @@ class UserActivityLog(BaseLogger):
     def start(self, detail='', note=''):
         """処理の開始をログに記録するためのメソッドです。
 
-        引数として処理内容の詳細と注記を受け取り、それを基にINFOレベルのログを出力します。
-
         Args:
             detail(str, optional):処理の詳細。デフォルトは空文字
             note(str, optional):処理の注記。デフォルトは空文字
@@ -222,8 +201,6 @@ class UserActivityLog(BaseLogger):
     def finish(self, detail='', note=''):
         """処理の終了をログに記録するためのメソッドです。
 
-        引数として処理内容の詳細と注記を受け取り、それを基にINFOレベルのログを出力します。
-
         Args:
             detail(str, optional):処理の詳細。デフォルトは空文字
             note(str, optional):処理の注記。デフォルトは空文字
@@ -232,9 +209,7 @@ class UserActivityLog(BaseLogger):
         self.info("-- " + detail + "処理終了 --" + note)
 
     def record(self):
-        """コンストラクタの情報を整理するためのメソッドです。
-
-        コンストラクタに保存されている情報を辞書形式に変換して返します。
+        """コンストラクタの情報を辞書形式に変換するためのメソッドです。
 
         Returns:
             dict[str, any]:ログデータを辞書形式で返す

@@ -1,12 +1,10 @@
-"""AWS S3バケットからディレクトリまたはファイルをダウンロードするための関数が記載されています。"""
+"""AWS S3バケットからディレクトリまたはファイルをダウンロードするための関数が記載されたモジュールです。"""
 import boto3
 
 from .models import download_dir, download_file
 
 def download(access_key:str, secret_key:str, bucket_name:str, aws_path:str, local_path:str):
     """AWS S3バケットからディレクトリまたはファイルをダウンロードするための関数です。
-
-    引数として受け取ったキーからS3クライアントを作成し、ディレクトリまたはファイルのダウンロードを行う関数を呼び出します。
 
     Args:
         access_key (str):クライアント作成に用いるアクセスキー

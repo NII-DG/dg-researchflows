@@ -1,6 +1,4 @@
-"""field.jsonのファイルのデータを扱うモジュールです。
-フィールドデータの操作を行うクラスを記載しています。
-"""
+"""field.jsonファイルのデータを操作するクラスを記載したモジュールです。"""
 import os
 from pathlib import Path
 from typing import List
@@ -13,9 +11,7 @@ p = Path(script_dir_path)
 field_json_file = p.joinpath('../../data/field.json').resolve()
 
 class Field:
-    """field.jsonのファイルのデータを扱うクラスです。
-
-    フィールド名のリスト作成や実験パッケージの取り出しなどフィールドデータの操作を行うメソッドを記載しています。
+    """field.jsonファイルのデータ操作を行うメソッドを記載したクラスです。
 
     Attributes:
         class:
@@ -37,7 +33,7 @@ class Field:
     def __init__(self) -> None:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
-        field.jsonのファイルを読み出し、フィールドのデータを自身のインスタンスに保存します。
+        field.jsonのファイルのデータを扱う際に共通となる処理を行います。
 
         """
         contents = JsonFile(str(field_json_file)).read()
@@ -46,8 +42,6 @@ class Field:
     def get_name(self):
         """フィールド名のリストを作成するメソッドです。
 
-        コンストラクタでインスタンスに保存したデータからfield_nameに対応するデータをリストとして取り出します。
-
         Returns:
             list:フィールド名のリスト
 
@@ -55,12 +49,10 @@ class Field:
         return [fld[self.__FIELD_NAME] for fld in self.field]
 
     def get_disabled_ids(self)->List[str]:
-        """アクティブでないデータのリストを作成するメソッドです。
-
-        フィールドデータがアクティブな状態かを判別し、アクティブでないデータの名前をリストして返します。
+        """アクティブ状態でないフィールドのリストを作成するメソッドです。
 
         Returns:
-            list[str]:アクティブでないフィールド名のリスト
+            list[str]:アクティブ状態でないフィールド名のリスト
 
         """
         disabled = []
@@ -70,9 +62,7 @@ class Field:
         return disabled
 
     def get_template_path(self, target_name):
-        """指定した実験パッケージを取得するメソッドです。
-
-        引数として受けとったtarget_nameと一致するフィールド名の実験パッケージを取得し、戻り値として返します。
+        """指定したフィールド名の実験パッケージを取得するメソッドです。
 
         Args:
             target_name (Any):目的の実験パッケージを指定するフィールド名

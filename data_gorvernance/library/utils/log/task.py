@@ -1,23 +1,20 @@
-"""タスク処理の前後でログを出力する機能に関するクラスが記載されています。"""
+"""タスク処理の前後でログを出力する機能に関するクラスが記載されたモジュールです。"""
 import functools
 
 from .models import UserActivityLog
 
 
 class TaskLog:
-    """タスクログのクラスです。
-
-    タスク処理の前後でログを出力する機能に関するメソッドを記載しています。
+    """タスクの実行時にログを出力する機能を記載したクラスです。
 
      Attributes:
             instance:
                 log(UserActivityLog):UserActivityLogクラスのインスタンス
 
     """
+
     def __init__(self, nb_working_file_path, notebook_name) -> None:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
-
-        引数として受け取ったパスとノートブックからUserActivityLogクラスのインスタンスを生成し、保存します。
 
         Args:
             nb_working_file (Any): ノートブック名を含む絶対パス
@@ -33,7 +30,7 @@ class TaskLog:
     def task_cell(cell_id: str, start_message="", finish_message=""):
         """タスクセルに必須の処理を行うメソッドです。
 
-        静的なメソッドとして機能し、funcメソッドをデコレートすることで実行されれる前後にログを出力する。
+        タスクセルの実行状況をトレースするため、実行の前後でログの出力を行います。
 
         Args:
             cell_id(str):ノートブックのセル番号
@@ -59,7 +56,7 @@ class TaskLog:
     def callback_form(event_name):
         """フォームの処理に必須の処理を行うメソッドです。
 
-         静的なメソッドとして機能し、funcメソッドをデコレートすることで実行されれる前後にログを出力する。
+        フォームの処理の実行状況をトレースするため、実行の前後でログの出力を行います。
 
         Args:
             event_name (Any): 処理が行われるイベントの名前

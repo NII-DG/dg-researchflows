@@ -11,9 +11,7 @@ json_path = Path(os.path.dirname(__file__)).joinpath('../../data/analysis_enviro
 
 
 class AnalysisEnvironment:
-    """解析環境の情報を取得するためのメソッドを記載したクラスです。
-
-    ジェイソンファイルを読み出し、特定の解析環境の情報を取得するためのメソッドが記載されています。
+    """ジェイソンファイルを読み出し、特定の解析環境の情報を取得するためのメソッドを記載したクラスです。
 
     Attributes:
         class:
@@ -35,16 +33,14 @@ class AnalysisEnvironment:
     def __init__(self):
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
-        パスで指定したジェイソンファイルを読み出し、そこから特定のフィールドの値を取り出しています。
+        解析環境の情報を取得する際、共通となるファイルの読みだし処理を行います。
 
         """
         contents = JsonFile(str(json_path)).read()
         self.analysis_environment = contents[self.__FIELD]
 
     def get_names(self):
-        """環境名をリストで取得するメソッドです。
-
-        コンストラクタで作成したフィールドから環境名を取得し、リストにして返します。
+        """保存されている環境名をリストで取得するメソッドです。
 
         Returns:
             list: 環境名のリスト
@@ -53,9 +49,7 @@ class AnalysisEnvironment:
         return [fld[self.__NAME] for fld in self.analysis_environment]
 
     def get_id(self, target_name):
-        """特定の解析環境のidを取得するメソッドです。
-
-        引数として渡された名前と一致する解析環境のidを取得して返します。
+        """指定した解析環境のidを取得するメソッドです。
 
         Args:
             target_name (Any): 目的の解析環境の名前
@@ -69,9 +63,7 @@ class AnalysisEnvironment:
                 return fld[self.__ID]
 
     def get_description(self, target_name):
-        """特定の解析環境の説明を取得するメソッドです。
-
-        引数として渡された名前と一致する解析環境の説明を取得して返します。
+        """指定した解析環境の概要を取得するメソッドです。
 
         Args:
             target_name (Any): 目的の解析環境の名前

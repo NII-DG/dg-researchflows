@@ -19,7 +19,7 @@ class OCSTemplate:
             __ID(str):id
             __FIELD_NAME(str):OCSテンプレート名
             __OCS_TEMPLATE_PATH(str):OCSテンプレートパス
-            __IS_ACTIVE(str):アクティブかの判定を行う
+            __IS_ACTIVE(str):アクティブ状態かの判定を行う
         instance:
            ocs_template(Any):OCSテンプレートデータを保存する。
 
@@ -33,7 +33,7 @@ class OCSTemplate:
     def __init__(self) -> None:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
-        ocs_template.jsonファイルのデータを扱う際に共通となる処理を行います。
+        ocs_template.jsonファイルのデータを扱う際に共通の処理である読み出し行います。
 
         """
         contents = JsonFile(str(ocs_template_json_file)).read()

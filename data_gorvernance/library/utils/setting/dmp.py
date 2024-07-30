@@ -19,7 +19,7 @@ class DMPManager(JsonFile):
 
     @staticmethod
     def create_dmp_options(contents):
-        """dmpのタイトルを抽出し、オプションの辞書を作成するメソッドです。
+        """dmpのタイトルを抽出し、オプションの一覧を作成するメソッドです。
 
         Args:
             contents (_type_): dmpデータを含むデータ群

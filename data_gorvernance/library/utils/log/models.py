@@ -24,8 +24,6 @@ class BaseLogger:
     def __init__(self, output_dir="."):
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
-        ロガーの生成や時刻の記録などロギング機能における基本の処理を行います。
-
         Args:
             output_dir(str, optional):ログファイルの出力ディレクトリ。デフォルトはカレントディレクトリ。
 
@@ -192,8 +190,8 @@ class UserActivityLog(BaseLogger):
         """処理の開始をログに記録するためのメソッドです。
 
         Args:
-            detail(str, optional):処理の詳細。デフォルトは空文字
-            note(str, optional):処理の注記。デフォルトは空文字
+            detail(str, optional):処理内容の詳細。デフォルトは空文字
+            note(str, optional):処理内容の注記。デフォルトは空文字
 
         """
         self.info("-- " + detail + "処理開始 --" + note)
@@ -202,17 +200,17 @@ class UserActivityLog(BaseLogger):
         """処理の終了をログに記録するためのメソッドです。
 
         Args:
-            detail(str, optional):処理の詳細。デフォルトは空文字
-            note(str, optional):処理の注記。デフォルトは空文字
+            detail(str, optional):処理内容の詳細。デフォルトは空文字
+            note(str, optional):処理内容の注記。デフォルトは空文字
 
         """
         self.info("-- " + detail + "処理終了 --" + note)
 
     def record(self):
-        """コンストラクタの情報を辞書形式に変換するためのメソッドです。
+        """インスタンスに保持している情報を辞書形式に変換するためのメソッドです。
 
         Returns:
-            dict[str, any]:ログデータを辞書形式で返す
+            dict[str, any]:辞書形式に変換したログデータ
 
         """
         return {

@@ -33,7 +33,7 @@ class AnalysisEnvironment:
     def __init__(self):
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
-        解析環境の情報を取得する際、共通となるファイルの読みだし処理を行います。
+        解析環境の情報を取得する際に共通の処理となるファイルの読みだしを行います。
 
         """
         contents = JsonFile(str(json_path)).read()

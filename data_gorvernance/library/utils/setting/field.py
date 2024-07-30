@@ -33,7 +33,7 @@ class Field:
     def __init__(self) -> None:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
-        field.jsonのファイルのデータを扱う際に共通となる処理を行います。
+        field.jsonのファイルのデータを扱う際に共通の処理である読み出しを行います。
 
         """
         contents = JsonFile(str(field_json_file)).read()

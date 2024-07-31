@@ -1,5 +1,6 @@
 """サブフローステータス更新を行います。
-    サブフローメニューへのボタンなどを表示するメソッドやステータスを更新するメソッドなどがあります。
+
+   サブフローメニューへのボタンなどを表示するメソッドやステータスを更新するメソッドなどがあります。
 
 """
 import os
@@ -19,10 +20,10 @@ def get_return_sub_flow_menu_relative_url_path(working_file_path: str)->str:
     """サブフローメニューNotebookへのパス、ファイルパスを取得するメソッドです。
     
     Args:
-        working_file_path:作業ファイルのパス
+        working_file_path(str):作業ファイルのパス
 
     Returns:
-        os.path.join:サブフローメニューのパスを返す。
+        os.path.join(str):サブフローメニューのパスを返す。
     
     """
 
@@ -133,7 +134,7 @@ class TaskDirector(TaskSave):
 
     # override
     def _save(self):
-        """サブフローステータスの更新情報を保存するメソッドです。"""
+        """ファイルをストレージへ保存するメソッドです"""
         # uploadしたときにタスク完了とするため
         super()._save()
         self.done_task()

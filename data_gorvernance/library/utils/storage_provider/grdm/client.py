@@ -1,7 +1,7 @@
 """ファイルまたはフォルダをアップロード
     
-    このモジュールはファイルの内容を取得し、ファイルまたはフォルダをアップロードします。
-    ファイルまたはフォルダをアップロードするメソッドやファイルの内容を取得するメソッドがあります。
+   このモジュールはファイルの内容を取得し、ファイルまたはフォルダをアップロードします。
+   ファイルまたはフォルダをアップロードするメソッドやファイルの内容を取得するメソッドがあります。
 """
 # rdmclientを利用する
 from http import HTTPStatus
@@ -28,8 +28,7 @@ def upload(token, base_url, project_id, source, destination, recursive=False, fo
         force (bool, optional): ファイルが存在した場合に上書きするかどうか. Defaults to False.
 
     Raises:
-        KeyError:引数が少なすぎる：送信元または送信先によるエラー
-        KeyError:ファイルをアップロードするには、ユーザー名とパスワードまたはトークンが必要というエラー
+        KeyError:必要な引数が与えられなかった
         RuntimeError:タイムアウト、ネットワークのエラー
         UnauthorizedError: 認証が通らない
     """

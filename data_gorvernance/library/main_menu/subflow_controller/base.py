@@ -1,6 +1,6 @@
 """サブフローの操作
 
-このモジュールはサブフロー操作基底クラスを始め、サブフローを操作する時に
+   このモジュールはサブフロー操作基底クラスを始め、サブフローを操作する時に
    ボタンを制御したり、値が入力されているか、あるいはユニークの値になっているかなどを確認するメソッドがあります。
 
 """
@@ -32,8 +32,6 @@ class BaseSubflowForm():
             _data_dir_name_form(pn.widgets.TextInput):データフォルダ名
             _parent_sub_flow_type_selector(pn.widgets.Select): 親サブフロー種別(フェーズ)
             _parent_sub_flow_selector(pn.widgets.Select):親サブフロー選択
-
-    
     """
 
     def __init__(self, abs_root, message_box: MessageBox) -> None:
@@ -118,7 +116,6 @@ class BaseSubflowForm():
         """処理開始ボタンのイベントリスナー設定するメソッドです。
         Args:
             callback_function(function):処理開始ボタンを呼び戻す
-
         """
         self.submit_button.on_click(callback_function)
 
@@ -256,9 +253,7 @@ class BaseSubflowForm():
     ############
 
     def callback_menu_form(self, event):
-        """ボタンを有効化させるメソッドです。
-
-        """
+        """ボタンを有効化させるメソッドです。"""
         # フォームコールバックファンクション
         try:
             # 新規作成ボタンのボタンの有効化チェック
@@ -369,7 +364,6 @@ class BaseSubflowForm():
 
         Raises:
             InputWarning: 入力不備によるエラー
-
         """
 
         # データフォルダ名の検証

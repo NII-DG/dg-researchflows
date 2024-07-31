@@ -1,6 +1,6 @@
 """サブフローの削除
 
-    このモジュールはサブフロー削除クラスを始め、新しいサブフローのデータを削除したりするメソッドなどがあります。
+   このモジュールはサブフロー削除クラスを始め、新しいサブフローのデータを削除したりするメソッドなどがあります。
 """
 from typing import Dict, List
 
@@ -18,7 +18,6 @@ class DeleteSubflowForm(BaseSubflowForm):
         instance:
             abs_root (str): サブフローの絶対パス
             message_box (MessageBox): メッセージを格納する。
-    
     """
 
     def __init__(self, abs_root, message_box) -> None:
@@ -27,7 +26,6 @@ class DeleteSubflowForm(BaseSubflowForm):
         Args:
             abs_root (str): サブフローの絶対パス
             message_box (MessageBox): メッセージを格納する。
-
         """
         super().__init__(abs_root, message_box)
         # 処理開始ボタン
@@ -102,7 +100,6 @@ class DeleteSubflowForm(BaseSubflowForm):
         Retunes:
                 str:「操作可能なサブフローがありません」というメッセージを返す。（リストの値の長さが2未満である場合）
                 pn.Column:「サブフロー削除」というメッセージを返し、ボタンを押せるようにする。
-        
         """
         sub_flow_type_list = self._sub_flow_type_selector.options
         if len(sub_flow_type_list) < 2:
@@ -122,8 +119,6 @@ class DeleteSubflowForm(BaseSubflowForm):
         
         Raises:
             Exception:削除失敗したエラー
-
-        
         """
 
         # 新規作成ボタンを処理中ステータスに更新する

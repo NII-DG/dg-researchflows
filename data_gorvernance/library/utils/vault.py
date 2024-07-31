@@ -1,4 +1,5 @@
 """Vaultサーバーへの接続
+
     このモジュールはVaultサーバーに接続するために必要な値の設定とチェックを行い、キーやポリシーを作成してサーバーを起動させ、接続確認を行うメソッドがあります。
 
 """
@@ -25,8 +26,7 @@ MAX_RETRY_COUNT = 5
 
 
 def start_server():
-    """サーバーを起動させるためにパスなどの値を用意するメソッドです。
-    """
+    """サーバーを起動するメソッドです。"""
     config_path = os.path.join(
         os.environ['HOME'], 'data_gorvernance/library/data/vault-config.hcl')
     subprocess.Popen(
@@ -49,9 +49,7 @@ class Vault():
     """
         
     def initialize(self):
-        """Vault初期化を行うメソッドです
-        
-        """
+        """Vault初期化を行うメソッドです"""
 
         try:
             self.__read_token()
@@ -190,7 +188,12 @@ class Vault():
             )
 
     def __write_token(self, token):
-        """ルートトークン保存のメソッドです"""
+        """ルートトークン保存のメソッドです
+        
+        Args:
+            token(str):パーソナルアクセストークン
+        
+        """
         with open(TOKEN_PATH, 'w') as f:
             f.write(token)
 

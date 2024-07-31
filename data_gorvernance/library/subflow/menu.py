@@ -1,6 +1,6 @@
 """サブフローメニューの表示
 
-    サブフローメニュークラスを始め、サブフロー図などの画像を表示させたり、メインメニューにアクセスするメソッドがあります。
+   サブフローメニュークラスを始め、サブフロー図などの画像を表示させたり、メインメニューにアクセスするメソッドがあります。
 """
 import os
 from pathlib import Path
@@ -56,8 +56,6 @@ class SubflowMenu(TaskLog):
             selector(pn.widgets.RadioBoxGroup):ラジオボタン
             selector_options(list[str]):ラジオボタンのオプション
             working_file (str): 実行Notebookファイルパス
-
-
     """
 
     def __init__(self, working_file) -> None:
@@ -100,7 +98,7 @@ class SubflowMenu(TaskLog):
 
     # イベント
     def select_flow(self, subflow: SubFlowManager, font_folder: Path):
-        """サブフロー図を表示するメソッドです。
+        """ラジオボタンの選択時にサブフロー図の表示を切り替えるメソッドです。
 
         Args:
             subflow (SubFlowManager): サブフロー図
@@ -111,9 +109,7 @@ class SubflowMenu(TaskLog):
 
         """
         def callback(event):
-            """サブフロー図の生成と表示を行うメソッドです。
-           
-            """
+            """サブフロー図の生成と表示を行うメソッドです。"""
             self.diagram_widgetbox.disabled = True
             self.set_title()
             self.set_diagram(subflow, font_folder, self.is_display_all())
@@ -122,7 +118,7 @@ class SubflowMenu(TaskLog):
 
     # 各要素の設定
     def set_title(self):
-        """タスクを設定するメソッドです。"""
+        """タイトルを設定するメソッドです。"""
         if self.is_display_all():
             self.title.object = f'### {message.get("subflow_menu", "title_all_task")}'
         else:
@@ -142,9 +138,7 @@ class SubflowMenu(TaskLog):
         Args:
             subflow(SubFlowManager):サブフロー図
             font_folder(Path):フォントフォルダー
-            display_all(bool):全ての画面を表示させるかどうか
-        
-        
+            display_all(bool):全てのタスクを表示させるかどうか
         """
         with TemporaryDirectory() as workdir:
             tmp_diag = Path(workdir) / 'skeleton.diag'
@@ -161,7 +155,7 @@ class SubflowMenu(TaskLog):
 
     # その他
     def is_display_all(self):
-        """画面を表示させるかどうかを判断するメソッドです。
+        """フロー図の表示を制御するメソッドです。
 
         Returns:
             display_all(bool):TrueまたはFalseの値を返す。
@@ -172,13 +166,13 @@ class SubflowMenu(TaskLog):
         return display_all
 
     def _get_contents(self, svg_file_path: str):
-        """コンテンツを取得するメソッドです。
+        """フロー図を取得するメソッドです。
 
         Args:
             svg_file_path (str): svgファイルのパス
 
         Returns:
-            File:svgファイルを返す。
+            File:svgファイルの内容を返す。
         """
         return file.File(svg_file_path).read()
 
@@ -189,8 +183,7 @@ class SubflowMenu(TaskLog):
             svg_file_path (str): svgファイルのパス
 
         Returns:
-            viewbox_width(int):svgの画像の横幅の値を返す
-        
+            viewbox_width(int):svgの画像の横幅の値を返す 
         """
         # SVGファイルをパース
         tree = ET.parse(svg_file_path)
@@ -218,7 +211,6 @@ class SubflowMenu(TaskLog):
         Args:
             working_file (str): 実行Notebookファイルパス
             is_selected (bool, optional): サブフローメニューを表示させるかどうか。 デフォルトでは False.
-
         """
         subflow_menu = cls(working_file)
         pn.extension()

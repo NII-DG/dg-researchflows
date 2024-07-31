@@ -1,8 +1,8 @@
 """データの取得、アップロード、権限やアクセス許可のチェック
     
-    このモジュールはデータの取得やアップロード、権限やアクセス許可のチェックを行います。
-    プロジェクトID、プロジェクトの一覧、テキストファイルの中身やjsonファイルの中身、メタデータを取得したり、
-    GRDMにアップロードしたり、"URLの権限やアクセス許可のチェックを行います。
+   このモジュールはデータの取得やアップロード、権限やアクセス許可のチェックを行います。
+   プロジェクトID、プロジェクトの一覧、テキストファイルの中身やjsonファイルの中身、メタデータを取得したり、
+   GRDMにアップロードしたり、"URLの権限やアクセス許可のチェックを行います。
 """
 import json
 import os
@@ -28,8 +28,7 @@ def get_project_id():
     """プロジェクトIDを取得するメソッドです。
 
     Returns:
-        split_path(list(str)):分割したパスの要素の値を返す。
-        
+        split_path(list(str)):分割したパスの要素の値を返す。  
     """
     # url: https://rdm.nii.ac.jp/vz48p/osfstorage
     url = os.environ.get("BINDER_REPO_URL", "")
@@ -70,6 +69,11 @@ def check_permission(base_url: str, token: str, project_id: str):
         token (str): パーソナルアクセストークン
         project_id (str): プロジェクトID
 
+    Raises:
+        UnauthorizedError: 認証が通らない
+        ProjectNotExist: 指定されたプロジェクトIDが存在しない
+        requests.exceptions.RequestException: その他の通信エラー
+
     Returns:
         パーミッションに問題なければTrue、問題があればFalseの値を返す。
     """
@@ -92,6 +96,9 @@ def get_projects_list(scheme, domain, token):
         domain(str):ドメイン名
         token(str):パーソナルトークン
 
+    Raises:
+        UnauthorizedError: 認証エラー
+        requests.exceptions.RequestException: 通信エラー
 
     Returns:
         プロジェクトの一覧のデータの値を返す。
@@ -103,7 +110,8 @@ def get_projects_list(scheme, domain, token):
 
 def sync(token, api_url, project_id, abs_source, abs_root="/home/jovyan"):
     """GRDMにアップロードするメソッドです。
-            abs_source は絶対パスでなければならない。
+        
+       abs_source は絶対パスでなければならない。
 
     Args:
         token (str): GRDMのパーソナルアクセストークン
@@ -113,9 +121,10 @@ def sync(token, api_url, project_id, abs_source, abs_root="/home/jovyan"):
         abs_root (str, optional): リモートのプロジェクトに対応させたいディレクトリの絶対パス. Defaults to "/home/jovyan".
 
     Raises:
+        UnauthorizedError: 認証が通らない
+        RuntimeError: RDMClientから上がってくるエラー全般
         FileNotFoundError: 指定したファイルが存在しないエラー
-        ValueError:絶対パスではないエラー
-        
+        ValueError:絶対パスではないエラー   
     """
 
     if os.path.isdir(abs_source):

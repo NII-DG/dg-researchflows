@@ -1,6 +1,6 @@
 """サブフローの名称変更
 
-    このモジュールはサブフロー名称変更クラスを始め、新しいサブフローの名称を変更したりするメソッドなどがあります。
+   このモジュールはサブフロー名称変更クラスを始め、新しいサブフローの名称を変更したりするメソッドなどがあります。
 """
 import os
 import traceback
@@ -21,7 +21,6 @@ class RenameSubflowForm(BaseSubflowForm):
         instance:
             abs_root (str): サブフローの絶対パス
             message_box (MessageBox): メッセージを格納する。
-    
     """
 
     def __init__(self, abs_root, message_box) -> None:
@@ -30,7 +29,6 @@ class RenameSubflowForm(BaseSubflowForm):
         Args:
             abs_root (str): サブフローの絶対パス
             message_box (MessageBox): メッセージを格納する。
-
         """
         super().__init__(abs_root, message_box)
         # 処理開始ボタン
@@ -45,7 +43,6 @@ class RenameSubflowForm(BaseSubflowForm):
 
         Raises:
             Exception: サブフロー種別(フェーズ)、サブフロー名がないエラー
-
         """
         # サブフロー名称：シングルセレクトコールバックファンクション
         try:
@@ -118,7 +115,6 @@ class RenameSubflowForm(BaseSubflowForm):
         
         Returns:
             pn.Column:サブフロー名称変更フォームに必要な値を返す。
-
         """
         sub_flow_type_list = self._sub_flow_type_selector.options
         if len(sub_flow_type_list) < 2:
@@ -139,8 +135,6 @@ class RenameSubflowForm(BaseSubflowForm):
         Raises:
             InputWarning:入力値に不備があったエラー
             Exception:ファイル名の変更に失敗した時のエラー
-
-        
         """
 
         # 新規作成ボタンを処理中ステータスに更新する

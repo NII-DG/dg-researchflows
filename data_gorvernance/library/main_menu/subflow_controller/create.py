@@ -1,6 +1,6 @@
 """サブフローの新規作成
 
-    このモジュールはサブフロー新規作成クラスを始め、新しいサブフローのデータを用意したり、データの検証を行うメソッドなどがあります。
+   このモジュールはサブフロー新規作成クラスを始め、新しいサブフローのデータを用意したり、データの検証を行うメソッドなどがあります。
 """
 import shutil
 import os
@@ -25,7 +25,6 @@ class CreateSubflowForm(BaseSubflowForm):
         instance:
             abs_root (str): サブフローの絶対パス
             message_box (MessageBox): メッセージを格納する。
-    
     """
 
     def __init__(self, abs_root, message_box) -> None:
@@ -34,7 +33,6 @@ class CreateSubflowForm(BaseSubflowForm):
         Args:
             abs_root (str): サブフローの絶対パス
             message_box (MessageBox): メッセージを格納する。
-
         """
         super().__init__(abs_root, message_box)
         # 処理開始ボタン
@@ -147,7 +145,6 @@ class CreateSubflowForm(BaseSubflowForm):
         
         Returns:
             pn.Column:サブフロー新規作成フォームに必要な値を返す。
-
         """
         return pn.Column(
             f'### {msg_config.get("main_menu", "create_sub_flow_title")}',
@@ -166,7 +163,6 @@ class CreateSubflowForm(BaseSubflowForm):
         Raises:
             InputWarning:入力値の不備によるエラー
             Exception:データ取得、更新が失敗したエラー
-      
         """
 
         # 新規作成ボタンを処理中ステータスに更新する
@@ -260,8 +256,6 @@ class CreateSubflowForm(BaseSubflowForm):
 
         Raises:
             Exception:新規サブフローデータのコピーに失敗したエラー
-
-
         """
 
         # 新規サブフローデータの用意

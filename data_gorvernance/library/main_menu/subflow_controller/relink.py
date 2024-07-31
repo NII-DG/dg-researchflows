@@ -1,6 +1,6 @@
 """サブフローの編集
 
-    このモジュールはサブフロー間接続編集クラスを始め、新しいサブフローのデータを編集したりするメソッドなどがあります。
+   このモジュールはサブフロー間接続編集クラスを始め、新しいサブフローのデータを編集したりするメソッドなどがあります。
 """
 from typing import Dict, List
 import traceback
@@ -205,8 +205,6 @@ class RelinkSubflowForm(BaseSubflowForm):
         
         Returns:
             pn.Column:サブフロー間接続編集フォームに必要な値を返す。
-
-        
         """
         sub_flow_type_list = self._sub_flow_type_selector.options
         if len(sub_flow_type_list) < 2:
@@ -227,7 +225,6 @@ class RelinkSubflowForm(BaseSubflowForm):
         
         Raises:
             Exception:編集失敗した場合のエラー
-        
         """
 
         # 新規作成ボタンを処理中ステータスに更新する

@@ -1,6 +1,6 @@
 """メインメニュー画面での操作
 
-    このモジュールはメインメニューの画面やボタンを表示するメソッドやサブフローメニューの画面の表示、操作を行えるメソッドなどがあります。
+   このモジュールはメインメニューの画面やボタンを表示するメソッドやサブフローメニューの画面の表示、操作を行えるメソッドなどがあります。
 """
 import os
 import traceback
@@ -45,9 +45,7 @@ class MainMenu(TaskLog):
             _sub_flow_widget_box(pn.WidgetBox):サブフロー操作コントローラーウェジットボックス
             working_file(str):実行Notebookファイルパス
 
-
     NOTE:
-
     Called from data_gorvernance/researchflow/main.ipynb
     """
 
@@ -176,7 +174,6 @@ class MainMenu(TaskLog):
 
         Args:
             event (int): 機能コントローラーのイベントリスナー
-
         """
         try:
             self._err_output.clear()
@@ -198,8 +195,7 @@ class MainMenu(TaskLog):
         """プロジェクト操作コントローラーの更新をするための遷移ボタンのメソッドです。
         
         Raises:
-            Exception:内部エラー
-        
+            Exception:内部エラー 
         """
         # 開発中のためアラートを表示する。
         try:
@@ -283,7 +279,8 @@ class MainMenu(TaskLog):
     def generate(cls, working_path:str):
         """メインメニューを生成するメソッドです。
 
-        working_path(str) : Notebookのファイルのパス
+        Args:
+            working_path(str) : Notebookのファイルのパス
         """
         # panel activation
         pn.extension()

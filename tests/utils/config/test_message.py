@@ -1,4 +1,5 @@
 """このモジュールはユニットテストフレームワークを用いてテストを行うモジュールです。
+
 data_gorvernance.library.utils.config.messageモジュールのメソッドのテストを行います。
 """
 from unittest import TestCase

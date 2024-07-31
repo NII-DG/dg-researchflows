@@ -10,15 +10,15 @@ class SubflowTask:
 
     Attributes:
         class:
-            __ID(str):不明
-            __NAME(str):不明
-            __IS_MULTIPLE(str):不明
-            __IS_REQURED(str) :不明
-            __COMPLETED_COUNT(str):不明
-            __DEPENDENT_TASK_IDS(str):実行依存先ID
+            __ID(str):タスクの機能ID
+            __NAME(str):タスクのファイル名
+            __IS_MULTIPLE(str):タスクが複数回実行されるかの判定。複数回実行されるものであればtrue、1回しか実行されないものであればfalse
+            __IS_REQURED(str) :必須タスクかの判定。必須であればtrue、そうでなければfalse
+            __COMPLETED_COUNT(str):タスクの完了回数
+            __DEPENDENT_TASK_IDS(str):依存するタスクの機能ID
             __STATUS(str):実行状況
-            __EXECUTION_ENVIRONMENTS(str):実行環境リスト
-            __DISABLED(str):不明
+            __EXECUTION_ENVIRONMENTS(str):実行中の実行環境IDのリスト
+            __DISABLED(str):使用不可の状態とするためのフラグ
 
             STATUS_UNFEASIBLE(str):実行状況（実行不可能）
             STATUS_UNEXECUTED(str):実行状況（未実行）
@@ -27,15 +27,15 @@ class SubflowTask:
             allowed_statuses(str):許可されたステータス
 
         instance:
-            id (str):不明
-            name (str): 不明
-            is_multiple (bool):不明
-            is_required (bool): _不明
-            completed_count (int):不明
-            dependent_task_ids (list[str]):実行依存先ID
+            id (str):タスクの機能ID
+            name (str): タスクのファイル名
+            is_multiple (bool):タスクが複数回実行されるかの判定。複数回実行されるものであればtrue、1回しか実行されないものであればfalse
+            is_required (bool): 必須タスクかの判定。必須であればtrue、そうでなければfalse
+            completed_count (int):タスクの完了回数
+            dependent_task_ids (list[str]):依存するタスクの機能ID
             status (str):実行状況
-            execution_environments (list[str]): 実行環境リスト
-            disabled (bool):不明
+            execution_environments (list[str]): 実行中の実行環境IDのリスト
+            disabled (bool):使用不可の状態とするためのフラグ
 
     """
     __ID = 'id'
@@ -58,15 +58,15 @@ class SubflowTask:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
         Args:
-            id (str):不明
-            name (str): 不明
-            is_multiple (bool):不明
-            is_required (bool): _不明
-            completed_count (int):不明
-            dependent_task_ids (list[str]):実行依存先ID
+            id (str):タスクの機能ID
+            name (str): タスクのファイル名
+            is_multiple (bool):タスクが複数回実行されるかの判定。複数回実行されるものであればtrue、1回しか実行されないものであればfalse
+            is_required (bool): 必須タスクかの判定。必須であればtrue、そうでなければfalse
+            completed_count (int):タスクの完了回数
+            dependent_task_ids (list[str]):依存するタスクの機能ID
             status (str):実行状況
-            execution_environments (list[str]): 実行環境リスト
-            disabled (bool):不明
+            execution_environments (list[str]): 実行中の実行環境IDのリスト
+            disabled (bool):使用不可の状態とするためのフラグ
 
         """
         self._id = id
@@ -98,7 +98,7 @@ class SubflowTask:
         """実行環境のリストへの追加を行うメソッドです。
 
         Args:
-            id (str): ID
+            id (str): タスクの機能ID
 
         """
         if id not in self._execution_environments:
@@ -109,7 +109,7 @@ class SubflowTask:
         """_idを取得するためのゲッターです。
 
         Returns:
-            str: ID
+            str: タスクの機能ID
 
         """
         return self._id
@@ -119,7 +119,7 @@ class SubflowTask:
         """_nameを取得するためのゲッターです。
 
         Returns:
-            str: 名前
+            str: タスクのファイル名
 
         """
         return self._name
@@ -129,7 +129,7 @@ class SubflowTask:
         """_is_multipleを取得するためのゲッターです。
 
         Returns:
-            bool: 不明
+            bool: タスクが複数回実行されるかの判定
 
         """
         return self._is_multiple
@@ -139,7 +139,7 @@ class SubflowTask:
         """_is_requiredを取得するためのゲッターです。
 
         Returns:
-            bool: 不明
+            bool: 必須タスクかの判定
 
         """
         return self._is_required
@@ -149,7 +149,7 @@ class SubflowTask:
         """_completed_countを取得するためのゲッターです。
 
         Returns:
-            bool: 不明
+            bool:タスクの完了回数
 
         """
         return self._completed_count
@@ -163,7 +163,7 @@ class SubflowTask:
         """_dependent_task_idsを取得するためのゲッターです。
 
         Returns:
-            list[str]: 不明
+            list[str]:依存するタスクの機能ID
 
         """
         return self._dependent_task_ids
@@ -173,7 +173,7 @@ class SubflowTask:
         """_statusを取得するためのゲッターです。
 
         Returns:
-            str: 不明
+            str:実行状況
 
         """
         return self._status
@@ -193,8 +193,7 @@ class SubflowTask:
         """_disableを取得するためのゲッターです。
 
         Returns:
-            bool: 不明
-
+            bool:使用不可の状態とするためのフラグ
         """
         return self._disable
 
@@ -213,7 +212,7 @@ class SubflowTask:
         """_execution_environmentsを取得するためのゲッターです。
 
         Returns:
-            list[str]: 不明
+            list[str]:実行中の実行環境IDのリスト
 
         """
         return self._execution_environments
@@ -239,14 +238,21 @@ class SubflowTask:
 
 
 class SubflowStatus:
-    """サブフローステータス管理JSON(status.json)の各項目を管理するメソッドを記載したクラスです。"""
+    """サブフローステータス管理JSON(status.json)の各項目を管理するメソッドを記載したクラスです。
+
+    Attributes:
+        instance:
+            _is_completed(bool):サブフローが完了しているかの判定。初期値はfalseで必須タスクが全て完了した段階でtrueに更新
+            _tasks(list[SubflowTask]):サブフローの各タスクのステータスのリスト
+
+    """
 
     def __init__(self, is_completed: bool, tasks: list[dict]) -> None:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
         Args:
-            is_completed (bool): 不明
-            tasks (list[dict]): 不明
+            is_completed (bool):サブフローが完了しているかの判定
+            tasks (list[dict]):サブフローの各タスクのステータスのリスト
 
         """
         self._is_completed = is_completed
@@ -257,7 +263,7 @@ class SubflowStatus:
         """_is_completedを取得するためのゲッターです。
 
         Returns:
-            bool: 不明
+            bool:サブフローが完了しているかの判定
 
         """
         return self._is_completed
@@ -267,7 +273,7 @@ class SubflowStatus:
         """_tasksを取得するためのゲッターです。
 
         Returns:
-           list[SubflowTask]: 不明
+           list[SubflowTask]:サブフローの各タスクのステータスのリスト
 
         """
         return self._tasks
@@ -319,7 +325,7 @@ class SubflowStatus:
 
         Args:
             task_name (str): 対象となるタスクの名前
-            environment_id (str): 実行環境のリストに追加するid
+            environment_id (str): 実行環境のリストに追加するID
 
         """
         for task in self._tasks:
@@ -333,7 +339,7 @@ class SubflowStatus:
 
         Args:
             task_name (str):対象のタスク名
-            environment_id (str): 実行環境リストのid
+            environment_id (str): 実行環境リストのID
 
         """
 

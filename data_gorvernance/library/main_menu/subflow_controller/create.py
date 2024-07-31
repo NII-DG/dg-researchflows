@@ -59,7 +59,7 @@ class CreateSubflowForm(BaseSubflowForm):
         return pahse_options
 
     def change_submit_button_init(self, name):
-        """処理メソッドボタンのメソッドです。
+        """ボタンの状態を初期化するメソッドです。
 
         Args:
             name (str): メッセージ

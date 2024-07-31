@@ -192,11 +192,7 @@ class MainMenu(TaskLog):
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_project_menu(self, event):
-        """プロジェクト操作コントローラーの更新をするための遷移ボタンのメソッドです。
-        
-        Raises:
-            Exception:内部エラー 
-        """
+        """プロジェクト操作コントローラーの更新をするための遷移ボタンのメソッドです。"""
         # 開発中のためアラートを表示する。
         try:
             self._err_output.clear()

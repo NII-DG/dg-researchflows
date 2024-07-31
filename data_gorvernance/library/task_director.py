@@ -1,7 +1,6 @@
 """サブフローステータス更新を行います。
 
 サブフローメニューへのボタンなどを表示するメソッドやステータスを更新するメソッドなどがあります。
-
 """
 import os
 
@@ -107,7 +106,7 @@ class TaskDirector(TaskSave):
         """サブフローメニューへのボタンpanel.HTMLオブジェクトの取得するメソッドです。
 
         Returns:
-            [panel.pane.HTML]: [HTMLオブジェクト]
+            panel.pane.HTML: HTMLオブジェクト
         """
         button_width = 500
         sub_flow_menu_relative_url = get_return_sub_flow_menu_relative_url_path(self.nb_working_file_path)

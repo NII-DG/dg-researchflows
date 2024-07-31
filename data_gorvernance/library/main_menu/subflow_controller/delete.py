@@ -93,13 +93,10 @@ class DeleteSubflowForm(BaseSubflowForm):
         self.submit_button.disabled = False
 
     def define_input_form(self):
-        """サブフロー削除フォームのメソッドです。
+        """サブフロー削除フォームを定義するメソッドです。
             
-        サブフローの削除が可能になるかどうかを表示する。
-        
         Retunes:
-                str:「操作可能なサブフローがありません」というメッセージを返す。（リストの値の長さが2未満である場合）
-                pn.Column:「サブフロー削除」というメッセージを返し、ボタンを押せるようにする。
+            Alert | pn.Column: フォームに表示する内容
         """
         sub_flow_type_list = self._sub_flow_type_selector.options
         if len(sub_flow_type_list) < 2:

@@ -97,7 +97,7 @@ def get_projects_list(scheme, domain, token):
         token(str):パーソナルトークン
 
     Raises:
-        UnauthorizedError: 認証エラー
+        UnauthorizedError: 認証が通らない
         requests.exceptions.RequestException: 通信エラー
 
     Returns:
@@ -111,7 +111,7 @@ def get_projects_list(scheme, domain, token):
 def sync(token, api_url, project_id, abs_source, abs_root="/home/jovyan"):
     """GRDMにアップロードするメソッドです。
         
-       abs_source は絶対パスでなければならない。
+    abs_source は絶対パスでなければならない。
 
     Args:
         token (str): GRDMのパーソナルアクセストークン
@@ -157,6 +157,7 @@ def download_text_file(token, api_url, project_id, remote_path, encoding='utf-8'
         project_id (str): プロジェクトID
         remote_path (str): ファイルパス
         encoding (optional): バイトを解析するエンコーディング
+
     Raises:
         FileNotFoundError: 指定したファイルが存在しない
         UnauthorizedError: 認証が通らない

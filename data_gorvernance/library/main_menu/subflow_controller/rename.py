@@ -114,7 +114,7 @@ class RenameSubflowForm(BaseSubflowForm):
         """サブフロー名称変更フォームのメソッドです。
         
         Returns:
-            pn.Column:サブフロー名称変更フォームに必要な値を返す。
+            Alert | pn.Column:サブフロー名称変更フォームに必要な値を返す。
         """
         sub_flow_type_list = self._sub_flow_type_selector.options
         if len(sub_flow_type_list) < 2:

@@ -19,8 +19,6 @@ class RelinkSubflowForm(BaseSubflowForm):
         instance:
             abs_root (str): サブフローの絶対パス
             message_box (MessageBox): メッセージを格納する。
-    
-    
     """
 
     def __init__(self, abs_root, message_box) -> None:
@@ -29,7 +27,6 @@ class RelinkSubflowForm(BaseSubflowForm):
         Args:
             abs_root (str): サブフローの絶対パス
             message_box (MessageBox): メッセージを格納する。
-
         """
 
         super().__init__(abs_root, message_box)
@@ -203,7 +200,7 @@ class RelinkSubflowForm(BaseSubflowForm):
         """サブフロー間接続編集フォームのメソッドです。
         
         Returns:
-            pn.Column:サブフロー間接続編集フォームに必要な値を返す。
+            Alert | pn.Column:サブフロー間接続編集フォームに必要な値を返す。
         """
         sub_flow_type_list = self._sub_flow_type_selector.options
         if len(sub_flow_type_list) < 2:

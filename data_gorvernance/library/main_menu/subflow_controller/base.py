@@ -2,7 +2,6 @@
 
 このモジュールはサブフロー操作基底クラスを始め、サブフローを操作する時に
 ボタンを制御したり、値が入力されているか、あるいはユニークの値になっているかなどを確認するメソッドがあります。
-
 """
 import re
 from typing import Dict, List
@@ -114,6 +113,7 @@ class BaseSubflowForm():
 
     def set_submit_button_on_click(self, callback_function):
         """処理開始ボタンのイベントリスナー設定するメソッドです。
+        
         Args:
             callback_function(function):処理開始ボタンを呼び戻す
         """
@@ -284,9 +284,7 @@ class BaseSubflowForm():
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_sub_flow_name_selector(self, event):
-        """サブフロー名称のボタンが操作できるように有効化するメソッドです
-
-        """
+        """サブフロー名称のボタンが操作できるように有効化するメソッドです"""
         # サブフロー名称：シングルセレクトコールバックファンクション
         # relinkとrenameで継承するため個別処理
         try:

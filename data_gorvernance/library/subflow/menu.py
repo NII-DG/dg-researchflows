@@ -106,7 +106,6 @@ class SubflowMenu(TaskLog):
 
         Returns:
             callback(function):サブフロー図を表示する。
-
         """
         def callback(event):
             """サブフロー図の生成と表示を行うメソッドです。"""

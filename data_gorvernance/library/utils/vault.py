@@ -1,7 +1,6 @@
 """Vaultサーバーへの接続
 
 このモジュールはVaultサーバーに接続するために必要な値の設定とチェックを行い、キーやポリシーを作成してサーバーを起動させ、接続確認を行うメソッドがあります。
-
 """
 import hvac
 import os
@@ -45,12 +44,10 @@ class Vault():
             __start_server(method):Vaultサーバー起動する。
             __create_dg_engine(method):シークレットエンジン(kv)作成。
             __create_dg_policy(method):ポリシーを作成。
-    
     """
         
     def initialize(self):
         """Vault初期化を行うメソッドです"""
-
         try:
             self.__read_token()
             return
@@ -68,7 +65,6 @@ class Vault():
         Args:
             key(str):トークンをvaultで保存するときのキー
             value(str):パーソナルトークン
-        
         """
         client = self.__get_client()
         client.secrets.kv.v1.create_or_update_secret(
@@ -83,10 +79,8 @@ class Vault():
         Args:
             key(str):トークンをvaultで保存するときのキー
 
-
         Returns:
             key(SecretsEngines):キーが存在した場合は秘密鍵の値を返し、存在しない場合はFalseの値を返す。
-        
         """
         client = self.__get_client()
         try:
@@ -107,7 +101,6 @@ class Vault():
 
         Returns:
             read_res(SecretsEngines):取得した値を返す。値がない場合はNoneを返す。
-        
         """
         if not self.has_value(key):
             return None
@@ -123,8 +116,7 @@ class Vault():
         """Vaultサーバー起動するメソッドです。
 
         Raises:
-            UnusableVault:値が利用できないエラー
-        
+            UnusableVault:値が利用できないエラー  
         """
 
         # vaultサーバー起動
@@ -162,7 +154,6 @@ class Vault():
 
     def __create_dg_engine(self):
         """シークレットエンジン(kv)作成をするメソッドです"""
-
         token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=token)
 
@@ -176,7 +167,6 @@ class Vault():
 
     def __create_dg_policy(self):
         """ポリシー作成をするメソッドです"""
-
         token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=token)
 
@@ -191,8 +181,7 @@ class Vault():
         """ルートトークン保存のメソッドです
         
         Args:
-            token(str):パーソナルアクセストークン
-        
+            token(str):パーソナルアクセストークン 
         """
         with open(TOKEN_PATH, 'w') as f:
             f.write(token)

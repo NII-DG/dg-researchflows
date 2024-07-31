@@ -29,8 +29,6 @@ class ContainerSetter():
             _abs_root_path(str):絶対rootディレクトリを取得・設定する
             working_fdir_path(str):非同期フォルダーパス
             setup_completed_file_path(str):初期セットアップ完了ステータスファイルパス
-
-    
     """
 
     def __init__(self, nb_working_file_path:str) -> None:
@@ -141,9 +139,9 @@ class ContainerSetter():
 
     def validate_format_username(self, user_name:str):
         """ユーザー名の正規表現を解析するメソッドです。
+
         Args:
             user_name(str):ユーザー名
-        
         """
         validation = re.compile(r'^[a-zA-Z0-9\-_.]+$')
         return validation.fullmatch(user_name)
@@ -155,7 +153,7 @@ class ContainerSetter():
         display(alert)
 
     def change_submit_button_init(self, name):
-        """処理メソッドボタンのメソッドです。
+        """ボタンの状態を初期化するメソッドです。
 
         Args:
             name (str): メッセージ
@@ -302,7 +300,7 @@ class ContainerSetter():
             nb_working_file_path (str): 実行Notebookパス
 
         Raises:
-            e: 予期しないエラーが発生した
+            Exception: 予期しないエラーが発生した
         """
         pn.extension()
         cls.check_imcomplete_auth()
@@ -327,7 +325,7 @@ class ContainerSetter():
             nb_working_file_path (str): 実行Notebookパス
 
         Raises:
-            e: 予期しないエラーが発生した
+            Exception: 予期しないエラーが発生した
         """
         pn.extension()
         cls.check_imcomplete_auth()
@@ -350,7 +348,7 @@ class ContainerSetter():
             nb_working_file_path (str): 実行Notebookパス
 
         Raises:
-            e: 予期しないエラーが発生した
+            Exception: 予期しないエラーが発生した
         """
         pn.extension()
         cls.check_imcomplete_auth()
@@ -373,7 +371,7 @@ class ContainerSetter():
             nb_working_file_path (str): 実行Notebookパス
 
         Raises:
-            e: 予期しないエラーが発生した
+            Exception: 予期しないエラーが発生した
         """
         pn.extension()
         cls.check_imcomplete_auth()
@@ -397,7 +395,7 @@ class ContainerSetter():
             nb_working_file_path (str): 実行Notebookパス
 
         Raises:
-            e: 予期しないエラーが発生した
+            Exception: 予期しないエラーが発生した
 
         """
         cls.check_imcomplete_auth()
@@ -459,7 +457,6 @@ class ContainerSetter():
         Returns:
             git_path(list):Gitのパス
             commit_message(str):コミットメッセージ
-        
         """
         cls.check_imcomplete_auth()
         display(Javascript('IPython.notebook.save_checkpoint();'))

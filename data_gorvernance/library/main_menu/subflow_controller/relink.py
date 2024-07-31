@@ -1,6 +1,6 @@
 """サブフローの編集
 
-   このモジュールはサブフロー間接続編集クラスを始め、新しいサブフローのデータを編集したりするメソッドなどがあります。
+このモジュールはサブフロー間接続編集クラスを始め、新しいサブフローのデータを編集したりするメソッドなどがあります。
 """
 from typing import Dict, List
 import traceback
@@ -125,7 +125,6 @@ class RelinkSubflowForm(BaseSubflowForm):
     # overwrite
     def callback_parent_sub_flow_type_selector(self, event):
         """親サブフロー種別(フェーズ)を表示するメソッドです。
-
 
         Raises:
             Exception: サブフロー種別(フェーズ)、サブフロー名、親サブフロー種別(フェーズ)がないエラー

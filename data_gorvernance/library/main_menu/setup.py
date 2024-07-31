@@ -1,6 +1,6 @@
 """初期セットアップ
 
-   このモジュールはセットアップを行うクラスがあり、セットアップを行うための認証を確認したり、設定を行うメソッドなどがあります。
+このモジュールはセットアップを行うクラスがあり、セットアップを行うための認証を確認したり、設定を行うメソッドなどがあります。
 """
 import os
 import re
@@ -494,8 +494,6 @@ class ContainerSetter():
             nb_working_file_path (str): 実行Notebookパス
             git_path(list[str]):Gitのパス
             commit_message(str):コミットメッセージ
-
-
         """
         cs = ContainerSetter(nb_working_file_path)
 

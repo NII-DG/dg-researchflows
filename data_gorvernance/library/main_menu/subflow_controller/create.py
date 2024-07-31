@@ -1,6 +1,6 @@
 """サブフローの新規作成
 
-   このモジュールはサブフロー新規作成クラスを始め、新しいサブフローのデータを用意したり、データの検証を行うメソッドなどがあります。
+このモジュールはサブフロー新規作成クラスを始め、新しいサブフローのデータを用意したり、データの検証を行うメソッドなどがあります。
 """
 import shutil
 import os
@@ -92,9 +92,7 @@ class CreateSubflowForm(BaseSubflowForm):
 
     # overwrite
     def change_disable_submit_button(self):
-        """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化するメソッドです。
-
-        """
+        """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化するメソッドです。"""
         # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
         self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
 
@@ -158,7 +156,8 @@ class CreateSubflowForm(BaseSubflowForm):
 
     def main(self):
         """サブフロー新規作成処理のメソッドです。
-                入力情報を取得し、その値を検証してリサーチフローステータス管理JSONの更新、新規サブフローデータの用意を行う。
+        
+        入力情報を取得し、その値を検証してリサーチフローステータス管理JSONの更新、新規サブフローデータの用意を行う。
 
         Raises:
             InputWarning:入力値の不備によるエラー

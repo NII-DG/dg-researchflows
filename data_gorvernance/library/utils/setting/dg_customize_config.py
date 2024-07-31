@@ -52,8 +52,8 @@ class SubFlowRule:
             __VERIFICATION_IDS(str):検証用のid群
         instance:
             _subflow_type_name(str):サブフローの型名
-            _task_ids(Any):タスクのID群
-            _verification_ids(Any):検証用のid群
+            _task_ids(list[str]):タスクのID群
+            _verification_ids(list[str]):検証用のid群
 
     """
     __TASK_IDS = 'task_ids'
@@ -71,7 +71,7 @@ class SubFlowRule:
         self._task_ids = data[self.__TASK_IDS]
         self._verification_ids = data[self.__VERIFICATION_IDS]
 
-def get_dg_customize_config():
+def get_dg_customize_config()->list[AlphaProperty]:
     """DGカスタマイズJSON定義書のインスタンスを取得するメソッドです。
 
     Returns:

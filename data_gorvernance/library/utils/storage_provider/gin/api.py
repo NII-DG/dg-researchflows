@@ -1,15 +1,16 @@
 """APIリクエストを行う関数が記載されたモジュールです。"""
 from urllib import parse
+from httplib2 import Response
 import requests
 import time
 import os
 
-def get_server_info(scheme, domain):
+def get_server_info(scheme:str, domain:str)->Response:
     """指定したAPIエンドポイントから情報を取得するための関数です。
 
     Args:
-        scheme (Any):スキーマ
-        domain (Any):ドメイン
+        scheme (str):スキーマ
+        domain (str):ドメイン
 
     Returns:
         Response:指定されたAPIエンドポイントからのHTTPレスポンス
@@ -26,14 +27,14 @@ def get_server_info(scheme, domain):
     except Exception as e:
         raise Exception(f'Fail Request to GIN fork url:{api_url}') from e
 
-def get_token_for_auth(scheme, domain, user_name, password):
+def get_token_for_auth(scheme:str, domain:str, user_name:str, password:str)->Response:
     """指定したユーザー名とパスワードから認証トークンを取得するメソッドです。
 
     Args:
-        scheme (Any):スキーマ
-        domain (Any):ドメイン
-        user_name (Any):ユーザー名
-        password (Any):パスワード
+        scheme (str):スキーマ
+        domain (str):ドメイン
+        user_name (str):ユーザー名
+        password (str):パスワード
 
     Returns:
         Response:認証トークンを含むHTTPレスポンス
@@ -44,14 +45,14 @@ def get_token_for_auth(scheme, domain, user_name, password):
     auth = (user_name, password)
     return requests.get(url=api_url, auth=auth)
 
-def create_token_for_auth(scheme, domain, user_name, password):
+def create_token_for_auth(scheme:str, domain:str, user_name:str, password:str)->Response:
     """指定したユーザー名とパスワードから認証トークンを作成するメソッドです。
 
     Args:
-        scheme (Any):スキーマ
-        domain (Any):ドメイン
-        user_name (Any):ユーザー名
-        password (Any):パスワード
+        scheme (str):スキーマ
+        domain (str):ドメイン
+        user_name (str):ユーザー名
+        password (str):パスワード
 
     Returns:
         Response:作成した認証トークンを含むAPIリクエストのレスポンス
@@ -63,13 +64,13 @@ def create_token_for_auth(scheme, domain, user_name, password):
     data={"name": "system-generated"}
     return requests.post(url=api_url, auth=auth, data=data)
 
-def get_user_info(scheme, domain, token):
+def get_user_info(scheme:str, domain:str, token:str)->Response:
     """指定したユーザーの情報を取得するためのメソッドです。
 
     Args:
-        scheme (Any):スキーマ
-        domain (Any):ドメイン
-        token (Any):トークン
+        scheme (str):スキーマ
+        domain (str):ドメイン
+        token (str):トークン
 
     Returns:
         Response:指定されたトークンを持つユーザの情報
@@ -80,13 +81,13 @@ def get_user_info(scheme, domain, token):
     params = {'token' : token}
     return requests.get(url=api_url, params=params)
 
-def delete_access_token(scheme, domain, token):
+def delete_access_token(scheme:str, domain:str, token:str)->Response:
     """指定したアクセストークンを削除するメソッドです。
 
     Args:
-        scheme (Any):スキーマ
-        domain (Any):ドメイン
-        token (Any):アクセストークン
+        scheme (str):スキーマ
+        domain (str):ドメイン
+        token (str):アクセストークン
 
     Returns:
         Response:APIリクエストのレスポンス
@@ -97,7 +98,7 @@ def delete_access_token(scheme, domain, token):
     params = {'token' : token}
     return requests.delete(url=api_url, params=params)
 
-def upload_key(scheme:str, domain:str, token:str, pubkey:str):
+def upload_key(scheme:str, domain:str, token:str, pubkey:str)->Response:
     """指定した公開鍵をアップロードするメソッドです。
 
     Args:
@@ -119,15 +120,15 @@ def upload_key(scheme:str, domain:str, token:str, pubkey:str):
     }
     return requests.post(url=api_url, params=params, data=data)
 
-def search_repo(scheme, domain, repo_id, user_id, token):
+def search_repo(scheme:str, domain:str, repo_id:str, user_id:str, token:str)->Response:
     """指定したリポジトリの検索を行うメソッドです。
 
     Args:
-        scheme (Any):スキーマ
-        domain (Any):ドメイン
-        repo_id (Any):リポジトリID
-        user_id (Any):ユーザーID
-        token (Any):トークン
+        scheme (str):スキーマ
+        domain (str):ドメイン
+        repo_id (str):リポジトリID
+        user_id (str):ユーザーID
+        token (str):トークン
 
     Returns:
         Response:APIリクエストのレスポンス
@@ -142,15 +143,15 @@ def search_repo(scheme, domain, repo_id, user_id, token):
     }
     return requests.get(url=api_url, params=params)
 
-def patch_container(scheme, domain, token, server_name, user_id):
+def patch_container(scheme:str, domain:str, token:str, server_name:str, user_id:str)->Response:
     """指定したコンテナの更新を行うメソッドです。
 
     Args:
-        scheme (Any):スキーマ
-        domain (Any):ドメイン
-        token (Any):トークン
-        server_name (Any):サーバー名
-        user_id (Any):ユーザーID
+        scheme (str):スキーマ
+        domain (str):ドメイン
+        token (str):トークン
+        server_name (str):サーバー名
+        user_id (str):ユーザーID
 
     Returns:
         Response:APIリクエストのレスポンス
@@ -165,13 +166,13 @@ def patch_container(scheme, domain, token, server_name, user_id):
     }
     return requests.patch(url=api_url, params=params)
 
-def search_public_repo(scheme, domain, repo_id,):
+def search_public_repo(scheme:str, domain:str, repo_id:str,)->Response:
     """指定した公開リポジトリの検索を行うメソッドです。
 
     Args:
-        scheme (Any):スキーマ
-        domain (Any):ドメイン
-        repo_id (Any):リポジトリID
+        scheme (str):スキーマ
+        domain (str):ドメイン
+        repo_id (str):リポジトリID
 
     Returns:
         Response:APIリクエストのレスポンス

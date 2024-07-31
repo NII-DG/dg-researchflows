@@ -105,7 +105,7 @@ class SubflowTask:
             self._execution_environments.append(id)
 
     @property
-    def id(self):
+    def id(self)->str:
         """_idを取得するためのゲッターです。
 
         Returns:
@@ -115,7 +115,7 @@ class SubflowTask:
         return self._id
 
     @property
-    def name(self):
+    def name(self)->str:
         """_nameを取得するためのゲッターです。
 
         Returns:
@@ -125,7 +125,7 @@ class SubflowTask:
         return self._name
 
     @property
-    def is_multiple(self):
+    def is_multiple(self)->bool:
         """_is_multipleを取得するためのゲッターです。
 
         Returns:
@@ -135,7 +135,7 @@ class SubflowTask:
         return self._is_multiple
 
     @property
-    def is_required(self):
+    def is_required(self)->bool:
         """_is_requiredを取得するためのゲッターです。
 
         Returns:
@@ -145,7 +145,7 @@ class SubflowTask:
         return self._is_required
 
     @property
-    def completed_count(self):
+    def completed_count(self)->int:
         """_completed_countを取得するためのゲッターです。
 
         Returns:
@@ -159,7 +159,7 @@ class SubflowTask:
         self._completed_count += 1
 
     @property
-    def dependent_task_ids(self):
+    def dependent_task_ids(self)->list[str]:
         """_dependent_task_idsを取得するためのゲッターです。
 
         Returns:
@@ -169,7 +169,7 @@ class SubflowTask:
         return self._dependent_task_ids
 
     @property
-    def status(self):
+    def status(self)->str:
         """_statusを取得するためのゲッターです。
 
         Returns:
@@ -189,7 +189,7 @@ class SubflowTask:
         self._set_status(status)
 
     @property
-    def disable(self):
+    def disable(self)->bool:
         """_disableを取得するためのゲッターです。
 
         Returns:
@@ -208,7 +208,7 @@ class SubflowTask:
         self._disable = is_disable
 
     @property
-    def execution_environments(self):
+    def execution_environments(self)->list[str]:
         """_execution_environmentsを取得するためのゲッターです。
 
         Returns:
@@ -217,11 +217,11 @@ class SubflowTask:
         """
         return self._execution_environments
 
-    def to_dict(self):
+    def to_dict(self)->dict[str, any]:
         """インスタンスが保持しているデータを辞書型のデータに変換するメソッドです。
 
         Returns:
-            _dict[str, Any]:サブフロータスクの辞書型データ
+            dict[str, Any]:サブフロータスクの辞書型データ
 
         """
         return {
@@ -259,7 +259,7 @@ class SubflowStatus:
         self._tasks = [SubflowTask(**task) for task in tasks]
 
     @property
-    def is_completed(self):
+    def is_completed(self)->bool:
         """_is_completedを取得するためのゲッターです。
 
         Returns:
@@ -269,7 +269,7 @@ class SubflowStatus:
         return self._is_completed
 
     @property
-    def tasks(self):
+    def tasks(self)->list[SubflowTask]:
         """_tasksを取得するためのゲッターです。
 
         Returns:
@@ -288,7 +288,7 @@ class SubflowStatus:
         """
         self._is_completed = is_completed
 
-    def to_dict(self):
+    def to_dict(self)->dict[str, any]:
         """"インスタンスが保持しているデータを辞書型のデータに変換するメソッドです。
 
         Returns:
@@ -397,7 +397,7 @@ class SubflowStatusFile(JsonFile):
         """
         super().__init__(file_path)
 
-    def read(self):
+    def read(self)->SubflowStatus:
         """ジェイソンファイルの読み出しを行うメソッドです。
 
         Returns:

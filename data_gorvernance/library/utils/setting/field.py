@@ -21,7 +21,7 @@ class Field:
             __EXPERIMENT_PACKAGE(str):実験パッケージ
             __IS_ACTIVE(str):アクティブかの判定を行う
         instance:
-            field(Any):フィールドデータを保存する。
+            field(list(object)):フィールドデータを保存する。
 
     """
     __FIELD = "field"
@@ -39,11 +39,11 @@ class Field:
         contents = JsonFile(str(field_json_file)).read()
         self.field = contents[self.__FIELD]
 
-    def get_name(self):
+    def get_name(self)->list[str]:
         """フィールド名のリストを作成するメソッドです。
 
         Returns:
-            list:フィールド名のリスト
+            list[str]:フィールド名のリスト
 
         """
         return [fld[self.__FIELD_NAME] for fld in self.field]
@@ -61,14 +61,14 @@ class Field:
                 disabled.append(fld[self.__FIELD_NAME])
         return disabled
 
-    def get_template_path(self, target_name):
+    def get_template_path(self, target_name:str)->str:
         """指定したフィールド名の実験パッケージを取得するメソッドです。
 
         Args:
-            target_name (Any):目的の実験パッケージを指定するフィールド名
+            target_name (str):目的の実験パッケージを指定するフィールド名
 
         Returns:
-            Any:目的の実験パッケージ
+            str:目的の実験パッケージ
 
         """
         for fld in self.field:

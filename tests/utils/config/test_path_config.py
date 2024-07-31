@@ -1,6 +1,7 @@
 """このモジュールはユニットテストフレームワークを用いてテストを行うモジュールです。
 
 data_gorvernance.library.utils.config.path_configモジュールのテストを行います。
+
 """
 from unittest import TestCase
 from data_gorvernance.library.utils.config import path_config

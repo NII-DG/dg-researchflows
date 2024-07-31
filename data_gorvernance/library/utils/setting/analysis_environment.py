@@ -1,7 +1,4 @@
-"""解析環境に関するモジュールです。
-
-特定の解析環境の情報を取得するためのメソッドが記載されています。
-"""
+"""解析環境の情報を取得するためのメソッドを記載したモジュールです。"""
 import os
 from pathlib import Path
 
@@ -40,7 +37,7 @@ class AnalysisEnvironment:
         contents = JsonFile(str(json_path)).read()
         self.analysis_environment = contents[self.__FIELD]
 
-    def get_names(self):
+    def get_names(self)->list:
         """保存されている環境名をリストで取得するメソッドです。
 
         Returns:
@@ -49,28 +46,28 @@ class AnalysisEnvironment:
         """
         return [fld[self.__NAME] for fld in self.analysis_environment]
 
-    def get_id(self, target_name):
+    def get_id(self, target_name:str)->str:
         """指定した解析環境のidを取得するメソッドです。
 
         Args:
-            target_name (Any): 目的の解析環境の名前
+            target_name (str): 目的の解析環境の名前
 
         Returns:
-            Any:target_nameに対応したid
+            str:target_nameに対応したid
 
         """
         for fld in self.analysis_environment:
             if fld[self.__NAME] == target_name:
                 return fld[self.__ID]
 
-    def get_description(self, target_name):
+    def get_description(self, target_name:str)->str:
         """指定した解析環境の概要を取得するメソッドです。
 
         Args:
-            target_name (Any): 目的の解析環境の名前
+            target_name (str): 目的の解析環境の名前
 
         Returns:
-            Any:target_nameに対応した化石環境の説明
+            str:target_nameに対応した解析環境の説明
 
         """
         for fld in self.analysis_environment:

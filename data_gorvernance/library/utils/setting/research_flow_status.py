@@ -12,7 +12,7 @@ from ..html.security import escape_html_text
 from ..file import JsonFile
 
 
-def get_subflow_type_and_id(working_file_path: str):
+def get_subflow_type_and_id(working_file_path:str)->tuple[str, str]:
     """サブフローの種別とidを取得するメソッドです。
 
     Args:
@@ -55,7 +55,7 @@ def get_subflow_type_and_id(working_file_path: str):
 
     return subflow_type, subflow_id
 
-def get_data_dir(working_file_path: str):
+def get_data_dir(working_file_path: str)->str:
     """該当するデータディレクトリまでの絶対パスを取得するメソッドです。
 
     Args:
@@ -184,7 +184,7 @@ class ResearchFlowStatusFile(JsonFile):
                 ## ユニークID取得に成功
                 return candidate_id
 
-    def is_unique_subflow_name(self, phase_seq_number, sub_flow_name)->bool:
+    def is_unique_subflow_name(self, phase_seq_number:int, sub_flow_name:str)->bool:
         """フェーズ内に同じ名前のサブフローが存在しないかの確認を行うメソッドです。
 
         Args:
@@ -214,12 +214,12 @@ class ResearchFlowStatusFile(JsonFile):
 
         return True
 
-    def is_unique_data_dir(self, phase_seq_number, data_dir_name)->bool:
+    def is_unique_data_dir(self, phase_seq_number:int, data_dir_name:str)->bool:
         """フェーズ内に同じ名前のデータフォルダが存在しないかの確認を行うメソッドです。
 
         Args:
-            phase_seq_number (_type_):フェーズシーケンス番号
-            data_dir_name (_type_):データフォルダ名
+            phase_seq_number (int):フェーズシーケンス番号
+            data_dir_name (str):データフォルダ名
 
         Returns:
             bool:同一のデータフォルダ名が存在するかの判定結果
@@ -303,17 +303,17 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         #リサーチフローステータス管理JSONを更新する。
         self.update_file(research_flow_status)
 
-    def create_sub_flow(self, creating_phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids):
+    def create_sub_flow(self, creating_phase_seq_number:int, sub_flow_name:str, data_dir_name:str, parent_sub_flow_ids:list[str])->tuple[str, str]:
         """新規のサブフローを作成し、リサーチフローステータスに追加するメソッドです。
 
         Args:
-            creating_phase_seq_number(Any):サブフローを作成するフェーズのシーケンス番号
-            sub_flow_name(Any): 新規サブフロー名
-            date_dir_name(Any):作成するディレクトリ名
-            parent_sub_flow_ids(Any):親サブフローID
+            creating_phase_seq_number(int):サブフローを作成するフェーズのシーケンス番号
+            sub_flow_name(str): 新規サブフロー名
+            date_dir_name(str):作成するディレクトリ名
+            parent_sub_flow_ids(list[str]):親サブフローID
 
         Returns:
-            Any:新規のサブフローを作成したフェーズの名前
+            str:新規のサブフローを作成したフェーズの名前
             str:新しく作成したサブフローのID
 
         Raises:
@@ -350,11 +350,11 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         self.update_file(research_flow_status)
         return phase_name, new_sub_flow_id
 
-    def del_sub_flow_data_by_sub_flow_id(self, sub_flow_id):
+    def del_sub_flow_data_by_sub_flow_id(self, sub_flow_id:str):
         """指定したサブフローデータの削除を行うメソッドです。
 
         Args:
-            sub_flow_id (Any):削除対象となるサブフローデータのID
+            sub_flow_id (str):削除対象となるサブフローデータのID
 
         Raises:
             NotFoundSubflowDataError:IDが一致するサブフローデータが存在しない
@@ -378,13 +378,13 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         # リサーチフローステータス管理JSONの上書き
         self.update_file(research_flow_status)
 
-    def relink_sub_flow(self, phase_seq_number, sub_flow_id, parent_sub_flow_ids):
+    def relink_sub_flow(self, phase_seq_number:int, sub_flow_id:str, parent_sub_flow_ids:list[str]):
         """親サブフローを変更するメソッドです。
 
         Args:
-            phase_seq_number (Any):対象のフェーズシーケンス番号
-            sub_flow_id (Any): 対象のサブフローID
-            parent_sub_flow_ids (Any):変更後の親サブフローID
+            phase_seq_number (int):対象のフェーズシーケンス番号
+            sub_flow_id (str): 対象のサブフローID
+            parent_sub_flow_ids (list[str]):変更後の親サブフローID
 
         Raises:
             NotFoundSubflowDataError:IDが一致するサブフローデータが存在しない
@@ -403,14 +403,14 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
             break
         self.update_file(research_flow_status)
 
-    def rename_sub_flow(self, phase_seq_number, sub_flow_id, sub_flow_name, data_dir_name):
+    def rename_sub_flow(self, phase_seq_number:int, sub_flow_id:str, sub_flow_name:str, data_dir_name:str):
         """サブフロー名とディレクトリ名を変更するメソッドです。
 
         Args:
-            phase_seq_number (Any):対象のフェーズシーケンス番号
-            sub_flow_id (Any):対象のサブフローID
-            sub_flow_name (Any):変更後のサブフロー名
-            data_dir_name (Any):変更後のディレクトリ名
+            phase_seq_number (int):対象のフェーズシーケンス番号
+            sub_flow_id (str):対象のサブフローID
+            sub_flow_name (str):変更後のサブフロー名
+            data_dir_name (str):変更後のディレクトリ名
 
         Raises:
             NotFoundSubflowDataError:IDが一致するサブフローデータが存在しない
@@ -430,16 +430,16 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
             break
         self.update_file(research_flow_status)
 
-    def get_flow_name_and_dir_name(self, phase_seq_number, id):
+    def get_flow_name_and_dir_name(self, phase_seq_number:int, id:str)->tuple[str, str]:
         """指定したサブフローデータのサブフロー名とディレクトリ名を取得するメソッドです。
 
         Args:
-            phase_seq_number (Any):対象のフェーズシーケンス番号
-            id (Any):対象のサブフローID
+            phase_seq_number (int):対象のフェーズシーケンス番号
+            id (str):対象のサブフローID
 
         Returns:
-            Any:サブフロー名
-            Any:ディレクトリ名
+            str:サブフロー名
+            str:ディレクトリ名
 
         Raises:
             NotFoundSubflowDataError:IDが一致するサブフローデータが存在しない
@@ -455,15 +455,15 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         else:
             raise NotFoundSubflowDataError(f'There Is No Data Directory Name. sub_flow_id : {id}')
 
-    def get_data_dir(self, phase_name, id):
+    def get_data_dir(self, phase_name:str, id:str)->str:
         """指定したサブフローデータのディレクトリ名を取得するメソッドです。
 
         Args:
-            phase_name (Any):対象のフェーズ名
-            id (Any):対象のサブフローID
+            phase_name (str):対象のフェーズ名
+            id (str):対象のサブフローID
 
         Returns:
-            Any:ディレクトリ名
+            str:ディレクトリ名
 
         Raises:
             NotFoundSubflowDataError:IDが一致するサブフローデータが存在しない
@@ -479,14 +479,14 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         else:
             raise NotFoundSubflowDataError(f'There Is No Data Directory Name. sub_flow_id : {id}')
 
-    def get_subflow_phase(self, phase_seq_number):
+    def get_subflow_phase(self, phase_seq_number:int)->str:
         """指定したフェーズの名前を取得するメソッドです。
 
         Args:
-            phase_seq_number (Any):対象のフェーズシーケンス番号
+            phase_seq_number (int):対象のフェーズシーケンス番号
 
         Returns:
-            Any:フェーズ名
+            str:フェーズ名
 
         Raises:
             Exception:フェーズシーケンス番号が一致するフェーズが存在しない
@@ -530,3 +530,4 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
             for subflow_data in phase_status._sub_flow_data:
                 id_list.append(subflow_data._id)
         return id_list
+

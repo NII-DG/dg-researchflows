@@ -21,7 +21,7 @@ class OCSTemplate:
             __OCS_TEMPLATE_PATH(str):OCSテンプレートパス
             __IS_ACTIVE(str):アクティブ状態かの判定を行う
         instance:
-           ocs_template(Any):OCSテンプレートデータを保存する。
+           ocs_template(list(object)):OCSテンプレートデータを保存する。
 
     """
     __FIELD = "ocs_template"
@@ -39,7 +39,7 @@ class OCSTemplate:
         contents = JsonFile(str(ocs_template_json_file)).read()
         self.ocs_template = contents[self.__FIELD]
 
-    def get_name(self):
+    def get_name(self)->list[str]:
         """OCSテンプレート名のリストを作成するメソッドです。
 
         Returns:
@@ -51,7 +51,6 @@ class OCSTemplate:
     def get_disabled_ids(self)->List[str]:
         """アクティブ状態でないデータのリストを作成するメソッドです。
 
-
         Returns:
             list[str]:アクティブ状態でないOCSテンプレート名のリスト
 
@@ -62,28 +61,28 @@ class OCSTemplate:
                 disabled.append(fld[self.__FIELD_NAME])
         return disabled
 
-    def get_id(self, target_name):
+    def get_id(self, target_name:str)->str:
         """指定したOCSテンプレートのIDを取得するメソッドです。
 
         Args:
-            target_name (Any):目的のOCSテンプレートIDを指定するOCSテンプレート名
+            target_name (str):目的のOCSテンプレートIDを指定するOCSテンプレート名
 
         Returns:
-            Any:目的のOCSテンプレートID
+            str:目的のOCSテンプレートID
 
         """
         for fld in self.ocs_template:
             if fld[self.__FIELD_NAME] == target_name:
                 return fld[self.__ID]
 
-    def get_template_path(self, target_name):
+    def get_template_path(self, target_name:str)->str:
         """指定したOCSテンプレートのパスを取得するメソッドです。
 
         Args:
-            target_name (Any):目的のOCSテンプレートパスを指定するOCSテンプレート名
+            target_name (str):目的のOCSテンプレートパスを指定するOCSテンプレート名
 
         Returns:
-            Any:目的のOCSテンプレート名
+            str:目的のOCSテンプレート名
 
         """
         for fld in self.ocs_template:

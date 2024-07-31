@@ -21,7 +21,7 @@ class BaseLogger:
 
     """
 
-    def __init__(self, output_dir="."):
+    def __init__(self, output_dir:str="."):
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
         Args:
@@ -34,13 +34,13 @@ class BaseLogger:
         self._update_handler()
         self.logger.propagate = False
 
-    def reset_file(self, fmt):
+    def reset_file(self, fmt:str):
         """ファイルのリセットを行うメソッドです。
 
        ログファイルは日付で分割されるため、日付が変わっていた場合のみログハンドラーを更新します。
 
         Args:
-            fmt(Any):フォーマッターを設定
+            fmt(str):フォーマッターを設定
 
         """
         now_date = datetime.datetime.now().strftime('%Y%m%d')
@@ -74,7 +74,7 @@ class BaseLogger:
         formatter = logging.Formatter(fmt)
         self.handler.setFormatter(formatter)
 
-    def set_log_level(self, level):
+    def set_log_level(self, level:str):
         """ロガーのログレベルを設定するためのメソッドです。
 
         Args:
@@ -100,19 +100,19 @@ class UserActivityLog(BaseLogger):
     Attributes:
         instance:
             username(str):ユーザー名
-            ipynb_file(Any):ノートブックファイルへのパス
+            ipynb_file(str):ノートブックファイルへのパス
             subflow_id(str):サブフローのID
             subflow_type(str):サブフローの種別
             cell_id(str):ノートブックのセルID
 
     """
 
-    def __init__(self, nb_working_file, notebook_name):
+    def __init__(self, nb_working_file=str, notebook_name=str):
         """ クラスのインスタンスを初期化するメソッドです。コンストラクタ
 
         Args:
-            nb_working_file (Any): ノートブック名を含む絶対パス
-            notebook_name(Any):ノートブック名
+            nb_working_file (str): ノートブック名を含む絶対パス
+            notebook_name(str):ノートブック名
 
         """
         # set log config
@@ -129,11 +129,12 @@ class UserActivityLog(BaseLogger):
         self.subflow_type = subflow_type
         self.cell_id = ""
 
-    def _get_log_dir(self, nb_working_file):
+
+    def _get_log_dir(self, nb_working_file=str)->str:
         """ログファイルを保存するディレクトリを生成するためのメソッドです。
 
         Args:
-            nb_working_file (Any): ノートブック名を含む絶対パス
+            nb_working_file (str): ノートブック名を含む絶対パス
 
         Returns:
             str:ログファイルを保存するディレクトリへのパス
@@ -147,7 +148,7 @@ class UserActivityLog(BaseLogger):
         os.makedirs(log_dir, exist_ok=True)
         return str(log_dir)
 
-    def _get_format(self):
+    def _get_format(self)->str:
         """フォーマットの定義を行うメソッドです。
 
         Returns:
@@ -156,37 +157,37 @@ class UserActivityLog(BaseLogger):
         """
         return '%(levelname)s\t%(asctime)s\t%(username)s\t%(subflow_id)s\t%(subflow_type)s\t%(ipynb_name)s\t%(cell_id)s\t%(message)s'
 
-    def info(self, message):
+    def info(self, message:str):
         """INFOレベルのログを出力するするためのメソッドです。
 
         Args:
-            message(Any):ログメッセージを設定
+            message(str):ログメッセージを設定
 
         """
         self.reset_file(self._get_format())
         self.logger.info(message, extra=self.record())
 
-    def warning(self, message):
+    def warning(self, message:str):
         """WARNINGレベルのログを出力するするためのメソッドです。
 
         Args:
-            message(Any):ログメッセージを設定
+            message(str):ログメッセージを設定
 
         """
         self.reset_file(self._get_format())
         self.logger.warning(message, extra=self.record())
 
-    def error(self, message):
+    def error(self, message:str):
         """ERRORレベルのログを出力するするためのメソッドです。
 
         Args:
-            message(Any):ログメッセージを設定
+            message(str):ログメッセージを設定
 
         """
         self.reset_file(self._get_format())
         self.logger.error(message, extra=self.record())
 
-    def start(self, detail='', note=''):
+    def start(self, detail:str='', note:str=''):
         """処理の開始をログに記録するためのメソッドです。
 
         Args:
@@ -196,7 +197,7 @@ class UserActivityLog(BaseLogger):
         """
         self.info("-- " + detail + "処理開始 --" + note)
 
-    def finish(self, detail='', note=''):
+    def finish(self, detail:str='', note:str=''):
         """処理の終了をログに記録するためのメソッドです。
 
         Args:
@@ -206,11 +207,11 @@ class UserActivityLog(BaseLogger):
         """
         self.info("-- " + detail + "処理終了 --" + note)
 
-    def record(self):
+    def record(self)->dict[str, str]:
         """インスタンスに保持している情報を辞書形式に変換するためのメソッドです。
 
         Returns:
-            dict[str, any]:辞書形式に変換したログデータ
+            dict[str, Any]:辞書形式に変換したログデータをデータ
 
         """
         return {
@@ -220,4 +221,3 @@ class UserActivityLog(BaseLogger):
             'ipynb_name': self.ipynb_file,
             'cell_id': self.cell_id
         }
-

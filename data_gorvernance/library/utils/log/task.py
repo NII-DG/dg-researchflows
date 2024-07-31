@@ -13,12 +13,12 @@ class TaskLog:
 
     """
 
-    def __init__(self, nb_working_file_path, notebook_name) -> None:
+    def __init__(self, nb_working_file_path=str, notebook_name=str) -> None:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
         Args:
-            nb_working_file (Any): ノートブック名を含む絶対パス
-            notebook_name(Any):ノートブック名
+            nb_working_file (str): ノートブック名を含む絶対パス
+            notebook_name(str):ノートブック名
 
         """
         self.log = UserActivityLog(nb_working_file_path, notebook_name)
@@ -27,7 +27,7 @@ class TaskLog:
     # 継承したクラスで呼ぶ為のデコレータ #
     ###################################
     @staticmethod
-    def task_cell(cell_id: str, start_message="", finish_message=""):
+    def task_cell(cell_id: str, start_message:str="", finish_message:str="")->callable:
         """タスクセルに必須の処理を行うメソッドです。
 
         タスクセルの実行状況をトレースするため、実行の前後でログの出力を行います。
@@ -38,7 +38,7 @@ class TaskLog:
             finish_message(str, optional):タスクの終了時に出力するメッセージ。デフォルトは空文字。
 
         Return:
-           Callable:wrapper関数
+           callable:wrapper関数
 
         """
         def wrapper(func):
@@ -53,13 +53,13 @@ class TaskLog:
         return wrapper
 
     @staticmethod
-    def callback_form(event_name):
+    def callback_form(event_name:str)->callable:
         """フォームの処理に必須の処理を行うメソッドです。
 
         フォームの処理の実行状況をトレースするため、実行の前後でログの出力を行います。
 
         Args:
-            event_name (Any): 処理が行われるイベントの名前
+            event_name (str): 処理が行われるイベントの名前
 
         Return:
             Callable:wrapper関数

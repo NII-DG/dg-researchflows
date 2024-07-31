@@ -1,7 +1,7 @@
 """gitの設定や操作を行う関数を記載しているモジュールです。"""
 from ...cmd import Cmd
 
-def get_remote_url():
+def get_remote_url()->str:
     """gitリポジトリのリモートurlを取得するためのメソッドです。
 
     Returns:
@@ -11,11 +11,11 @@ def get_remote_url():
     stdout, stderr, rt = Cmd.decode_exec_subprocess('git config --get remote.origin.url')
     return stdout.replace('\n', '')
 
-def git_annex_untrust(cwd):
-    """現在の作業ディレクトリを信頼できない設定にするメソッドです。
+def git_annex_untrust(cwd:str)->str:
+    """ルートディレクトリを信頼できない設定にするメソッドです。
 
     Args:
-        cwd (Any):現在の作業ディレクトリ
+        cwd (str):ルートディレクトリの絶対パス
 
     Returns:
         str:コマンドの実行結果
@@ -25,17 +25,17 @@ def git_annex_untrust(cwd):
     result = stdout.decode('utf-8')
     return result
 
-def git_annex_trust(cwd):
-    """現在の作業ディレクトリをwebリモートを信頼する設定にするメソッドです。
+def git_annex_trust(cwd:str):
+    """ルートディレクトリを信頼する設定にするメソッドです。
 
     Args:
-        cwd (Any):現在の作業ディレクトリ
+        cwd (str):ルートディレクトリの絶対パス
 
     """
     stdout, stderr, rt = Cmd.exec_subprocess(cmd='git annex --force trust web', cwd=cwd)
     result = stdout.decode('utf-8')
 
-def git_annex_lock(path:str):
+def git_annex_lock(path:str)->str:
     """ファイルを編集不可能にするメソッドです。
 
     Args:
@@ -49,7 +49,7 @@ def git_annex_lock(path:str):
     result = stdout.decode('utf-8')
     return result
 
-def git_annex_unlock(path:str):
+def git_annex_unlock(path:str)->str:
     """ファイルを編集可能にするメソッドです。
 
     Args:
@@ -63,36 +63,36 @@ def git_annex_unlock(path:str):
     result = stdout.decode('utf-8')
     return result
 
-def git_annex_metadata_add_minetype_sha256_contentsize(file_path, mime_type, sha256, content_size, exec_path):
+def git_annex_metadata_add_minetype_sha256_contentsize(file_path:str, mime_type:str, sha256:str, content_size:int, exec_path:str):
     """指定したファイルにGit Annexのメタデータ(mime_type, sha256, content_size) を追加するメソッドです。
 
     Args:
-        file_path (Any):メタデータを追加する対象のファイル
-        mime_type (Any):MIMEタイプ
-        sha256 (Any):SHA256ハッシュ値
-        content_size (Any):コンテンツサイズ
-        exec_path (Any):対象のディレクトリ
+        file_path (str):メタデータを追加する対象のファイル
+        mime_type (str):MIMEタイプ
+        sha256 (str):SHA256ハッシュ値
+        content_size (int):コンテンツサイズ
+        exec_path (str):対象のディレクトリ
 
     """
     Cmd.exec_subprocess(f'git annex metadata "{file_path}" -s mime_type={mime_type} -s sha256={sha256} -s content_size={content_size}', cwd=exec_path)
 
-def git_annex_metadata_add_sd_date_published(file_path, sd_date_published, exec_path):
+def git_annex_metadata_add_sd_date_published(file_path:str, sd_date_published:str, exec_path:str):
     """指定したファイルにGit Annexのメタデータ(sd_date_published)を追加するメソッドです。
 
     Args:
-        file_path (Any):メタデータを追加する対象のファイル
-        sd_date_published (Any):データが生成/公開された日付を示すメタデータ
-        exec_path (Any):対象のディレクトリ
+        file_path (str):メタデータを追加する対象のファイル
+        sd_date_published (str):データが生成/公開された日付を示すメタデータ
+        exec_path (str):対象のディレクトリ
 
     """
     Cmd.exec_subprocess(f'git annex metadata "{file_path}" -s sd_date_published={sd_date_published}', cwd=exec_path)
 
-def git_commmit(msg:str, cwd):
+def git_commmit(msg:str, cwd:str)->str:
     """コミットを作成するためのメソッドです。
 
     Args:
         msg (str):コミットメッセージ
-        cwd (Any):現在の作業ディレクトリ
+        cwd (str):ルートディレクトリの絶対パス
 
     Returns:
         str:コマンドの実行結果
@@ -102,11 +102,11 @@ def git_commmit(msg:str, cwd):
     result = stdout.decode('utf-8')
     return result
 
-def git_pull(cwd):
+def git_pull(cwd:str)->str:
     """指定したディレクトリでプルを行うメソッドです。
 
     Args:
-        cwd (Any):現在の作業ディレクトリ
+        cwd (str):ルートディレクトリの絶対パス
 
     Returns:
         str:コマンドの実行結果
@@ -117,11 +117,11 @@ def git_pull(cwd):
     return result
 
 
-def git_branch(cwd, option=''):
+def git_branch(cwd:str, option:str='')->str:
     """指定したディレクトリでブランチを操作するメソッドです。
 
     Args:
-        cwd (Any):現在の作業ディレクトリ
+        cwd (str):ルートディレクトリの絶対パス
         option (str):git branchコマンドに追加で渡すオプション
 
     Returns:
@@ -135,11 +135,11 @@ def git_branch(cwd, option=''):
     result = stdout.decode('utf-8')
     return result
 
-def git_branch_for_remote(cwd):
+def git_branch_for_remote(cwd:str)->str:
     """指定したディレクトリ内のGitリポジトリでリモートブランチの一覧を取得するためのメソッドです。
 
     Args:
-        cwd (Any):現在の作業ディレクトリ
+        cwd (Any):ルートディレクトリの絶対パス
 
     Returns:
         str:コマンドの実行結果
@@ -147,11 +147,11 @@ def git_branch_for_remote(cwd):
     """
     return git_branch(cwd, '-r')
 
-def is_annex_branch_in_repote(cwd):
+def is_annex_branch_in_repote(cwd:str)->bool:
     """origin/git-annexのリモートブランチが存在するか確認するメソッドです。
 
     Args:
-        cwd (Any):現在の作業ディレクトリ
+        cwd (Any):ルートディレクトリの絶対パス
 
     Returns:
         bool:origin/git-annexが存在するかの判定結果
@@ -164,11 +164,11 @@ def is_annex_branch_in_repote(cwd):
         return False
 
 
-def exec_git_status(cwd):
+def exec_git_status(cwd:str)->str:
     """現在のgitリポジトリの状態を表示するメソッドです。
 
     Args:
-        cwd (Any):現在の作業ディレクトリ
+        cwd (Any):ルートディレクトリの絶対パス
 
     Returns:
         str:コマンドの実行結果
@@ -178,11 +178,11 @@ def exec_git_status(cwd):
     result = stdout.decode('utf-8')
     return result
 
-def is_conflict(cwd) -> bool:
+def is_conflict(cwd:str) -> bool:
     """現在のgitリポジトリに衝突しているものがないか確かめるメソッドです。
 
     Args:
-        cwd (Any):現在の作業ディレクトリ
+        cwd (Any):ルートディレクトリの絶対パス
 
     Returns:
         bool:衝突しているものがないかの判定

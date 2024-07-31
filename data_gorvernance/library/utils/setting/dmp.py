@@ -18,11 +18,11 @@ class DMPManager(JsonFile):
         super().__init__(file_path)
 
     @staticmethod
-    def create_dmp_options(contents):
+    def create_dmp_options(contents:dict)->dict:
         """dmpのタイトルを抽出し、オプションの一覧を作成するメソッドです。
 
         Args:
-            contents (_type_): dmpデータを含むデータ群
+            contents (dict): dmpデータ群
 
         Returns:
             dict:dmpのタイトル一覧
@@ -36,12 +36,12 @@ class DMPManager(JsonFile):
         return options
 
     @staticmethod
-    def get_dmp(contents, index):
+    def get_dmp(contents:dict, index:int)->dict[str, list]:
         """指定したdmpを取得するためのメソッドです。
 
         Args:
-            contents (Any):dmpデータを含むデータ群
-            index (Any):索引
+            contents (dict):dmpデータ群
+            index (int):索引
 
         Returns:
             dict[str, list]:Indexで指定したdmpのデータ
@@ -50,11 +50,11 @@ class DMPManager(JsonFile):
         return {"dmp": [contents['dmp'][index]]}
 
     @staticmethod
-    def display_format(content):
+    def display_format(content:dict)->str:
         """dmpデータの表示フォーマットを作成するメソッドです。
 
         Args:
-            content (Any):dmpデータを含むデータ群
+            content (dict):dmpデータ群
 
         Returns:
             str:表示する際のフォーマットに整えたdmpデータ

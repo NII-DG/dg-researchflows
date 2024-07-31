@@ -88,7 +88,7 @@ def download(token, project_id, base_url, remote_path, base_path=None):
         base_path (optional): ファイルを探すディレクトリのパス
 
     Returns:
-        str: 指定したファイルの内容
+        list: 指定したファイルの内容
 
     Raises:
         UnauthorizedError: 認証が通らない

@@ -171,7 +171,7 @@ class SubflowMenu(TaskLog):
             svg_file_path (str): svgファイルのパス
 
         Returns:
-            File:svgファイルの内容を返す。
+            File(str):svgファイルの内容を返す。
         """
         return file.File(svg_file_path).read()
 

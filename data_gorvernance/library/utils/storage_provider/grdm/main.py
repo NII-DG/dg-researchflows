@@ -75,7 +75,7 @@ def check_permission(base_url: str, token: str, project_id: str):
         requests.exceptions.RequestException: その他の通信エラー
 
     Returns:
-        パーミッションに問題なければTrue、問題があればFalseの値を返す。
+        bool:パーミッションに問題なければTrue、問題があればFalseの値を返す。
     """
     response = get_user_info(base_url, token)
     user_id = response['data']['id']
@@ -101,7 +101,7 @@ def get_projects_list(scheme, domain, token):
         requests.exceptions.RequestException: 通信エラー
 
     Returns:
-        プロジェクトの一覧のデータの値を返す。
+        dict:プロジェクトの一覧のデータの値を返す。
     """
     response = get_projects(scheme, domain, token)
     data = response['data']
@@ -243,7 +243,7 @@ def build_collaborator_url(base_url: str, project_id: str):
         project_id (str): プロジェクトID
 
     Returns:
-        str: 指定されたproject idのプロジェクトメンバー一覧画面のURL
+        parse.urlunparse: 指定されたproject idのプロジェクトメンバー一覧画面のURL
     """
     parsed = parse.urlparse(base_url)
     endpoint = f'{project_id}/contributors/'

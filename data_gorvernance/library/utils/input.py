@@ -1,8 +1,10 @@
 """トークン取得のモジュールです。
+
 各種トークンやプロジェクトIDを取得する関数が記載されています。
+
 """
 import getpass
-from typing import Callable
+from typing import Callable, Tuple
 
 from . import dg_web
 from .config import message as msg_config
@@ -12,11 +14,12 @@ from .vault import Vault
 from .error import UnusableVault, UnauthorizedError, ProjectNotExist, PermissionError
 
 
-def get_project_id():
+def get_project_id() -> str:
     """ プロジェクトIDを取得する関数です。
 
     Returns:
         str: プロジェクトIDを返す。
+
     """
     project_id = grdm.get_project_id()
     if project_id:
@@ -77,7 +80,7 @@ def get_token(key:str, func:Callable[[str], bool], message:str) -> str:
     return token
 
 
-def get_grdm_token(vault_key):
+def get_grdm_token(vault_key: str) -> str:
     """ GRDMのパーソナルアクセストークンを取得する関数です。
 
     Returns:
@@ -88,21 +91,22 @@ def get_grdm_token(vault_key):
         requests.exceptions.RequestException: 通信不良
 
     """
-    def check_auth(token):
+    def check_auth(token: str) -> bool:
         """ トークンの有効性を検証する関数です。
 
         Args:
-            token (str): パーソナルアクセストークン
+            token (str): パーソナルアクセストークンを設定します。
 
         Returns:
             bool: トークンの有効性を返す。
+
         """
         return grdm.check_authorization(grdm.BASE_URL, token)
 
     return get_token(vault_key, check_auth, msg_config.get('form', 'pls_input_grdm_token'))
 
 
-def get_goveredrun_token():
+def get_goveredrun_token() -> str:
     """ Governed Runのトークンを取得する関数です。
 
     Returns:
@@ -113,13 +117,21 @@ def get_goveredrun_token():
         requests.exceptions.RequestException: 通信不良
 
     """
-    def check_auth(token):
+    def check_auth(token: str) -> bool:
+        """ Governed Runのトークンの有効性を確認する
+
+        Args:
+            token (str): Governed Runのトークンを設定します。
+
+        Returns:
+            bool: Governed Runのトークンの有効性を返す。
+        """
         return dg_web.check_governedrun_token(dg_web.SCHEME, dg_web.DOMAIN, token)
 
     return get_token('govrun_token', check_auth, msg_config.get('form', 'pls_input_govrun_token'))
 
 
-def get_grdm_connection_parameters():
+def get_grdm_connection_parameters() -> Tuple[str, str]:
     """GRDMのトークンとプロジェクトIDを取得する関数です。
 
     Returns:

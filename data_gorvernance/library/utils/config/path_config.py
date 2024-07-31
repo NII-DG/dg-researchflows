@@ -48,13 +48,13 @@ DG_IMAGES_FOLDER = os.path.join(DATA_GOVERNANCE, IMAGES)
 DG_WORKING_FOLDER = os.path.join(DATA_GOVERNANCE, WORKING)
 DG_WORKING_RESEARCHFLOW_FOLDER = os.path.join(DG_WORKING_FOLDER, RESEARCHFLOW)
 
-def get_task_data_dir(abs_root, phase:str, data_dir_name:str)->str:
+def get_task_data_dir(abs_root:str, phase:str, data_dir_name:str)->str:
     """ タスクデータディレクトリのパスを取得する関数です。
 
     <root>/data/<phase>/<data_dir_name>の形式で取得します。
 
     Args:
-        abs_root (): 絶対パスを設定します。
+        abs_root (str): ルートディレクトリの絶対パスを設定します。
         phase (str): サブフロー種別（フェーズ）を設定します。
         data_dir_name (str): データディレクトリ名を設定します。
 
@@ -90,11 +90,11 @@ USER_INFO_PATH = os.path.join(DG_WORKING_FOLDER, USER_INFO)
 PLAN_TASK_STATUS_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, STATUS_JSON)
 PLAN_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, PLAN_JSON)
 
-def get_research_flow_status_file_path(abs_root:Any)->str:
+def get_research_flow_status_file_path(abs_root:str)->str:
     """ リサーチフローのステータスファイルのパスを取得する関数です。
 
     Args:
-        abs_root (Any): 絶対パスを設定します。
+        abs_root (str): ルートディレクトリの絶対パスを設定します。
 
     Returns:
         str: リサーチフローのステータスファイルのパスを返す。

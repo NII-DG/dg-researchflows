@@ -1,15 +1,16 @@
 """ コマンドを実行するモジュールです。"""
 import subprocess
+from typing import Tuple
 from ..utils.error import ExecCmdError
 
 class Cmd():
     """ シェルコマンド実行のクラスです。"""
 
     @classmethod
-    def decode_exec_subprocess(cls, cmd: str, cwd: str='', raise_error: bool=True):
+    def decode_exec_subprocess(cls, cmd: str, cwd: str='', raise_error: bool=True)->Tuple[str, str, int]:
         """ コマンドの実行結果をデコードするメソッドです。
 
-        引数で引数のコマンドを実行させ、その実行結果をデコードするメソッドです。
+        引数のコマンドを実行させ、その実行結果をデコードするメソッドです。
 
         Args:
             cmd(str): 実行するコマンドを設定します。
@@ -17,9 +18,9 @@ class Cmd():
             raise_error(bool, optional): コマンド実行失敗したときに例外を発生させるかを設定します。
 
         Returns:
-            stdout: コマンドの標準出力を返す。
-            stderr: コマンドの標準エラーを返す。
-            rt: コマンド実行の戻り値を返す。
+            str: コマンドの標準出力を返す。
+            str: コマンドの標準エラーを返す。
+            int: コマンド実行の戻り値を返す。
 
         """
         stdout, stderr, rt = Cmd.exec_subprocess(cmd, cwd, raise_error)
@@ -28,10 +29,8 @@ class Cmd():
         return stdout, stderr, rt
 
     @classmethod
-    def exec_subprocess(cls, cmd: str, cwd: str='', raise_error: bool=True):
+    def exec_subprocess(cls, cmd: str, cwd: str='', raise_error: bool=True)->Tuple[bytes, bytes, int]:
         """ 指定されたコマンドを新しいプロセスで実行するメソッドです。
-
-        指定されたシェルコマンドを新しいプロセスで実行し、そのコマンドの標準出力、標準エラー出力、戻り値を返すメソッドです。
 
         Args:
             cmd(str): 実行するコマンドを設定します。
@@ -39,9 +38,9 @@ class Cmd():
             raise_error(bool, optional): コマンド実行失敗したときに例外を発生させるかを設定します。
 
         Returns:
-            stdout: コマンドの標準出力を返す。
-            stderr: コマンドの標準エラーを返す。
-            rt: コマンド実行の戻り値を返す。
+            bytes: コマンドの標準出力を返す。
+            bytes: コマンドの標準エラーを返す。
+            int: コマンド実行の戻り値を返す。
 
         Raises:
             ExecCmdError: コマンドの実行結果がエラー

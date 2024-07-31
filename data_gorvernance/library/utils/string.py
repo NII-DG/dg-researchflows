@@ -4,7 +4,7 @@ import re
 class StringManager:
     """ 文字列を操作するクラスです。"""
     @staticmethod
-    def is_empty(text: str):
+    def is_empty(text: str) -> bool:
         """ 空文字もしくは空白文字かどうかを判定する
 
         Args:
@@ -17,7 +17,7 @@ class StringManager:
         return bool(not text or text.isspace())
 
     @staticmethod
-    def has_whitespace(text: str):
+    def has_whitespace(text: str) -> bool:
         """ 空白文字が含まれるかどうかを判定する
 
         Args:
@@ -30,7 +30,7 @@ class StringManager:
         return any(char.isspace() for char in text)
 
     @staticmethod
-    def is_half(text: str):
+    def is_half(text: str) -> bool:
         """ 半角英数記号かどうかを判定する
 
         Args:
@@ -43,7 +43,7 @@ class StringManager:
         return bool(re.match(r'^[\x20-\x7E]*$', text))
 
     @staticmethod
-    def strip(text:str, remove_empty=True)->str:
+    def strip(text:str, remove_empty: bool=True) -> str:
         """ 文字列の両端の空白文字を削除するメソッドです。
 
         remove_empty=Falseのとき、空白文字のみで構成された文字列が渡された場合にもとの文字列をそのまま返す

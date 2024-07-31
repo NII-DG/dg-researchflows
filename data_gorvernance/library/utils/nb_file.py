@@ -10,7 +10,7 @@ from .html import security
 class NbFile(File):
     """ Notebookファイル操作のクラスです。"""
 
-    def __init__(self, file_path: str):
+    def __init__(self, file_path: str) -> None:
         """ クラスのインスタンスの初期化処理を実行するメソッドです。
 
         Args:
@@ -24,7 +24,7 @@ class NbFile(File):
             raise FileNotFoundError(f'Not Found File. file path : {file_path}')
         super().__init__(file_path)
 
-    def embed_subflow_name_on_header(self, subflow_name: str):
+    def embed_subflow_name_on_header(self, subflow_name: str) -> None:
         """サブフローメニュNotebookのヘッダーサブフロー名を埋める
 
         Args:
@@ -38,20 +38,20 @@ class NbFile(File):
         self.write(notebook)
 
 
-    def read(self):
+    def read(self) -> nbformat.NotebookNode:
         """ ファイルからNotebookを読み込むメソッドです。
 
         Returns:
-            Any: 読み込んだNotebookを返す。
+            nbformat.NotebookNode: 読み込んだNotebookを返す。
 
         """
         return nbformat.read(self.path, as_version=4)
 
-    def write(self, notebook_data: Any):
+    def write(self, notebook_data: nbformat.NotebookNode) -> None:
         """ ファイルにNotebookを書き込むメソッドです。
 
         Args:
-            notebook_data (Any): 書き込むNotebookを設定します。
+            notebook_data (nbformat.NotebookNode): 書き込むNotebookを設定します。
 
         """
         nbformat.write(notebook_data, self.path)

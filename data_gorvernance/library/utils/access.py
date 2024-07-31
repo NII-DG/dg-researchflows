@@ -1,6 +1,4 @@
-""" タブを開くボタンを表示するモジュールです。
-別タブでメインメニューやデータフォルダを開くためのボタンを作成する関数が記載されています。
-"""
+""" タブを開くボタンを表示するモジュールです。"""
 import os
 from pathlib import Path
 
@@ -14,10 +12,8 @@ from library.utils.setting import get_data_dir
 from . import file
 
 
-def open_main_menu(working_file: str):
+def open_main_menu(working_file: str) -> None:
     """ 別タブでメインメニューを開くボタンを表示する関数です。
-
-    指定されたファイルから相対的なパスを計算し、そのパスを使用して新しいタブでメインメニューを開くボタンを作成します。
 
     Args:
         working_file(str): 移動元のファイルパスを設定します。
@@ -41,10 +37,8 @@ def open_main_menu(working_file: str):
     display(Javascript('IPython.notebook.save_checkpoint();'))
 
 
-def open_data_folder(working_file: str):
+def open_data_folder(working_file: str) -> None:
     """ 別タブでデータフォルダを開くボタンを表示する関数です。
-
-    指定されたファイルから相対的なパスを計算し、そのパスを使用して新しいタブでデータフォルダを開くボタンを作成します。
 
     Args:
         working_file(str) : 移動元のファイルパスを設定します。

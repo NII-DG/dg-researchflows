@@ -3,7 +3,7 @@ import html
 
 
 # HTMLエンティティエスケープを行う
-def escape_html_text(original_string)->str:
+def escape_html_text(original_string: str) -> str:
     """HTMLエンティティエスケープを行う関数です。
 
     Args:

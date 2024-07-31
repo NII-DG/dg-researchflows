@@ -1,5 +1,7 @@
 """ Notebookで使用するwidgetのモジュールです。
+
 Panel.Widgetsを拡張したクラスが記載されています。
+
 """
 import panel as pn
 
@@ -15,7 +17,8 @@ class Button(pn.widgets.Button):
             button_style(str): ボタンのスタイル。'solid'または'outline'のいずれか。
 
     """
-    def set_looks_init(self, name: str=""):
+
+    def set_looks_init(self, name: str="") -> None:
         """ ボタンの見た目を設定するメソッドです。
 
         Args:
@@ -29,7 +32,7 @@ class Button(pn.widgets.Button):
         self.button_type = 'primary'
         self.button_style = 'solid'
 
-    def set_looks_processing(self, name: str=""):
+    def set_looks_processing(self, name: str="") -> None:
         """ ボタンの見た目を設定するメソッド
 
         Args:
@@ -43,7 +46,7 @@ class Button(pn.widgets.Button):
         self.button_type = 'primary'
         self.button_style = 'outline'
 
-    def set_looks_success(self, name: str):
+    def set_looks_success(self, name: str) -> None:
         """ ボタンの見た目を設定するメソッド
 
         Args:
@@ -54,7 +57,7 @@ class Button(pn.widgets.Button):
         self.button_type = 'success'
         self.button_style = 'solid'
 
-    def set_looks_warning(self, name: str):
+    def set_looks_warning(self, name: str) -> None:
         """ ボタンの見た目を設定するメソッド
 
         Args:
@@ -65,7 +68,7 @@ class Button(pn.widgets.Button):
         self.button_type = 'warning'
         self.button_style = 'solid'
 
-    def set_looks_error(self, name: str):
+    def set_looks_error(self, name: str) -> None:
         """ ボタンの見た目を設定するメソッド
 
         Args:
@@ -79,8 +82,9 @@ class Button(pn.widgets.Button):
 
 class Alert(pn.pane.Alert):
     """ pn.pane.Alertを拡張して特定のアラートを簡単に作成できるようにしたクラスです。"""
+
     @classmethod
-    def info(cls, msg: str=""):
+    def info(cls, msg: str="") -> 'Alert':
         """ infoタイプのアラートを作成するメソッドです。
 
         Args:
@@ -93,7 +97,7 @@ class Alert(pn.pane.Alert):
         return cls(msg, sizing_mode="stretch_width", alert_type='info')
 
     @classmethod
-    def success(cls, msg: str=""):
+    def success(cls, msg: str="") -> 'Alert':
         """ successタイプのアラートを作成するメソッドです。
 
         Args:
@@ -106,7 +110,7 @@ class Alert(pn.pane.Alert):
         return cls(msg, sizing_mode="stretch_width", alert_type='success')
 
     @classmethod
-    def warning(cls, msg: str=""):
+    def warning(cls, msg: str="") -> 'Alert':
         """ warningタイプのアラートを作成するメソッドです。
 
         Args:
@@ -119,7 +123,7 @@ class Alert(pn.pane.Alert):
         return cls(msg, sizing_mode="stretch_width", alert_type='warning')
 
     @classmethod
-    def error(cls, msg: str=""):
+    def error(cls, msg: str="") -> 'Alert':
         """ dangerタイプのアラートを作成するメソッドです。
 
         Args:
@@ -133,6 +137,7 @@ class Alert(pn.pane.Alert):
 
 class MessageBox(pn.WidgetBox):
     """ メッセージを表示するためのwidgetBoxのクラスです。"""
+
     def has_message(self)->bool:
         """ MessageBoxにメッセージが存在するかを判定するメソッドです。
 

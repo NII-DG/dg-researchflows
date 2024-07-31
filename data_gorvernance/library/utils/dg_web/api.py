@@ -1,5 +1,7 @@
 """dg-webと接続するモジュールです。
+
 dg-webからガバナンスシートやメタデータのスキーマの取得する関数や検証を行う関数が記載されています。
+
 """
 from http import HTTPStatus
 from urllib import parse
@@ -10,7 +12,7 @@ from requests.exceptions import RequestException
 from ..error import UnauthorizedError, NotFoundContentsError
 
 
-def get_govsheet_schema(scheme:str, domain:str):
+def get_govsheet_schema(scheme:str, domain:str)->dict:
     """ ガバナンスシートのスキーマを取得する関数です。
 
     Args:
@@ -28,7 +30,7 @@ def get_govsheet_schema(scheme:str, domain:str):
     return response.json()
 
 
-def get_metadata_schema(scheme:str, domain:str):
+def get_metadata_schema(scheme:str, domain:str)->dict:
     """ メタデータのスキーマを取得する関数です。
 
     Args:
@@ -76,7 +78,7 @@ def check_governedrun_token(scheme:str, domain:str, token:str)->bool:
     return False
 
 
-def validate(scheme:str, domain:str, grdm_token:str, project_id:str, govrun_token:str=None, govsheet=None, metadata=None):
+def validate(scheme:str, domain:str, grdm_token:str, project_id:str, govrun_token:str=None, govsheet:dict=None, metadata:dict=None)->dict:
     """ 検証する関数です。
 
     Args:
@@ -84,9 +86,9 @@ def validate(scheme:str, domain:str, grdm_token:str, project_id:str, govrun_toke
         domain(str): ドメインを設定します。
         grdm_token(str): GRDMのトークンを設定します。
         project_id(str): プロジェクトidを設定します。
-        govrun_token(str|None): Governed Runのトークンを設定します。
-        govsheet(): ガバナンスシートを設定します。
-        metadata(): メアデータを設定します。
+        govrun_token(str, optional): Governed Runのトークンを設定します。
+        govsheet(dict, optional): ガバナンスシートを設定します。
+        metadata(dict, optional): メアデータを設定します。
 
     Returns:
         dict: 検証結果を返す。
@@ -115,7 +117,7 @@ def validate(scheme:str, domain:str, grdm_token:str, project_id:str, govrun_toke
     return response.json()
 
 
-def get_validations(scheme:str, domain:str, grdm_token: str, project_id: str):
+def get_validations(scheme:str, domain:str, grdm_token: str, project_id: str)->dict:
     """ 検証結果を取得する関数です。
 
     Args:
@@ -151,7 +153,7 @@ def get_validations(scheme:str, domain:str, grdm_token: str, project_id: str):
     return response.json()
 
 
-def get_validations_validationId(scheme:str, domain:str, grdm_token: str, project_id: str, validation_id: str):
+def get_validations_validationId(scheme:str, domain:str, grdm_token: str, project_id: str, validation_id: str)->dict:
     """ idを指定して検証結果を取得する関数です。
 
     Args:

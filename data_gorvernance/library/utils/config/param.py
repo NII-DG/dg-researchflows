@@ -1,5 +1,7 @@
 """ 設定ファイルのモジュールです。
+
 設定ファイルの操作のクラスや各種設定情報を保持するクラスが記載されています。
+
 """
 import os
 from pathlib import Path
@@ -22,18 +24,19 @@ class ParamConfig():
             __DGCORE(str): dgCoreのキー
             __REPOSITORY(str): repositoryのキー
         instance:
-            _param_file(JsonFile): jsonファイル
+            _param_file(JsonFile): 設定ファイルを操作するためのインスタンス
             _siblings(Siblings): Siblingsクラスのインスタンス
             _rcosBinderUrl: RCOSのBinderのURL
             _dg_core(GgCore): GgCoreクラスのインスタンス
             _repository(Repository): Repositoryクラスのインスタンス
+
     """
     __SIBLINGS = 'siblings'
     __RCOSBINDERURL = 'rcosBinderUrl'
     __DGCORE = 'dgCore'
     __REPOSITORY = 'repository'
 
-    def __init__(self):
+    def __init__(self) -> None:
         """ インスタンスの初期化処理を実行するメソッドです。"""
         self._param_file = JsonFile(str(param_json_file))
         data = self._param_file.read()
@@ -43,7 +46,7 @@ class ParamConfig():
         self._dg_core = GgCore(data[self.__DGCORE])
         self._repository = Repository(data[self.__REPOSITORY])
 
-    def update(self):
+    def update(self) -> None:
         """ JSONファイルを書き換えるメソッドです。"""
         data = {}
         data[self.__SIBLINGS] = self._siblings.to_dict()
@@ -53,7 +56,7 @@ class ParamConfig():
         self._param_file.write(data)
 
     @classmethod
-    def get_param_data(cls):
+    def get_param_data(cls) -> 'ParamConfig':
         """ 各種データを取得する
 
         Returns:
@@ -64,7 +67,7 @@ class ParamConfig():
         return pc
 
     @classmethod
-    def get_siblings_ginHttp(cls):
+    def get_siblings_ginHttp(cls) -> str:
         """ ginHTTPを取得するメソッドです。
 
         Returns:
@@ -75,7 +78,7 @@ class ParamConfig():
         return pc._siblings._ginHttp
 
     @classmethod
-    def get_repo_id(cls):
+    def get_repo_id(cls) -> str:
         """ リポジトリのIDを取得するメソッドです。
 
         Returns:
@@ -101,6 +104,7 @@ class Siblings():
             _ginSsh(str): ginSshの値
             _gitHugibHttp(str): gitHugibHttpの値
             _gitHubSsh(str): gitHubSshの値
+
     """
     __GINHTTP = 'ginHttp'
     __GINSSH = 'ginSsh'
@@ -119,7 +123,7 @@ class Siblings():
         self._gitHugibHttp = siblings_data[self.__GITHUGIBHTTP]
         self._gitHubSsh = siblings_data[self.__GITHUBSSH]
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """ インスタンス変数を辞書に変換するメソッドです。
 
         Returns:
@@ -158,7 +162,7 @@ class GgCore():
         self._scheme = dg_core_data[self.__SCHEME]
         self._netloc = dg_core_data[self.__NETLOC]
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """ インスタンス変数を辞書に変換するメソッドです。
 
         Returns:
@@ -191,7 +195,7 @@ class Repository():
         """
         self._id = repo_data[self.__ID]
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         """ インスタンス変数を辞書に変換するメソッドです。
 
         Returns:

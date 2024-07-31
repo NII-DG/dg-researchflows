@@ -1,13 +1,16 @@
 """ ファイル操作のモジュールです。
+
 JSONファイルを操作するためのクラスやファイルをコピーする関数が記載されています。
+
 """
 import os
 import shutil
 import json
 from pathlib import Path
+from typing import List, Set, Callable
 
 
-def copy_file(source_path: str, destination_path: str):
+def copy_file(source_path: str, destination_path: str) -> None:
     """ ファイルをコピーする関数です。
 
     Args:
@@ -22,7 +25,7 @@ def copy_file(source_path: str, destination_path: str):
     shutil.copyfile(source_path, destination_path)
 
 
-def copy_dir(src: str, dst: str, overwrite: bool=False):
+def copy_dir(src: str, dst: str, overwrite: bool=False) -> None:
     """ ディレクトリをコピーする関数です。
 
     Args:
@@ -34,7 +37,7 @@ def copy_dir(src: str, dst: str, overwrite: bool=False):
         指定したディレクトリがなければ作成される。
 
     """
-    def f_exists(base: str, dst: str):
+    def f_exists(base: str, dst: str) -> Callable[[str, List[str]], Set[str]]:
         """ 指定したベースディレクトリと目的のディレクトリの間で存在するファイル名を返す関数です。
 
         Args:
@@ -42,18 +45,20 @@ def copy_dir(src: str, dst: str, overwrite: bool=False):
             dst(str): 比較対象のディレクトリのパスを設定します。
 
         Returns:
-            function: _ignore関数を返す。
+            function: 相対的なディレクトリ名およびファイル名のセットを返す関数を返す。
+
         """
         base, dst = Path(base), Path(dst)
-        def _ignore(path: str, names: str):   # サブディレクトリー毎に呼び出される
+        def _ignore(path: str, names: List[str]) -> Set[str]:   # サブディレクトリー毎に呼び出される
             """ 指定したパスと名前で存在するファイル名のセットを返す関数です。
 
             Args:
                 path(str): サブディレクトリのパスを設定します。
-                names(str): サブディレクトリの名前を設定します。
+                names(List[str]): サブディレクトリ内のファイル名のリストを設定します。
 
             Returns:
                 set[str]: ベースディレクトリと目的ディレクトリの間で存在するファイル名のセットを返す。
+
             """
             names = set(names)
             rel = Path(path).relative_to(base)
@@ -66,7 +71,7 @@ def copy_dir(src: str, dst: str, overwrite: bool=False):
         shutil.copytree(src, dst, ignore=f_exists(src, dst), dirs_exist_ok=True)
 
 
-def relative_path(target_path: str, start_dir: str):
+def relative_path(target_path: str, start_dir: str) -> str:
     """ target_pathをstart_dirからの相対パスに変換する関数です。
 
     Args:
@@ -93,11 +98,11 @@ class File:
 
     Attributes:
         instance:
-            path(Path): ファイルのパス
+            path(Path): ファイルのパスを返す。
 
     """
 
-    def __init__(self, file_path: str):
+    def __init__(self, file_path: str) -> None:
         """ クラスのインスタンスの初期化処理を実行するメソッドです。
 
         Args:
@@ -106,7 +111,7 @@ class File:
         """
         self.path = Path(file_path)
 
-    def read(self):
+    def read(self) -> str:
         """ ファイルから内容を読み込み、その内容を返すメソッドです。
 
         Returns:
@@ -117,7 +122,7 @@ class File:
             content = file.read()
         return content
 
-    def write(self, content: str):
+    def write(self, content: str) -> None:
         """ 指定された内容をファイルに書き込むメソッドです。
 
         Args:
@@ -128,7 +133,7 @@ class File:
         with self.path.open('w') as file:
             file.write(content)
 
-    def create(self, exist_ok=True):
+    def create(self, exist_ok=True) -> None:
         """ 新しいファイルを作成するメソッドです。
 
         Args:
@@ -138,7 +143,7 @@ class File:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.path.touch(exist_ok=exist_ok)
 
-    def remove(self, missing_ok=False):
+    def remove(self, missing_ok=False) -> None:
         """ ファイルを削除するメソッドです。
 
         Args:
@@ -154,28 +159,32 @@ class JsonFile(File):
     JSONファイルの読み込みや書き込みをします。
 
     """
-    def __init__(self, file_path: str):
+
+    def __init__(self, file_path: str) -> None:
         """ クラスのインスタンスの初期化処理を実行するメソッドです。
 
         Args:
             file_path(str): ファイルパスを設定します。
+
         """
         super().__init__(file_path)
 
-    def read(self):
+    def read(self) -> dict:
         """ ファイルの内容をjsonとして読み込むメソッドです。
 
         Returns:
             dict: ファイルの内容を返す。
+
         """
         content = super().read()
         return json.loads(content)
 
-    def write(self, data:dict):
+    def write(self, data:dict) -> None:
         """ 与えられた内容をjsonとしてファイルに書き込むメソッドです。
 
         Args:
             data(dict): 書き込む内容を設定します。
+
         """
         json_data = json.dumps(data, ensure_ascii=False, indent=4)
         super().write(json_data)

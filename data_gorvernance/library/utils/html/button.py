@@ -6,15 +6,15 @@ def create_button(
             url:str='',
             msg:str='',
             disable:bool=False,
-            target='_self',
-            a_character_color='#ffffff',
-            a_font_size='15px',
-            button_width='300px',
-            button_height='30px',
-            button_border_radius='5px',
+            target:str='_self',
+            a_character_color:str='#ffffff',
+            a_font_size:str='15px',
+            button_width:str='300px',
+            button_height:str='30px',
+            button_border_radius:str='5px',
             border:List[str] = [],
-            button_background_color='#0072B5',
-):
+            button_background_color:str='#0072B5',
+) -> str:
     """ HTMLのボタンを作成する関数です。
 
     Args:

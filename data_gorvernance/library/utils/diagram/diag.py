@@ -18,6 +18,7 @@ class DiagManager:
             content(str): ファイルの内容
 
     """
+
     def __init__(self, file_path: str) -> None:
         """ クラスのインスタンスの初期化処理を実行するメソッドです。
 
@@ -29,7 +30,7 @@ class DiagManager:
         # 以下暫定措置としてファイル書き変えのために用いる
         self.content = File(str(self.path)).read()
 
-    def add_node_property(self, node_id: str, custom: str):
+    def add_node_property(self, node_id: str, custom: str) -> None:
         """ノードに属性を追加するメソッドです。
 
         Args:
@@ -57,8 +58,8 @@ class DiagManager:
 
 
 
-    def update_node_color(self, node_id: str, color: str):
-        """ ノードの色を更新するメソッドです。
+    def update_node_color(self, node_id: str, color: str) -> None:
+        """ ノードの色を設定するメソッドです。
 
         Args:
             node_id (str): ノードIDを設定します。
@@ -67,8 +68,8 @@ class DiagManager:
         """
         self.add_node_property(node_id, f'color="{color}"')
 
-    def update_node_icon(self, node_id: str, path: str):
-        """ ノードのアイコンを更新するメソッドです。
+    def update_node_icon(self, node_id: str, path: str) -> None:
+        """ ノードのアイコンを設定するメソッドです。
 
         Args:
             node_id (str): ノードIDを設定します。
@@ -77,8 +78,8 @@ class DiagManager:
         """
         self.add_node_property(node_id, f'background="{path}"')
 
-    def update_node_style(self, node_id, style):
-        """ ノードのスタイルを更新するメソッドです。。
+    def update_node_style(self, node_id: str, style: str) -> None:
+        """ ノードのスタイルを設定するメソッドです。。
 
         Args:
             node_id (str): ノードIDを設定します。
@@ -87,7 +88,7 @@ class DiagManager:
         """
         self.add_node_property(node_id, f'style={style}')
 
-    def update_node_stacked(self, node_id):
+    def update_node_stacked(self, node_id: str) -> None:
         """ ノードの重ね合わせのメソッドです。
 
         Args:
@@ -96,8 +97,8 @@ class DiagManager:
         """
         self.add_node_property(node_id, f'stacked')
 
-    def generate_svg(self, tmp_diag: str, output: str, font: str):
-        """ SVGを生成するメソッドです。
+    def generate_svg(self, tmp_diag: str, output: str, font: str) -> None:
+        """ diagファイルからsvgファイルを生成するメソッドです。
 
         Args:
             tmp_diag (str): 一時的なダイアグラムのパスを設定します。
@@ -110,7 +111,7 @@ class DiagManager:
         run(['blockdiag', '-f', font, '-Tsvg', '-o', output, diag], check=True)
 
     # 仮置き
-    def run(self, output, diag, font):
+    def run(self, output: str, diag: str, font: str) -> int:
         """ 新しいプロセスでなくダイアグラムを生成する関数。
 
         Args:

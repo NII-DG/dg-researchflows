@@ -1,5 +1,7 @@
 """ パッケージを作成するモジュールです。
+
 cookiecutterテンプレートを使用してパッケージを作成するクラスが記載されています。
+
 """
 import os
 from collections import OrderedDict
@@ -23,27 +25,28 @@ class MakePackage:
 
     Attributes:
         instance:
-            template_context(OrderedDict): テンプレートのコンテキストを保持する辞書
-            rendered_context(OrderedDict): レンダリングされたコンテキストを保持する辞書
+            template_context(OrderedDict): テンプレートの設定値を保持する辞書
+            rendered_context(OrderedDict): レンダリングされた設定値を保持する辞書
             prompts(dict): プロンプトの情報を保持する辞書
             template_dir(str): cookiecutterテンプレートのディレクトリ
 
     """
+
     def __init__(self) -> None:
         """ クラスのインスタンスの初期化処理を実行するメソッドです。"""
         self.template_context = OrderedDict([])
         self.rendered_context = OrderedDict([])
         self.prompts = {}
 
-    def get_template(self, template, checkout=None):
-        """ 指定されたテンプレートを取得するメソッドです。
+    def get_template(self, template: str, checkout: str=None) -> dict:
+        """ cookiecutterのテンプレートの設定値を取得するメソッドです。
 
         Args:
             template (str): クローンするリポジトリのURLまたはパスを指定する
             checkout (str, optional): クローン後にチェックアウトするブランチ、タグ、コミット IDを設定します。
 
         Returns:
-            dict: テンプレートを返す。
+            dict: cookiecutterのテンプレートの設定値を返す。
 
         """
         config_dict = get_user_config()
@@ -59,14 +62,14 @@ class MakePackage:
         self.template_context = context['cookiecutter']
         return self.get_default_context(context)
 
-    def get_default_context(self, context):
-        """ わかりません
+    def get_default_context(self, context: dict) -> OrderedDict:
+        """ テンプレートの設定値を整形するメソッド
 
         Args:
-            context (dict): コンテキスト情報
+            context (dict): テンプレートの設定値
 
         Returns:
-            OrderedDict:
+            OrderedDict: 整形したテンプレートを返す。
 
         """
         cookiecutter_dict = OrderedDict([])
@@ -84,14 +87,14 @@ class MakePackage:
         self.rendered_context = cookiecutter_dict
         return cookiecutter_dict
 
-    def get_title(self, var_name):
-        """ わかりません
+    def get_title(self, var_name: str) -> str:
+        """ テンプレートの設定値の表示名を取得する
 
         Args:
-            var_name (str):
+            var_name (str): テンプレートの設定値のキー
 
         Returns:
-            _type_:
+            str: テンプレートの設定値の表示名を返す。
 
         """
         prompts = self.prompts
@@ -101,7 +104,7 @@ class MakePackage:
             else var_name
         )
 
-    def create_package(self, context_dict=None, output_dir='.'):
+    def create_package(self, context_dict: dict=None, output_dir: str='.'):
         """ cookiecutterテンプレートを使用してパッケージを作成する
 
         Args:

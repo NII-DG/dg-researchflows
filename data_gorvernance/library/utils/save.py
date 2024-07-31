@@ -1,6 +1,7 @@
 """ タスクを保存するモジュールです。"""
 import os
 import traceback
+from typing import Any, Tuple, List, Union
 
 import panel as pn
 from IPython.display import clear_output
@@ -15,7 +16,7 @@ from .input import get_grdm_connection_parameters
 from .error import UnusableVault, ProjectNotExist, UnauthorizedError, PermissionError
 
 
-def all_sync_path(abs_root: str):
+def all_sync_path(abs_root: str) -> list:
     """ 指定されたルートディレクトリから特定のディレクトリのパスを返す関数です。
 
     Args:
@@ -53,6 +54,7 @@ class TaskSave(TaskLog):
             _save_submit_button(Button): 確定ボタン
 
     """
+
     def __init__(self, nb_working_file_path: str, notebook_name: str) -> None:
         """ クラスのインスタンスの初期化処理を実行するメソッドです。
 
@@ -74,7 +76,7 @@ class TaskSave(TaskLog):
         # 確定ボタン
         self._save_submit_button = Button(width=500)
 
-    def get_grdm_params(self):
+    def get_grdm_params(self) -> Tuple[str, str]:
         """ GRDMのトークンとプロジェクトIDを取得するメソッドです。
 
         Returns:
@@ -107,7 +109,7 @@ class TaskSave(TaskLog):
             self.log.error(message)
         return token, project_id
 
-    def define_save_form(self, source):
+    def define_save_form(self, source: Union[str, List[str], Any]) -> None:
         """ GRDMに保存するフォームを作成するメソッドです。
 
         Args:
@@ -136,16 +138,16 @@ class TaskSave(TaskLog):
             self.save_form_box.append(self._save_submit_button)
 
     @TaskLog.callback_form("input_token")
-    def _save_submit_callback(self, event):
+    def _save_submit_callback(self, event:Any) -> None:
         """ ボタン押下時に保存するメソッドです。
 
         Args:
-            event (Event): ボタンクリックイベント。
+            event (Any): ボタンクリックイベント。
 
         """
         self._save()
 
-    def _save(self):
+    def _save(self) -> None:
         """ 保存を実行するメソッドです。"""
         size = len(self._source)
         timediff = TimeDiff()

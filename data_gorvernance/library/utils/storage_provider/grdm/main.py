@@ -25,7 +25,7 @@ ALLOWED_PERMISSION = ["admin", "write"]
 
 
 def get_project_id():
-    """プロジェクトIDを取得する関数です。
+    """プロジェクトIDを取得するメソッドです。
 
     Returns:
         split_path(list(str)):分割したパスの要素の値を返す。
@@ -43,7 +43,7 @@ def get_project_id():
 
 
 def check_authorization(base_url: str, token: str) -> bool:
-    """URLの権限のチェックをする関数です。
+    """URLの権限のチェックをするメソッドです。
 
     Args:
         base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
@@ -63,7 +63,7 @@ def check_authorization(base_url: str, token: str) -> bool:
 
 
 def check_permission(base_url: str, token: str, project_id: str):
-    """アクセス許可のチェックを行う関数です。
+    """アクセス許可のチェックを行うメソッドです。
 
     Args:
         base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
@@ -85,7 +85,7 @@ def check_permission(base_url: str, token: str, project_id: str):
 
 
 def get_projects_list(scheme, domain, token):
-    """プロジェクトの一覧を取得する関数です。
+    """プロジェクトの一覧を取得するメソッドです。
 
     Args:
         scheme(str): プロトコル名(http, https, ssh)
@@ -102,7 +102,7 @@ def get_projects_list(scheme, domain, token):
 
 
 def sync(token, api_url, project_id, abs_source, abs_root="/home/jovyan"):
-    """GRDMにアップロードする関数です。
+    """GRDMにアップロードするメソッドです。
             abs_source は絶対パスでなければならない。
 
     Args:
@@ -140,7 +140,7 @@ def sync(token, api_url, project_id, abs_source, abs_root="/home/jovyan"):
 
 
 def download_text_file(token, api_url, project_id, remote_path, encoding='utf-8'):
-    """テキストファイルの中身を取得する関数です。
+    """テキストファイルの中身を取得するメソッドです。
 
     Args:
         token (str): GRDMのパーソナルアクセストークン
@@ -163,7 +163,7 @@ def download_text_file(token, api_url, project_id, remote_path, encoding='utf-8'
 
 
 def download_json_file(token, api_url, project_id, remote_path):
-    """jsonファイルの中身を取得する関数です。
+    """jsonファイルの中身を取得するメソッドです。
 
     Args:
         token (str): GRDMのパーソナルアクセストークン
@@ -182,7 +182,7 @@ def download_json_file(token, api_url, project_id, remote_path):
 
 
 def get_project_metadata(base_url: str, token: str, project_id: str):
-    """プロジェクトメタデータを取得する関数です。
+    """プロジェクトメタデータを取得するメソッドです。
 
     Args:
         base_url (str):Root URL (e.g. https://rdm.nii.ac.jp)
@@ -202,7 +202,7 @@ def get_project_metadata(base_url: str, token: str, project_id: str):
 
 
 def get_collaborator_list(base_url: str, token: str, project_id: str) -> dict:
-    """共同管理者の取得する関数です。
+    """共同管理者の取得するメソッドです。
 
     Args:
         base_url (str):Root URL (e.g. https://rdm.nii.ac.jp)
@@ -226,7 +226,7 @@ def get_collaborator_list(base_url: str, token: str, project_id: str) -> dict:
 
 
 def build_collaborator_url(base_url: str, project_id: str):
-    """プロジェクトのメンバー一覧のURLを返す関数です。
+    """プロジェクトのメンバー一覧のURLを返すメソッドです。
 
     Args:
         base_url (str):Root URL (e.g. https://rdm.nii.ac.jp)

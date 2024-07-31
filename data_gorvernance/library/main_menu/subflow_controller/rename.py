@@ -1,5 +1,6 @@
 """サブフローの名称変更
-    このモジュールはサブフロー名称変更クラスを始め、新しいサブフローの名称を変更したりする関数などがあります。
+
+    このモジュールはサブフロー名称変更クラスを始め、新しいサブフローの名称を変更したりするメソッドなどがあります。
 """
 import os
 import traceback
@@ -15,12 +16,8 @@ from ...utils.error import InputWarning
 
 class RenameSubflowForm(BaseSubflowForm):
     """サブフロー名称変更クラスです。
-        
     
     Attributes:
-        class:
-            なし
-
         instance:
             abs_root (str): サブフローの絶対パス
             message_box (MessageBox): メッセージを格納する。
@@ -28,8 +25,7 @@ class RenameSubflowForm(BaseSubflowForm):
     """
 
     def __init__(self, abs_root, message_box) -> None:
-        """RenameSubflowForm コンストラクタの関数です
-            親クラス__init__メソッドを呼び出しています。
+        """RenameSubflowForm コンストラクタのメソッドです
 
         Args:
             abs_root (str): サブフローの絶対パス
@@ -42,14 +38,14 @@ class RenameSubflowForm(BaseSubflowForm):
 
     # overwrite
     def callback_sub_flow_name_selector(self, event):
-        """サブフロー種別(フェーズ)を表示する関数です。
+        """サブフロー種別(フェーズ)を表示するメソッドです。
 
         Returns:
             Dict[str, int]: フェーズ表示名を返す。
 
         Raises:
-            Exception: サブフロー種別(フェーズ)がないエラー
-            Exception: サブフロー名がないエラー
+            Exception: サブフロー種別(フェーズ)、サブフロー名がないエラー
+
         """
         # サブフロー名称：シングルセレクトコールバックファンクション
         try:
@@ -79,10 +75,7 @@ class RenameSubflowForm(BaseSubflowForm):
 
     # overwrite
     def change_disable_submit_button(self):
-        """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する関数です。
-    
-
-        """
+        """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化するメソッドです。"""
         # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
         self.change_submit_button_init(msg_config.get('main_menu', 'rename_sub_flow'))
 
@@ -121,7 +114,7 @@ class RenameSubflowForm(BaseSubflowForm):
         self.submit_button.disabled = False
 
     def define_input_form(self):
-        """サブフロー名称変更フォームの関数です。
+        """サブフロー名称変更フォームのメソッドです。
         
         Returns:
             pn.Column:サブフロー名称変更フォームに必要な値を返す。
@@ -141,11 +134,10 @@ class RenameSubflowForm(BaseSubflowForm):
             )
 
     def main(self):
-        """サブフロー名称変更処理の関数です。
+        """サブフロー名称変更処理のメソッドです。
         
         Raises:
             InputWarning:入力値に不備があったエラー
-            InputWarning:同じファイルが存在している時のエラー
             Exception:ファイル名の変更に失敗した時のエラー
 
         

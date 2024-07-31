@@ -1,5 +1,6 @@
 """初期セットアップ
-    このモジュールはセットアップを行うクラスがあり、セットアップを行うための認証を確認したり、設定を行う関数などがあります。
+
+    このモジュールはセットアップを行うクラスがあり、セットアップを行うための認証を確認したり、設定を行うメソッドなどがあります。
 """
 import os
 import re
@@ -23,9 +24,6 @@ class ContainerSetter():
     """セットアップを行うクラスです。
     
     Attributes:
-        class:
-            なし
-
         instance:
             nb_working_file_path (str): 実行Notebookパス
             _abs_root_path(str):絶対rootディレクトリを取得・設定する
@@ -36,7 +34,7 @@ class ContainerSetter():
     """
 
     def __init__(self, nb_working_file_path:str) -> None:
-        """ContainerSetter コンストラクタの関数です。
+        """ContainerSetter コンストラクタのメソッドです。
 
         Args:
             nb_working_file_path (str): 実行Notebookパス
@@ -56,13 +54,13 @@ class ContainerSetter():
         os.makedirs(self.working_fdir_path, exist_ok=True)
 
     def del_setup_completed_file(self):
-        """セットアップが完了したファイルを削除する関数です。"""
+        """セットアップが完了したファイルを削除するメソッドです。"""
         if os.path.exists(self.setup_completed_file_path):
             os.remove(self.setup_completed_file_path)
         else:
             pass
     def display_main_menu(self,nb_working_file_path:str):
-        """メインメニューの画面を表示する関数です。
+        """メインメニューの画面を表示するメソッドです。
 
         Args:
             nb_working_file_path (str): 実行Notebookパス
@@ -71,9 +69,7 @@ class ContainerSetter():
         access_main_menu(nb_working_file_path)
 
     def define_setup_form(self):
-        """セットアップフォームを定義する関数です。
-        
-        """
+        """セットアップフォームを定義するメソッドです。"""
         # ユーザ名
         self._user_name_form = pn.widgets.TextInput(name=msg_config.get('user_auth','username_title'), placeholder=msg_config.get('user_auth','username_help'), width=DEFAULT_WIDTH)
         # パスワード
@@ -88,9 +84,7 @@ class ContainerSetter():
         self._msg_output.width = 900
 
     def callback_submit_user_auth(self, event):
-        """ボタンが押された時、ユーザーに権限があるかどうかを認証する関数です。
-        
-        """
+        """ボタンが押された時、ユーザーに権限があるかどうかを認証するメソッドです。"""
         # 入力値を取得する
         user_name = self._user_name_form.value_input
         password = self._password_form.value_input
@@ -146,7 +140,7 @@ class ContainerSetter():
 
 
     def validate_format_username(self, user_name:str):
-        """ユーザー名の正規表現を解析する関数です。
+        """ユーザー名の正規表現を解析するメソッドです。
         Args:
             user_name(str):ユーザー名
         
@@ -156,12 +150,12 @@ class ContainerSetter():
 
 
     def already_setup(self):
-        """セットアップが完了していることを画面に表示する関数です"""
+        """セットアップが完了していることを画面に表示するメソッドです"""
         alert = pn.pane.Alert(msg_config.get('setup', 'setup_completed'),sizing_mode="stretch_width",alert_type='warning')
         display(alert)
 
     def change_submit_button_init(self, name):
-        """処理関数ボタンの関数です。
+        """処理メソッドボタンのメソッドです。
 
         Args:
             name (str): メッセージ
@@ -171,7 +165,7 @@ class ContainerSetter():
         self._submit_button.button_style = 'solid'
 
     def change_submit_button_processing(self, name):
-        """ボタンを処理中ステータスに更新する関数です。
+        """ボタンを処理中ステータスに更新するメソッドです。
 
         Args:
             name (str): 実行中のメッセージ
@@ -181,7 +175,7 @@ class ContainerSetter():
         self._submit_button.button_style = 'outline'
 
     def change_submit_button_success(self, name):
-        """ボタンが押されて成功した時のメッセージを返す関数です。
+        """ボタンが押されて成功した時のメッセージを返すメソッドです。
 
         Args:
             name (str): 成功したメッセージ
@@ -191,7 +185,7 @@ class ContainerSetter():
         self._submit_button.button_style = 'solid'
 
     def change_submit_button_warning(self, name):
-        """ボタンが押されて認証が失敗した時の警告メッセージを返す関数です。
+        """ボタンが押されて認証が失敗した時の警告メッセージを返すメソッドです。
 
         Args:
             name (str): 警告メッセージ
@@ -201,7 +195,7 @@ class ContainerSetter():
         self._submit_button.button_style = 'solid'
 
     def change_submit_button_error(self, name):
-        """ボタンが押されて内部エラーが発生した時のエラーを返す関数です。
+        """ボタンが押されて内部エラーが発生した時のエラーを返すメソッドです。
 
         Args:
             name (str): エラーメッセージ
@@ -212,7 +206,7 @@ class ContainerSetter():
 
     @classmethod
     def setup_form(cls,nb_working_file_path:str):
-        """セットアップフォームを表示する関数です。
+        """セットアップフォームを表示するメソッドです。
 
         Args:
             nb_working_file_path (str): 実行Notebookパス
@@ -242,7 +236,7 @@ class ContainerSetter():
 
     @classmethod
     def delete_build_token(cls):
-        """トークンを削除する関数です。
+        """トークンを削除するメソッドです。
 
         Raises:
             Exception: トークン削除失敗
@@ -273,13 +267,13 @@ class ContainerSetter():
 
     @classmethod
     def datalad_create(cls, nb_working_file_path:str):
-        """dataladを設定する関数です。
+        """dataladを設定するメソッドです。
 
         Args:
             nb_working_file_path (str): 実行Notebookパス
 
         Raises:
-            e: 予期しないエラーが発生した
+            Exception: 予期しないエラーが発生した
         """
         pn.extension()
         cls.check_imcomplete_auth()
@@ -302,7 +296,7 @@ class ContainerSetter():
 
     @classmethod
     def ssh_create_key(cls, nb_working_file_path:str):
-        """SSHキーを作成する関数です。
+        """SSHキーを作成するメソッドです。
 
         Args:
             nb_working_file_path (str): 実行Notebookパス
@@ -327,7 +321,7 @@ class ContainerSetter():
 
     @classmethod
     def upload_ssh_key(cls, nb_working_file_path:str):
-        """GIN-forkへの公開鍵の登録を行う関数です。
+        """GIN-forkへの公開鍵の登録を行うメソッドです。
 
         Args:
             nb_working_file_path (str): 実行Notebookパス
@@ -350,7 +344,7 @@ class ContainerSetter():
 
     @classmethod
     def ssh_trust_gin(cls, nb_working_file_path:str):
-        """SSHホスト（GIN-fork）を信頼することを設定する関数です。
+        """SSHホスト（GIN-fork）を信頼することを設定するメソッドです。
 
         Args:
             nb_working_file_path (str): 実行Notebookパス
@@ -373,7 +367,7 @@ class ContainerSetter():
 
     @classmethod
     def prepare_sync(cls, nb_working_file_path:str):
-        """GIN-forkへの同期調整を行う関数です。
+        """GIN-forkへの同期調整を行うメソッドです。
 
         Args:
             nb_working_file_path (str): 実行Notebookパス
@@ -397,7 +391,7 @@ class ContainerSetter():
     @classmethod
     def setup_sibling(cls, nb_working_file_path:str):
         pn.extension()
-        """siblingの登録をする関数です。
+        """siblingの登録をするメソッドです。
 
         Args:
             nb_working_file_path (str): 実行Notebookパス
@@ -425,7 +419,7 @@ class ContainerSetter():
 
     @classmethod
     def completed_setup(cls,nb_working_file_path:str):
-        """初期セットアップ完了を記録する関数です。
+        """初期セットアップ完了を記録するメソッドです。
 
         Args:
             nb_working_file_path (str): 実行Notebookパス
@@ -494,7 +488,7 @@ class ContainerSetter():
     @classmethod
     def sync(cls, nb_working_file_path:str, git_path:list[str], commit_message:str):
         pn.extension()
-        """Gin_forkに実行結果を同期する関数です。
+        """Gin_forkに実行結果を同期するメソッドです。
 
         Args:
             nb_working_file_path (str): 実行Notebookパス
@@ -516,7 +510,7 @@ class ContainerSetter():
 
     @classmethod
     def check_imcomplete_auth(cls):
-        """ユーザーの認証が完了しているかを確認する関数です。
+        """ユーザーの認証が完了しているかを確認するメソッドです。
 
         Raises:
             Exception: 認証が完了していない
@@ -530,7 +524,7 @@ class ContainerSetter():
 
     @classmethod
     def return_main_menu(cls,nb_working_file_path:str):
-        """メインメニューに戻るための関数です。
+        """メインメニューに戻るためのメソッドです。
 
         Args:
             nb_working_file_path (str): 実行Notebookパス

@@ -1,5 +1,6 @@
 """サブフローメニューの表示
-    サブフローメニュークラスを始め、サブフロー図などの画像を表示させたり、メインメニューにアクセスする関数があります。
+
+    サブフローメニュークラスを始め、サブフロー図などの画像を表示させたり、メインメニューにアクセスするメソッドがあります。
 """
 import os
 from pathlib import Path
@@ -20,10 +21,10 @@ from ..task_director import get_subflow_type_and_id
 from ..utils.widgets import MessageBox
 
 def access_main_menu(working_file: str):
-    """メインメニューにアクセスする関数です。
+    """メインメニューにアクセスするメソッドです。
 
     Args:
-        working_file (str): [実行Notebookファイルパス]
+        working_file (str): 実行Notebookファイルパス
     """
     root_folder = Path(
         path_config.get_abs_root_form_working_dg_file_path(working_file)
@@ -47,9 +48,6 @@ class SubflowMenu(TaskLog):
     """サブフローメニューのクラスです。
     
     Attributes:
-        class:
-            なし
-
         instance:
             menu_widgetbox(pn.WidgetBox):表示するウィジェットを格納する
             diagram(pn.pane.HTML):サブフロー図
@@ -57,15 +55,16 @@ class SubflowMenu(TaskLog):
             diagram_widgetbox(pn.WidgetBox):サブフロー図をHTMLとして埋め込む
             selector(pn.widgets.RadioBoxGroup):ラジオボタン
             selector_options(list[str]):ラジオボタンのオプション
+            working_file (str): 実行Notebookファイルパス
 
 
     """
 
     def __init__(self, working_file) -> None:
-        """SubflowMenu コンストラクタの関数です
+        """SubflowMenu コンストラクタのメソッドです
 
         Args:
-            working_file (str): [実行Notebookファイルパス]
+            working_file (str): 実行Notebookファイルパス
         """
         super().__init__(working_file, path_config.MENU_NOTEBOOK)
 
@@ -101,7 +100,7 @@ class SubflowMenu(TaskLog):
 
     # イベント
     def select_flow(self, subflow: SubFlowManager, font_folder: Path):
-        """サブフロー図を表示する関数です。
+        """サブフロー図を表示するメソッドです。
 
         Args:
             subflow (SubFlowManager): サブフロー図
@@ -112,7 +111,7 @@ class SubflowMenu(TaskLog):
 
         """
         def callback(event):
-            """サブフロー図の生成と表示を行う関数です。
+            """サブフロー図の生成と表示を行うメソッドです。
            
             """
             self.diagram_widgetbox.disabled = True
@@ -123,17 +122,14 @@ class SubflowMenu(TaskLog):
 
     # 各要素の設定
     def set_title(self):
-        """タスクを設定する関数です。
-                全てのタスク、または推奨タスクのメッセージを取得します。
-        
-        """
+        """タスクを設定するメソッドです。"""
         if self.is_display_all():
             self.title.object = f'### {message.get("subflow_menu", "title_all_task")}'
         else:
             self.title.object = f'### {message.get("subflow_menu", "title_abled_task")}'
 
     def _set_width(self):
-        """フロー図の大きさをもとにwidgetboxの大きさを統一する関数です。"""
+        """フロー図の大きさをもとにwidgetboxの大きさを統一するメソッドです。"""
         d = self.diagram.width + 20
         self.menu_widgetbox.width = d
         self.diagram_widgetbox.width = d
@@ -141,7 +137,7 @@ class SubflowMenu(TaskLog):
         self._msg_output = d
 
     def set_diagram(self, subflow: SubFlowManager, font_folder: Path, display_all=True):
-        """フロー図の生成と表示設定の関数です。
+        """フロー図の生成と表示設定のメソッドです。
         
         Args:
             subflow(SubFlowManager):サブフロー図
@@ -165,7 +161,7 @@ class SubflowMenu(TaskLog):
 
     # その他
     def is_display_all(self):
-        """画面を表示させるかどうかを判断する関数です。
+        """画面を表示させるかどうかを判断するメソッドです。
 
         Returns:
             display_all(bool):TrueまたはFalseの値を返す。
@@ -176,7 +172,7 @@ class SubflowMenu(TaskLog):
         return display_all
 
     def _get_contents(self, svg_file_path: str):
-        """コンテンツを取得する関数です。
+        """コンテンツを取得するメソッドです。
 
         Args:
             svg_file_path (str): svgファイルのパス
@@ -187,7 +183,7 @@ class SubflowMenu(TaskLog):
         return file.File(svg_file_path).read()
 
     def _get_svg_size(self, svg_file_path: str):
-        """svgの画像の横幅を返す関数です。
+        """svgの画像の横幅を返すメソッドです。
         
         Args:
             svg_file_path (str): svgファイルのパス
@@ -217,11 +213,10 @@ class SubflowMenu(TaskLog):
 
     @classmethod
     def render(cls, working_file: str, is_selected=False):
-        """サブフローメニューを表示させる関数です。
-                
+        """サブフローメニューを表示させるメソッドです。
 
         Args:
-            working_file (str): [実行Notebookファイルパス]
+            working_file (str): 実行Notebookファイルパス
             is_selected (bool, optional): サブフローメニューを表示させるかどうか。 デフォルトでは False.
 
         """

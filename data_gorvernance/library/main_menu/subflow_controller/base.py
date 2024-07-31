@@ -1,6 +1,7 @@
 """サブフローの操作
+
 このモジュールはサブフロー操作基底クラスを始め、サブフローを操作する時に
-   ボタンを制御したり、値が入力されているか、あるいはユニークの値になっているかなどを確認する関数があります。
+   ボタンを制御したり、値が入力されているか、あるいはユニークの値になっているかなどを確認するメソッドがあります。
 
 """
 import re
@@ -21,9 +22,6 @@ class BaseSubflowForm():
     """サブフロー操作基底クラス
 
     Attributes:
-        class:
-            なし
-
         instance:
             abs_root(str):サブフローの絶対パス
             research_flow_status(List[PhaseStatus]):リサーチフローステータス管理情報
@@ -39,7 +37,7 @@ class BaseSubflowForm():
     """
 
     def __init__(self, abs_root, message_box: MessageBox) -> None:
-        """BaseSubflowForm コンストラクタの関数です。
+        """BaseSubflowForm コンストラクタのメソッドです。
 
         Args:
             abs_root (str): サブフローの絶対パス
@@ -117,7 +115,7 @@ class BaseSubflowForm():
 
 
     def set_submit_button_on_click(self, callback_function):
-        """処理開始ボタンのイベントリスナー設定する関数です。
+        """処理開始ボタンのイベントリスナー設定するメソッドです。
         Args:
             callback_function(function):処理開始ボタンを呼び戻す
 
@@ -125,7 +123,7 @@ class BaseSubflowForm():
         self.submit_button.on_click(callback_function)
 
     def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus])->Dict[str, int]:
-        """サブフロー種別(フェーズ)を表示する関数です。
+        """サブフロー種別(フェーズ)を表示するメソッドです。
 
         Args:
             research_flow_status (List[PhaseStatus]): リサーチフローステータス管理情報
@@ -146,7 +144,7 @@ class BaseSubflowForm():
         return pahse_options
 
     def generate_sub_flow_name_options(self, phase_seq_number:int, research_flow_status:List[PhaseStatus])->Dict[str, int]:
-        """サブフロー名を表示する関数です。
+        """サブフロー名を表示するメソッドです。
 
         Args:
             phase_seq_number (int): サブフロー種別
@@ -170,7 +168,7 @@ class BaseSubflowForm():
 
 
     def generate_parent_sub_flow_type_options(self, pahase_seq_number:int, research_flow_status:List[PhaseStatus])->Dict[str, int]:
-        """親サブフロー種別を表示する関数です。
+        """親サブフロー種別を表示するメソッドです。
 
         Args:
             pahase_seq_number (int): 親サブフロー種別
@@ -192,7 +190,7 @@ class BaseSubflowForm():
 
 
     def generate_parent_sub_flow_options(self, pahase_seq_number:int, research_flow_status:List[PhaseStatus])->Dict[str, str]:
-        """親サブフロー選択オプションで選択した値を表示する関数です。
+        """親サブフロー選択オプションで選択した値を表示するメソッドです。
 
         Args:
             pahase_seq_number (int): 親サブフロー選択オプション
@@ -214,7 +212,7 @@ class BaseSubflowForm():
         return pahse_options
 
     def change_submit_button_init(self, name):
-        """処理開始ボタンの関数です。
+        """処理開始ボタンのメソッドです。
 
         Args:
             name (str): メッセージ
@@ -222,7 +220,7 @@ class BaseSubflowForm():
         self.submit_button.set_looks_init(name)
 
     def change_submit_button_processing(self, name):
-        """新規作成ボタンを処理中ステータスに更新する関数です。
+        """新規作成ボタンを処理中ステータスに更新するメソッドです。
 
         Args:
             name (str): 実行中のメッセージ
@@ -230,7 +228,7 @@ class BaseSubflowForm():
         self.submit_button.set_looks_processing(name)
 
     def change_submit_button_success(self, name):
-        """ボタンが押されて成功した時のメッセージを返す関数です。
+        """ボタンが押されて成功した時のメッセージを返すメソッドです。
 
         Args:
             name (str): 成功したメッセージ
@@ -238,7 +236,7 @@ class BaseSubflowForm():
         self.submit_button.set_looks_success(name)
 
     def change_submit_button_warning(self, name):
-        """ボタンが押されて失敗した時の警告メッセージを返す関数です。
+        """ボタンが押されて失敗した時の警告メッセージを返すメソッドです。
 
         Args:
             name (str): 警告メッセージ
@@ -246,7 +244,7 @@ class BaseSubflowForm():
         self.submit_button.set_looks_warning(name)
 
     def change_submit_button_error(self, name):
-        """ボタンが押されて内部エラーが発生した時のエラーを返す関数です。
+        """ボタンが押されて内部エラーが発生した時のエラーを返すメソッドです。
 
         Args:
             name (str): エラーメッセージ
@@ -258,7 +256,7 @@ class BaseSubflowForm():
     ############
 
     def callback_menu_form(self, event):
-        """ボタンを有効化させる関数です。
+        """ボタンを有効化させるメソッドです。
 
         """
         # フォームコールバックファンクション
@@ -269,8 +267,7 @@ class BaseSubflowForm():
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_sub_flow_type_selector(self, event):
-        """サブフロー種別(フェーズ)のボタンが操作できるように有効化する関数です。
-
+        """サブフロー種別(フェーズ)のボタンが操作できるように有効化するメソッドです。
 
         Raises:
             Exception: サブフローのセレクタタイプなし、内部エラー
@@ -292,7 +289,7 @@ class BaseSubflowForm():
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_sub_flow_name_selector(self, event):
-        """サブフロー名称のボタンが操作できるように有効化する関数です
+        """サブフロー名称のボタンが操作できるように有効化するメソッドです
 
         """
         # サブフロー名称：シングルセレクトコールバックファンクション
@@ -304,7 +301,7 @@ class BaseSubflowForm():
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_parent_sub_flow_type_selector(self, event):
-        """親サブフロー種別(フェーズ)のボタンが操作できるように有効化する関数です
+        """親サブフロー種別(フェーズ)のボタンが操作できるように有効化するメソッドです
 
         Raises:
             Exception: サブフローのセレクタタイプなし
@@ -330,17 +327,17 @@ class BaseSubflowForm():
     ############
 
     def change_disable_submit_button(self):
-        """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する関数です。"""
+        """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化するメソッドです。"""
         # 継承した先で実装する
 
     def validate_sub_flow_name(self, sub_flow_name):
-        """サブフロー名称の値が存在するかを確認している関数です。
+        """サブフロー名称の値が存在するかを確認しているメソッドです。
 
         Args:
             sub_flow_name (str): サブフロー名称
 
         Raises:
-            InputWarning: 値が未入力のエラー
+            InputWarning: 入力不備のエラー
         """
 
         if StringManager.is_empty(sub_flow_name):
@@ -349,7 +346,7 @@ class BaseSubflowForm():
             raise InputWarning(message)
 
     def is_unique_subflow_name(self, sub_flow_name, phase_seq_number):
-        """サブフローの名称がユニークの値になっているかどうかを確認している関数です。
+        """サブフローの名称がユニークの値になっているかどうかを確認しているメソッドです。
 
         Args:
             sub_flow_name (str): サブフロー名称
@@ -365,15 +362,14 @@ class BaseSubflowForm():
             raise InputWarning(message)
 
     def validate_data_dir_name(self, data_dir_name):
-        """データフォルダ名の検証をする時に問題がないか確認する関数です。
+        """データフォルダ名の検証をする時に問題がないか確認するメソッドです。
 
         Args:
             data_dir_name (str): データフォルダ名
 
         Raises:
-            InputWarning: データフォルダ名の値が未入力のエラー
-            InputWarning: データフォルダ名の値が半角文字でない時のエラー
-            InputWarning: データフォルダ名の値が禁止文字列(\/:*?"<>|)が含まれていた時のエラー
+            InputWarning: 入力不備によるエラー
+
         """
 
         # データフォルダ名の検証
@@ -393,7 +389,7 @@ class BaseSubflowForm():
             raise InputWarning(message)
 
     def is_unique_data_dir(self, data_dir_name, phase_seq_number):
-        """データフォルダ名がユニークの値になっているかを確認する関数です。
+        """データフォルダ名がユニークの値になっているかを確認するメソッドです。
 
         Args:
             data_dir_name (str): データフォルダ名

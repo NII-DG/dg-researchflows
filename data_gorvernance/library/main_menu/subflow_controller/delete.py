@@ -1,5 +1,6 @@
 """サブフローの削除
-    このモジュールはサブフロー削除クラスを始め、新しいサブフローのデータを削除したりする関数などがあります。
+
+    このモジュールはサブフロー削除クラスを始め、新しいサブフローのデータを削除したりするメソッドなどがあります。
 """
 from typing import Dict, List
 
@@ -14,9 +15,6 @@ class DeleteSubflowForm(BaseSubflowForm):
     """サブフロー削除クラスです。
 
     Attributes:
-        class:
-            なし
-
         instance:
             abs_root (str): サブフローの絶対パス
             message_box (MessageBox): メッセージを格納する。
@@ -24,8 +22,7 @@ class DeleteSubflowForm(BaseSubflowForm):
     """
 
     def __init__(self, abs_root, message_box) -> None:
-        """DeleteSubflowForm コンストラクタの関数です
-            親クラス__init__メソッドを呼び出しています。
+        """DeleteSubflowForm コンストラクタのメソッドです
 
         Args:
             abs_root (str): サブフローの絶対パス
@@ -38,7 +35,7 @@ class DeleteSubflowForm(BaseSubflowForm):
 
     # overwrite
     def generate_sub_flow_name_options(self, phase_seq_number:int, research_flow_status:List[PhaseStatus])->Dict[str, int]:
-        """サブフロー種別(フェーズ)を表示する関数です。
+        """サブフロー種別(フェーズ)を表示するメソッドです。
 
         Args:
             research_flow_status (List[PhaseStatus]): リサーチフローステータス管理情報
@@ -75,9 +72,7 @@ class DeleteSubflowForm(BaseSubflowForm):
 
     # overwrite
     def change_disable_submit_button(self):
-        """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する関数です。
-        
-        """
+        """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化するメソッドです。"""
         # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
         self.change_submit_button_init(msg_config.get('main_menu', 'delete_sub_flow'))
 
@@ -100,7 +95,8 @@ class DeleteSubflowForm(BaseSubflowForm):
         self.submit_button.disabled = False
 
     def define_input_form(self):
-        """サブフロー削除フォームの関数です。
+        """サブフロー削除フォームのメソッドです。
+            
             サブフローの削除が可能になるかどうかを表示する。
         
         Retunes:
@@ -120,8 +116,9 @@ class DeleteSubflowForm(BaseSubflowForm):
             )
 
     def main(self):
-        """サブフロー削除処理の関数です。
-            入力情報やパスを取得し、 削除したいデータを取得する。 
+        """サブフロー削除処理のメソッドです。
+          
+              入力情報やパスを取得し、 削除したいデータを取得する。 
         
         Raises:
             Exception:削除失敗したエラー

@@ -1,13 +1,13 @@
 """メタデータの整形、取得、返却
     
     このモジュールはメタデータに必要な値を用意します。
-    プロジェクトメタデータを整形したり、メタデータのテンプレートを取得したり、メタデータをフォーマットして返却する関数があります。
+    プロジェクトメタデータを整形したり、メタデータのテンプレートを取得したり、メタデータをフォーマットして返却するメソッドがあります。
 """
 import json
 import requests
 
 def format_metadata(metadata):
-    """Gakunin RDMから取得したプロジェクトメタデータを整形する関数です。
+    """Gakunin RDMから取得したプロジェクトメタデータを整形するメソッドです。
     
     Args:
         metadata(list):メタデータの値
@@ -52,7 +52,7 @@ def format_metadata(metadata):
 
 
 def get_schema(url):
-    """メタデータのプロトコル名を取得する関数です。
+    """メタデータのプロトコル名を取得するメソッドです。
             リクエストされたURLに接続し、その接続に問題がないかを確認してプロトコル名を取得する。
             
     Args:
@@ -68,7 +68,7 @@ def get_schema(url):
 
 
 def format_display_name(schema: dict, page_id: str, qid: str, value=None):
-    """メタデータをフォーマットして返却する関数です。
+    """メタデータをフォーマットして返却するメソッドです。
 
     Args:
         schema (dict): メタデータのプロトコル名

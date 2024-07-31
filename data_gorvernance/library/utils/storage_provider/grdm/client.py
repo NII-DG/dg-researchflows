@@ -1,7 +1,7 @@
 """ファイルまたはフォルダをアップロード
     
     このモジュールはファイルの内容を取得し、ファイルまたはフォルダをアップロードします。
-    ファイルまたはフォルダをアップロードする関数やファイルの内容を取得する関数があります。
+    ファイルまたはフォルダをアップロードするメソッドやファイルの内容を取得するメソッドがあります。
 """
 # rdmclientを利用する
 from http import HTTPStatus
@@ -16,7 +16,7 @@ from ...error import UnauthorizedError
 
 
 def upload(token, base_url, project_id, source, destination, recursive=False, force=False):
-    """ファイルまたはフォルダをアップロードする関数です。
+    """ファイルまたはフォルダをアップロードするメソッドです。
 
     Args:
         token (str): GRDMのパーソナルアクセストークン
@@ -79,7 +79,7 @@ def upload(token, base_url, project_id, source, destination, recursive=False, fo
 
 
 def download(token, project_id, base_url, remote_path, base_path=None):
-    """ファイルの内容を取得する関数です。
+    """ファイルの内容を取得するメソッドです。
 
     Args:
         token (str): GRDMのパーソナルアクセストークン

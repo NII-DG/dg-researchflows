@@ -1,5 +1,6 @@
 """メインメニュー画面での操作
-    このモジュールはメインメニューの画面やボタンを表示する関数やサブフローメニューの画面の表示、操作を行える関数などがあります。
+
+    このモジュールはメインメニューの画面やボタンを表示するメソッドやサブフローメニューの画面の表示、操作を行えるメソッドなどがあります。
 """
 import os
 import traceback
@@ -30,11 +31,8 @@ from ..utils.error import InputWarning
 class MainMenu(TaskLog):
     """メインメニューのクラスです。
 
-
     Attributes:
-        class:
-            なし
-
+       
         instance:
             abs_root(str): リサーチフロー図の絶対パス
             _research_flow_status_file_path(str): リサーチフロー図の生成
@@ -45,6 +43,7 @@ class MainMenu(TaskLog):
             _project_widget_box(pn.WidgetBox):サブフロー操作コントローラーウェジットボックス
             _sub_flow_menu(pn.widgets.Select):サブフローメニュー
             _sub_flow_widget_box(pn.WidgetBox):サブフロー操作コントローラーウェジットボックス
+            working_file(str):実行Notebookファイルパス
 
 
     NOTE:
@@ -53,10 +52,10 @@ class MainMenu(TaskLog):
     """
 
     def __init__(self, working_file) -> None:
-        """MainMenu コンストラクタの関数です
-            親クラスの__init__メソッドを呼び出す関数です。
-            Args:
-                working_file(str):[実行Notebookファイルパス]
+        """MainMenu コンストラクタのメソッドです
+
+        Args:
+            working_file(str):実行Notebookファイルパス
         
         """
         super().__init__(working_file, 'main.ipynb')
@@ -149,8 +148,7 @@ class MainMenu(TaskLog):
         self.check_status_research_preparation_flow()
 
     def check_status_research_preparation_flow(self):
-        """研究準備の実行ステータス確認をする関数です。
-        """
+        """研究準備の実行ステータス確認をするメソッドです。"""
         sf = SubflowStatusFile(os.path.join(self.abs_root, path_config.PLAN_TASK_STATUS_FILE_PATH))
         plan_sub_flow_status = sf.read()
         # 研究準備サブフローの進行状況をチェックする。
@@ -174,13 +172,10 @@ class MainMenu(TaskLog):
     ######################################
 
     def callback_menu_tabs(self, event):
-        """サブフロー操作で選択ができるようにする関数です。
+        """サブフロー操作で選択ができるようにするメソッドです。
 
         Args:
-            event (_type_): 機能コントローラーのイベントリスナー
-
-        Raises:
-            Exception:内部エラー
+            event (int): 機能コントローラーのイベントリスナー
 
         """
         try:
@@ -200,7 +195,7 @@ class MainMenu(TaskLog):
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_project_menu(self, event):
-        """プロジェクト操作コントローラーの更新をするための遷移ボタンの関数です。
+        """プロジェクト操作コントローラーの更新をするための遷移ボタンのメソッドです。
         
         Raises:
             Exception:内部エラー
@@ -216,12 +211,7 @@ class MainMenu(TaskLog):
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_sub_flow_menu(self, event):
-        """サブフロー操作コントローラーオプションによるサブフロー操作フォームを表示する関数です。
-
-        Raises:
-            Exception:内部エラー
-        
-        """
+        """サブフロー操作コントローラーオプションによるサブフロー操作フォームを表示するメソッドです。"""
         try:
             self._err_output.clear()
             selected_value = self._sub_flow_menu.value
@@ -250,13 +240,13 @@ class MainMenu(TaskLog):
     #########################
 
     def update_sub_flow_widget_box_for_init(self):
-        """サブフロー操作オプションの選択誘導する関数です。"""
+        """サブフロー操作オプションの選択誘導するメソッドです。"""
         self._sub_flow_widget_box.clear()
         alert = pn.pane.Alert(msg_config.get('main_menu','guide_select_action'),sizing_mode="stretch_width",alert_type='info')
         self._sub_flow_widget_box.append(alert)
 
     def update_sub_flow_widget_box(self):
-        """サブフロー操作フォームの表示する関数です。"""
+        """サブフロー操作フォームの表示するメソッドです。"""
         # ボタンのイベントリスナー
         self.subflow_form.set_submit_button_on_click(self.callback_submit_button)
 
@@ -267,12 +257,7 @@ class MainMenu(TaskLog):
         self.subflow_form.submit_button.disabled=True
 
     def callback_submit_button(self, event):
-        """サブフローのボタンを呼び戻す関数です。
-
-        Raises:
-            InputWarning:入力値が間違っているエラー
-            Exception:内部エラー
-        """
+        """サブフローのボタンを呼び戻すメソッドです。"""
         try:
             # start
             self.log.start(detail=self.callback_type)
@@ -296,7 +281,7 @@ class MainMenu(TaskLog):
 
     @classmethod
     def generate(cls, working_path:str):
-        """メインメニューを生成する関数です。
+        """メインメニューを生成するメソッドです。
 
         working_path(str) : Notebookのファイルのパス
         """

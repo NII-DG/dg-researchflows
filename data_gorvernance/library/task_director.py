@@ -1,5 +1,5 @@
 """サブフローステータス更新を行います。
-    サブフローメニューへのボタンなどを表示する関数やステータスを更新する関数などがあります。
+    サブフローメニューへのボタンなどを表示するメソッドやステータスを更新するメソッドなどがあります。
 
 """
 import os
@@ -16,7 +16,7 @@ from .utils.setting import get_subflow_type_and_id, SubflowStatusFile, SubflowSt
 
 
 def get_return_sub_flow_menu_relative_url_path(working_file_path: str)->str:
-    """サブフローメニューNotebookへのパス、ファイルパスを取得する関数です。
+    """サブフローメニューNotebookへのパス、ファイルパスを取得するメソッドです。
     
     Args:
         working_file_path:作業ファイルのパス
@@ -41,11 +41,8 @@ class TaskDirector(TaskSave):
     """サブフローメニューへの接続、サブフローステータス更新を行うクラスです。
 
     Attributes:
-        class:
-            なし
-
         instance:
-            nb_working_file_path (str): [実行Notebookのファイルパス]
+            nb_working_file_path (str): 実行Notebookのファイルパス
             _abs_root_path(str):サブフローの絶対パス
             _script_file_name(str):絶対rootディレクトリ
             _sub_flow_status_file_path(str):サブフローステータスファイルのパス
@@ -53,12 +50,12 @@ class TaskDirector(TaskSave):
     """
 
     def __init__(self, nb_working_file_path:str, notebook_name:str) -> None:
-        """TaskInterface コンストラクタの関数です。
+        """TaskInterface コンストラクタのメソッドです。
 
         Notebookファイルのオペレーションするための共通クラス
 
         Args:
-            nb_working_file_path (str): [実行Notebookのファイルパス]
+            nb_working_file_path (str): 実行Notebookのファイルパス
 
         Raise:
             ValueError:値が不適切の時のエラー
@@ -87,7 +84,7 @@ class TaskDirector(TaskSave):
     #  update task status  #
     ########################
     def doing_task(self):
-        """タスク開始によるサブフローステータス管理JSONの更新をする関数です"""
+        """タスク開始によるサブフローステータス管理JSONの更新をするメソッドです"""
         # タスク開始によるサブフローステータス管理JSONの更新
         sf = SubflowStatusFile(self._sub_flow_status_file_path)
         sf_status: SubflowStatus = sf.read()
@@ -96,7 +93,7 @@ class TaskDirector(TaskSave):
         sf.write(sf_status)
 
     def done_task(self):
-        """タスク完了によるサブフローステータス管理JSONの更新をする関数です"""
+        """タスク完了によるサブフローステータス管理JSONの更新をするメソッドです"""
         sf = SubflowStatusFile(self._sub_flow_status_file_path)
         sf_status: SubflowStatus = sf.read()
         sf_status.completed_task_by_task_name(self._script_file_name, os.environ["JUPYTERHUB_SERVER_NAME"])
@@ -106,7 +103,8 @@ class TaskDirector(TaskSave):
     #  return subflow menu  #
     #########################
     def get_subflow_menu_button_object(self)-> HTML:
-        """サブフローメニューへのボタンpanel.HTMLオブジェクトの取得する関数です。
+        """サブフローメニューへのボタンpanel.HTMLオブジェクトの取得するメソッドです。
+
         Returns:
             [panel.pane.HTML]: [HTMLオブジェクト]
         """
@@ -123,9 +121,7 @@ class TaskDirector(TaskSave):
 
     # ここではログを吐かない
     def return_subflow_menu(self):
-        """サブフローメニューへのボタン表示を行う関数です。
-        
-        """
+        """サブフローメニューへのボタン表示を行うメソッドです。"""
         pn.extension()
         sub_flow_menu_link_button  = self.get_subflow_menu_button_object()
         display(sub_flow_menu_link_button)
@@ -137,7 +133,7 @@ class TaskDirector(TaskSave):
 
     # override
     def _save(self):
-        """サブフローステータスの更新情報を保存する関数です。"""
+        """サブフローステータスの更新情報を保存するメソッドです。"""
         # uploadしたときにタスク完了とするため
         super()._save()
         self.done_task()

@@ -51,7 +51,7 @@ class MainMenu(TaskLog):
 
         self.reserch_flow_status_operater = ResearchFlowStatusOperater(self._research_flow_status_file_path)
         # プロジェクトで初回のリサーチフロー図アクセス時の初期化
-        self.reserch_flow_status_operater.init_research_preparation(self._research_flow_status_file_path)
+        self.reserch_flow_status_operater.init_research_preparation()
         ## リサーチフロー図オブジェクトの定義
         self._research_flow_image = pn.pane.HTML(self.reserch_flow_status_operater.get_svg_of_research_flow_status())
         self._research_flow_image.width = 1000

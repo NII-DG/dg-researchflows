@@ -25,7 +25,7 @@ class NbFile(File):
         super().__init__(file_path)
 
     def embed_subflow_name_on_header(self, subflow_name: str) -> None:
-        """サブフローメニュNotebookのヘッダーサブフロー名を埋める
+        """サブフローメニュNotebookのヘッダーサブフロー名を埋めるメソッドです。
 
         Args:
             subflow_name (str): サブフロー名を設定します。

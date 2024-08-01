@@ -187,7 +187,7 @@ class Column(pn.Column):
         super().__init__(**params)
 
 class ArrayBox(pn.WidgetBox):
-    """ 入力欄が増減する項目をまとめたクラス
+    """ 入力欄が増減する項目をまとめたクラスです。
 
     Attributes:
         instance:
@@ -209,7 +209,7 @@ class ArrayBox(pn.WidgetBox):
         super().__init__(**params)
 
 class ObjectBox(pn.WidgetBox):
-    """ 入力欄を大項目でまとめるクラス
+    """ 入力欄を大項目でまとめるクラスです。
 
     Attributes:
         instance:
@@ -274,7 +274,7 @@ class Form:
         Args:
             definition (dict): jsonschemaのkeyに対する定義部分. property value.
             key (str): jsonschemaのproperty key
-            value (dict|None): keyに対する初期値を設定します。初期値が存在しない場合はNoneを指定する。
+            value (dict|None): keyに対する初期値を設定します。初期値が存在しない場合はNoneを指定します。
 
         Returns:
             form (ArrayBox | ObjectBox | Column): 渡されたkeyに対する入力欄を返す。
@@ -333,7 +333,7 @@ class Form:
         return form
 
     def _generate_object_widget(self, definition:dict, title:str, key:str, values:dict)->ObjectBox:
-        """type: objectをwidgetbox化する
+        """type: objectをwidgetbox化するメソッドです。
 
         Args:
             definition (dict): jsonschemaのkeyに対する定義部分を設定します。 property value.
@@ -342,7 +342,7 @@ class Form:
             values (dict): keyに対する初期値を設定します。
 
         Returns:
-            obj_box (ObjectBox): 渡されたkeyに対する入力欄
+            obj_box (ObjectBox): 渡されたkeyに対する入力欄を返す。
 
         """
         obj_box = ObjectBox(schema_key=key)
@@ -361,7 +361,7 @@ class Form:
         return obj_box
 
     def _genetate_array_widget(self, definition:dict, title:str, key:str, values:Any)->ArrayBox:
-        """type: arrayをwidgetbox化する
+        """type: arrayをwidgetbox化するメソッドです。
 
         Args:
             definition (dict): jsonschemaのkeyに対する定義部分. property value.
@@ -370,7 +370,7 @@ class Form:
             values (Any): keyに対する初期値を設定します。
 
         Returns:
-            box (ArrayBox): 渡されたkeyに対する入力欄
+            box (ArrayBox): 渡されたkeyに対する入力欄を返す。
 
         """
         box = ArrayBox(schema_key=key)
@@ -381,7 +381,7 @@ class Form:
         column = pn.Column()
 
         def create_items(value: dict=None)->pn.Row:
-            """arrayのひとつの要素を作成する
+            """arrayのひとつの要素を作成するメソッドです。
 
             Args:
                 value (dict|None): 項目の初期値を設定します。
@@ -578,7 +578,7 @@ class Form:
             schema (dict): widgetに対応するプロパティ定義を設定します。
 
         Returns:
-            dict: objectのvalue群
+            dict: objectのvalue群を返す。
 
         """
         objects = widget.objects
@@ -592,14 +592,14 @@ class Form:
         return value
 
     def _get_array_value(self, widget: ArrayBox, schema: dict)->list:
-        """ArrayBox内のwidgetの値を取得する
+        """ArrayBox内のwidgetの値を取得するメソッドです。
 
         Args:
             widget (ArrayBox): データを取得したいArrayBoxを設定します。
             schema (dict): widgetに対応するプロパティ定義を設定します。
 
         Returns:
-            list: arrayのvalue群
+            list: arrayのvalue群を返す。
 
         """
         objects = widget.objects

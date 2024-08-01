@@ -37,7 +37,7 @@ class StringManager:
             text (str): 判定する文字列を設定します。
 
         Returns:
-            bool: 半角英数記号かどうかを返す
+            bool: 半角英数記号かどうかを返す。
 
         """
         return bool(re.match(r'^[\x20-\x7E]*$', text))

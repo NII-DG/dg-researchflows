@@ -33,7 +33,7 @@ class Button(pn.widgets.Button):
         self.button_style = 'solid'
 
     def set_looks_processing(self, name: str="") -> None:
-        """ ボタンの見た目を設定するメソッド
+        """ ボタンの見た目を設定するメソッドです。
 
         Args:
             name (str): ボタンのタイトルを設定します。
@@ -47,7 +47,7 @@ class Button(pn.widgets.Button):
         self.button_style = 'outline'
 
     def set_looks_success(self, name: str) -> None:
-        """ ボタンの見た目を設定するメソッド
+        """ ボタンの見た目を設定するメソッドです。
 
         Args:
             name (str): ボタンのタイトルを設定します。
@@ -58,7 +58,7 @@ class Button(pn.widgets.Button):
         self.button_style = 'solid'
 
     def set_looks_warning(self, name: str) -> None:
-        """ ボタンの見た目を設定するメソッド
+        """ ボタンの見た目を設定するメソッドです。
 
         Args:
             name (str): ボタンのタイトルを設定します。
@@ -69,7 +69,7 @@ class Button(pn.widgets.Button):
         self.button_style = 'solid'
 
     def set_looks_error(self, name: str) -> None:
-        """ ボタンの見た目を設定するメソッド
+        """ ボタンの見た目を設定するメソッドです。
 
         Args:
             name (str): ボタンのタイトルを設定します。

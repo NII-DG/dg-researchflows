@@ -79,7 +79,7 @@ class DiagManager:
         self.add_node_property(node_id, f'background="{path}"')
 
     def update_node_style(self, node_id: str, style: str) -> None:
-        """ ノードのスタイルを設定するメソッドです。。
+        """ ノードのスタイルを設定するメソッドです。
 
         Args:
             node_id (str): ノードIDを設定します。

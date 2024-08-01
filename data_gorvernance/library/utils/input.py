@@ -40,7 +40,7 @@ def get_token(key:str, func:Callable[[str], bool], message:str) -> str:
 
     Args:
         key (str): トークンをvaultで保存するときのキーを設定します。
-        func (Callable[[str], bool]): トークンの有効性を確認するメソッドを設定します。
+        func (Callable[[str], bool]): トークンの有効性を確認する関数を設定します。
         message(str): inputを求める際の表示メッセージを設定します。
 
     Returns:
@@ -118,7 +118,7 @@ def get_goveredrun_token() -> str:
 
     """
     def check_auth(token: str) -> bool:
-        """ Governed Runのトークンの有効性を確認する
+        """ Governed Runのトークンの有効性を確認する関数です。
 
         Args:
             token (str): Governed Runのトークンを設定します。

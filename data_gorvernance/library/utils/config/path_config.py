@@ -175,7 +175,7 @@ def get_prepare_file_name_list_for_subflow()->List[str]:
     """ 新規サブフローデータ作成時にコピーするファイルのリストを取得する関数です。
 
     Returns:
-        List[str]: 新規サブフローデータ作成時にコピーするファイルのリスト
+        List[str]: 新規サブフローデータ作成時にコピーするファイルのリストを返す。
 
     """
     return [MENU_NOTEBOOK, STATUS_JSON, PROPERTY_JSON]

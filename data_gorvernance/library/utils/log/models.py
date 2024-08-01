@@ -149,7 +149,7 @@ class UserActivityLog(BaseLogger):
         return str(log_dir)
 
     def _get_format(self)->str:
-        """フォーマットの定義を行うメソッドです。
+        """フォーマットの定義を取得するメソッドです。
 
         Returns:
            str:フォーマットの定義
@@ -158,7 +158,7 @@ class UserActivityLog(BaseLogger):
         return '%(levelname)s\t%(asctime)s\t%(username)s\t%(subflow_id)s\t%(subflow_type)s\t%(ipynb_name)s\t%(cell_id)s\t%(message)s'
 
     def info(self, message:str):
-        """INFOレベルのログを出力するするためのメソッドです。
+        """INFOレベルのログを出力するためのメソッドです。
 
         Args:
             message(str):ログメッセージを設定
@@ -168,7 +168,7 @@ class UserActivityLog(BaseLogger):
         self.logger.info(message, extra=self.record())
 
     def warning(self, message:str):
-        """WARNINGレベルのログを出力するするためのメソッドです。
+        """WARNINGレベルのログを出力するためのメソッドです。
 
         Args:
             message(str):ログメッセージを設定
@@ -178,7 +178,7 @@ class UserActivityLog(BaseLogger):
         self.logger.warning(message, extra=self.record())
 
     def error(self, message:str):
-        """ERRORレベルのログを出力するするためのメソッドです。
+        """ERRORレベルのログを出力するためのメソッドです。
 
         Args:
             message(str):ログメッセージを設定
@@ -188,7 +188,7 @@ class UserActivityLog(BaseLogger):
         self.logger.error(message, extra=self.record())
 
     def start(self, detail:str='', note:str=''):
-        """処理の開始をログに記録するためのメソッドです。
+        """処理の開始ログを出力するためのメソッドです。
 
         Args:
             detail(str):処理内容の詳細。デフォルトは空文字
@@ -198,7 +198,7 @@ class UserActivityLog(BaseLogger):
         self.info("-- " + detail + "処理開始 --" + note)
 
     def finish(self, detail:str='', note:str=''):
-        """処理の終了をログに記録するためのメソッドです。
+        """処理の終了ログを出力するためのメソッドです。
 
         Args:
             detail(str):処理内容の詳細。デフォルトは空文字

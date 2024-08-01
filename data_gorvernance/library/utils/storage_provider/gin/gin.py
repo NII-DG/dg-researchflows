@@ -53,19 +53,21 @@ ORIG_GITIGNORE_PATH  = srp_path.joinpath('../../..', 'data/original_gitignore').
 
 
 def extract_url_and_auth_info_from_git_url(git_url:str)->tuple[str, str, str]:
-    """指定されたGitのURLからプロトコル、ユーザ名、パスワード、ドメインを抜き出すメソッドです。
+    """指定したGitのURLからプロトコル、ユーザ名、パスワード、ドメインを抜き出すメソッドです。
 
     Args:
-        git_url (str):指定されたGitのURL
+        git_url (str):指定したGitのURL
 
     Returns:
-        str:抽出した文字列から新たに作成したurl
-        str:ユーザー名
-        str:パスワード
+        文字列を抜き出せた場合
+            str:抽出した文字列から新たに作成したurl
+            str:ユーザー名
+            str:パスワード
 
-        str:元のurl
-        str:空のユーザー名
-        str:空のパスワード
+        抜き出せなかった場合
+            str:元のurl
+            str:空のユーザー名
+            str:空のパスワード
 
     """
     pattern = r"(http[s]?://)([^:]+):([^@]+)@(.+)"
@@ -677,10 +679,10 @@ def push():
     datalad_api.push(to=SIBLING, data='auto')
 
 def is_should_annex_content_path(file_path : str)->bool:
-    """指定されたファイルパスがannexの条件を満たすかを調べるメソッドです。
+    """指定したファイルパスがannexの条件を満たすかを調べるメソッドです。
 
     Args:
-        file_path (str):指定されたファイルパス
+        file_path (str):指定したファイルパス
 
     Returns:
         bool:条件を満たしているかのフラグ

@@ -12,7 +12,7 @@ class SubflowTask:
         class:
             __ID(str):タスクの機能IDのキー名
             __NAME(str):タスクのファイル名のキー名
-            __IS_MULTIPLE(str):タスクが複数回実行されるかの判定に用いるフラグのキー名。複数回実行されるものであればtrue、1回しか実行されないものであればfalse
+            __IS_MULTIPLE(str):タスクが複数回実行可能かの判定に用いるフラグのキー名。複数回実行されるものであればtrue、1回しか実行されないものであればfalse
             __IS_REQURED(str) :必須タスクかの判定に用いるフラグのキー名。必須であればtrue、そうでなければfalse
             __COMPLETED_COUNT(str):タスクの完了回数のキー名
             __DEPENDENT_TASK_IDS(str):依存するタスクの機能IDのキー名
@@ -20,16 +20,16 @@ class SubflowTask:
             __EXECUTION_ENVIRONMENTS(str):実行中の実行環境IDのリストのキー名
             __DISABLED(str):使用不可の状態とするためのフラグのキー名
 
-            STATUS_UNFEASIBLE(str):実行状況（実行不可能）のキー名
-            STATUS_UNEXECUTED(str):実行状況（未実行）のキー名
-            STATUS_DOING(str):実行状況（実行中）のキー名
-            STATUS_DONE(str):実行状況（実行完了）のキー名
-            allowed_statuses(str):許可されたステータスのキー名
+            STATUS_UNFEASIBLE(str):実行状況（実行不可能）
+            STATUS_UNEXECUTED(str):実行状況（未実行）
+            STATUS_DOING(str):実行状況（実行中）
+            STATUS_DONE(str):実行状況（実行完了）
+            allowed_statuses(str):許可されているステータスの値
 
         instance:
             _id (str):タスクの機能ID
             _name (str): タスクのファイル名
-            _is_multiple (bool):タスクが複数回実行されるかの判定に用いるフラグ。複数回実行されるものであればtrue、1回しか実行されないものであればfalse
+            _is_multiple (bool):タスクが複数回実行可能かの判定に用いるフラグ。複数回実行されるものであればtrue、1回しか実行されないものであればfalse
             _is_required (bool): 必須タスクかの判定に用いるフラグ。必須であればtrue、そうでなければfalse
             _completed_count (int):タスクの完了回数
             _dependent_task_ids (list[str]):依存するタスクの機能ID
@@ -60,7 +60,7 @@ class SubflowTask:
         Args:
             id (str):タスクの機能ID
             name (str): タスクのファイル名
-            is_multiple (bool):タスクが複数回実行されるかの判定に用いるフラグ。複数回実行されるものであればtrue、1回しか実行されないものであればfalse
+            is_multiple (bool):タスクが複数回実行可能かの判定に用いるフラグ。複数回実行されるものであればtrue、1回しか実行されないものであればfalse
             is_required (bool): 必須タスクかの判定に用いるフラグ。必須であればtrue、そうでなければfalse
             completed_count (int):タスクの完了回数
             dependent_task_ids (list[str]):依存するタスクの機能ID
@@ -126,7 +126,7 @@ class SubflowTask:
 
     @property
     def is_multiple(self)->bool:
-        """タスクが複数回実行されるかの判定に用いるフラグを取得するためのゲッターです。
+        """タスクが複数回実行可能かの判定に用いるフラグを取得するためのゲッターです。
 
         Returns:
             bool: タスクが複数回実行されるかの判定に用いるフラグ
@@ -321,7 +321,7 @@ class SubflowStatus:
         raise Exception(f'Not Found task status by {id}')
 
     def doing_task_by_task_name(self, task_name:str, environment_id:str):
-        """指定されたタスクのステータスを実行中にするメソッドです。
+        """指定したタスクのステータスを実行中に更新するメソッドです。
 
         Args:
             task_name (str): 対象となるタスクの名前
@@ -335,7 +335,7 @@ class SubflowStatus:
                 task.add_execution_environments(environment_id)
 
     def completed_task_by_task_name(self, task_name:str, environment_id:str):
-        """指定したタスクの実行状況を完了に更新するメソッドです。
+        """指定したタスクのステータスを完了に更新するメソッドです。
 
         Args:
             task_name (str):対象のタスク名

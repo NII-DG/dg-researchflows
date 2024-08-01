@@ -6,14 +6,14 @@ import time
 import os
 
 def get_server_info(scheme:str, domain:str)->Response:
-    """指定したAPIエンドポイントから情報を取得するための関数です。
+    """サーバー情報を取得するための関数です。
 
     Args:
         scheme (str):スキーマ
         domain (str):ドメイン
 
     Returns:
-        Response:指定されたAPIエンドポイントからのHTTPレスポンス
+        Response:指定したAPIエンドポイントからのHTTPレスポンス
 
     Raises:
         Exception:APIリクエストの送信に失敗した
@@ -73,7 +73,7 @@ def get_user_info(scheme:str, domain:str, token:str)->Response:
         token (str):トークン
 
     Returns:
-        Response:指定されたトークンを持つユーザの情報
+        Response:指定したトークンを持つユーザの情報
 
     """
     sub_url = "api/v1/user"

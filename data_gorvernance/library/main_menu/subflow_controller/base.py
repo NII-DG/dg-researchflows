@@ -24,6 +24,7 @@ class BaseSubflowForm():
         instance:
             abs_root(str):サブフローの絶対パス
             research_flow_status(List[PhaseStatus]):リサーチフローステータス管理情報
+            reserch_flow_status_operater(ResearchFlowStatusOperater):リサーチフロー図を生成
             _err_output(MessageBox):エラーの出力
             _sub_flow_type_selector(pn.widgets.Select):サブフロー種別(フェーズ)
             _sub_flow_name_selector(pn.widgets.Select):サブフロー名称
@@ -31,9 +32,10 @@ class BaseSubflowForm():
             _data_dir_name_form(pn.widgets.TextInput):データフォルダ名
             _parent_sub_flow_type_selector(pn.widgets.Select): 親サブフロー種別(フェーズ)
             _parent_sub_flow_selector(pn.widgets.Select):親サブフロー選択
+            submit_button(Button):処理開始ボタン
     """
 
-    def __init__(self, abs_root, message_box: MessageBox) -> None:
+    def __init__(self, abs_root:str, message_box: MessageBox) -> None:
         """BaseSubflowForm コンストラクタのメソッドです。
 
         Args:
@@ -111,11 +113,11 @@ class BaseSubflowForm():
         self.submit_button.width = 500
 
 
-    def set_submit_button_on_click(self, callback_function):
+    def set_submit_button_on_click(self, callback_function:callable):
         """処理開始ボタンのイベントリスナー設定するメソッドです。
-        
+
         Args:
-            callback_function(function):処理開始ボタンを呼び戻す
+            callback_function(callable):処理開始ボタンを呼び戻す
         """
         self.submit_button.on_click(callback_function)
 
@@ -208,7 +210,7 @@ class BaseSubflowForm():
                         pahse_options[sf._name] = sf._id
         return pahse_options
 
-    def change_submit_button_init(self, name):
+    def change_submit_button_init(self, name:str):
         """処理開始ボタンのメソッドです。
 
         Args:
@@ -216,7 +218,7 @@ class BaseSubflowForm():
         """
         self.submit_button.set_looks_init(name)
 
-    def change_submit_button_processing(self, name):
+    def change_submit_button_processing(self, name:str):
         """新規作成ボタンを処理中ステータスに更新するメソッドです。
 
         Args:
@@ -224,7 +226,7 @@ class BaseSubflowForm():
         """
         self.submit_button.set_looks_processing(name)
 
-    def change_submit_button_success(self, name):
+    def change_submit_button_success(self, name:str):
         """ボタンが押されて成功した時のメッセージを返すメソッドです。
 
         Args:
@@ -232,7 +234,7 @@ class BaseSubflowForm():
         """
         self.submit_button.set_looks_success(name)
 
-    def change_submit_button_warning(self, name):
+    def change_submit_button_warning(self, name:str):
         """ボタンが押されて失敗した時の警告メッセージを返すメソッドです。
 
         Args:
@@ -240,7 +242,7 @@ class BaseSubflowForm():
         """
         self.submit_button.set_looks_warning(name)
 
-    def change_submit_button_error(self, name):
+    def change_submit_button_error(self, name:str):
         """ボタンが押されて内部エラーが発生した時のエラーを返すメソッドです。
 
         Args:
@@ -323,7 +325,7 @@ class BaseSubflowForm():
         """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化するメソッドです。"""
         # 継承した先で実装する
 
-    def validate_sub_flow_name(self, sub_flow_name):
+    def validate_sub_flow_name(self, sub_flow_name:str):
         """サブフロー名称の値が存在するかを確認しているメソッドです。
 
         Args:
@@ -338,7 +340,7 @@ class BaseSubflowForm():
             message = msg_config.get('main_menu','not_input_subflow_name')
             raise InputWarning(message)
 
-    def is_unique_subflow_name(self, sub_flow_name, phase_seq_number):
+    def is_unique_subflow_name(self, sub_flow_name:str, phase_seq_number:int):
         """サブフローの名称がユニークの値になっているかどうかを確認しているメソッドです。
 
         Args:
@@ -354,7 +356,7 @@ class BaseSubflowForm():
             message = msg_config.get('main_menu','must_not_same_subflow_name')
             raise InputWarning(message)
 
-    def validate_data_dir_name(self, data_dir_name):
+    def validate_data_dir_name(self, data_dir_name:str):
         """データフォルダ名の検証をする時に問題がないか確認するメソッドです。
 
         Args:
@@ -380,7 +382,7 @@ class BaseSubflowForm():
             message = msg_config.get('main_menu','data_dir_pattern_error')
             raise InputWarning(message)
 
-    def is_unique_data_dir(self, data_dir_name, phase_seq_number):
+    def is_unique_data_dir(self, data_dir_name:str, phase_seq_number:int):
         """データフォルダ名がユニークの値になっているかを確認するメソッドです。
 
         Args:

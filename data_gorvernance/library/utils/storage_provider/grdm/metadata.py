@@ -6,7 +6,7 @@
 import json
 import requests
 
-def format_metadata(metadata):
+def format_metadata(metadata:dict) -> list:
     """Gakunin RDMから取得したプロジェクトメタデータを整形するメソッドです。
     
     Args:
@@ -48,7 +48,7 @@ def format_metadata(metadata):
     return {'dmp': first_value}
 
 
-def get_schema(url):
+def get_schema(url:str) -> json:
     """メタデータのプロトコル名を取得するメソッドです。
 
     リクエストされたURLに接続し、その接続に問題がないかを確認してプロトコル名を取得する。
@@ -57,14 +57,14 @@ def get_schema(url):
         url(str):メタデータのURL
 
     Returns:
-        Response:メタデータのプロトコル名の値を返す。
+        Response.json:メタデータのプロトコル名の値を返す。
     """
     response = requests.get(url=url)
     response.raise_for_status()
     return response.json()
 
 
-def format_display_name(schema: dict, page_id: str, qid: str, value=None):
+def format_display_name(schema: dict, page_id: str, qid: str, value=None) -> dict:
     """メタデータをフォーマットして返却するメソッドです。
 
     Args:

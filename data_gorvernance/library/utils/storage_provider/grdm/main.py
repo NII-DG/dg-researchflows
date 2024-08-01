@@ -24,11 +24,11 @@ NEED_TOKEN_SCOPE = ["osf.full_write"]
 ALLOWED_PERMISSION = ["admin", "write"]
 
 
-def get_project_id():
+def get_project_id() -> list[str]:
     """プロジェクトIDを取得するメソッドです。
 
     Returns:
-        split_path(list(str)):分割したパスの要素の値を返す。  
+        list[str]:分割したパスの要素の値を返す。  
     """
     # url: https://rdm.nii.ac.jp/vz48p/osfstorage
     url = os.environ.get("BINDER_REPO_URL", "")
@@ -61,7 +61,7 @@ def check_authorization(base_url: str, token: str) -> bool:
     return False
 
 
-def check_permission(base_url: str, token: str, project_id: str):
+def check_permission(base_url: str, token: str, project_id: str) -> bool:
     """アクセス許可のチェックを行うメソッドです。
 
     Args:
@@ -88,7 +88,7 @@ def check_permission(base_url: str, token: str, project_id: str):
     return False
 
 
-def get_projects_list(scheme, domain, token):
+def get_projects_list(scheme: str, domain: str, token: str) -> dict:
     """プロジェクトの一覧を取得するメソッドです。
 
     Args:
@@ -108,7 +108,7 @@ def get_projects_list(scheme, domain, token):
     return {d['id']: d['attributes']['title'] for d in data}
 
 
-def sync(token, api_url, project_id, abs_source, abs_root="/home/jovyan"):
+def sync(token: str, api_url: str, project_id: str, abs_source: str | list, abs_root:str="/home/jovyan"):
     """GRDMにアップロードするメソッドです。
         
     abs_source は絶対パスでなければならない。
@@ -148,7 +148,7 @@ def sync(token, api_url, project_id, abs_source, abs_root="/home/jovyan"):
     )
 
 
-def download_text_file(token, api_url, project_id, remote_path, encoding='utf-8'):
+def download_text_file(token: str, api_url: str, project_id: str, remote_path: str, encoding='utf-8'):
     """テキストファイルの中身を取得するメソッドです。
 
     Args:
@@ -172,7 +172,7 @@ def download_text_file(token, api_url, project_id, remote_path, encoding='utf-8'
     return content.decode(encoding)
 
 
-def download_json_file(token, api_url, project_id, remote_path):
+def download_json_file(token: str, api_url: str, project_id: str, remote_path: str):
     """jsonファイルの中身を取得するメソッドです。
 
     Args:
@@ -235,7 +235,7 @@ def get_collaborator_list(base_url: str, token: str, project_id: str) -> dict:
     }
 
 
-def build_collaborator_url(base_url: str, project_id: str):
+def build_collaborator_url(base_url: str, project_id: str) -> parse.urlunparse:
     """プロジェクトのメンバー一覧のURLを返すメソッドです。
 
     Args:

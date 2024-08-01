@@ -56,9 +56,11 @@ class SubflowMenu(TaskLog):
             selector(pn.widgets.RadioBoxGroup):ラジオボタン
             selector_options(list[str]):ラジオボタンのオプション
             working_file (str): 実行Notebookファイルパス
+            button(pn.widgets.Button):ボタンの設定
+            select_widgetbox(pn.widgets.Button):ボタンの配置
     """
 
-    def __init__(self, working_file) -> None:
+    def __init__(self, working_file:str) -> None:
         """SubflowMenu コンストラクタのメソッドです
 
         Args:
@@ -97,7 +99,7 @@ class SubflowMenu(TaskLog):
         )
 
     # イベント
-    def select_flow(self, subflow: SubFlowManager, font_folder: Path):
+    def select_flow(self, subflow: SubFlowManager, font_folder: Path) -> callable:
         """ラジオボタンの選択時にサブフロー図の表示を切り替えるメソッドです。
 
         Args:
@@ -105,7 +107,7 @@ class SubflowMenu(TaskLog):
             font_folder (Path): フォントフォルダのパス
 
         Returns:
-            callback(function):サブフロー図を表示する。
+            callable:サブフロー図を表示する。
         """
         def callback(event):
             """サブフロー図の生成と表示を行うメソッドです。"""
@@ -153,36 +155,36 @@ class SubflowMenu(TaskLog):
             self._set_width()
 
     # その他
-    def is_display_all(self):
+    def is_display_all(self) -> bool:
         """フロー図の表示を制御するメソッドです。
 
         Returns:
-            display_all(bool):TrueまたはFalseの値を返す。
+            bool:TrueまたはFalseの値を返す。
         """
         display_all = True
         if self.selector.value == self.selector_options[0]:
             display_all = False
         return display_all
 
-    def _get_contents(self, svg_file_path: str):
+    def _get_contents(self, svg_file_path: str) -> str:
         """フロー図を取得するメソッドです。
 
         Args:
             svg_file_path (str): svgファイルのパス
 
         Returns:
-            File(str):svgファイルの内容を返す。
+            str:svgファイルの内容を返す。
         """
         return file.File(svg_file_path).read()
 
-    def _get_svg_size(self, svg_file_path: str):
+    def _get_svg_size(self, svg_file_path: str) -> int:
         """svgの画像の横幅を返すメソッドです。
         
         Args:
             svg_file_path (str): svgファイルのパス
 
         Returns:
-            viewbox_width(int):svgの画像の横幅の値を返す 
+            int:svgの画像の横幅の値を返す 
         """
         # SVGファイルをパース
         tree = ET.parse(svg_file_path)

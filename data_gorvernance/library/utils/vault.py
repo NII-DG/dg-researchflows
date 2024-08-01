@@ -40,10 +40,10 @@ class Vault():
     
     Attributes:
         instance:
-            __read_token(method):ルートトークンを読み取る。
-            __start_server(method):Vaultサーバー起動する。
-            __create_dg_engine(method):シークレットエンジン(kv)作成。
-            __create_dg_policy(method):ポリシーを作成。
+            __read_token(Callable):ルートトークンを読み取る。
+            __start_server(Callable):Vaultサーバー起動する。
+            __create_dg_engine(Callable):シークレットエンジン(kv)作成。
+            __create_dg_policy(Callable):ポリシーを作成。
     """
         
     def initialize(self):
@@ -59,7 +59,7 @@ class Vault():
         self.__create_dg_engine()
         self.__create_dg_policy()
 
-    def set_value(self, key, value):
+    def set_value(self, key:str, value:str):
         """値の設定をするメソッドです
 
         Args:
@@ -73,14 +73,14 @@ class Vault():
             mount_point=DG_ENGINE_NAME,
         )
 
-    def has_value(self, key):
+    def has_value(self, key:str) -> bool:
         """値の存在チェックをするメソッドです
 
         Args:
             key(str):トークンをvaultで保存するときのキー
 
         Returns:
-            key(SecretsEngines):キーが存在した場合は秘密鍵の値を返し、存在しない場合はFalseの値を返す。
+            bool:キーが存在した場合は秘密鍵のTrueの値を返し、存在しない場合はFalseの値を返す。
         """
         client = self.__get_client()
         try:
@@ -93,14 +93,14 @@ class Vault():
             return False
         return key in secrets['data']['keys']
 
-    def get_value(self, key):
+    def get_value(self, key:str) -> dict:
         """値の取得をするメソッドです
         
         Args:
             key(str):トークンをvaultで保存するときのキー
 
         Returns:
-            read_res(SecretsEngines):取得した値を返す。値がない場合はNoneを返す。
+            dict:取得した値を返す。値がない場合はNoneを返す。
         """
         if not self.has_value(key):
             return None
@@ -177,7 +177,7 @@ class Vault():
                 policy=DG_POLICY,
             )
 
-    def __write_token(self, token):
+    def __write_token(self, token:str):
         """ルートトークン保存のメソッドです
         
         Args:
@@ -186,14 +186,14 @@ class Vault():
         with open(TOKEN_PATH, 'w') as f:
             f.write(token)
 
-    def __read_token(self):
+    def __read_token(self) -> str:
         """ルートトークン取得のメソッドです
         
         Raises:
             UnusableVault:値が利用できないエラー
             
         Returns:
-            root_token(str):ルートトークンの値を返す。
+            str:ルートトークンの値を返す。
         """
         if not os.path.isfile(TOKEN_PATH):
             raise UnusableVault
@@ -202,7 +202,7 @@ class Vault():
             root_token = f.read()
         return root_token
 
-    def __get_client(self):
+    def __get_client(self) -> hvac.Client:
         """接続の確認を行うメソッドです
         
         Returns:

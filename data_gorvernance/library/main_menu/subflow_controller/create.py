@@ -25,9 +25,10 @@ class CreateSubflowForm(BaseSubflowForm):
         instance:
             abs_root (str): サブフローの絶対パス
             message_box (MessageBox): メッセージを格納する。
+            change_submit_button_init(Callable):処理開始ボタン
     """
 
-    def __init__(self, abs_root, message_box) -> None:
+    def __init__(self, abs_root:str, message_box:pn.widgets.MessageBox) -> None:
         """CreateSubflowForm コンストラクタのメソッドです
 
         Args:
@@ -58,7 +59,7 @@ class CreateSubflowForm(BaseSubflowForm):
                 pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
         return pahse_options
 
-    def change_submit_button_init(self, name):
+    def change_submit_button_init(self, name:str):
         """ボタンの状態を初期化するメソッドです。
 
         Args:
@@ -138,7 +139,7 @@ class CreateSubflowForm(BaseSubflowForm):
 
         self.submit_button.disabled = False
 
-    def define_input_form(self):
+    def define_input_form(self) -> pn.Column:
         """サブフロー新規作成フォームのメソッドです。
         
         Returns:
@@ -226,7 +227,7 @@ class CreateSubflowForm(BaseSubflowForm):
         self._data_dir_name_form.value_input = ''
         self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
 
-    def create_data_dir(self, phase_name:str, data_dir_name:str):
+    def create_data_dir(self, phase_name:str, data_dir_name:str) -> str:
         """データディレクトリを作成するメソッドです。
 
         Args:
@@ -237,7 +238,7 @@ class CreateSubflowForm(BaseSubflowForm):
             Exception: 既にファイルが存在しているエラー
 
         Returns:
-            path(str): データディレクトリを作成するパスの値を返す。
+            str: データディレクトリを作成するパスの値を返す。
         """
         path = path_config.get_task_data_dir(self.abs_root, phase_name, data_dir_name)
         if os.path.exists(path):
@@ -245,7 +246,7 @@ class CreateSubflowForm(BaseSubflowForm):
         os.makedirs(path)
         return path
 
-    def prepare_new_subflow_data(self, phase_name:str, new_sub_flow_id:str, sub_flow_name):
+    def prepare_new_subflow_data(self, phase_name:str, new_sub_flow_id:str, sub_flow_name:str):
         """新しいサブフローのデータを用意するメソッドです。
 
         Args:

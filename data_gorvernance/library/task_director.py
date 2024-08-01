@@ -22,7 +22,7 @@ def get_return_sub_flow_menu_relative_url_path(working_file_path: str)->str:
         working_file_path(str):作業ファイルのパス
 
     Returns:
-        os.path.join(str):サブフローメニューのパスを返す。
+        str:サブフローメニューのパスを返す。
     
     """
 

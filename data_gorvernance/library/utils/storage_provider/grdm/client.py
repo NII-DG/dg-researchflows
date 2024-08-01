@@ -15,7 +15,7 @@ from requests.exceptions import RequestException
 from ...error import UnauthorizedError
 
 
-def upload(token, base_url, project_id, source, destination, recursive=False, force=False):
+def upload(token:str, base_url:str, project_id:str, source:str, destination:str, recursive:bool=False, force:bool=False):
     """ファイルまたはフォルダをアップロードするメソッドです。
 
     Args:
@@ -77,7 +77,7 @@ def upload(token, base_url, project_id, source, destination, recursive=False, fo
 
 
 
-def download(token, project_id, base_url, remote_path, base_path=None):
+def download(token:str, project_id:str, base_url:str, remote_path:str, base_path=None) ->list:
     """ファイルの内容を取得するメソッドです。
 
     Args:

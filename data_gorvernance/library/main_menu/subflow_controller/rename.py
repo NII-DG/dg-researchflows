@@ -21,9 +21,10 @@ class RenameSubflowForm(BaseSubflowForm):
         instance:
             abs_root (str): サブフローの絶対パス
             message_box (MessageBox): メッセージを格納する。
+            change_submit_button_init(Callable):処理開始ボタン
     """
 
-    def __init__(self, abs_root, message_box) -> None:
+    def __init__(self, abs_root:str, message_box:pn.widgets.MessageBox) -> None:
         """RenameSubflowForm コンストラクタのメソッドです
 
         Args:
@@ -37,9 +38,6 @@ class RenameSubflowForm(BaseSubflowForm):
     # overwrite
     def callback_sub_flow_name_selector(self, event):
         """サブフロー種別(フェーズ)を表示するメソッドです。
-
-        Returns:
-            Dict[str, int]: フェーズ表示名を返す。
 
         Raises:
             Exception: サブフロー種別(フェーズ)、サブフロー名がないエラー
@@ -110,7 +108,7 @@ class RenameSubflowForm(BaseSubflowForm):
 
         self.submit_button.disabled = False
 
-    def define_input_form(self):
+    def define_input_form(self) -> Alert | pn.Column:
         """サブフロー名称変更フォームのメソッドです。
         
         Returns:

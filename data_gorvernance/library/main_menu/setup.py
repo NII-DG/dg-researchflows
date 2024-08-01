@@ -152,7 +152,7 @@ class ContainerSetter():
         alert = pn.pane.Alert(msg_config.get('setup', 'setup_completed'),sizing_mode="stretch_width",alert_type='warning')
         display(alert)
 
-    def change_submit_button_init(self, name):
+    def change_submit_button_init(self, name:str):
         """ボタンの状態を初期化するメソッドです。
 
         Args:
@@ -162,7 +162,7 @@ class ContainerSetter():
         self._submit_button.button_type = 'primary'
         self._submit_button.button_style = 'solid'
 
-    def change_submit_button_processing(self, name):
+    def change_submit_button_processing(self, name:str):
         """ボタンを処理中ステータスに更新するメソッドです。
 
         Args:
@@ -172,7 +172,7 @@ class ContainerSetter():
         self._submit_button.button_type = 'primary'
         self._submit_button.button_style = 'outline'
 
-    def change_submit_button_success(self, name):
+    def change_submit_button_success(self, name:str):
         """ボタンが押されて成功した時のメッセージを返すメソッドです。
 
         Args:
@@ -182,7 +182,7 @@ class ContainerSetter():
         self._submit_button.button_type = 'success'
         self._submit_button.button_style = 'solid'
 
-    def change_submit_button_warning(self, name):
+    def change_submit_button_warning(self, name:str):
         """ボタンが押されて認証が失敗した時の警告メッセージを返すメソッドです。
 
         Args:
@@ -192,7 +192,7 @@ class ContainerSetter():
         self._submit_button.button_type = 'warning'
         self._submit_button.button_style = 'solid'
 
-    def change_submit_button_error(self, name):
+    def change_submit_button_error(self, name:str):
         """ボタンが押されて内部エラーが発生した時のエラーを返すメソッドです。
 
         Args:
@@ -447,7 +447,7 @@ class ContainerSetter():
             display(alert)
 
     @classmethod
-    def syncs_config(cls, nb_working_file_path:str):
+    def syncs_config(cls, nb_working_file_path:str) -> list | str:
         pn.extension()
         """同期のためにファイルとメッセージの設定
         
@@ -455,8 +455,8 @@ class ContainerSetter():
             nb_working_file_path (str): 実行Notebookパス
 
         Returns:
-            git_path(list):Gitのパス
-            commit_message(str):コミットメッセージ
+            list:Gitのパス
+            str:コミットメッセージ
         """
         cls.check_imcomplete_auth()
         display(Javascript('IPython.notebook.save_checkpoint();'))

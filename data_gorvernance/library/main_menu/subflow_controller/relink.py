@@ -19,14 +19,15 @@ class RelinkSubflowForm(BaseSubflowForm):
         instance:
             abs_root (str): サブフローの絶対パス
             message_box (MessageBox): メッセージを格納する。
+            change_submit_button_init(Callable):処理開始ボタン
     """
 
-    def __init__(self, abs_root, message_box) -> None:
+    def __init__(self, abs_root:str, message_box:pn.widgets.MessageBox) -> None:
         """RelinkSubflowForm コンストラクタのメソッドです
 
         Args:
             abs_root (str): サブフローの絶対パス
-            message_box (MessageBox): メッセージを格納する。
+            message_box (pn.widgets.MessageBox): メッセージを格納する。
         """
 
         super().__init__(abs_root, message_box)
@@ -58,17 +59,17 @@ class RelinkSubflowForm(BaseSubflowForm):
                 pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
         return pahse_options
 
-    def get_parent_type_and_ids(self, phase_seq_number, sub_flow_id, research_flow_status:List[PhaseStatus]):
+    def get_parent_type_and_ids(self, phase_seq_number:str, sub_flow_id:str, research_flow_status:List[PhaseStatus]) -> int | list:
         """親サブフロー種別(フェーズ)と親サブフローIDを取得するメソッドです。
 
         Args:
             phase_seq_number (int): フェーズ番号
-            sub_flow_id (Select): サブフローID
+            sub_flow_id (str): サブフローID
             research_flow_status (List[PhaseStatus]): リサーチフローステータス管理情報
 
         Returns:
-            parent_sub_flow_type(Literal): 親サブフロー種別(フェーズ)
-            parent_ids(list):親サブフローIDの値を返す。
+            int: 親サブフロー種別(フェーズ)
+            list:親サブフローIDの値を返す。
         """
         parent_ids = []
         parent_sub_flow_type = 0
@@ -94,9 +95,6 @@ class RelinkSubflowForm(BaseSubflowForm):
     # overwrite
     def callback_sub_flow_name_selector(self, event):
         """サブフロー種別(フェーズ)を表示するメソッドです。
-
-        Returns:
-            Dict[str, int]: フェーズ表示名を返す。
 
         Raises:
             Exception: サブフロー選択肢タイプ、サブフロー名がないエラー
@@ -196,7 +194,7 @@ class RelinkSubflowForm(BaseSubflowForm):
 
         self.submit_button.disabled = False
 
-    def define_input_form(self):
+    def define_input_form(self) -> Alert | pn.Column:
         """サブフロー間接続編集フォームのメソッドです。
         
         Returns:

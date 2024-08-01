@@ -35,21 +35,24 @@ class MainMenu(TaskLog):
        
         instance:
             abs_root(str): リサーチフロー図の絶対パス
-            _research_flow_status_file_path(str): リサーチフロー図の生成
+            _research_flow_status_file_path(str): リサーチフロー図があるパス
+            reserch_flow_status_operater(ResearchFlowStatusOperater):リサーチフロー図の生成
             _research_flow_image(pn.pane.HTML): リサーチフロー図オブジェクトの定義
             _err_output(MessageBox):エラーの出力
             _menu_tabs(pn.Tabs):メニュータブ
+            button_for_project_menu(pn.pane.HTML):メインメニューに遷移するためのボタン
             _project_menu(pn.pane.HTML):プロジェクトメニュー
             _project_widget_box(pn.WidgetBox):サブフロー操作コントローラーウェジットボックス
             _sub_flow_menu(pn.widgets.Select):サブフローメニュー
             _sub_flow_widget_box(pn.WidgetBox):サブフロー操作コントローラーウェジットボックス
             working_file(str):実行Notebookファイルパス
+            check_status_research_preparation_flow(Callable):check_status_research_preparation_flow関数を呼び出す
 
     NOTE:
     Called from data_gorvernance/researchflow/main.ipynb
     """
 
-    def __init__(self, working_file) -> None:
+    def __init__(self, working_file:str) -> None:
         """MainMenu コンストラクタのメソッドです
 
         Args:
@@ -169,7 +172,7 @@ class MainMenu(TaskLog):
     # イベントリスナーコールバックメソッド #
     ######################################
 
-    def callback_menu_tabs(self, event):
+    def callback_menu_tabs(self, event:int):
         """サブフロー操作で選択ができるようにするメソッドです。
 
         Args:

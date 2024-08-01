@@ -34,8 +34,8 @@ class TaskLog:
 
         Args:
             cell_id(str):ノートブックのセル番号
-            start_message(str, optional):タスクの開始時に出力するメッセージ。デフォルトは空文字。
-            finish_message(str, optional):タスクの終了時に出力するメッセージ。デフォルトは空文字。
+            start_message(str):タスクの開始時に出力するメッセージ。デフォルトは空文字。
+            finish_message(str):タスクの終了時に出力するメッセージ。デフォルトは空文字。
 
         Return:
            callable:wrapper関数

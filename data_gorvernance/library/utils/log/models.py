@@ -25,7 +25,7 @@ class BaseLogger:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
         Args:
-            output_dir(str, optional):ログファイルの出力ディレクトリ。デフォルトはカレントディレクトリ。
+            output_dir(str):ログファイルの出力ディレクトリ。デフォルトはカレントディレクトリ。
 
         """
         self.logger = logging.getLogger(__name__)
@@ -191,8 +191,8 @@ class UserActivityLog(BaseLogger):
         """処理の開始をログに記録するためのメソッドです。
 
         Args:
-            detail(str, optional):処理内容の詳細。デフォルトは空文字
-            note(str, optional):処理内容の注記。デフォルトは空文字
+            detail(str):処理内容の詳細。デフォルトは空文字
+            note(str):処理内容の注記。デフォルトは空文字
 
         """
         self.info("-- " + detail + "処理開始 --" + note)
@@ -201,8 +201,8 @@ class UserActivityLog(BaseLogger):
         """処理の終了をログに記録するためのメソッドです。
 
         Args:
-            detail(str, optional):処理内容の詳細。デフォルトは空文字
-            note(str, optional):処理内容の注記。デフォルトは空文字
+            detail(str):処理内容の詳細。デフォルトは空文字
+            note(str):処理内容の注記。デフォルトは空文字
 
         """
         self.info("-- " + detail + "処理終了 --" + note)

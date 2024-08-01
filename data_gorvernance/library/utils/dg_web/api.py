@@ -20,7 +20,7 @@ def get_govsheet_schema(scheme:str, domain:str)->dict:
         domain (str): ドメインを設定します。
 
     Returns:
-        dict: ガバナンスシートのスキーマ
+        dict: ガバナンスシートのスキーマを返す。
 
     """
     sub_url = '/schemas/govSheet'
@@ -49,7 +49,7 @@ def get_metadata_schema(scheme:str, domain:str)->dict:
 
 
 def check_governedrun_token(scheme:str, domain:str, token:str)->bool:
-    """ Governed Runのトークンの有効性を確認する
+    """ Governed Runのトークンの有効性を確認する関数です。
 
     Args:
         scheme (str): スキームを設定します。
@@ -60,7 +60,7 @@ def check_governedrun_token(scheme:str, domain:str, token:str)->bool:
         bool: Governed Runのトークンが有効であればTrue、有効でなければFalseを返す。
 
     Raises:
-        requests.exceptions.RequestException: 通信エラー
+        RequestException: 通信エラー
 
     """
     sub_url = '/checkToken'
@@ -86,16 +86,16 @@ def validate(scheme:str, domain:str, grdm_token:str, project_id:str, govrun_toke
         domain(str): ドメインを設定します。
         grdm_token(str): GRDMのトークンを設定します。
         project_id(str): プロジェクトidを設定します。
-        govrun_token(str, optional): Governed Runのトークンを設定します。
-        govsheet(dict, optional): ガバナンスシートを設定します。
-        metadata(dict, optional): メアデータを設定します。
+        govrun_token(str|None): Governed Runのトークンを設定します。
+        govsheet(dict|None): ガバナンスシートを設定します。
+        metadata(dict|None): メアデータを設定します。
 
     Returns:
         dict: 検証結果を返す。
 
     Raises:
         UnauthorizedError: 認証が通らない
-        requests.exceptions.RequestException: その他の通信エラー
+        RequestException: その他の通信エラー
 
     """
     sub_url = '/validations/submit'
@@ -132,7 +132,7 @@ def get_validations(scheme:str, domain:str, grdm_token: str, project_id: str)->d
     Raises:
         UnauthorizedError: 認証が通らない
         NotFoundContentsError: 検証結果が存在しない
-        requests.exceptions.RequestException: その他の通信エラー
+        RequestException: その他の通信エラー
 
     """
     sub_url = '/validations'
@@ -169,7 +169,7 @@ def get_validations_validationId(scheme:str, domain:str, grdm_token: str, projec
     Raises:
         UnauthorizedError: 認証が通らない
         NotFoundContentsError: 検証結果が存在しない
-        requests.exceptions.RequestException: その他の通信エラー
+        RequestException: その他の通信エラー
 
     """
     sub_url = f'/validations/{validation_id}'

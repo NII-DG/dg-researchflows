@@ -7,9 +7,9 @@ class TimeDiff:
 
     Attributes:
         instance:
-            time_diff(float):
-            start_time(float):
-            end_time(float):
+            time_diff(float): startメソッドとendメソッドの呼び出し間の経過時間
+            start_time(float): パフォーマンスカウンタの開始時間
+            end_time(float): パフォーマンスカウンタの終了時間
 
     """
 

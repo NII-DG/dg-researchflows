@@ -57,7 +57,7 @@ class ParamConfig():
 
     @classmethod
     def get_param_data(cls) -> 'ParamConfig':
-        """ 各種データを取得する
+        """ 各種データを取得するメソッドです。
 
         Returns:
             ParamConfig: 各種パラメータを持つオブジェクトを返す。
@@ -127,7 +127,7 @@ class Siblings():
         """ インスタンス変数を辞書に変換するメソッドです。
 
         Returns:
-            dict: インスタンス変数の値を持つ辞書
+            dict: インスタンス変数の値を持つ辞書を返す。
 
         """
         data = {}
@@ -146,7 +146,7 @@ class GgCore():
             __NETLOC(str): ネットワークロケーションのキー
         instance:
             _scheme(str): スキーマの値
-            _netloc8str): ネットワークロケーションの値
+            _netloc(str): ネットワークロケーションの値
 
     """
     __SCHEME = 'Scheme'
@@ -166,7 +166,7 @@ class GgCore():
         """ インスタンス変数を辞書に変換するメソッドです。
 
         Returns:
-            dict: インスタンス変数の値を持つ辞書
+            dict: インスタンス変数の値を持つ辞書を返す。
 
         """
         data = {}

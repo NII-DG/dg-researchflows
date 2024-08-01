@@ -38,12 +38,12 @@ class MakePackage:
         self.rendered_context = OrderedDict([])
         self.prompts = {}
 
-    def get_template(self, template: str, checkout: str=None) -> dict:
+    def get_template(self, template: str, checkout: str | None = None) -> dict:
         """ cookiecutterのテンプレートの設定値を取得するメソッドです。
 
         Args:
             template (str): クローンするリポジトリのURLまたはパスを指定する
-            checkout (str, optional): クローン後にチェックアウトするブランチ、タグ、コミット IDを設定します。
+            checkout (str | None): クローン後にチェックアウトするブランチ、タグ、コミット IDを設定します。
 
         Returns:
             dict: cookiecutterのテンプレートの設定値を返す。
@@ -104,12 +104,12 @@ class MakePackage:
             else var_name
         )
 
-    def create_package(self, context_dict: dict=None, output_dir: str='.'):
+    def create_package(self, context_dict: dict | None = None, output_dir: str='.'):
         """ cookiecutterテンプレートを使用してパッケージを作成する
 
         Args:
-            context_dict (dict, optional): デフォルトおよびユーザー設定を上書きするコンテキストの辞書を設定します。
-            output_dir (str, optional): パッケージを作成するディレクトリを設定します。
+            context_dict (dict | None): デフォルトおよびユーザー設定を上書きするコンテキストの辞書を設定します。
+            output_dir (str): パッケージを作成するディレクトリを設定します。
 
         """
         cookiecutter(self.template_dir, no_input=True, extra_context=context_dict, output_dir=output_dir)

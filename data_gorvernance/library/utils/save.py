@@ -59,8 +59,8 @@ class TaskSave(TaskLog):
         """ クラスのインスタンスの初期化処理を実行するメソッドです。
 
         Args:
-            nb_working_file_path (str): 実行Notebookのファイルパス
-            notebook_name (str): 実行Notebookのファイル名
+            nb_working_file_path (str): 実行Notebookのファイルパスを設定します。
+            notebook_name (str): 実行Notebookのファイル名を設定します。
 
         """
         super().__init__(nb_working_file_path, notebook_name)
@@ -109,11 +109,11 @@ class TaskSave(TaskLog):
             self.log.error(message)
         return token, project_id
 
-    def define_save_form(self, source: (str | List[str] | Any)) -> None:
+    def define_save_form(self, source: str | List[str]) -> None:
         """ GRDMに保存するフォームを作成するメソッドです。
 
         Args:
-            source (str or list): 保存するファイルを設定します。
+            source (str | List[str]): 保存するファイルを設定します。
 
         Raises:
             TypeError: sourceがstrまたはlistでない
@@ -142,7 +142,7 @@ class TaskSave(TaskLog):
         """ ボタン押下時に保存するメソッドです。
 
         Args:
-            event (Any): ボタンクリックイベント。
+            event (Any): ボタンクリックイベントを設定します。
 
         """
         self._save()

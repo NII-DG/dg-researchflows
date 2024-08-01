@@ -45,7 +45,7 @@ def copy_dir(src: str, dst: str, overwrite: bool=False) -> None:
             dst(str): 比較対象のディレクトリのパスを設定します。
 
         Returns:
-            function: 相対的なディレクトリ名およびファイル名のセットを返す関数を返す。
+            Callable[[str, List[str]], Set[str]]: 相対的なディレクトリ名およびファイル名のセットを返す関数を返す。
 
         """
         base, dst = Path(base), Path(dst)
@@ -137,7 +137,7 @@ class File:
         """ 新しいファイルを作成するメソッドです。
 
         Args:
-            exist_ok(bool, optional): 既存のディレクトリを指定してエラーにならないかを設定します。
+            exist_ok(bool): 既存のディレクトリを指定してエラーにならないかを設定します。
 
         """
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -147,7 +147,7 @@ class File:
         """ ファイルを削除するメソッドです。
 
         Args:
-            missing_ok(bool, optional): 存在しないファイルを指定してエラーにならないかを設定します。
+            missing_ok(bool): 存在しないファイルを指定してエラーにならないかを設定します。
 
         """
         self.path.unlink(missing_ok)

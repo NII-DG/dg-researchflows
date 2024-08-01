@@ -22,7 +22,7 @@ class Button(pn.widgets.Button):
         """ ボタンの見た目を設定するメソッドです。
 
         Args:
-            name (str, optional): ボタンのタイトルを設定します。
+            name (str): ボタンのタイトルを設定します。
 
         """
         if name:
@@ -36,7 +36,7 @@ class Button(pn.widgets.Button):
         """ ボタンの見た目を設定するメソッド
 
         Args:
-            name (str, optional): ボタンのタイトルを設定します。
+            name (str): ボタンのタイトルを設定します。
 
         """
         if name:
@@ -88,7 +88,7 @@ class Alert(pn.pane.Alert):
         """ infoタイプのアラートを作成するメソッドです。
 
         Args:
-            msg (str, optional): アラートに表示するメッセージを設定します。
+            msg (str): アラートに表示するメッセージを設定します。
 
         Returns:
             Alert: infoタイプのAlertのインスタンスを返す。
@@ -101,7 +101,7 @@ class Alert(pn.pane.Alert):
         """ successタイプのアラートを作成するメソッドです。
 
         Args:
-            msg (str, optional): アラートに表示するメッセージを設定します。
+            msg (str): アラートに表示するメッセージを設定します。
 
         Returns:
             Alert: successタイプのAlertのインスタンスを返す。
@@ -114,7 +114,7 @@ class Alert(pn.pane.Alert):
         """ warningタイプのアラートを作成するメソッドです。
 
         Args:
-            msg (str, optional): アラートに表示するメッセージを設定します。
+            msg (str): アラートに表示するメッセージを設定します。
 
         Returns:
             Alert: warningタイプのAlertのインスタンスを返す。
@@ -127,7 +127,7 @@ class Alert(pn.pane.Alert):
         """ dangerタイプのアラートを作成するメソッドです。
 
         Args:
-            msg (str, optional): アラートに表示するメッセージを設定します。
+            msg (str): アラートに表示するメッセージを設定します。
 
         Returns:
             Alert: dangerタイプのAlertのインスタンスを返す。
@@ -154,7 +154,7 @@ class MessageBox(pn.WidgetBox):
         """ infoアラートに更新するメソッドです。
 
         Args:
-            msg (str, optional): アラートに表示するメッセージを設定します。
+            msg (str): アラートに表示するメッセージを設定します。
 
         Returns:
             Alert: infoタイプのAlertのインスタンスを返す。
@@ -169,7 +169,7 @@ class MessageBox(pn.WidgetBox):
         """ successアラートに更新するメソッドです。
 
         Args:
-            msg (str, optional): アラートに表示するメッセージを設定します。
+            msg (str): アラートに表示するメッセージを設定します。
 
         Returns:
             Alert: successタイプのAlertのインスタンスを返す。
@@ -184,7 +184,7 @@ class MessageBox(pn.WidgetBox):
         """ warningアラートに更新するメソッドです。
 
         Args:
-            msg (str, optional): アラートに表示するメッセージを設定します。
+            msg (str): アラートに表示するメッセージを設定します。
 
         Returns:
             Alert: warningタイプのAlertのインスタンスを返す。
@@ -199,7 +199,7 @@ class MessageBox(pn.WidgetBox):
         """ errorアラートに更新するメソッドです。
 
         Args:
-            msg (str, optional): アラートに表示するメッセージを設定します。
+            msg (str): アラートに表示するメッセージを設定します。
 
         Returns:
             Alert: dangerタイプのAlertのインスタンスを返す。
@@ -214,7 +214,7 @@ class MessageBox(pn.WidgetBox):
         """ infoアラートを追加するメソッドです。
 
         Args:
-            msg (str, optional): アラートに表示するメッセージを設定します。
+            msg (str): アラートに表示するメッセージを設定します。
 
         Returns:
             Alert: infoタイプのAlertのインスタンスを返す。
@@ -228,7 +228,7 @@ class MessageBox(pn.WidgetBox):
         """ successアラートを追加するメソッドです。
 
         Args:
-            msg (str, optional): アラートに表示するメッセージを設定します。
+            msg (str): アラートに表示するメッセージを設定します。
 
         Returns:
             Alert: successタイプのAlertのインスタンスを返す。
@@ -242,7 +242,7 @@ class MessageBox(pn.WidgetBox):
         """ warningアラートを追加するメソッドです。
 
         Args:
-            msg (str, optional): アラートに表示するメッセージを設定します。
+            msg (str): アラートに表示するメッセージを設定します。
 
         Returns:
             Alert: warningタイプのAlertのインスタンスを返す。
@@ -256,7 +256,7 @@ class MessageBox(pn.WidgetBox):
         """ errorアラートを追加するメソッドです。
 
         Args:
-            msg (str, optional): アラートに表示するメッセージを設定します。
+            msg (str): アラートに表示するメッセージを設定します。
 
         Returns:
             Alert: dangerタイプのAlertのインスタンスを返す。

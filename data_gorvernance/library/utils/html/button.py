@@ -18,17 +18,17 @@ def create_button(
     """ HTMLのボタンを作成する関数です。
 
     Args:
-        url (str, optional): ボタンがクリックされたときに遷移するURLを設定します。
-        msg (str, optional): ボタン上に表示するメッセージを設定します。
-        disable (bool, optional): ボタンを無効化するかどうかを設定します。Trueの場合、ボタンは無効化されます。
-        target (str, optional): リンクの開き方を指定します。'_self'は同じタブで開くことを意味します。
-        a_character_color (str, optional): ボタンの文字色を指定します。
-        a_font_size (str, optional): ボタンのフォントサイズを指定します。
-        button_width (str, optional): ボタンの幅を指定します。
-        button_height (str, optional): ボタンの高さを指定します。
-        button_border_radius (str, optional): ボタンの角の丸みを指定します。
-        border (List[str], optional): ボタンの枠線のスタイルを指定します。
-        button_background_color (str, optional): ボタンの背景色を指定します。
+        url (str): ボタンがクリックされたときに遷移するURLを設定します。
+        msg (str): ボタン上に表示するメッセージを設定します。
+        disable (bool): ボタンを無効化するかどうかを設定します。Trueの場合、ボタンは無効化されます。
+        target (str): リンクの開き方を指定します。'_self'は同じタブで開くことを意味します。
+        a_character_color (str): ボタンの文字色を指定します。
+        a_font_size (str): ボタンのフォントサイズを指定します。
+        button_width (str: ボタンの幅を指定します。
+        button_height (str): ボタンの高さを指定します。
+        button_border_radius (str): ボタンの角の丸みを指定します。
+        border (List[str]): ボタンの枠線のスタイルを指定します。
+        button_background_color (str): ボタンの背景色を指定します。
 
     Returns:
         str: 生成されたHTMLボタンの文字列を返す。

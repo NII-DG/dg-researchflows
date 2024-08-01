@@ -99,11 +99,11 @@ def create_anchor(elems: list, link: str):
     """リンクを付与する関数です。
 
     Args:
-        elems (list): リンクを付与する要素のリスト。
-        link (str): リンクのURL
+        elems (list): リンクを付与する要素のリストを設定します。
+        link (str): リンクのURLを設定します。
 
     Returns:
-        etree.Element: リンクを付与した要素。
+        etree.Element: リンクを付与した要素を返す。
 
     """
     a_elem = etree.Element('a')

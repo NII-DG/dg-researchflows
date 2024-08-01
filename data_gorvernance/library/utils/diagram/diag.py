@@ -112,7 +112,7 @@ class DiagManager:
 
     # 仮置き
     def run(self, output: str, diag: str, font: str) -> int:
-        """ 新しいプロセスでなくダイアグラムを生成する関数。
+        """ 新しいプロセスでなくダイアグラムを生成するメソッドです。
 
         Args:
             output (str): 出力するパスを設定します。

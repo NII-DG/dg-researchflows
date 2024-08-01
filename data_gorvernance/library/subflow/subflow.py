@@ -42,10 +42,10 @@ class SubFlowManager:
         self.task_dir = using_task_dir
 
     def setup_tasks(self, souce_task_dir: str):
-        """ ソースタスクディレクトリからタスクファイルをコピーするメソッドです。
+        """ タスクの原本があるディレクトリからタスクファイルをコピーするメソッドです。
 
         Args:
-            souce_task_dir(str) : ソースタスクディレクトリのパスを設定します。
+            souce_task_dir(str) : タスクの原本があるディレクトリのパスを設定します。
 
         """
         if os.path.isdir(souce_task_dir):
@@ -91,7 +91,7 @@ class SubFlowManager:
             svg_path (str): SVGファイルの出力パスを設定します。
             tmp_diag (str): 一時的なダイアグラムファイルへのパスを設定します。
             font (str): ダイアグラムに使用するフォントを設定します。
-            display_all (bool, optional): 非推奨のタスクを推奨タスクと同じように表示するかどうかを設定します。
+            display_all (bool): 非推奨のタスクを推奨タスクと同じように表示するかどうかを設定します。
 
         """
         # 毎回元ファイルを読み込む
@@ -111,7 +111,7 @@ class SubFlowManager:
         """ タスクの状態に基づいてダイアグラムを更新するメソッドです。
 
         Args:
-            display_all (bool, optional): 非推奨のタスクを推奨タスクと同じように表示するかどうかを設定します。
+            display_all (bool): 非推奨のタスクを推奨タスクと同じように表示するかどうかを設定します。
 
         """
         for task in self.tasks:
@@ -119,13 +119,11 @@ class SubFlowManager:
             self._adjust_by_optional(task, display_all)
 
     def _adjust_by_optional(self, task: SubflowTask, display_all: bool = True) -> None:
-        """ 非推奨タスクな場合にダイアグラムを調整するメソッドです。
-
-        非推奨のタスクはグレーアウトされ、リンクが押せない状態になります。
+        """ 非推奨のタスクをグレーアウトし、リンクが押せない状態にするメソッドです。
 
         Args:
             task (SubflowTask): 調整するタスクを設定します。
-            display_all (bool, optional): 非推奨のタスクを通常通りに表示するかどうかを設定します。
+            display_all (bool): 非推奨のタスクを通常通りに表示するかどうかを設定します。
 
         """
         if task.disable:
@@ -139,11 +137,11 @@ class SubFlowManager:
                 self.svg_config[task.id]['is_link'] = False
 
     def _adjust_by_status(self, task: SubflowTask, display_all: bool = True) -> None:
-        """ フロー図の見た目を状態によって変えるメソッドです。
+        """ フロー図の見た目をタスクの状態によって変えるメソッドです。
 
         Args:
             task (SubflowTask): 調整するタスクを設定します。
-            display_all (bool, optional): 非推奨のタスクを推奨タスクと同じように調整するかどうかを設定します。
+            display_all (bool): 非推奨のタスクを推奨タスクと同じように調整するかどうかを設定します。
 
         """
         if task.disable and not display_all:

@@ -54,7 +54,7 @@ def get_task_data_dir(abs_root:str, phase:str, data_dir_name:str)->str:
     <root>/data/<phase>/<data_dir_name>の形式で取得します。
 
     Args:
-        abs_root (str): ルートディレクトリの絶対パスを設定します。
+        abs_root (str): ホームディレクトリの絶対パスを設定します。
         phase (str): サブフロー種別（フェーズ）を設定します。
         data_dir_name (str): データディレクトリ名を設定します。
 
@@ -94,7 +94,7 @@ def get_research_flow_status_file_path(abs_root:str)->str:
     """ リサーチフローのステータスファイルのパスを取得する関数です。
 
     Args:
-        abs_root (str): ルートディレクトリの絶対パスを設定します。
+        abs_root (str): ホームディレクトリの絶対パスを設定します。
 
     Returns:
         str: リサーチフローのステータスファイルのパスを返す。
@@ -121,7 +121,7 @@ def get_sub_flow_menu_path(phase:str, subflow_id:str='')->str:
     Args:
         phase (str): サブフロー種別（フェーズ）を設定します。
 
-        subflow_id (str, optional): サブフローIDを設定します。
+        subflow_id (str): サブフローIDを設定します。
 
     Returns:
         str : サブフローメニューNotebookへのパス
@@ -141,7 +141,7 @@ def get_sub_flow_status_file_path(phase:str, subflow_id:str='')->str:
 
     Args:
         phase (str): サブフロー種別（フェーズ）を設定します。
-        subflow_id (str, optional): サブフローIDを設定します。
+        subflow_id (str): サブフローIDを設定します。
 
     Returns:
         str: サブフローのステータスファイルへのパスを返す。
@@ -157,7 +157,7 @@ def get_ocs_template_dir( subflow_id:str='' ):
     """ ocs-templatesディレクトリのパスを取得する関数です。
 
     Args:
-        subflow_id (str, optional): サブフローIDを設定します。
+        subflow_id (str): サブフローIDを設定します。
 
     Returns:
         str: ocs-templatesディレクトリのパスを返す。

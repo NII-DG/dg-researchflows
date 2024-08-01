@@ -50,8 +50,8 @@ class RunCrateForm:
         """RunCrate選択の入力欄を生成するメソッドです。
 
         Args:
-            crates (list): index.jsonの内容
-            data (dict): metadata
+            crates (list): index.jsonの内容を設定します。
+            data (dict|None): metadataを設定します。
 
         """
         # データの整形

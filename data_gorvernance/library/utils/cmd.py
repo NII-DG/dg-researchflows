@@ -10,12 +10,12 @@ class Cmd():
     def decode_exec_subprocess(cls, cmd: str, cwd: str='', raise_error: bool=True)->Tuple[str, str, int]:
         """ コマンドの実行結果をデコードするメソッドです。
 
-        引数のコマンドを実行させ、その実行結果をデコードするメソッドです。
+        引数で指定したコマンドを実行させ、その実行結果をデコードするメソッドです。
 
         Args:
             cmd(str): 実行するコマンドを設定します。
-            cwd(str, optional): プロセスの作業ディレクトリを設定します。デフォルト値は''です。
-            raise_error(bool, optional): コマンド実行失敗したときに例外を発生させるかを設定します。
+            cwd(str): プロセスの作業ディレクトリを設定します。デフォルト値は''です。
+            raise_error(bool): コマンド実行失敗したときに例外を発生させるかを設定します。
 
         Returns:
             str: コマンドの標準出力を返す。
@@ -34,8 +34,8 @@ class Cmd():
 
         Args:
             cmd(str): 実行するコマンドを設定します。
-            cwd(str, optional): プロセスの作業ディレクトリを設定します。
-            raise_error(bool, optional): コマンド実行失敗したときに例外を発生させるかを設定します。
+            cwd(str): プロセスの作業ディレクトリを設定します。
+            raise_error(bool): コマンド実行失敗したときに例外を発生させるかを設定します。
 
         Returns:
             bytes: コマンドの標準出力を返す。

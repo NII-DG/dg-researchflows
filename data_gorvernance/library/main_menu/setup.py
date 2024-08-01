@@ -1,11 +1,11 @@
 import os
+from pathlib import Path
 import re
 import traceback
-from pathlib import Path
 
-import panel as pn
-from IPython.display import display, clear_output
 from IPython.core.display import Javascript
+from IPython.display import display, clear_output
+import panel as pn
 
 from library.subflow.menu import access_main_menu
 from library.utils.config import path_config, message as msg_config

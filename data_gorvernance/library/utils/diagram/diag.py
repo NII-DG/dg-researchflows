@@ -1,6 +1,6 @@
-import traceback
 from pathlib import Path
 from subprocess import run
+import traceback
 
 from blockdiag.command import BlockdiagApp
 from blockdiag.utils.logging import error
@@ -33,8 +33,6 @@ class DiagManager:
             else:
                 new_lines.append(line)
         self.content = '\n'.join(new_lines)
-
-
 
     def update_node_color(self, node_id: str, color: str):
         self.add_node_property(node_id, f'color="{color}"')
@@ -80,4 +78,3 @@ class DiagManager:
             return -1
         finally:
             app.cleanup()
-

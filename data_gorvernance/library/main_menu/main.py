@@ -1,9 +1,9 @@
 import os
 import traceback
 
-import panel as pn
-from IPython.display import display
 from IPython.core.display import Javascript
+from IPython.display import display
+import panel as pn
 
 from library.utils.config import path_config, message as msg_config
 from library.utils.error import InputWarning

@@ -3,8 +3,8 @@ import shutil
 import traceback
 from typing import Dict, List
 
-import panel as pn
 from dg_drawer.research_flow import PhaseStatus
+import panel as pn
 
 from library.utils import file
 from library.utils.config import path_config, message as msg_config

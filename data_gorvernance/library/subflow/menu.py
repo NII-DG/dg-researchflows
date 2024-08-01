@@ -1,12 +1,12 @@
 import os
-import traceback
-import xml.etree.ElementTree as ET
 from pathlib import Path
 from tempfile import TemporaryDirectory
+import traceback
+import xml.etree.ElementTree as ET
 
-import panel as pn
-from IPython.display import display
 from IPython.core.display import Javascript
+from IPython.display import display
+import panel as pn
 
 from library.task_director import get_subflow_type_and_id
 from library.utils import file

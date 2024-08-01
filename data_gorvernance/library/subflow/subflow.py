@@ -1,5 +1,5 @@
-import os
 from itertools import chain, zip_longest
+import os
 from pathlib import Path
 
 from nbformat import NO_CONVERT, read

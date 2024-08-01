@@ -13,13 +13,13 @@ class AnalysisEnvironment:
 
     Attributes:
         class:
-            __FIELD(str):解析環境
+            __FIELD(str):解析環境のキー名
             __ID(str):解析環境のid
             __NAME(str):解析環境の名前
             __DESCRIPTION(str):解析環境の説明
             __IS_ACTIVE(str):アクティブかの判定を行う
         instance:
-            analysis_environment(Any):解析環境
+            analysis_environment(list「object]):解析環境のキー名のリスト
 
     """
     __FIELD = 'analysis_environment'
@@ -31,7 +31,7 @@ class AnalysisEnvironment:
     def __init__(self):
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
-        解析環境の情報を取得する際に共通の処理となるファイルの読みだしを行います。
+        解析環境の情報を取得する際に共通の処理となるファイルの読み込みを行います。
 
         """
         contents = JsonFile(str(json_path)).read()

@@ -27,15 +27,15 @@ class SubflowTask:
             allowed_statuses(str):許可されたステータス
 
         instance:
-            id (str):タスクの機能ID
-            name (str): タスクのファイル名
-            is_multiple (bool):タスクが複数回実行されるかの判定。複数回実行されるものであればtrue、1回しか実行されないものであればfalse
-            is_required (bool): 必須タスクかの判定。必須であればtrue、そうでなければfalse
-            completed_count (int):タスクの完了回数
-            dependent_task_ids (list[str]):依存するタスクの機能ID
-            status (str):実行状況
-            execution_environments (list[str]): 実行中の実行環境IDのリスト
-            disabled (bool):使用不可の状態とするためのフラグ
+            _id (str):タスクの機能ID
+            _name (str): タスクのファイル名
+            _is_multiple (bool):タスクが複数回実行されるかの判定。複数回実行されるものであればtrue、1回しか実行されないものであればfalse
+            _is_required (bool): 必須タスクかの判定。必須であればtrue、そうでなければfalse
+            _completed_count (int):タスクの完了回数
+            _dependent_task_ids (list[str]):依存するタスクの機能ID
+            _status (str):実行状況
+            _execution_environments (list[str]): 実行中の実行環境IDのリスト
+            _disabled (bool):使用不可の状態とするためのフラグ
 
     """
     __ID = 'id'
@@ -86,7 +86,7 @@ class SubflowTask:
             status (str):ステータス情報
 
         Raises:
-            ValueError:強化されたステータスに含まれていない
+            ValueError:許可されたステータスに含まれていない
 
         """
         if status in self.allowed_statuses:
@@ -106,7 +106,7 @@ class SubflowTask:
 
     @property
     def id(self)->str:
-        """_idを取得するためのゲッターです。
+        """タスクの機能IDを取得するためのゲッターです。
 
         Returns:
             str: タスクの機能ID
@@ -116,7 +116,7 @@ class SubflowTask:
 
     @property
     def name(self)->str:
-        """_nameを取得するためのゲッターです。
+        """タスクのファイル名を取得するためのゲッターです。
 
         Returns:
             str: タスクのファイル名
@@ -126,7 +126,7 @@ class SubflowTask:
 
     @property
     def is_multiple(self)->bool:
-        """_is_multipleを取得するためのゲッターです。
+        """タスクが複数回実行されるかの判定結果を取得するためのゲッターです。
 
         Returns:
             bool: タスクが複数回実行されるかの判定
@@ -136,7 +136,7 @@ class SubflowTask:
 
     @property
     def is_required(self)->bool:
-        """_is_requiredを取得するためのゲッターです。
+        """必須タスクかの判定結果を取得するためのゲッターです。
 
         Returns:
             bool: 必須タスクかの判定
@@ -146,7 +146,7 @@ class SubflowTask:
 
     @property
     def completed_count(self)->int:
-        """_completed_countを取得するためのゲッターです。
+        """タスクの完了回数を取得するためのゲッターです。
 
         Returns:
             bool:タスクの完了回数
@@ -160,7 +160,7 @@ class SubflowTask:
 
     @property
     def dependent_task_ids(self)->list[str]:
-        """_dependent_task_idsを取得するためのゲッターです。
+        """依存するタスクの機能IDを取得するためのゲッターです。
 
         Returns:
             list[str]:依存するタスクの機能ID
@@ -170,7 +170,7 @@ class SubflowTask:
 
     @property
     def status(self)->str:
-        """_statusを取得するためのゲッターです。
+        """実行状況を取得するためのゲッターです。
 
         Returns:
             str:実行状況
@@ -180,7 +180,7 @@ class SubflowTask:
 
     @status.setter
     def status(self, status: str):
-        """_statusに値をセットするためのセッターです。
+        """実行状況を設定するためのセッターです。
 
         Args:
             status (str):_statusにセットする値
@@ -190,7 +190,7 @@ class SubflowTask:
 
     @property
     def disable(self)->bool:
-        """_disableを取得するためのゲッターです。
+        """使用不可の状態とするためのフラグを取得するためのゲッターです。
 
         Returns:
             bool:使用不可の状態とするためのフラグ
@@ -199,7 +199,7 @@ class SubflowTask:
 
     @disable.setter
     def disable(self, is_disable:bool):
-        """_disableに値をセットするためのセッターです。
+        """使用不可の状態とするためのフラグを設定するためのセッターです。
 
         Args:
             is_disable (bool):_disableにセットする値
@@ -209,7 +209,7 @@ class SubflowTask:
 
     @property
     def execution_environments(self)->list[str]:
-        """_execution_environmentsを取得するためのゲッターです。
+        """実行中の実行環境IDのリストを取得するためのゲッターです。
 
         Returns:
             list[str]:実行中の実行環境IDのリスト
@@ -260,7 +260,7 @@ class SubflowStatus:
 
     @property
     def is_completed(self)->bool:
-        """_is_completedを取得するためのゲッターです。
+        """サブフローが完了しているかの判定結果を取得するためのゲッターです。
 
         Returns:
             bool:サブフローが完了しているかの判定
@@ -270,7 +270,7 @@ class SubflowStatus:
 
     @property
     def tasks(self)->list[SubflowTask]:
-        """_tasksを取得するためのゲッターです。
+        """:サブフローの各タスクのステータスのリストを取得するためのゲッターです。
 
         Returns:
            list[SubflowTask]:サブフローの各タスクのステータスのリスト
@@ -280,7 +280,7 @@ class SubflowStatus:
 
     @is_completed.setter
     def is_completed(self, is_completed: bool):
-        """_is_completedに値をセットするためのセッターです。
+        """サブフローが完了しているかの判定結果の値を設定するためのセッターです。
 
         Args:
             is_completed (bool):_is_completedにセットする値
@@ -389,8 +389,6 @@ class SubflowStatusFile(JsonFile):
     def __init__(self, file_path: str):
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
-        親クラスのコンストラクタを呼び出すことでパスオブジェクトを作成します。
-
         Args:
             file_path (str): 対象ファイルのパス
 
@@ -398,7 +396,7 @@ class SubflowStatusFile(JsonFile):
         super().__init__(file_path)
 
     def read(self)->SubflowStatus:
-        """ジェイソンファイルの読み出しを行うメソッドです。
+        """ジェイソンファイルの読み込みを行うメソッドです。
 
         Returns:
             SubflowStatus:作成したSubflowStatusクラスのインスタンス

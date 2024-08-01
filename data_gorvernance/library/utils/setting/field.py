@@ -15,13 +15,13 @@ class Field:
 
     Attributes:
         class:
-            __FIELD(str):フィールドデータ
-            __ID(str):id
+            __FIELD(str):フィールドデータのキー名
+            __ID(int):id
             __FIELD_NAME(str):フィールド名
             __EXPERIMENT_PACKAGE(str):実験パッケージ
             __IS_ACTIVE(str):アクティブかの判定を行う
         instance:
-            field(list(object)):フィールドデータを保存する。
+            field(list(object)):フィールドデータのキー名のリスト
 
     """
     __FIELD = "field"
@@ -33,7 +33,7 @@ class Field:
     def __init__(self) -> None:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
-        field.jsonのファイルのデータを扱う際に共通の処理である読み出しを行います。
+        field.jsonのファイルからフィールドデータを読み込みます。
 
         """
         contents = JsonFile(str(field_json_file)).read()

@@ -9,8 +9,6 @@ class DMPManager(JsonFile):
     def __init__(self, file_path: str):
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
-        親クラスのコンストラクタを用いてpathオブジェクトに変換しています。
-
         Args:
             file_path (str): ファイルパスを表す文字列
 

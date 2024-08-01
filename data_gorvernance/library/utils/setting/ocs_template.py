@@ -15,13 +15,13 @@ class OCSTemplate:
 
     Attributes:
         class:
-            __FIELD(str):OCSテンプレートデータ
+            __FIELD(str):OCSテンプレートデータのキー名
             __ID(str):id
             __FIELD_NAME(str):OCSテンプレート名
             __OCS_TEMPLATE_PATH(str):OCSテンプレートパス
             __IS_ACTIVE(str):アクティブ状態かの判定を行う
         instance:
-           ocs_template(list(object)):OCSテンプレートデータを保存する。
+           ocs_template(list(object)):OCSテンプレートデータのキー名のリスト
 
     """
     __FIELD = "ocs_template"

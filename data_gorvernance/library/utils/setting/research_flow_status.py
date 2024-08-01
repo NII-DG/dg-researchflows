@@ -90,8 +90,6 @@ class ResearchFlowStatusFile(JsonFile):
     def __init__(self, file_path: str):
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
-        引数として受け取ったファイルパスが存在している場合のみ、親クラスのコンストラクタを用いてpathオブジェクトに変換します。
-
         Args:
             file_path (str):ファイルパス
 
@@ -171,7 +169,7 @@ class ResearchFlowStatusFile(JsonFile):
         """固有のサブフローIDを発行するメソッドです。
 
         Returns:
-            str: 新たに発行した固有のサブフローID
+            str:新たに発行した固有のサブフローID
 
         """
         while True:
@@ -185,7 +183,7 @@ class ResearchFlowStatusFile(JsonFile):
                 return candidate_id
 
     def is_unique_subflow_name(self, phase_seq_number:int, sub_flow_name:str)->bool:
-        """フェーズ内に同じ名前のサブフローが存在しないかの確認を行うメソッドです。
+        """フェーズ内に同じ名前のサブフローが存在するかの確認を行うメソッドです。
 
         Args:
             phase_seq_number:フェーズシーケンス番号
@@ -195,7 +193,7 @@ class ResearchFlowStatusFile(JsonFile):
             bool:同一のサブフロー名が存在するかの判定結果
 
         Raises:
-            Exception:一致するフェーズが存在しない
+            Exception:引数で指定したフェーズが存在しない
 
         """
         exist_phase = False
@@ -262,7 +260,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         return fd.draw()
 
     def update_display_object(self, research_flow_status:List[PhaseStatus])-> List[PhaseStatus]:
-        """  リサーチフローステータス管理情報を画面表示用に調整するメソッドです。
+        """リサーチフローステータス管理情報を画面表示用に調整するメソッドです。
 
         Args:
             research_flow_status (List[PhaseStatus]):リサーチフローステータス管理情報
@@ -279,13 +277,8 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
             update_research_flow_status.append(phase)
         return update_research_flow_status
 
-    def init_research_preparation(self, file_path:str):
-        """研究準備ステータスの初期化を行うメソッドです。
-
-        Args:
-            file_path (str):使用されていないので詳細は不明です。
-
-        """
+    def init_research_preparation(self):
+        """研究準備ステータスの初期化を行うメソッドです。"""
         # 研究準備のサブフローデータのサブフロー作成時間が-1の場合、現在の現時刻に更新する。
         research_flow_status = self.load_research_flow_status()
         for phase_status in research_flow_status:
@@ -317,7 +310,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
             str:新しく作成したサブフローのID
 
         Raises:
-            Exception:対象のフェーズが存在しない
+            Exception:引数で指定しフェーズが存在しない
             Exception:新しく作成したサブフローのIDが発行できない
 
         """

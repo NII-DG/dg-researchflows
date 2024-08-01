@@ -48,8 +48,8 @@ class SubFlowRule:
 
     Attributes:
         class:
-            __TASK_IDS(str):タスクのid群
-            __VERIFICATION_IDS(str):検証用のid群
+            __TASK_IDS(list[str]):タスクのid群
+            __VERIFICATION_IDS(list[str]):検証用のid群
         instance:
             _subflow_type_name(str):サブフローの型名
             _task_ids(list[str]):タスクのID群

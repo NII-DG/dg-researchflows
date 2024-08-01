@@ -156,7 +156,7 @@ class ResearchFlowStatusFile(JsonFile):
             research_flow_status (List[PhaseStatus]): リサーチフローステータス管理情報
 
         Returns:
-            bool:target_idと一致するサブフローIDが存在するかの判定
+            bool:target_idと一致するサブフローIDが存在するかの判定に用いるフラグ
 
         """
         for phase in research_flow_status:
@@ -190,7 +190,7 @@ class ResearchFlowStatusFile(JsonFile):
             sub_flow_name:サブフロー名
 
         Returns:
-            bool:同一のサブフロー名が存在するかの判定結果
+            bool:同一のサブフロー名が存在するかのフラグ
 
         Raises:
             Exception:引数で指定したフェーズが存在しない
@@ -213,14 +213,14 @@ class ResearchFlowStatusFile(JsonFile):
         return True
 
     def is_unique_data_dir(self, phase_seq_number:int, data_dir_name:str)->bool:
-        """フェーズ内に同じ名前のデータフォルダが存在しないかの確認を行うメソッドです。
+        """フェーズ内に同じ名前のデータフォルダが存在するかの確認を行うメソッドです。
 
         Args:
             phase_seq_number (int):フェーズシーケンス番号
             data_dir_name (str):データフォルダ名
 
         Returns:
-            bool:同一のデータフォルダ名が存在するかの判定結果
+            bool:同一のデータフォルダ名が存在するかのフラグ
 
         Raises:
             Exception:一致するフェーズが存在しない

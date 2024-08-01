@@ -10,27 +10,27 @@ class SubflowTask:
 
     Attributes:
         class:
-            __ID(str):タスクの機能ID
-            __NAME(str):タスクのファイル名
-            __IS_MULTIPLE(str):タスクが複数回実行されるかの判定。複数回実行されるものであればtrue、1回しか実行されないものであればfalse
-            __IS_REQURED(str) :必須タスクかの判定。必須であればtrue、そうでなければfalse
-            __COMPLETED_COUNT(str):タスクの完了回数
-            __DEPENDENT_TASK_IDS(str):依存するタスクの機能ID
-            __STATUS(str):実行状況
-            __EXECUTION_ENVIRONMENTS(str):実行中の実行環境IDのリスト
-            __DISABLED(str):使用不可の状態とするためのフラグ
+            __ID(str):タスクの機能IDのキー名
+            __NAME(str):タスクのファイル名のキー名
+            __IS_MULTIPLE(str):タスクが複数回実行されるかの判定に用いるフラグのキー名。複数回実行されるものであればtrue、1回しか実行されないものであればfalse
+            __IS_REQURED(str) :必須タスクかの判定に用いるフラグのキー名。必須であればtrue、そうでなければfalse
+            __COMPLETED_COUNT(str):タスクの完了回数のキー名
+            __DEPENDENT_TASK_IDS(str):依存するタスクの機能IDのキー名
+            __STATUS(str):実行状況のキー名
+            __EXECUTION_ENVIRONMENTS(str):実行中の実行環境IDのリストのキー名
+            __DISABLED(str):使用不可の状態とするためのフラグのキー名
 
-            STATUS_UNFEASIBLE(str):実行状況（実行不可能）
-            STATUS_UNEXECUTED(str):実行状況（未実行）
-            STATUS_DOING(str):実行状況（実行中）
-            STATUS_DONE(str):実行状況（実行完了）
-            allowed_statuses(str):許可されたステータス
+            STATUS_UNFEASIBLE(str):実行状況（実行不可能）のキー名
+            STATUS_UNEXECUTED(str):実行状況（未実行）のキー名
+            STATUS_DOING(str):実行状況（実行中）のキー名
+            STATUS_DONE(str):実行状況（実行完了）のキー名
+            allowed_statuses(str):許可されたステータスのキー名
 
         instance:
             _id (str):タスクの機能ID
             _name (str): タスクのファイル名
-            _is_multiple (bool):タスクが複数回実行されるかの判定。複数回実行されるものであればtrue、1回しか実行されないものであればfalse
-            _is_required (bool): 必須タスクかの判定。必須であればtrue、そうでなければfalse
+            _is_multiple (bool):タスクが複数回実行されるかの判定に用いるフラグ。複数回実行されるものであればtrue、1回しか実行されないものであればfalse
+            _is_required (bool): 必須タスクかの判定に用いるフラグ。必須であればtrue、そうでなければfalse
             _completed_count (int):タスクの完了回数
             _dependent_task_ids (list[str]):依存するタスクの機能ID
             _status (str):実行状況
@@ -60,8 +60,8 @@ class SubflowTask:
         Args:
             id (str):タスクの機能ID
             name (str): タスクのファイル名
-            is_multiple (bool):タスクが複数回実行されるかの判定。複数回実行されるものであればtrue、1回しか実行されないものであればfalse
-            is_required (bool): 必須タスクかの判定。必須であればtrue、そうでなければfalse
+            is_multiple (bool):タスクが複数回実行されるかの判定に用いるフラグ。複数回実行されるものであればtrue、1回しか実行されないものであればfalse
+            is_required (bool): 必須タスクかの判定に用いるフラグ。必須であればtrue、そうでなければfalse
             completed_count (int):タスクの完了回数
             dependent_task_ids (list[str]):依存するタスクの機能ID
             status (str):実行状況
@@ -126,20 +126,20 @@ class SubflowTask:
 
     @property
     def is_multiple(self)->bool:
-        """タスクが複数回実行されるかの判定結果を取得するためのゲッターです。
+        """タスクが複数回実行されるかの判定に用いるフラグを取得するためのゲッターです。
 
         Returns:
-            bool: タスクが複数回実行されるかの判定
+            bool: タスクが複数回実行されるかの判定に用いるフラグ
 
         """
         return self._is_multiple
 
     @property
     def is_required(self)->bool:
-        """必須タスクかの判定結果を取得するためのゲッターです。
+        """必須タスクかの判定に用いるフラグを取得するためのゲッターです。
 
         Returns:
-            bool: 必須タスクかの判定
+            bool: 必須タスクかの判定に用いるフラグ
 
         """
         return self._is_required
@@ -149,7 +149,7 @@ class SubflowTask:
         """タスクの完了回数を取得するためのゲッターです。
 
         Returns:
-            bool:タスクの完了回数
+            int:タスクの完了回数
 
         """
         return self._completed_count
@@ -242,7 +242,7 @@ class SubflowStatus:
 
     Attributes:
         instance:
-            _is_completed(bool):サブフローが完了しているかの判定。初期値はfalseで必須タスクが全て完了した段階でtrueに更新
+            _is_completed(bool):サブフローが完了しているかの判定に用いるフラグ。初期値はfalseで必須タスクが全て完了した段階でtrueに更新
             _tasks(list[SubflowTask]):サブフローの各タスクのステータスのリスト
 
     """
@@ -251,7 +251,7 @@ class SubflowStatus:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
         Args:
-            is_completed (bool):サブフローが完了しているかの判定
+            is_completed (bool):サブフローが完了しているかの判定に用いるフラグ
             tasks (list[dict]):サブフローの各タスクのステータスのリスト
 
         """
@@ -260,10 +260,10 @@ class SubflowStatus:
 
     @property
     def is_completed(self)->bool:
-        """サブフローが完了しているかの判定結果を取得するためのゲッターです。
+        """サブフローが完了しているかの判定に用いるフラグを取得するためのゲッターです。
 
         Returns:
-            bool:サブフローが完了しているかの判定
+            bool:サブフローが完了しているかの判定に用いるフラグ
 
         """
         return self._is_completed
@@ -280,7 +280,7 @@ class SubflowStatus:
 
     @is_completed.setter
     def is_completed(self, is_completed: bool):
-        """サブフローが完了しているかの判定結果の値を設定するためのセッターです。
+        """サブフローが完了しているかの判定に用いるフラグの値を設定するためのセッターです。
 
         Args:
             is_completed (bool):_is_completedにセットする値

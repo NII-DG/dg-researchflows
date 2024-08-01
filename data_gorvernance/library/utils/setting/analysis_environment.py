@@ -14,12 +14,12 @@ class AnalysisEnvironment:
     Attributes:
         class:
             __FIELD(str):解析環境のキー名
-            __ID(str):解析環境のid
-            __NAME(str):解析環境の名前
-            __DESCRIPTION(str):解析環境の説明
-            __IS_ACTIVE(str):アクティブかの判定を行う
+            __ID(str):解析環境のidのキー名
+            __NAME(str):解析環境の名前のキー名
+            __DESCRIPTION(str):解析環境の説明のキー名
+            __IS_ACTIVE(str):アクティブかの判定に用いるフラグのキー名
         instance:
-            analysis_environment(list「object]):解析環境のキー名のリスト
+            analysis_environment(list「object]):解析環境のリスト
 
     """
     __FIELD = 'analysis_environment'

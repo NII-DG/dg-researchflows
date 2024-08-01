@@ -154,7 +154,7 @@ def is_annex_branch_in_repote(cwd:str)->bool:
         cwd (Any):ルートディレクトリの絶対パス
 
     Returns:
-        bool:origin/git-annexが存在するかの判定結果
+        bool:origin/git-annexが存在するかのフラグ
 
     """
     result = git_branch_for_remote(cwd)
@@ -179,13 +179,13 @@ def exec_git_status(cwd:str)->str:
     return result
 
 def is_conflict(cwd:str) -> bool:
-    """現在のgitリポジトリに衝突しているものがないか確かめるメソッドです。
+    """現在のgitリポジトリに衝突しているものがあるかを確かめるメソッドです。
 
     Args:
         cwd (Any):ルートディレクトリの絶対パス
 
     Returns:
-        bool:衝突しているものがないかの判定
+        bool:衝突しているものがあるかのフラグ
 
     """
     result = exec_git_status(cwd)

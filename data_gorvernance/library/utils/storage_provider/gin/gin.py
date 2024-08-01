@@ -254,7 +254,7 @@ def exist_user_info()->bool:
     """ユーザー情報が保存されているファイルが存在しているかを確認するメソッドです。
 
     Returns:
-        bool: ユーザー情報が保存されているファイルが存在しているかの結果
+        bool: ユーザー情報が保存されているファイルが存在しているかのフラグ
 
     """
     return os.path.exists(USER_INFO_PATH)
@@ -263,7 +263,7 @@ def del_build_token()->tuple[bool, Optional[str]]:
     """トークンの削除を行うメソッドです。
 
     Returns:
-        bool:トークンが存在しているかの判定
+        bool:トークンが存在しているかのフラグ
         str:トークンの削除処理がどのように行われたかのメッセージ
 
     """
@@ -290,7 +290,7 @@ def datalad_create(dir_path:str)->bool:
         path (str): データセット化するディレクトリのパス
 
     Returns:
-        bool:既にdataladのデータセットであるかの判定を行う
+        bool:既にdataladのデータセットであるかのフラグ
 
     """
     if not os.path.isdir(os.path.join(dir_path, ".datalad")):
@@ -306,7 +306,7 @@ def create_key(root_path:str)->bool:
         root_path (str):SSHキーを作成するディレクトリのルートパス
 
     Returns:
-        bool:SSHキーを作成したかの判定を行う
+        bool:SSHキーが作成されたかのフラグ
 
     """
     ssh_key_path = os.path.join(root_path, __SSH_KEY_PATH)
@@ -346,7 +346,7 @@ def upload_ssh_key(root_path:str)->str:
         raise Exception(f'Fial Upload pub-SSH key. Response Code [{response.status_code}]')
 
 def trust_gin(root_path:str):
-    """GINの信頼設定を行うメソッドです。。
+    """GINの信頼設定を行うメソッドです。
 
     Args:
         root_path (str):設定ファイルの保存されているディレクトリのルートパス
@@ -469,7 +469,7 @@ def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str], gitann
         get_paths (list[str]):取得するデータセットへのパス
 
     Returns:
-        bool:同期の成功判定
+        bool:同期の成否を示すフラグ
 
     note:
         update()を最初にするとgit annex lockができない。addをする必要がある。
@@ -683,7 +683,7 @@ def is_should_annex_content_path(file_path : str)->bool:
         file_path (str):指定されたファイルパス
 
     Returns:
-        bool:条件を満たしているかの結果
+        bool:条件を満たしているかのフラグ
 
     """
     path_factor = file_path.split('/')
@@ -872,7 +872,7 @@ def update_repo_url()->bool:
     """HTTPとSSHのリモートURLを最新化するメソッドです。
 
     Returns:
-        bool: プライベートリポジトリかどうかの判定を行う
+        bool: プライベートリポジトリかどうかのフラグ
 
     Raises:
         requests.exceptions.RequestException: 接続の確立不良

@@ -16,12 +16,12 @@ class Field:
     Attributes:
         class:
             __FIELD(str):フィールドデータのキー名
-            __ID(int):id
-            __FIELD_NAME(str):フィールド名
-            __EXPERIMENT_PACKAGE(str):実験パッケージ
-            __IS_ACTIVE(str):アクティブかの判定を行う
+            __ID(int):idのキー名
+            __FIELD_NAME(str):フィールド名のキー名
+            __EXPERIMENT_PACKAGE(str):実験パッケージのキー名
+            __IS_ACTIVE(str):アクティブかの判定に用いるフラグのキー名
         instance:
-            field(list(object)):フィールドデータのキー名のリスト
+            field(list(object)):フィールドデータのリスト
 
     """
     __FIELD = "field"

@@ -16,12 +16,12 @@ class OCSTemplate:
     Attributes:
         class:
             __FIELD(str):OCSテンプレートデータのキー名
-            __ID(str):id
-            __FIELD_NAME(str):OCSテンプレート名
-            __OCS_TEMPLATE_PATH(str):OCSテンプレートパス
-            __IS_ACTIVE(str):アクティブ状態かの判定を行う
+            __ID(str):idのキー名
+            __FIELD_NAME(str):OCSテンプレート名のキー名
+            __OCS_TEMPLATE_PATH(str):OCSテンプレートパスのキー名
+            __IS_ACTIVE(str):アクティブ状態かの判定に用いるフラグのキー名
         instance:
-           ocs_template(list(object)):OCSテンプレートデータのキー名のリスト
+           ocs_template(list(object)):OCSテンプレートデータのリスト
 
     """
     __FIELD = "ocs_template"

@@ -37,7 +37,7 @@ def start_server():
 
 class Vault():
     """Vault Server操作クラスです
-    
+
     Attributes:
         instance:
             __read_token(Callable):ルートトークンを読み取る。
@@ -95,7 +95,7 @@ class Vault():
 
     def get_value(self, key:str) -> dict:
         """値の取得をするメソッドです
-        
+
         Args:
             key(str):トークンをvaultで保存するときのキー
 
@@ -179,7 +179,7 @@ class Vault():
 
     def __write_token(self, token:str):
         """ルートトークン保存のメソッドです
-        
+
         Args:
             token(str):パーソナルアクセストークン 
         """
@@ -188,10 +188,10 @@ class Vault():
 
     def __read_token(self) -> str:
         """ルートトークン取得のメソッドです
-        
+
         Raises:
             UnusableVault:値が利用できないエラー
-            
+
         Returns:
             str:ルートトークンの値を返す。
         """
@@ -204,7 +204,7 @@ class Vault():
 
     def __get_client(self) -> hvac.Client:
         """接続の確認を行うメソッドです
-        
+
         Returns:
             hvac.Client:接続先のページを表示する。     
         """

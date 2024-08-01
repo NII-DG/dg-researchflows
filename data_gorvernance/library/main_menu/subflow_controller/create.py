@@ -141,7 +141,7 @@ class CreateSubflowForm(BaseSubflowForm):
 
     def define_input_form(self) -> pn.Column:
         """サブフロー新規作成フォームのメソッドです。
-        
+
         Returns:
             pn.Column:サブフロー新規作成フォームに必要な値を返す。
         """
@@ -157,7 +157,7 @@ class CreateSubflowForm(BaseSubflowForm):
 
     def main(self):
         """サブフロー新規作成処理のメソッドです。
-        
+
         入力情報を取得し、その値を検証してリサーチフローステータス管理JSONの更新、新規サブフローデータの用意を行う。
 
         Raises:

@@ -16,7 +16,7 @@ from ...utils.error import InputWarning
 
 class RenameSubflowForm(BaseSubflowForm):
     """サブフロー名称変更クラスです。
-    
+
     Attributes:
         instance:
             abs_root (str): サブフローの絶対パス
@@ -110,7 +110,7 @@ class RenameSubflowForm(BaseSubflowForm):
 
     def define_input_form(self) -> Alert | pn.Column:
         """サブフロー名称変更フォームのメソッドです。
-        
+
         Returns:
             Alert | pn.Column:サブフロー名称変更フォームに必要な値を返す。
         """
@@ -129,7 +129,7 @@ class RenameSubflowForm(BaseSubflowForm):
 
     def main(self):
         """サブフロー名称変更処理のメソッドです。
-        
+
         Raises:
             InputWarning:入力値に不備があったエラー
             Exception:ファイル名の変更に失敗した時のエラー

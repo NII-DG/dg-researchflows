@@ -95,7 +95,7 @@ class DeleteSubflowForm(BaseSubflowForm):
 
     def define_input_form(self) -> Alert:
         """サブフロー削除フォームを定義するメソッドです。
-            
+
         Retunes:
             Alert | pn.Column: フォームに表示する内容
         """
@@ -112,9 +112,9 @@ class DeleteSubflowForm(BaseSubflowForm):
 
     def main(self):
         """サブフロー削除処理のメソッドです。
-          
+
         入力情報やパスを取得し、 削除したいデータを取得する。 
-        
+
         Raises:
             Exception:削除失敗したエラー
         """

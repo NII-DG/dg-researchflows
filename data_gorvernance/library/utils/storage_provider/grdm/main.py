@@ -1,5 +1,5 @@
 """データの取得、アップロード、権限やアクセス許可のチェック
-    
+
 このモジュールはデータの取得やアップロード、権限やアクセス許可のチェックを行います。
 プロジェクトID、プロジェクトの一覧、テキストファイルの中身やjsonファイルの中身、メタデータを取得したり、
 GRDMにアップロードしたり、"URLの権限やアクセス許可のチェックを行います。
@@ -110,7 +110,7 @@ def get_projects_list(scheme: str, domain: str, token: str) -> dict:
 
 def sync(token: str, api_url: str, project_id: str, abs_source: str | list, abs_root:str="/home/jovyan"):
     """GRDMにアップロードするメソッドです。
-        
+
     abs_source は絶対パスでなければならない。
 
     Args:

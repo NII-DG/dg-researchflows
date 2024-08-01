@@ -14,7 +14,7 @@ from ...utils.widgets import Alert
 
 class RelinkSubflowForm(BaseSubflowForm):
     """サブフロー間接続編集クラスです。
-        
+
     Attributes:
         instance:
             abs_root (str): サブフローの絶対パス
@@ -196,7 +196,7 @@ class RelinkSubflowForm(BaseSubflowForm):
 
     def define_input_form(self) -> Alert | pn.Column:
         """サブフロー間接続編集フォームのメソッドです。
-        
+
         Returns:
             Alert | pn.Column:サブフロー間接続編集フォームに必要な値を返す。
         """
@@ -216,7 +216,7 @@ class RelinkSubflowForm(BaseSubflowForm):
 
     def main(self):
         """サブフロー間接続編集処理のメソッドです。
-        
+
         Raises:
             Exception:編集失敗した場合のエラー
         """

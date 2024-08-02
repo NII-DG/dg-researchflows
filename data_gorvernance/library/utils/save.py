@@ -57,7 +57,7 @@ class TaskSave(TaskLog):
         except UnusableVault as e:
             message = msg_config.get('form', 'no_vault')
             self.save_msg_output.update_error(message)
-            self.log.error(str(e))
+            self.log.error(traceback.format_exc())
         except PermissionError:
             message = msg_config.get('form', 'insufficient_permission')
             self.save_msg_output.update_error(message)
@@ -128,7 +128,7 @@ class TaskSave(TaskLog):
             minutes, seconds = timediff.get_diff_minute()
             error_summary = traceback.format_exception_only(type(e), e)[0].rstrip('\\n')
             error_msg = msg_config.get('save', 'connection_error') + "\n" + error_summary
-            self.log.error(error_msg)
+            self.log.error(f'{error_msg}\n{traceback.format_exc()}')
             self.save_msg_output.add_error(f'経過時間: {minutes}m {seconds}s\n {error_msg}')
             return
         except Exception as e:
@@ -137,7 +137,7 @@ class TaskSave(TaskLog):
             error_summary = traceback.format_exception_only(type(e), e)[0].rstrip('\\n')
             error_msg = f'## [INTERNAL ERROR] : {error_summary}\n{traceback.format_exc()}'
             self.save_msg_output.add_error(f'経過時間: {minutes}m {seconds}s\n {error_msg}')
-            self.log.error(error_msg)
+            self.log.error(f'{error_msg}\n{traceback.format_exc()}')
             return
         # end
         timediff.end()

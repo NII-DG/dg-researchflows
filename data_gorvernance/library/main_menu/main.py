@@ -236,7 +236,7 @@ class MainMenu(TaskLog):
             # end
             self.log.finish(detail=self.callback_type)
         except InputWarning as e:
-            self.log.warning(str(e))
+            self.log.warning(traceback.format_exc())
         except  Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
             self.log.error(message)

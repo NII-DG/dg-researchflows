@@ -15,7 +15,7 @@ from ...utils.config import path_config, message as msg_config
 from ...utils.string import StringManager
 from ...utils.widgets import Button, MessageBox
 from ...utils.error import InputWarning
-
+from typing import Callable
 
 class BaseSubflowForm():
     """サブフロー操作基底クラス
@@ -113,11 +113,11 @@ class BaseSubflowForm():
         self.submit_button.width = 500
 
 
-    def set_submit_button_on_click(self, callback_function:callable):
+    def set_submit_button_on_click(self, callback_function:Callable):
         """処理開始ボタンのイベントリスナー設定するメソッドです。
 
         Args:
-            callback_function(callable):処理開始ボタンを呼び戻す
+            callback_function(Callable):処理開始ボタンを呼び戻す
         """
         self.submit_button.on_click(callback_function)
 

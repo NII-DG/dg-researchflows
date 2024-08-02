@@ -19,6 +19,7 @@ from ..utils import file
 from ..utils.log import TaskLog
 from ..task_director import get_subflow_type_and_id
 from ..utils.widgets import MessageBox
+from typing import Callable
 
 def access_main_menu(working_file: str):
     """メインメニューにアクセスするメソッドです。
@@ -99,7 +100,7 @@ class SubflowMenu(TaskLog):
         )
 
     # イベント
-    def select_flow(self, subflow: SubFlowManager, font_folder: Path) -> callable:
+    def select_flow(self, subflow: SubFlowManager, font_folder: Path) -> Callable:
         """ラジオボタンの選択時にサブフロー図の表示を切り替えるメソッドです。
 
         Args:
@@ -107,7 +108,7 @@ class SubflowMenu(TaskLog):
             font_folder (Path): フォントフォルダのパス
 
         Returns:
-            callable:サブフロー図を表示する。
+            Callable:サブフロー図を表示する。
         """
         def callback(event):
             """サブフロー図の生成と表示を行うメソッドです。"""

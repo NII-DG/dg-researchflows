@@ -24,11 +24,11 @@ NEED_TOKEN_SCOPE = ["osf.full_write"]
 ALLOWED_PERMISSION = ["admin", "write"]
 
 
-def get_project_id() -> list[str]:
+def get_project_id() -> (str | None):
     """プロジェクトIDを取得するメソッドです。
 
     Returns:
-        list[str]:分割したパスの要素の値を返す。  
+        str:分割したパスの要素の値を返す。  
     """
     # url: https://rdm.nii.ac.jp/vz48p/osfstorage
     url = os.environ.get("BINDER_REPO_URL", "")

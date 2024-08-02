@@ -29,6 +29,15 @@ class ContainerSetter():
             _abs_root_path(str):絶対rootディレクトリを取得・設定する
             working_fdir_path(str):非同期フォルダーパス
             setup_completed_file_path(str):初期セットアップ完了ステータスファイルパス
+            _user_name_form(pn.widgets.TextInput):ユーザー名のフォーム
+            _password_form(pn.widgets.PasswordInput):パスワードのフォーム
+            _submit_button(Button):ボタンの設定
+            _msg_output(MessageBox) : ユーザーに提示するメッセージを格納する。
+            change_submit_button_init(Callable):ボタンの状態を初期化する
+            validate_format_username(Callable):ユーザー名の正規表現を解析する
+            change_submit_button_warning(Callable):ボタンが押されて失敗した時の警告メッセージを返す
+            change_submit_button_error(Callable):ボタンが押されて内部エラーが発生した時のエラーを返す
+            change_submit_button_success(Callable):ボタンが押されて成功した時のメッセージを返す
     """
 
     def __init__(self, nb_working_file_path:str) -> None:
@@ -447,7 +456,7 @@ class ContainerSetter():
             display(alert)
 
     @classmethod
-    def syncs_config(cls, nb_working_file_path:str) -> list | str:
+    def syncs_config(cls, nb_working_file_path:str) -> tuple[list, str]:
         pn.extension()
         """同期のためにファイルとメッセージの設定
         

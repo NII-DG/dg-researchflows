@@ -77,7 +77,7 @@ def upload(token:str, base_url:str, project_id:str, source:str, destination:str,
 
 
 
-def download(token:str, project_id:str, base_url:str, remote_path:str, base_path=None) ->list:
+def download(token:str, project_id:str, base_url:str, remote_path:str, base_path=None) -> (bytes | None):
     """ファイルの内容を取得するメソッドです。
 
     Args:
@@ -88,7 +88,7 @@ def download(token:str, project_id:str, base_url:str, remote_path:str, base_path
         base_path (optional): ファイルを探すディレクトリのパス
 
     Returns:
-        list: 指定したファイルの内容
+        bytes: 指定したファイルの内容
 
     Raises:
         UnauthorizedError: 認証が通らない

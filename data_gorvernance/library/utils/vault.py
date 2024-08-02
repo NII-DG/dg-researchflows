@@ -44,6 +44,10 @@ class Vault():
             __start_server(Callable):Vaultサーバー起動する。
             __create_dg_engine(Callable):シークレットエンジン(kv)作成。
             __create_dg_policy(Callable):ポリシーを作成。
+            __get_client(Callable):接続先のページを表示する。
+            has_value(Callable):キーが存在するかしないかを確認する。
+            __write_token(Callable):ルートトークン保存を行う。
+            __read_token(Callable):ルートトークンを取得する。
     """
         
     def initialize(self):

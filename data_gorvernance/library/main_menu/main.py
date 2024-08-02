@@ -46,6 +46,11 @@ class MainMenu(TaskLog):
             _sub_flow_widget_box(pn.WidgetBox):サブフロー操作コントローラーウェジットボックス
             working_file(str):実行Notebookファイルパス
             check_status_research_preparation_flow(Callable):check_status_research_preparation_flow関数を呼び出す
+            update_sub_flow_widget_box_for_init(Callable):サブフロー操作オプションの選択誘導する
+            callback_type(str):呼び出すメソッドのタイプ
+            subflow_form(CreateSubflowForm):サブフローのフォーム
+            update_sub_flow_widget_box(Callable):サブフロー操作フォームの表示する
+            log(traceback.format_exc) :エラーログを取得する。
 
     NOTE:
     Called from data_gorvernance/researchflow/main.ipynb

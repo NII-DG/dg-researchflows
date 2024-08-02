@@ -20,6 +20,19 @@ class RelinkSubflowForm(BaseSubflowForm):
             abs_root (str): サブフローの絶対パス
             message_box (MessageBox): メッセージを格納する。
             change_submit_button_init(Callable):処理開始ボタン
+            reserch_flow_status_operater(ResearchFlowStatusOperater):リサーチフロー図を生成
+            _sub_flow_type_selector(pn.widgets.Select):サブフロー種別(フェーズ)
+            _sub_flow_name_selector(pn.widgets.Select):サブフロー名
+            generate_parent_sub_flow_type_options(Callable):親サブフロー種別を表示する
+            _err_output(MessageBox):エラーの出力
+            generate_parent_sub_flow_options(Callable):親サブフロー選択オプションで選択した値を表示する
+            _parent_sub_flow_type_selector(pn.widgets.Select): 親サブフロー種別(フェーズ)
+            get_parent_type_and_ids(Callable):親サブフロー種別(フェーズ)と親サブフローIDを取得する
+            change_disable_submit_button(Callable):新規作成ボタンのボタンの有効化チェック
+            _parent_sub_flow_selector(pn.widgets.Select):親サブフロー選択
+            change_submit_button_error(Callable):ボタンが押されて内部エラーが発生した時のエラーを返す
+            submit_button(Button):ボタンの設定
+            change_submit_button_processing(Callable):新規作成ボタンを処理中ステータスに更新する
     """
 
     def __init__(self, abs_root:str, message_box:pn.widgets.MessageBox) -> None:
@@ -35,14 +48,14 @@ class RelinkSubflowForm(BaseSubflowForm):
         self.change_submit_button_init(msg_config.get('main_menu', 'relink_sub_flow'))
 
     # overwrite
-    def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus])->Dict[str, int]:
+    def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus]) -> dict:
         """サブフロー種別(フェーズ)を表示するメソッドです。
 
         Args:
             research_flow_status (List[PhaseStatus]): リサーチフローステータス管理情報
 
         Returns:
-            Dict[str, int]: フェーズ表示名を返す。
+            dict: フェーズ表示名を返す。
         """
         # サブフロー種別(フェーズ)オプション(表示名をKey、順序値をVauleとする)
         pahse_options = {}
@@ -59,7 +72,7 @@ class RelinkSubflowForm(BaseSubflowForm):
                 pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
         return pahse_options
 
-    def get_parent_type_and_ids(self, phase_seq_number:str, sub_flow_id:str, research_flow_status:List[PhaseStatus]) -> int | list:
+    def get_parent_type_and_ids(self, phase_seq_number:str, sub_flow_id:str, research_flow_status:List[PhaseStatus]) -> (tuple[int[0], list] | tuple[list | int[0], list]):
         """親サブフロー種別(フェーズ)と親サブフローIDを取得するメソッドです。
 
         Args:

@@ -33,7 +33,6 @@ class BaseSubflowForm():
             _parent_sub_flow_type_selector(pn.widgets.Select): 親サブフロー種別(フェーズ)
             _parent_sub_flow_selector(pn.widgets.Select):親サブフロー選択
             submit_button(Button):処理開始ボタン
-            change_disable_submit_button(Callable):新規作成ボタンのボタンの有効化チェック
     """
 
     def __init__(self, abs_root:str, message_box: MessageBox) -> None:

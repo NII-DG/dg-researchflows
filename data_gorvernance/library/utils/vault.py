@@ -36,20 +36,8 @@ def start_server():
 
 
 class Vault():
-    """Vault Server操作クラスです
+    """Vault Server操作クラスです"""
 
-    Attributes:
-        instance:
-            __read_token(Callable):ルートトークンを読み取る。
-            __start_server(Callable):Vaultサーバー起動する。
-            __create_dg_engine(Callable):シークレットエンジン(kv)作成。
-            __create_dg_policy(Callable):ポリシーを作成。
-            __get_client(Callable):接続先のページを表示する。
-            has_value(Callable):キーが存在するかしないかを確認する。
-            __write_token(Callable):ルートトークン保存を行う。
-            __read_token(Callable):ルートトークンを取得する。
-    """
-        
     def initialize(self):
         """Vault初期化を行うメソッドです"""
         try:
@@ -120,7 +108,7 @@ class Vault():
         """Vaultサーバー起動するメソッドです。
 
         Raises:
-            UnusableVault:値が利用できないエラー  
+            UnusableVault:値が利用できないエラー
         """
 
         # vaultサーバー起動
@@ -185,7 +173,7 @@ class Vault():
         """ルートトークン保存のメソッドです
 
         Args:
-            token(str):パーソナルアクセストークン 
+            token(str):パーソナルアクセストークン
         """
         with open(TOKEN_PATH, 'w') as f:
             f.write(token)
@@ -210,7 +198,7 @@ class Vault():
         """接続の確認を行うメソッドです
 
         Returns:
-            hvac.Client:接続先のページを表示する。     
+            hvac.Client:接続先のページを表示する。
         """
         root_token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=root_token)

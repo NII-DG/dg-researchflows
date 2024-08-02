@@ -22,7 +22,7 @@ SELECT_DEFAULT_VALUE = '--'
 SETUP_COMPLETED_FILE = 'setup_completed.txt'
 class ContainerSetter():
     """セットアップを行うクラスです。
-    
+
     Attributes:
         instance:
             nb_working_file_path (str): 実行Notebookパス
@@ -33,11 +33,6 @@ class ContainerSetter():
             _password_form(pn.widgets.PasswordInput):パスワードのフォーム
             _submit_button(Button):ボタンの設定
             _msg_output(MessageBox) : ユーザーに提示するメッセージを格納する。
-            change_submit_button_init(Callable):ボタンの状態を初期化する
-            validate_format_username(Callable):ユーザー名の正規表現を解析する
-            change_submit_button_warning(Callable):ボタンが押されて失敗した時の警告メッセージを返す
-            change_submit_button_error(Callable):ボタンが押されて内部エラーが発生した時のエラーを返す
-            change_submit_button_success(Callable):ボタンが押されて成功した時のメッセージを返す
     """
 
     def __init__(self, nb_working_file_path:str) -> None:
@@ -459,7 +454,7 @@ class ContainerSetter():
     def syncs_config(cls, nb_working_file_path:str) -> tuple[list, str]:
         pn.extension()
         """同期のためにファイルとメッセージの設定
-        
+
          Args:
             nb_working_file_path (str): 実行Notebookパス
 

@@ -31,7 +31,7 @@ class MainMenu(TaskLog):
     """メインメニューのクラスです。
 
     Attributes:
-       
+
         instance:
             abs_root(str): リサーチフロー図の絶対パス
             _research_flow_status_file_path(str): リサーチフロー図があるパス
@@ -45,11 +45,8 @@ class MainMenu(TaskLog):
             _sub_flow_menu(pn.widgets.Select):サブフローメニュー
             _sub_flow_widget_box(pn.WidgetBox):サブフロー操作コントローラーウェジットボックス
             working_file(str):実行Notebookファイルパス
-            check_status_research_preparation_flow(Callable):check_status_research_preparation_flow関数を呼び出す
-            update_sub_flow_widget_box_for_init(Callable):サブフロー操作オプションの選択誘導する
             callback_type(str):呼び出すメソッドのタイプ
             subflow_form(CreateSubflowForm):サブフローのフォーム
-            update_sub_flow_widget_box(Callable):サブフロー操作フォームの表示する
             log(traceback.format_exc) :エラーログを取得する。
 
     NOTE:
@@ -61,10 +58,10 @@ class MainMenu(TaskLog):
 
         Args:
             working_file(str):実行Notebookファイルパス
-        
+
         """
         super().__init__(working_file, 'main.ipynb')
-       
+
 
         ##############################
         # リサーチフロー図オブジェクト #

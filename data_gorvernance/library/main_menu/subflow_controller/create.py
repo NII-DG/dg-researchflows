@@ -25,25 +25,14 @@ class CreateSubflowForm(BaseSubflowForm):
         instance:
             abs_root (str): サブフローの絶対パス
             message_box (MessageBox): メッセージを格納する。
-            change_submit_button_init(Callable):処理開始ボタン
             submit_button(Button):ボタンの設定
             reserch_flow_status_operater(ResearchFlowStatusOperater):リサーチフロー図を生成
             _sub_flow_type_selector(pn.widgets.Select):サブフロー種別(フェーズ)
             _err_output(MessageBox):エラーの出力
             _parent_sub_flow_type_selector(pn.widgets.Select): 親サブフロー種別(フェーズ)
             _parent_sub_flow_selector(pn.widgets.Select):親サブフロー選択
-            change_disable_submit_button(Callable):新規作成ボタンのボタンの有効化チェック
             _sub_flow_name_form(TextInput):サブフロー名のフォーム
             _data_dir_name_form(TextInput):データディレクトリ名のフォーム
-            validate_sub_flow_name(Callable):サブフロー名称の値が存在するかを確認している
-            is_unique_subflow_name(Callable):サブフローの名称がユニークの値になっているかどうかを確認している
-            validate_data_dir_name(Callable):データフォルダ名の検証をする時に問題がないか確認する
-            is_unique_data_dir(Callable):データフォルダ名がユニークの値になっているかを確認する
-            change_submit_button_warning(Callable):ボタンが押されて失敗した時の警告メッセージを返す
-            create_data_dir(Callable):データディレクトリを作成する
-            prepare_new_subflow_data(Callable):新しいサブフローのデータを用意する
-            change_submit_button_error(Callable):ボタンが押されて内部エラーが発生した時のエラーを返す
-            change_submit_button_processing(Callable):新規作成ボタンを処理中ステータスに更新する
     """
 
     def __init__(self, abs_root:str, message_box:pn.widgets.MessageBox) -> None:

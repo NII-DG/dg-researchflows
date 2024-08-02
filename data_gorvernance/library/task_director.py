@@ -17,13 +17,13 @@ from .utils.setting import get_subflow_type_and_id, SubflowStatusFile, SubflowSt
 
 def get_return_sub_flow_menu_relative_url_path(working_file_path: str) -> str:
     """サブフローメニューNotebookへのパス、ファイルパスを取得するメソッドです。
-    
+
     Args:
         working_file_path(str):作業ファイルのパス
 
     Returns:
         str:サブフローメニューのパスを返す。
-    
+
     """
 
     subflow_type, subflow_id = get_subflow_type_and_id(working_file_path)
@@ -46,8 +46,6 @@ class TaskDirector(TaskSave):
             _abs_root_path(str):サブフローの絶対パス
             _script_file_name(str):絶対rootディレクトリ
             _sub_flow_status_file_path(str):サブフローステータスファイルのパス
-            get_subflow_menu_button_object(Callable):サブフローメニューへのボタンpanel.HTMLオブジェクトの取得する
-            done_task(Callable):タスク完了によるサブフローステータス管理JSONの更新をする
     """
 
     def __init__(self, nb_working_file_path:str, notebook_name:str) -> None:

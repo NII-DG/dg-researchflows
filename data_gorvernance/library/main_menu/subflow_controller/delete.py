@@ -18,13 +18,11 @@ class DeleteSubflowForm(BaseSubflowForm):
         instance:
             abs_root (str): サブフローの絶対パス
             message_box (MessageBox): メッセージを格納する。
-            change_submit_button_init(Callable):処理開始ボタン
             _sub_flow_type_selector(pn.widgets.Select):サブフロー種別(フェーズ)
             _sub_flow_name_selector(pn.widgets.Select):サブフロー選択
             submit_button(Button):ボタンの設定
             reserch_flow_status_operater(ResearchFlowStatusOperater):リサーチフロー図を生成
             _err_output(MessageBox):エラーの出力
-            change_submit_button_processing(Callable):新規作成ボタンを処理中ステータスに更新する
     """
 
     def __init__(self, abs_root:str, message_box:pn.widgets.MessageBox) -> None:
@@ -119,7 +117,7 @@ class DeleteSubflowForm(BaseSubflowForm):
     def main(self):
         """サブフロー削除処理のメソッドです。
 
-        入力情報やパスを取得し、 削除したいデータを取得する。 
+        入力情報やパスを取得し、 削除したいデータを取得する。
 
         Raises:
             Exception:削除失敗したエラー

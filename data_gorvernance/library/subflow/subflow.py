@@ -18,7 +18,7 @@ class SubFlowManager:
     Attributes:
         instance:
             current_dir(str): サブフローメニューの親ディレクトリ
-            tasks(list[SubflowTask]): サブフローのタスクの設定値
+            tasks(List[SubflowTask]): サブフローのタスクの設定値
             diag_file(str): ダイアグラムのファイルへのパス
             task_dir(str): タスクが格納されているディレクトリ
             diag(DiagManager): ダイアグラムを管理するインスタンス

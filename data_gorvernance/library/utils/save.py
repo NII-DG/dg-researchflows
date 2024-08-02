@@ -17,13 +17,13 @@ from .error import UnusableVault, ProjectNotExist, UnauthorizedError, Permission
 
 
 def all_sync_path(abs_root: str) -> list:
-    """ 指定されたルートディレクトリから特定のディレクトリのパスを返す関数です。
+    """ 指定されたホームディレクトリから特定のディレクトリのパスを返す関数です。
 
     Args:
-        abs_root (str): 絶対パスのルートディレクトリを設定します。
+        abs_root (str): 絶対パスのホームディレクトリを設定します。
 
     Returns:
-        list: ルートディレクトリからdataと、data_governanceのworking以外のパスのリストを返す。
+        list: ホームディレクトリからdataと、data_governanceのworking以外のパスのリストを返す。
 
     """
     paths = []

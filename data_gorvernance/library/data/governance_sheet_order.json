@@ -1,0 +1,92 @@
+{
+    "ui:order" : [
+        "project",
+        "resource",
+        "person",
+        "institution",
+        "fundingAgency",
+        "grant",
+        "dmp",
+        "accessRights",
+        "rerun"
+    ],
+    "project": {
+        "ui:order": [
+            "rootProjectName",
+            "rootProjectDescription",
+            "rootProjectResearcher",
+            "rootProjectField",
+            "rootProjectFunder",
+            "rootProjectFunding",
+            "rootProjectDateStarted",
+            "rootProjectUrl",
+            "rootProjectLicenseInformation",
+            "rootProjectAccessRightsInformation",
+            "rootProjectDmp"
+        ]
+    },
+    "resource": {
+        "ui:order": [
+            "resourceName",
+            "resourceEncodingFormat",
+            "resourceDateCreated",
+            "resourceDateModified",
+            "resourceUrl",
+            "resourceVersion",
+            "resourceHash"
+        ]
+    },
+    "person": {
+        "ui:order": [
+            "personName",
+            "personAffiliation",
+            "personEmail",
+            "personIdentifier"
+        ]
+    },
+    "institution": {
+        "ui:order": [
+            "institutionName",
+            "institutionAddress",
+            "institutionIdentifier"
+        ]
+    },
+    "fundingAgency": {
+        "ui:order": [
+            "fundingAgencyName",
+            "fundingAgencyAddress",
+            "fundingAgencyIdentifier"
+        ]
+    },
+    "grant": {
+        "ui:order": [
+            "grantName",
+            "grantUrl",
+            "grantFunder",
+            "grantIdentifier"
+        ]
+    },
+    "dmp": {
+        "ui:order": [
+            "dmpDataNumber",
+            "dmpDataDescription",
+            "dmpDataLicenseInformation",
+            "dmpDataAccessRightsInformation",
+            "dmpDataManager",
+            "dmpHostingInstitution"
+        ]
+    },
+    "accessRights": {
+        "ui:order": [
+            "accessRightsConditionOfAccess",
+            "accessRightsDateAvailable",
+            "accessRightsDataAccessRequirements"
+        ]
+    },
+    "rerun": {
+        "ui:order": [
+            "rerunLevel",
+            "rerunCondition"
+        ]
+    }
+}

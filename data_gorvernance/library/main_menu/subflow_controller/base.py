@@ -322,7 +322,7 @@ class BaseSubflowForm():
     ############
 
     def change_disable_submit_button(self):
-        """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化するメソッドです。"""
+        """継承しているサブフローフォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化するメソッドです。"""
         # 継承した先で実装する
 
     def validate_sub_flow_name(self, sub_flow_name:str):

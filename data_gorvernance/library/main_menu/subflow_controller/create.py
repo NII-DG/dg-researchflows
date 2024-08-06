@@ -260,9 +260,6 @@ class CreateSubflowForm(BaseSubflowForm):
             phase_name (str): フェーズ名
             new_sub_flow_id (str): 新しいサブフローのID
             sub_flow_name (str): サブフロー名
-
-        Raises:
-            Exception:新規サブフローデータのコピーに失敗したエラー
         """
 
         # 新規サブフローデータの用意

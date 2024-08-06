@@ -162,8 +162,8 @@ class RelinkSubflowForm(BaseSubflowForm):
 
     # overwrite
     def change_disable_submit_button(self):
-        """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化するメソッドです。"""
-        # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
+        """サブフロー編集フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化するメソッドです。"""
+        # サブフロー編集フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
         self.change_submit_button_init(msg_config.get('main_menu', 'relink_sub_flow'))
 
         value = self._sub_flow_type_selector.value
@@ -221,11 +221,7 @@ class RelinkSubflowForm(BaseSubflowForm):
             )
 
     def main(self):
-        """サブフロー間接続編集処理のメソッドです。
-
-        Raises:
-            Exception:編集失敗した場合のエラー
-        """
+        """サブフロー間接続編集処理のメソッドです。"""
 
         # 新規作成ボタンを処理中ステータスに更新する
         self.change_submit_button_processing(msg_config.get('main_menu', 'update_relink_sub_flow'))

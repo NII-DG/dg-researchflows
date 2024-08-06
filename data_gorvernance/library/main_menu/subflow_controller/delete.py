@@ -75,8 +75,8 @@ class DeleteSubflowForm(BaseSubflowForm):
 
     # overwrite
     def change_disable_submit_button(self):
-        """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化するメソッドです。"""
-        # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
+        """サブフロー削除フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化するメソッドです。"""
+        # サブフロー削除フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
         self.change_submit_button_init(msg_config.get('main_menu', 'delete_sub_flow'))
 
         value = self._sub_flow_type_selector.value
@@ -118,9 +118,6 @@ class DeleteSubflowForm(BaseSubflowForm):
         """サブフロー削除処理のメソッドです。
 
         入力情報やパスを取得し、 削除したいデータを取得する。
-
-        Raises:
-            Exception:削除失敗したエラー
         """
 
         # 新規作成ボタンを処理中ステータスに更新する

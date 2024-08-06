@@ -51,7 +51,7 @@ class SubflowMenu(TaskLog):
     Attributes:
         instance:
             menu_widgetbox(pn.WidgetBox):表示するウィジェットを格納する
-            diagram(pn.pane.HTML):サブフロー図
+            diagram(pn.pane.HTML):サブフロー図を格納する
             title(pn.pane.Markdown):サブフロー図のタイトル
             diagram_widgetbox(pn.WidgetBox):サブフロー図をHTMLとして埋め込む
             selector(pn.widgets.RadioBoxGroup):ラジオボタン

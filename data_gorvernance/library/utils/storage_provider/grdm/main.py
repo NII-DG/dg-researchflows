@@ -93,7 +93,7 @@ def get_projects_list(scheme: str, domain: str, token: str) -> dict:
     Args:
         scheme(str): プロトコル名(http, https, ssh)
         domain(str):ドメイン名
-        token(str):パーソナルトークン
+        token(str):パーソナルアクセストークン
 
     Raises:
         UnauthorizedError: 認証が通らない

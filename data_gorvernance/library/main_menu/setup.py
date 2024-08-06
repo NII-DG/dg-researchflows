@@ -177,7 +177,7 @@ class ContainerSetter():
         self._submit_button.button_style = 'outline'
 
     def change_submit_button_success(self, name:str):
-        """ボタンが押されて成功した時のメッセージを返すメソッドです。
+        """ボタンを成功の状態に更新するメソッドです。
 
         Args:
             name (str): 成功したメッセージ
@@ -187,7 +187,7 @@ class ContainerSetter():
         self._submit_button.button_style = 'solid'
 
     def change_submit_button_warning(self, name:str):
-        """ボタンが押されて認証が失敗した時の警告メッセージを返すメソッドです。
+        """ボタンを警告の状態に更新するメソッドです。
 
         Args:
             name (str): 警告メッセージ
@@ -197,7 +197,7 @@ class ContainerSetter():
         self._submit_button.button_style = 'solid'
 
     def change_submit_button_error(self, name:str):
-        """ボタンが押されて内部エラーが発生した時のエラーを返すメソッドです。
+        """ボタンをエラーの状態に更新するメソッドです。
 
         Args:
             name (str): エラーメッセージ

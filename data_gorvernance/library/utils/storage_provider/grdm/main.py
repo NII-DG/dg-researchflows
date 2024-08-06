@@ -23,12 +23,11 @@ from ...error import NotFoundContentsError, UnauthorizedError
 NEED_TOKEN_SCOPE = ["osf.full_write"]
 ALLOWED_PERMISSION = ["admin", "write"]
 
-
 def get_project_id() -> (str | None):
     """プロジェクトIDを取得するメソッドです。
 
     Returns:
-        str:分割したパスの要素の値を返す。  
+        str:分割したパスの要素の値を返す。
     """
     # url: https://rdm.nii.ac.jp/vz48p/osfstorage
     url = os.environ.get("BINDER_REPO_URL", "")
@@ -124,7 +123,7 @@ def sync(token: str, api_url: str, project_id: str, abs_source: str | list, abs_
         UnauthorizedError: 認証が通らない
         RuntimeError: RDMClientから上がってくるエラー全般
         FileNotFoundError: 指定したファイルが存在しないエラー
-        ValueError:絶対パスではないエラー   
+        ValueError:絶対パスではないエラー
     """
 
     if os.path.isdir(abs_source):

@@ -47,7 +47,7 @@ def access_main_menu(working_file: str):
 
 class SubflowMenu(TaskLog):
     """サブフローメニューのクラスです。
-    
+
     Attributes:
         instance:
             menu_widgetbox(pn.WidgetBox):表示するウィジェットを格納する
@@ -136,7 +136,7 @@ class SubflowMenu(TaskLog):
 
     def set_diagram(self, subflow: SubFlowManager, font_folder: Path, display_all=True):
         """フロー図の生成と表示設定のメソッドです。
-        
+
         Args:
             subflow(SubFlowManager):サブフロー図
             font_folder(Path):フォントフォルダー
@@ -180,12 +180,12 @@ class SubflowMenu(TaskLog):
 
     def _get_svg_size(self, svg_file_path: str) -> int:
         """svgの画像の横幅を返すメソッドです。
-        
+
         Args:
             svg_file_path (str): svgファイルのパス
 
         Returns:
-            int:svgの画像の横幅の値を返す 
+            int:svgの画像の横幅の値を返す
         """
         # SVGファイルをパース
         tree = ET.parse(svg_file_path)

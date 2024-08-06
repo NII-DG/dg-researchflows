@@ -14,7 +14,6 @@ from requests.exceptions import RequestException
 
 from ...error import UnauthorizedError
 
-
 def upload(token:str, base_url:str, project_id:str, source:str, destination:str, recursive:bool=False, force:bool=False):
     """ファイルまたはフォルダをアップロードするメソッドです。
 

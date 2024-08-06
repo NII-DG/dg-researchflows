@@ -44,10 +44,8 @@ class MainMenu(TaskLog):
             _project_widget_box(pn.WidgetBox):サブフロー操作コントローラーウェジットボックス
             _sub_flow_menu(pn.widgets.Select):サブフローメニュー
             _sub_flow_widget_box(pn.WidgetBox):サブフロー操作コントローラーウェジットボックス
-            working_file(str):実行Notebookファイルパス
             callback_type(str):呼び出すメソッドのタイプ
-            subflow_form(CreateSubflowForm):サブフローのフォーム
-            log(traceback.format_exc) :エラーログを取得する。
+            subflow_form(CreateSubflowForm | RelinkSubflowForm | RenameSubflowForm | DeleteSubflowForm):サブフローのフォーム
 
     NOTE:
     Called from data_gorvernance/researchflow/main.ipynb
@@ -173,11 +171,11 @@ class MainMenu(TaskLog):
     # イベントリスナーコールバックメソッド #
     ######################################
 
-    def callback_menu_tabs(self, event:int):
+    def callback_menu_tabs(self, event):
         """サブフロー操作で選択ができるようにするメソッドです。
 
         Args:
-            event (int): 機能コントローラーのイベントリスナー
+            event: 機能コントローラーのイベントリスナー
         """
         try:
             self._err_output.clear()

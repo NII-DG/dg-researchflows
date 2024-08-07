@@ -4,7 +4,7 @@
 
 """
 import traceback
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 import panel as pn
 
@@ -268,7 +268,7 @@ class Form:
                 value = data.get(key, {})
             self.form_box.append(self._generate_widget(properties, key, value))
 
-    def _generate_widget(self, definition:dict, key:str, value:dict=None)->ArrayBox | ObjectBox | Column:
+    def _generate_widget(self, definition:dict, key:str, value:dict=None)->Union[ArrayBox, ObjectBox, Column]:
         """jsonschemaの設定値からpanelのwidgetを作成するメソッドです。
 
         Args:
@@ -400,7 +400,7 @@ class Form:
             else:
                 return pn.Row(widget, create_remove_button(widget, align='end'))
 
-        def create_remove_button(widget: ArrayBox | ObjectBox | Column, align: str='start')->Button:
+        def create_remove_button(widget: Union[ArrayBox, ObjectBox, Column], align: str='start')->Button:
             """ arrayの選択した要素を削除するボタンを生成するメソッドです。
 
             Args:

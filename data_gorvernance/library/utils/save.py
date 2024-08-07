@@ -1,7 +1,7 @@
 """ タスクを保存するモジュールです。"""
 import os
 import traceback
-from typing import Any, Tuple, List
+from typing import Any, Tuple, List, Union
 
 import panel as pn
 from IPython.display import clear_output
@@ -109,11 +109,11 @@ class TaskSave(TaskLog):
             self.log.error(message)
         return token, project_id
 
-    def define_save_form(self, source: str | List[str]) -> None:
+    def define_save_form(self, source: Union[str, List[str]]) -> None:
         """ GRDMに保存するフォームを作成するメソッドです。
 
         Args:
-            source (str | List[str]): 保存するファイルを設定します。
+            source (Union[str, List[str]]): 保存するファイルを設定します。
 
         Raises:
             TypeError: sourceがstrまたはlistでない

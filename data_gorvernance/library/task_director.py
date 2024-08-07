@@ -1,6 +1,6 @@
-"""サブフローステータス更新を行います。
+"""サブフローステータス更新を行うモジュールです。
 
-サブフローメニューへのボタンなどを表示するメソッドやステータスを更新するメソッドなどがあります。
+ここは全てのタスクに共通の処理をまとめます。
 """
 import os
 
@@ -38,18 +38,18 @@ def get_return_sub_flow_menu_relative_url_path(working_file_path: str) -> str:
 
 
 class TaskDirector(TaskSave):
-    """サブフローメニューへの接続、サブフローステータス更新を行うクラスです。
+    """タスクの基底クラスです。
 
     Attributes:
         instance:
             nb_working_file_path (str): 実行Notebookのファイルパス
-            _abs_root_path(str):サブフローの絶対パス
-            _script_file_name(str):絶対rootディレクトリ
+            _abs_root_path(str):リサーチフローのルートディレクトリ
+            _script_file_name(str):実行Notebookのファイル名
             _sub_flow_status_file_path(str):サブフローステータスファイルのパス
     """
 
     def __init__(self, nb_working_file_path:str, notebook_name:str) -> None:
-        """TaskInterface コンストラクタのメソッドです。
+        """TaskDirector コンストラクタのメソッドです。
 
         Notebookファイルのオペレーションするための共通クラス
 

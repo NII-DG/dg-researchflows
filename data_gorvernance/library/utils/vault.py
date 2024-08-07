@@ -1,4 +1,4 @@
-"""Vaultサーバーへの接続
+"""Vaultサーバーへの接続のモジュールです。
 
 このモジュールはVaultサーバーに接続するために必要な値の設定とチェックを行い、キーやポリシーを作成してサーバーを起動させ、接続確認を行うメソッドがあります。
 """
@@ -56,7 +56,7 @@ class Vault():
 
         Args:
             key(str):トークンをvaultで保存するときのキー
-            value(str):パーソナルトークン
+            value(str): vaultに保存する値
         """
         client = self.__get_client()
         client.secrets.kv.v1.create_or_update_secret(
@@ -72,7 +72,7 @@ class Vault():
             key(str):トークンをvaultで保存するときのキー
 
         Returns:
-            bool:キーが存在した場合は秘密鍵のTrueの値を返し、存在しない場合はFalseの値を返す。
+            bool: 指定された値が存在する場合はTrueを返し、存在しない場合はFalseを返す。
         """
         client = self.__get_client()
         try:
@@ -85,14 +85,14 @@ class Vault():
             return False
         return key in secrets['data']['keys']
 
-    def get_value(self, key:str) -> dict:
+    def get_value(self, key:str) -> str | None:
         """値の取得をするメソッドです
 
         Args:
             key(str):トークンをvaultで保存するときのキー
 
         Returns:
-            dict:取得した値を返す。値がない場合はNoneを返す。
+            str: 取得した値を返す。値がない場合はNoneを返す。
         """
         if not self.has_value(key):
             return None
@@ -108,7 +108,7 @@ class Vault():
         """Vaultサーバー起動するメソッドです。
 
         Raises:
-            UnusableVault:値が利用できないエラー
+            UnusableVault:vaultが利用できない場合のエラー
         """
 
         # vaultサーバー起動
@@ -173,7 +173,7 @@ class Vault():
         """ルートトークン保存のメソッドです
 
         Args:
-            token(str):パーソナルアクセストークン
+            token(str):ルートトークン
         """
         with open(TOKEN_PATH, 'w') as f:
             f.write(token)
@@ -182,7 +182,7 @@ class Vault():
         """ルートトークン取得のメソッドです
 
         Raises:
-            UnusableVault:値が利用できないエラー
+            UnusableVault:vaultが利用できないエラー
 
         Returns:
             str:ルートトークンの値を返す。
@@ -195,10 +195,10 @@ class Vault():
         return root_token
 
     def __get_client(self) -> hvac.Client:
-        """接続の確認を行うメソッドです
+        """vaultに接続するためのクライアントを取得するメソッドです。
 
         Returns:
-            hvac.Client:接続先のページを表示する。
+            hvac.Client:vaultサーバーのクライアント
         """
         root_token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=root_token)

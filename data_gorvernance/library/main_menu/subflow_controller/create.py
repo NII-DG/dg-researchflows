@@ -1,4 +1,4 @@
-"""サブフローの新規作成
+"""サブフローの新規作成を行うモジュールです。
 
 このモジュールはサブフロー新規作成クラスを始め、新しいサブフローのデータを用意したり、データの検証を行うメソッドなどがあります。
 """
@@ -23,8 +23,7 @@ class CreateSubflowForm(BaseSubflowForm):
 
     Attributes:
         instance:
-            abs_root (str): サブフローの絶対パス
-            message_box (MessageBox): メッセージを格納する。
+            abs_root (str): リサーチフローのルートディレクトリ
             submit_button(Button):ボタンの設定
             reserch_flow_status_operater(ResearchFlowStatusOperater):リサーチフロー図を生成
             _sub_flow_type_selector(pn.widgets.Select):サブフロー種別(フェーズ)
@@ -39,7 +38,7 @@ class CreateSubflowForm(BaseSubflowForm):
         """CreateSubflowForm コンストラクタのメソッドです
 
         Args:
-            abs_root (str): サブフローの絶対パス
+            abs_root (str): リサーチフローのルートディレクトリ
             message_box (MessageBox): メッセージを格納する。
         """
         super().__init__(abs_root, message_box)
@@ -77,11 +76,7 @@ class CreateSubflowForm(BaseSubflowForm):
 
     # overwrite
     def callback_sub_flow_type_selector(self, event):
-        """サブフロー種別(フェーズ)のボタンが操作できるように有効化するメソッドです。
-
-        Raises:
-            Exception: 内部エラーが発生した。
-        """
+        """サブフロー種別(フェーズ)のボタンが操作できるように有効化するメソッドです。"""
         # サブフロー種別(フェーズ):シングルセレクトコールバックファンクション
         try:
             # リサーチフローステータス管理情報の取得

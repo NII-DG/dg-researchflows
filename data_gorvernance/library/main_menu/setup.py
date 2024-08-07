@@ -1,4 +1,4 @@
-"""初期セットアップ
+"""初期セットアップを行うモジュールです。
 
 このモジュールはセットアップを行うクラスがあり、セットアップを行うための認証を確認したり、設定を行うメソッドなどがあります。
 """
@@ -26,7 +26,7 @@ class ContainerSetter():
     Attributes:
         instance:
             nb_working_file_path (str): 実行Notebookパス
-            _abs_root_path(str):絶対rootディレクトリを取得・設定する
+            _abs_root_path(str):リサーチフローのルートディレクトリ
             working_fdir_path(str):非同期フォルダーパス
             setup_completed_file_path(str):初期セットアップ完了ステータスファイルパス
             _user_name_form(pn.widgets.TextInput):ユーザー名のフォーム

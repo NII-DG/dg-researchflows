@@ -1,4 +1,4 @@
-"""データの取得、アップロード、権限やアクセス許可のチェック
+"""データの取得、アップロード、権限やアクセス許可のチェックをするモジュールです。
 
 このモジュールはデータの取得やアップロード、権限やアクセス許可のチェックを行います。
 プロジェクトID、プロジェクトの一覧、テキストファイルの中身やjsonファイルの中身、メタデータを取得したり、
@@ -27,7 +27,7 @@ def get_project_id() -> (str | None):
     """プロジェクトIDを取得するメソッドです。
 
     Returns:
-        str:分割したパスの要素の値を返す。
+        str:プロジェクトIDを返す。値が取得できなかった場合はNone。
     """
     # url: https://rdm.nii.ac.jp/vz48p/osfstorage
     url = os.environ.get("BINDER_REPO_URL", "")
@@ -41,7 +41,7 @@ def get_project_id() -> (str | None):
 
 
 def check_authorization(base_url: str, token: str) -> bool:
-    """URLの権限のチェックをするメソッドです。
+    """パーソナルアクセストークンの権限をチェックするメソッドです。
 
     Args:
         base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
@@ -61,7 +61,7 @@ def check_authorization(base_url: str, token: str) -> bool:
 
 
 def check_permission(base_url: str, token: str, project_id: str) -> bool:
-    """アクセス許可のチェックを行うメソッドです。
+    """リポジトリへのアクセス権限のチェックを行うメソッドです。
 
     Args:
         base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
@@ -107,7 +107,7 @@ def get_projects_list(scheme: str, domain: str, token: str) -> dict:
     return {d['id']: d['attributes']['title'] for d in data}
 
 
-def sync(token: str, api_url: str, project_id: str, abs_source: str | list, abs_root:str="/home/jovyan"):
+def sync(token: str, api_url: str, project_id: str, abs_source: str, abs_root:str="/home/jovyan"):
     """GRDMにアップロードするメソッドです。
 
     abs_source は絶対パスでなければならない。
@@ -116,8 +116,8 @@ def sync(token: str, api_url: str, project_id: str, abs_source: str | list, abs_
         token (str): GRDMのパーソナルアクセストークン
         api_url (str): API URL (e.g. https://api.osf.io/v2/)
         project_id (str): プロジェクトID
-        abs_source (str or list): 同期したいファイルまたはディレクトリ
-        abs_root (str, optional): リモートのプロジェクトに対応させたいディレクトリの絶対パス. Defaults to "/home/jovyan".
+        abs_source (str): 同期したいファイルまたはディレクトリ
+        abs_root (str): リサーチフローのルートディレクトリ. Defaults to "/home/jovyan".
 
     Raises:
         UnauthorizedError: 認証が通らない
@@ -155,7 +155,7 @@ def download_text_file(token: str, api_url: str, project_id: str, remote_path: s
         api_url (str): API URL (e.g. https://api.osf.io/v2/)
         project_id (str): プロジェクトID
         remote_path (str): ファイルパス
-        encoding (optional): バイトを解析するエンコーディング
+        encoding (str): バイトを解析するエンコーディング
 
     Raises:
         FileNotFoundError: 指定したファイルが存在しない
@@ -234,7 +234,7 @@ def get_collaborator_list(base_url: str, token: str, project_id: str) -> dict:
     }
 
 
-def build_collaborator_url(base_url: str, project_id: str) -> parse.urlunparse:
+def build_collaborator_url(base_url: str, project_id: str) -> str:
     """プロジェクトのメンバー一覧のURLを返すメソッドです。
 
     Args:
@@ -242,7 +242,7 @@ def build_collaborator_url(base_url: str, project_id: str) -> parse.urlunparse:
         project_id (str): プロジェクトID
 
     Returns:
-        parse.urlunparse: 指定されたproject idのプロジェクトメンバー一覧画面のURL
+        str: 指定されたproject idのプロジェクトメンバー一覧画面のURL
     """
     parsed = parse.urlparse(base_url)
     endpoint = f'{project_id}/contributors/'

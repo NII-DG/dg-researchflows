@@ -1,4 +1,4 @@
-"""メインメニュー画面での操作
+"""メインメニュー画面での操作のモジュールです。
 
 このモジュールはメインメニューの画面やボタンを表示するメソッドやサブフローメニューの画面の表示、操作を行えるメソッドなどがあります。
 """
@@ -33,7 +33,7 @@ class MainMenu(TaskLog):
     Attributes:
 
         instance:
-            abs_root(str): リサーチフロー図の絶対パス
+            abs_root(str): リサーチフローのルートディレクトリ
             _research_flow_status_file_path(str): リサーチフロー図があるパス
             reserch_flow_status_operater(ResearchFlowStatusOperater):リサーチフロー図の生成
             _research_flow_image(pn.pane.HTML): リサーチフロー図オブジェクトの定義

@@ -1,4 +1,4 @@
-"""サブフローメニューの表示
+"""サブフローメニューの表示をするモジュールです。
 
 サブフローメニュークラスを始め、サブフロー図などの画像を表示させたり、メインメニューにアクセスするメソッドがあります。
 """
@@ -101,7 +101,7 @@ class SubflowMenu(TaskLog):
 
     # イベント
     def select_flow(self, subflow: SubFlowManager, font_folder: Path) -> Callable:
-        """ラジオボタンの選択時にサブフロー図の表示を切り替えるメソッドです。
+        """ボタン押下時にサブフロー図の表示を切り替えるメソッドです。
 
         Args:
             subflow (SubFlowManager): サブフロー図
@@ -160,7 +160,7 @@ class SubflowMenu(TaskLog):
         """フロー図の表示を制御するメソッドです。
 
         Returns:
-            bool:TrueまたはFalseの値を返す。
+            bool:すべてのタスクをアクティブにするかどうか
         """
         display_all = True
         if self.selector.value == self.selector_options[0]:
@@ -212,7 +212,7 @@ class SubflowMenu(TaskLog):
 
         Args:
             working_file (str): 実行Notebookファイルパス
-            is_selected (bool, optional): サブフローメニューを表示させるかどうか。 デフォルトでは False.
+            is_selected (bool): サブフロー図の切り替えをできるようにするかどうか。デフォルトでは False.
         """
         subflow_menu = cls(working_file)
         pn.extension()

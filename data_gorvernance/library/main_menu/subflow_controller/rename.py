@@ -1,6 +1,6 @@
-"""サブフローの名称変更
+"""サブフローの名称変更を行うモジュールです。
 
-このモジュールはサブフロー名称変更クラスを始め、新しいサブフローの名称を変更したりするメソッドなどがあります。
+このモジュールはサブフロー名称変更クラスを始め、既存のサブフローの名称を変更したりするメソッドなどがあります。
 """
 import os
 import traceback
@@ -19,8 +19,7 @@ class RenameSubflowForm(BaseSubflowForm):
 
     Attributes:
         instance:
-            abs_root (str): サブフローの絶対パス
-            message_box (MessageBox): メッセージを格納する。
+            abs_root (str): リサーチフローのルートディレクトリ
             _sub_flow_type_selector(pn.widgets.Select):サブフロー種別(フェーズ)
             _sub_flow_name_selector(pn.widgets.Select):サブフロー名
             _sub_flow_name_form(TextInput):サブフロー名のフォーム
@@ -34,7 +33,7 @@ class RenameSubflowForm(BaseSubflowForm):
         """RenameSubflowForm コンストラクタのメソッドです
 
         Args:
-            abs_root (str): サブフローの絶対パス
+            abs_root (str): リサーチフローのルートディレクトリ
             message_box (MessageBox): メッセージを格納する。
         """
         super().__init__(abs_root, message_box)
@@ -43,11 +42,7 @@ class RenameSubflowForm(BaseSubflowForm):
 
     # overwrite
     def callback_sub_flow_name_selector(self, event):
-        """サブフロー種別(フェーズ)を表示するメソッドです。
-
-        Raises:
-            Exception: サブフロー種別(フェーズ)、サブフロー名がないエラー
-        """
+        """サブフロー種別(フェーズ)を表示するメソッドです。"""
         # サブフロー名称：シングルセレクトコールバックファンクション
         try:
             selected_sub_flow_type = self._sub_flow_type_selector.value
@@ -76,7 +71,7 @@ class RenameSubflowForm(BaseSubflowForm):
 
     # overwrite
     def change_disable_submit_button(self):
-        """サブフロー名称変更フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化するメソッドです。"""
+        """サブフロー名称変更フォームの必須項目が選択・入力が満たしている場合、変更ボタンを有効化するメソッドです。"""
         # サブフロー名称変更フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
         self.change_submit_button_init(msg_config.get('main_menu', 'rename_sub_flow'))
 
@@ -138,7 +133,7 @@ class RenameSubflowForm(BaseSubflowForm):
 
         Raises:
             InputWarning:入力値に不備があったエラー
-            Exception:ファイル名の変更に失敗した時のエラー
+            Exception:サブフロー名称の変更に失敗した時のエラー
         """
 
         # 新規作成ボタンを処理中ステータスに更新する

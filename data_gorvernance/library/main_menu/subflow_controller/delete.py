@@ -1,4 +1,4 @@
-"""サブフローの削除
+"""サブフローの削除を行うモジュールです。
 
 このモジュールはサブフロー削除クラスを始め、新しいサブフローのデータを削除したりするメソッドなどがあります。
 """
@@ -16,8 +16,7 @@ class DeleteSubflowForm(BaseSubflowForm):
 
     Attributes:
         instance:
-            abs_root (str): サブフローの絶対パス
-            message_box (MessageBox): メッセージを格納する。
+            abs_root (str): リサーチフローのルートディレクトリ
             _sub_flow_type_selector(pn.widgets.Select):サブフロー種別(フェーズ)
             _sub_flow_name_selector(pn.widgets.Select):サブフロー選択
             submit_button(Button):ボタンの設定
@@ -29,7 +28,7 @@ class DeleteSubflowForm(BaseSubflowForm):
         """DeleteSubflowForm コンストラクタのメソッドです
 
         Args:
-            abs_root (str): サブフローの絶対パス
+            abs_root (str): リサーチフローのルートディレクトリ
             message_box (MessageBox): メッセージを格納する。
         """
         super().__init__(abs_root, message_box)
@@ -75,7 +74,7 @@ class DeleteSubflowForm(BaseSubflowForm):
 
     # overwrite
     def change_disable_submit_button(self):
-        """サブフロー削除フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化するメソッドです。"""
+        """サブフロー削除フォームの必須項目が選択・入力が満たしている場合、削除ボタンを有効化するメソッドです。"""
         # サブフロー削除フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
         self.change_submit_button_init(msg_config.get('main_menu', 'delete_sub_flow'))
 

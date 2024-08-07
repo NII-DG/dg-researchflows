@@ -1,4 +1,4 @@
-"""サブフローの操作
+"""サブフローの操作を行うモジュールです。
 
 このモジュールはサブフロー操作基底クラスを始め、サブフローを操作する時に
 ボタンを制御したり、値が入力されているか、あるいはユニークの値になっているかなどを確認するメソッドがあります。
@@ -22,8 +22,7 @@ class BaseSubflowForm():
 
     Attributes:
         instance:
-            abs_root(str):サブフローの絶対パス
-            research_flow_status(List[PhaseStatus]):リサーチフローステータス管理情報
+            abs_root(str):リサーチフローのルートディレクトリ
             reserch_flow_status_operater(ResearchFlowStatusOperater):リサーチフロー図を生成
             _err_output(MessageBox):エラーの出力
             _sub_flow_type_selector(pn.widgets.Select):サブフロー種別(フェーズ)
@@ -39,7 +38,7 @@ class BaseSubflowForm():
         """BaseSubflowForm コンストラクタのメソッドです。
 
         Args:
-            abs_root (str): サブフローの絶対パス
+            abs_root (str): リサーチフローのルートディレクトリ
             message_box (MessageBox): メッセージを格納する。
         """
         self.abs_root = abs_root
@@ -264,11 +263,7 @@ class BaseSubflowForm():
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_sub_flow_type_selector(self, event):
-        """サブフロー種別(フェーズ)のボタンが操作できるように有効化するメソッドです。
-
-        Raises:
-            Exception: サブフローのセレクタタイプなし、内部エラー
-        """
+        """サブフロー種別(フェーズ)のボタンが操作できるように有効化するメソッドです。"""
         # サブフロー種別(フェーズ):シングルセレクトコールバックファンクション
         try:
             # リサーチフローステータス管理情報の取得
@@ -296,11 +291,7 @@ class BaseSubflowForm():
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_parent_sub_flow_type_selector(self, event):
-        """親サブフロー種別(フェーズ)のボタンが操作できるように有効化するメソッドです
-
-        Raises:
-            Exception: サブフローのセレクタタイプなし
-        """
+        """親サブフロー種別(フェーズ)のボタンが操作できるように有効化するメソッドです"""
         # 親サブフロー種別(フェーズ)のコールバックファンクション
         try:
             # リサーチフローステータス管理情報の取得
@@ -322,11 +313,11 @@ class BaseSubflowForm():
     ############
 
     def change_disable_submit_button(self):
-        """継承しているサブフローフォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化するメソッドです。"""
+        """フォームの必須項目の選択・入力が満たしている場合、ボタンを有効化するメソッドです。"""
         # 継承した先で実装する
 
     def validate_sub_flow_name(self, sub_flow_name:str):
-        """サブフロー名称の値が存在するかを確認しているメソッドです。
+        """サブフロー名称の検証をするメソッドです。
 
         Args:
             sub_flow_name (str): サブフロー名称
@@ -357,7 +348,7 @@ class BaseSubflowForm():
             raise InputWarning(message)
 
     def validate_data_dir_name(self, data_dir_name:str):
-        """データフォルダ名の検証をする時に問題がないか確認するメソッドです。
+        """データフォルダ名の検証をするメソッドです。
 
         Args:
             data_dir_name (str): データフォルダ名

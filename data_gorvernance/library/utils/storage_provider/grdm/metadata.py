@@ -1,4 +1,4 @@
-"""メタデータの整形、取得、返却
+"""メタデータの整形、取得、返却を行うモジュールです。
 
 このモジュールはメタデータに必要な値を用意します。
 プロジェクトメタデータを整形したり、メタデータのテンプレートを取得したり、メタデータをフォーマットして返却するメソッドがあります。
@@ -13,7 +13,7 @@ def format_metadata(metadata:dict) -> dict[str, list]:
         metadata(dict):メタデータの値
 
     Returns:
-        list:Dmpの値を返す。
+        dict: 整形したプロジェクトメタデータ
     """
 
     datas = metadata['data']
@@ -48,16 +48,16 @@ def format_metadata(metadata:dict) -> dict[str, list]:
     return {'dmp': first_value}
 
 
-def get_schema(url:str) -> json:
-    """メタデータのプロトコル名を取得するメソッドです。
+def get_schema(url:str) -> dict:
+    """メタデータのテンプレートを取得する。
 
-    リクエストされたURLに接続し、その接続に問題がないかを確認してプロトコル名を取得する。
+    リクエストされたURLに接続し、その接続に問題がないかを確認してテンプレート名を取得する。
 
     Args:
-        url(str):メタデータのURL
+        url(str):メタデータのテンプレート取得先のURL
 
     Returns:
-        Response.json:メタデータのプロトコル名の値を返す。
+       dict:メタデータのテンプレートの値を返す。
     """
     response = requests.get(url=url)
     response.raise_for_status()
@@ -68,10 +68,10 @@ def format_display_name(schema: dict, page_id: str, qid: str, value=None) -> dic
     """メタデータをフォーマットして返却するメソッドです。
 
     Args:
-        schema (dict): メタデータのプロトコル名
+        schema (dict): メタデータのテンプレート
         page_id (str): プロジェクトメタデータ("page1")、ファイルメタデータ("page2")
         qid (str): メタデータのqid
-        value (optional): メタデータに設定された値. Defaults to None.
+        value (list): メタデータに設定された値。 Defaults to None.
 
     Returns:
         dict: フォーマットされたメタデータの値

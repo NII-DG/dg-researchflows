@@ -1,4 +1,4 @@
-"""ファイルまたはフォルダをアップロード
+"""ファイルまたはフォルダをアップロードを行うモジュールです。
 
 このモジュールはファイルの内容を取得し、ファイルまたはフォルダをアップロードします。
 ファイルまたはフォルダをアップロードするメソッドやファイルの内容を取得するメソッドがあります。
@@ -23,12 +23,12 @@ def upload(token:str, base_url:str, project_id:str, source:str, destination:str,
         project_id (str): プロジェクトID
         source (str): 保存元パス
         destination (str): 保存先パス
-        recursive (bool, optional): 指定したsourceがフォルダかどうか. Defaults to False.
-        force (bool, optional): ファイルが存在した場合に上書きするかどうか. Defaults to False.
+        recursive (bool): 指定したsourceがフォルダかどうか. Defaults to False.
+        force (bool): ファイルが存在した場合に上書きするかどうか. Defaults to False.
 
     Raises:
         KeyError:必要な引数が与えられなかった
-        RuntimeError:タイムアウト、ネットワークのエラー
+        RuntimeError:再帰モードを使用している時、ソースがディレクトリであることを期待したエラー
         UnauthorizedError: 認証が通らない
     """
     # Falseで固定
@@ -84,7 +84,7 @@ def download(token:str, project_id:str, base_url:str, remote_path:str, base_path
         project_id (str): プロジェクトID
         base_url (str): API URL (e.g. https://api.osf.io/v2/)
         remote_path (str): ファイルパス
-        base_path (optional): ファイルを探すディレクトリのパス
+        base_path (str): ファイルを探すディレクトリのパス
 
     Returns:
         bytes: 指定したファイルの内容

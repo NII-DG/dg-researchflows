@@ -1,6 +1,6 @@
-"""サブフローの編集
+"""サブフローの接続編集を行うモジュールです。
 
-このモジュールはサブフロー間接続編集クラスを始め、新しいサブフローのデータを編集したりするメソッドなどがあります。
+このモジュールはサブフロー間接続編集クラスを始め、既存のサブフロー間の接続を編集したりするメソッドなどがあります。
 """
 from typing import Dict, List
 import traceback
@@ -17,8 +17,6 @@ class RelinkSubflowForm(BaseSubflowForm):
 
     Attributes:
         instance:
-            abs_root (str): サブフローの絶対パス
-            message_box (MessageBox): メッセージを格納する。
             reserch_flow_status_operater(ResearchFlowStatusOperater):リサーチフロー図を生成
             _sub_flow_type_selector(pn.widgets.Select):サブフロー種別(フェーズ)
             _sub_flow_name_selector(pn.widgets.Select):サブフロー名
@@ -32,7 +30,7 @@ class RelinkSubflowForm(BaseSubflowForm):
         """RelinkSubflowForm コンストラクタのメソッドです
 
         Args:
-            abs_root (str): サブフローの絶対パス
+            abs_root (str): リサーチフローのルートディレクトリ
             message_box (pn.widgets.MessageBox): メッセージを格納する。
         """
 
@@ -65,7 +63,7 @@ class RelinkSubflowForm(BaseSubflowForm):
                 pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
         return pahse_options
 
-    def get_parent_type_and_ids(self, phase_seq_number:str, sub_flow_id:str, research_flow_status:List[PhaseStatus]) -> (tuple[int[0], list] | tuple[list | int[0], list]):
+    def get_parent_type_and_ids(self, phase_seq_number:str, sub_flow_id:str, research_flow_status:List[PhaseStatus]) -> tuple[int, list]:
         """親サブフロー種別(フェーズ)と親サブフローIDを取得するメソッドです。
 
         Args:
@@ -100,11 +98,7 @@ class RelinkSubflowForm(BaseSubflowForm):
 
     # overwrite
     def callback_sub_flow_name_selector(self, event):
-        """サブフロー種別(フェーズ)を表示するメソッドです。
-
-        Raises:
-            Exception: サブフロー選択肢タイプ、サブフロー名がないエラー
-        """
+        """サブフロー種別(フェーズ)を表示するメソッドです。"""
         # サブフロー名称：シングルセレクトコールバックファンクション
         try:
             # リサーチフローステータス管理情報の取得
@@ -125,11 +119,7 @@ class RelinkSubflowForm(BaseSubflowForm):
 
     # overwrite
     def callback_parent_sub_flow_type_selector(self, event):
-        """親サブフロー種別(フェーズ)を表示するメソッドです。
-
-        Raises:
-            Exception: サブフロー種別(フェーズ)、サブフロー名、親サブフロー種別(フェーズ)がないエラー
-        """
+        """親サブフロー種別(フェーズ)を表示するメソッドです。"""
         # 親サブフロー種別(フェーズ)のコールバックファンクション
         try:
             # リサーチフローステータス管理情報の取得
@@ -162,7 +152,7 @@ class RelinkSubflowForm(BaseSubflowForm):
 
     # overwrite
     def change_disable_submit_button(self):
-        """サブフロー編集フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化するメソッドです。"""
+        """サブフロー編集フォームの必須項目が選択・入力が満たしている場合、編集ボタンを有効化するメソッドです。"""
         # サブフロー編集フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
         self.change_submit_button_init(msg_config.get('main_menu', 'relink_sub_flow'))
 

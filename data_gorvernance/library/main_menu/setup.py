@@ -152,7 +152,7 @@ class ContainerSetter():
 
 
     def already_setup(self):
-        """セットアップが完了していることを画面に表示するメソッドです"""
+        """セットアップが完了していることを画面に表示するメソッドです。"""
         alert = pn.pane.Alert(msg_config.get('setup', 'setup_completed'),sizing_mode="stretch_width",alert_type='warning')
         display(alert)
 
@@ -453,7 +453,7 @@ class ContainerSetter():
     @classmethod
     def syncs_config(cls, nb_working_file_path:str) -> tuple[list, str]:
         pn.extension()
-        """同期のためにファイルとメッセージの設定
+        """同期のためにファイルとメッセージの設定をするメソッドです。
 
          Args:
             nb_working_file_path (str): 実行Notebookパス

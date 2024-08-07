@@ -40,7 +40,7 @@ class Vault():
     """Vault Server操作クラスです"""
 
     def initialize(self):
-        """Vault初期化を行うメソッドです"""
+        """Vault初期化を行うメソッドです。"""
         try:
             self.__read_token()
             return
@@ -53,7 +53,7 @@ class Vault():
         self.__create_dg_policy()
 
     def set_value(self, key:str, value:str):
-        """値の設定をするメソッドです
+        """値の設定をするメソッドです。
 
         Args:
             key(str):トークンをvaultで保存するときのキー
@@ -67,7 +67,7 @@ class Vault():
         )
 
     def has_value(self, key:str) -> bool:
-        """値の存在チェックをするメソッドです
+        """値の存在チェックをするメソッドです。
 
         Args:
             key(str):トークンをvaultで保存するときのキー
@@ -87,7 +87,7 @@ class Vault():
         return key in secrets['data']['keys']
 
     def get_value(self, key:str) -> Union[str, None]:
-        """値の取得をするメソッドです
+        """値の取得をするメソッドです。
 
         Args:
             key(str):トークンをvaultで保存するときのキー
@@ -146,7 +146,7 @@ class Vault():
         self.__write_token(root_token)
 
     def __create_dg_engine(self):
-        """シークレットエンジン(kv)作成をするメソッドです"""
+        """シークレットエンジン(kv)作成をするメソッドです。"""
         token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=token)
 
@@ -159,7 +159,7 @@ class Vault():
             )
 
     def __create_dg_policy(self):
-        """ポリシー作成をするメソッドです"""
+        """ポリシー作成をするメソッドです。"""
         token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=token)
 
@@ -171,7 +171,7 @@ class Vault():
             )
 
     def __write_token(self, token:str):
-        """ルートトークン保存のメソッドです
+        """ルートトークン保存のメソッドです。
 
         Args:
             token(str):ルートトークン
@@ -180,7 +180,7 @@ class Vault():
             f.write(token)
 
     def __read_token(self) -> str:
-        """ルートトークン取得のメソッドです
+        """ルートトークン取得のメソッドです。
 
         Raises:
             UnusableVault:vaultが利用できないエラー

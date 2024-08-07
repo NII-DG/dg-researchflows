@@ -49,7 +49,7 @@ def format_metadata(metadata:dict) -> dict[str, list]:
 
 
 def get_schema(url:str) -> dict:
-    """メタデータのテンプレートを取得する。
+    """メタデータのテンプレートを取得するメソッドです。
 
     リクエストされたURLに接続し、その接続に問題がないかを確認してテンプレート名を取得する。
 
@@ -57,7 +57,7 @@ def get_schema(url:str) -> dict:
         url(str):メタデータのテンプレート取得先のURL
 
     Returns:
-       dict:メタデータのテンプレートの値を返す。
+        dict:メタデータのテンプレートの値を返す。
     """
     response = requests.get(url=url)
     response.raise_for_status()

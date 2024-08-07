@@ -18,16 +18,17 @@ from .api import (
 )
 from .metadata import format_metadata
 from ...error import NotFoundContentsError, UnauthorizedError
+from typing import Union
 
 
 NEED_TOKEN_SCOPE = ["osf.full_write"]
 ALLOWED_PERMISSION = ["admin", "write"]
 
-def get_project_id() -> (str | None):
+def get_project_id() -> Union[str, None]:
     """プロジェクトIDを取得するメソッドです。
 
     Returns:
-        str:プロジェクトIDを返す。値が取得できなかった場合はNone。
+        Union[str, None]:プロジェクトIDを返す。値が取得できなかった場合はNone。
     """
     # url: https://rdm.nii.ac.jp/vz48p/osfstorage
     url = os.environ.get("BINDER_REPO_URL", "")

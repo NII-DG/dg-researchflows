@@ -12,6 +12,7 @@ from .base import BaseSubflowForm
 from ...utils.string import StringManager
 from ...utils.widgets import Alert
 from ...utils.error import InputWarning
+from typing import Union
 
 
 class RenameSubflowForm(BaseSubflowForm):
@@ -109,11 +110,11 @@ class RenameSubflowForm(BaseSubflowForm):
 
         self.submit_button.disabled = False
 
-    def define_input_form(self) -> Alert | pn.Column:
+    def define_input_form(self) -> Union[Alert, pn.Column]:
         """サブフロー名称変更フォームのメソッドです。
 
         Returns:
-            Alert | pn.Column:サブフロー名称変更フォームに必要な値を返す。
+            Union[Alert, pn.Column]:サブフロー名称変更フォームに必要な値を返す。
         """
         sub_flow_type_list = self._sub_flow_type_selector.options
         if len(sub_flow_type_list) < 2:

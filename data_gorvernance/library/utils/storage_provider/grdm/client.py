@@ -11,6 +11,7 @@ from osfclient.cli import OSF, split_storage
 from osfclient.utils import norm_remote_path, split_storage, is_path_matched
 from osfclient.exceptions import UnauthorizedException
 from requests.exceptions import RequestException
+from typing import Union
 
 from ...error import UnauthorizedError
 
@@ -76,7 +77,7 @@ def upload(token:str, base_url:str, project_id:str, source:str, destination:str,
 
 
 
-def download(token:str, project_id:str, base_url:str, remote_path:str, base_path=None) -> (bytes | None):
+def download(token:str, project_id:str, base_url:str, remote_path:str, base_path=None) -> Union[bytes, None]:
     """ファイルの内容を取得するメソッドです。
 
     Args:
@@ -87,7 +88,7 @@ def download(token:str, project_id:str, base_url:str, remote_path:str, base_path
         base_path (str): ファイルを探すディレクトリのパス
 
     Returns:
-        bytes: 指定したファイルの内容
+        Union[bytes, None]: 指定したファイルの内容
 
     Raises:
         UnauthorizedError: 認証が通らない

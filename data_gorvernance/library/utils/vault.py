@@ -10,6 +10,7 @@ import threading
 import time
 
 from .error import UnusableVault
+from typing import Union
 
 VAULT_ADDR = 'http://127.0.0.1:8200'
 TOKEN_PATH = '/home/jovyan/.vault/token'
@@ -85,14 +86,14 @@ class Vault():
             return False
         return key in secrets['data']['keys']
 
-    def get_value(self, key:str) -> str | None:
+    def get_value(self, key:str) -> Union[str, None]:
         """値の取得をするメソッドです
 
         Args:
             key(str):トークンをvaultで保存するときのキー
 
         Returns:
-            str: 取得した値を返す。値がない場合はNoneを返す。
+            Union[str, None]: 取得した値を返す。値がない場合はNoneを返す。
         """
         if not self.has_value(key):
             return None

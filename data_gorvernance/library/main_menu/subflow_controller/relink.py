@@ -11,6 +11,7 @@ from dg_drawer.research_flow import PhaseStatus
 from ...utils.config import message as msg_config
 from .base import BaseSubflowForm
 from ...utils.widgets import Alert
+from typing import Union
 
 class RelinkSubflowForm(BaseSubflowForm):
     """サブフロー間接続編集クラスです。
@@ -190,11 +191,11 @@ class RelinkSubflowForm(BaseSubflowForm):
 
         self.submit_button.disabled = False
 
-    def define_input_form(self) -> Alert | pn.Column:
+    def define_input_form(self) -> Union[Alert, pn.Column]:
         """サブフロー間接続編集フォームのメソッドです。
 
         Returns:
-            Alert | pn.Column:サブフロー間接続編集フォームに必要な値を返す。
+            Union[Alert, pn.Column]:サブフロー間接続編集フォームに必要な値を返す。
         """
         sub_flow_type_list = self._sub_flow_type_selector.options
         if len(sub_flow_type_list) < 2:

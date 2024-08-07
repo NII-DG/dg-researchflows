@@ -10,6 +10,7 @@ from dg_drawer.research_flow import PhaseStatus
 from ...utils.config import path_config, message as msg_config
 from .base import BaseSubflowForm
 from ...utils.widgets import Alert
+from typing import Union
 
 class DeleteSubflowForm(BaseSubflowForm):
     """サブフロー削除クラスです。
@@ -96,11 +97,11 @@ class DeleteSubflowForm(BaseSubflowForm):
 
         self.submit_button.disabled = False
 
-    def define_input_form(self) -> Alert | pn.Column:
+    def define_input_form(self) -> Union[Alert, pn.Column]:
         """サブフロー削除フォームを定義するメソッドです。
 
         Retunes:
-            Alert | pn.Column: フォームに表示する内容
+            Union[Alert, pn.Column]: フォームに表示する内容
         """
         sub_flow_type_list = self._sub_flow_type_selector.options
         if len(sub_flow_type_list) < 2:

@@ -123,6 +123,3 @@ RUN chown -R ${NB_UID} ${HOME}
 
 
 ###### User Custom Area [End] #######
-
-USER ${NB_USER}
-

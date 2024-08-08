@@ -1,3 +1,7 @@
+"""Vaultサーバーへの接続のモジュールです。
+
+このモジュールはVaultサーバーに接続するために必要な値の設定とチェックを行い、キーやポリシーを作成してサーバーを起動させ、接続確認を行うメソッドがあります。
+"""
 import hvac
 import os
 import requests
@@ -6,6 +10,7 @@ import threading
 import time
 
 from .error import UnusableVault
+from typing import Union
 
 VAULT_ADDR = 'http://127.0.0.1:8200'
 TOKEN_PATH = '/home/jovyan/.vault/token'
@@ -21,6 +26,7 @@ MAX_RETRY_COUNT = 5
 
 
 def start_server():
+    """サーバーを起動するメソッドです。"""
     config_path = os.path.join(
         os.environ['HOME'], 'data_gorvernance/library/data/vault-config.hcl')
     subprocess.Popen(
@@ -31,11 +37,10 @@ def start_server():
 
 
 class Vault():
-    """Vault Server操作クラス"""
+    """Vault Server操作クラスです。"""
 
     def initialize(self):
-        """Vault初期化"""
-
+        """Vault初期化を行うメソッドです。"""
         try:
             self.__read_token()
             return
@@ -47,8 +52,13 @@ class Vault():
         self.__create_dg_engine()
         self.__create_dg_policy()
 
-    def set_value(self, key, value):
-        """値の設定"""
+    def set_value(self, key:str, value:str):
+        """値の設定をするメソッドです。
+
+        Args:
+            key(str):トークンをvaultで保存するときのキー
+            value(str): vaultに保存する値
+        """
         client = self.__get_client()
         client.secrets.kv.v1.create_or_update_secret(
             path=key,
@@ -56,8 +66,15 @@ class Vault():
             mount_point=DG_ENGINE_NAME,
         )
 
-    def has_value(self, key):
-        """値の存在チェック"""
+    def has_value(self, key:str) -> bool:
+        """値の存在チェックをするメソッドです。
+
+        Args:
+            key(str):トークンをvaultで保存するときのキー
+
+        Returns:
+            bool: 指定された値が存在する場合はTrueを返し、存在しない場合はFalseを返す。
+        """
         client = self.__get_client()
         try:
             secrets = client.secrets.kv.v1.list_secrets(
@@ -69,8 +86,15 @@ class Vault():
             return False
         return key in secrets['data']['keys']
 
-    def get_value(self, key):
-        """値の取得"""
+    def get_value(self, key:str) -> Union[str, None]:
+        """値の取得をするメソッドです。
+
+        Args:
+            key(str):トークンをvaultで保存するときのキー
+
+        Returns:
+            Union[str, None]: 取得した値を返す。値がない場合はNoneを返す。
+        """
         if not self.has_value(key):
             return None
 
@@ -82,7 +106,11 @@ class Vault():
         return read_res['data']['secret']
 
     def __start_server(self):
-        """Vaultサーバー起動"""
+        """Vaultサーバー起動するメソッドです。
+
+        Raises:
+            UnusableVault:vaultが利用できない場合のエラー
+        """
 
         # vaultサーバー起動
         thread = threading.Thread(target=start_server)
@@ -118,8 +146,7 @@ class Vault():
         self.__write_token(root_token)
 
     def __create_dg_engine(self):
-        """シークレットエンジン(kv)作成"""
-
+        """シークレットエンジン(kv)作成をするメソッドです。"""
         token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=token)
 
@@ -132,8 +159,7 @@ class Vault():
             )
 
     def __create_dg_policy(self):
-        """ポリシー作成"""
-
+        """ポリシー作成をするメソッドです。"""
         token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=token)
 
@@ -144,13 +170,24 @@ class Vault():
                 policy=DG_POLICY,
             )
 
-    def __write_token(self, token):
-        """ルートトークン保存"""
+    def __write_token(self, token:str):
+        """ルートトークン保存のメソッドです。
+
+        Args:
+            token(str):ルートトークン
+        """
         with open(TOKEN_PATH, 'w') as f:
             f.write(token)
 
-    def __read_token(self):
-        """ルートトークン取得"""
+    def __read_token(self) -> str:
+        """ルートトークン取得のメソッドです。
+
+        Raises:
+            UnusableVault:vaultが利用できないエラー
+
+        Returns:
+            str:ルートトークンの値を返す。
+        """
         if not os.path.isfile(TOKEN_PATH):
             raise UnusableVault
 
@@ -158,7 +195,12 @@ class Vault():
             root_token = f.read()
         return root_token
 
-    def __get_client(self):
+    def __get_client(self) -> hvac.Client:
+        """vaultに接続するためのクライアントを取得するメソッドです。
+
+        Returns:
+            hvac.Client:vaultサーバーのクライアント
+        """
         root_token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=root_token)
         token_res = client.auth.token.create(

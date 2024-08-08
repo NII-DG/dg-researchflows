@@ -1,3 +1,4 @@
+"""リサーチフローステータス関連の処理を行う関数やクラスが記載されたモジュールです。"""
 import os
 from typing import List
 from datetime import datetime
@@ -11,8 +12,8 @@ from ..html.security import escape_html_text
 from ..file import JsonFile
 
 
-def get_subflow_type_and_id(working_file_path: str):
-    """ノートブックのパスを受け取ってsubflowの種別とidを返す
+def get_subflow_type_and_id(working_file_path:str)->tuple[str, str]:
+    """サブフローの種別とidを取得するメソッドです。
 
     Args:
         working_file_path (str): researchflowディレクトリ配下のノートブックのファイルパス
@@ -20,6 +21,7 @@ def get_subflow_type_and_id(working_file_path: str):
     Returns:
         str: サブフロー種別（無い場合は空文字）
         str: サブフローID（無い場合は空文字）
+
     """
     working_file_path = os.path.normpath(working_file_path)
     parts = os.path.dirname(working_file_path).split(os.sep)
@@ -53,8 +55,20 @@ def get_subflow_type_and_id(working_file_path: str):
 
     return subflow_type, subflow_id
 
-def get_data_dir(working_file_path: str):
-    """該当するdataディレクトリまでの絶対パスを返す"""
+def get_data_dir(working_file_path: str)->str:
+    """該当するデータディレクトリまでの絶対パスを取得するメソッドです。
+
+    Args:
+        working_file_path (str): データディレクトリを指定する作業ディレクトリのファイルパス
+
+    Returns:
+        str:該当するデータディレクトリの絶対パス
+
+    Raises:
+        Exception:subflow_typeまたはsubflow_idが取得できなかった
+        Exception:ディレクトリ名が取得できなかった
+
+    """
     working_file_path = os.path.normpath(working_file_path)
     abs_root = path_config.get_abs_root_form_working_dg_file_path(working_file_path)
 
@@ -71,19 +85,39 @@ def get_data_dir(working_file_path: str):
     return path_config.get_task_data_dir(abs_root, subflow_type, data_dir_name)
 
 class ResearchFlowStatusFile(JsonFile):
-    """research_flow_status.pyの読み書きと関連処理"""
+    """リサーチフローステータスの参照や操作を行うクラスです。"""
 
     def __init__(self, file_path: str):
+        """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
+
+        Args:
+            file_path (str):ファイルパス
+
+        Raises:
+            FileNotFoundError:指定したパスのファイルが存在しない
+
+        """
         if os.path.isfile(file_path):
             super().__init__(file_path)
         else:
             raise FileNotFoundError(f'[ERROR] : Not Found File. File Path : {file_path}')
 
     def load_research_flow_status(self)->List[PhaseStatus]:
-        """リサーチフローステータス管理JSONからリサーチフローステータスインスタンスを取得する"""
+        """リサーチフローステータス管理JSONからリサーチフローステータスのインスタンスを取得するメソッドです。
+
+        Returns:
+            List[PhaseStatus]:リサーチフローステータスのリスト
+
+        """
         return ResearchFlowStatus.load_from_json(str(self.path))
 
     def update_file(self, research_flow_status:List[PhaseStatus]):
+        """リサーチフローステータス管理JSONの更新を行うメソッドです。
+
+        Args:
+            research_flow_status (List[PhaseStatus]): 更新に用いるリサーチフローステータス管理情報
+
+        """
         # research_flow_statusを基にリサーチフローステータス管理JSONを更新する。
         research_flow_status_data = {}
         research_flow_status_data['research_flow_pahse_data'] = []
@@ -107,12 +141,24 @@ class ResearchFlowStatusFile(JsonFile):
         super().write(research_flow_status_data)
 
     def issue_uuidv4(self)->str:
-        """UUIDv4の発行"""
+        """UUIDv4の発行を行うメソッドです。
+
+        Returns:
+            str:発行したUUIDを文字列に変換したもの
+
+        """
         return str(uuid.uuid4())
 
     def exist_sub_flow_id_in_research_flow_status(self, research_flow_status:List[PhaseStatus], target_id:str)->bool:
-        """リサーチフローステータス管理情報にサブフローIDが存在するかチェック"""
+        """リサーチフローステータス管理情報に同一のサブフローIDが存在するか確認するメソッドです。
 
+        Args:
+            research_flow_status (List[PhaseStatus]): リサーチフローステータス管理情報
+
+        Returns:
+            bool:target_idと一致するサブフローIDが存在するかの判定に用いるフラグ
+
+        """
         for phase in research_flow_status:
             for sub_flow in phase._sub_flow_data:
                 if sub_flow._id == target_id:
@@ -120,7 +166,12 @@ class ResearchFlowStatusFile(JsonFile):
         return False
 
     def issue_unique_sub_flow_id(self)->str:
-        """ユニークなサブフローIDを発行する"""
+        """固有のサブフローIDを発行するメソッドです。
+
+        Returns:
+            str:新たに発行した固有のサブフローID
+
+        """
         while True:
             candidate_id = self.issue_uuidv4()
             research_flow_status = self.load_research_flow_status()
@@ -131,8 +182,20 @@ class ResearchFlowStatusFile(JsonFile):
                 ## ユニークID取得に成功
                 return candidate_id
 
-    def is_unique_subflow_name(self, phase_seq_number, sub_flow_name)->bool:
-        """サブフロー名のユニークチェック"""
+    def is_unique_subflow_name(self, phase_seq_number:int, sub_flow_name:str)->bool:
+        """フェーズ内に同じ名前のサブフローが存在するかの確認を行うメソッドです。
+
+        Args:
+            phase_seq_number:フェーズシーケンス番号
+            sub_flow_name:サブフロー名
+
+        Returns:
+            bool:同一のサブフロー名が存在するかのフラグ
+
+        Raises:
+            Exception:引数で指定したフェーズが存在しない
+
+        """
         exist_phase = False
         research_flow_status = self.load_research_flow_status()
         for phase_status in research_flow_status:
@@ -149,8 +212,20 @@ class ResearchFlowStatusFile(JsonFile):
 
         return True
 
-    def is_unique_data_dir(self, phase_seq_number, data_dir_name)->bool:
-        """データフォルダ名のユニークチェック"""
+    def is_unique_data_dir(self, phase_seq_number:int, data_dir_name:str)->bool:
+        """フェーズ内に同じ名前のデータフォルダが存在するかの確認を行うメソッドです。
+
+        Args:
+            phase_seq_number (int):フェーズシーケンス番号
+            data_dir_name (str):データフォルダ名
+
+        Returns:
+            bool:同一のデータフォルダ名が存在するかのフラグ
+
+        Raises:
+            Exception:一致するフェーズが存在しない
+
+        """
         exist_phase = False
         research_flow_status = self.load_research_flow_status()
         for phase_status in research_flow_status:
@@ -168,13 +243,14 @@ class ResearchFlowStatusFile(JsonFile):
         return True
 
 class ResearchFlowStatusOperater(ResearchFlowStatusFile):
-    """リサーチフローステータスの操作と利用"""
+    """リサーチフローステータスの参照や操作をおこなうクラスです。"""
 
     def get_svg_of_research_flow_status(self)->str:
-        """Get SVG data of Research Flow Image by file path
+        """リサーチフローイメージのSVGデータを取得するメソッドです。
 
         Returns:
-            str: SVG data of Research Flow Image
+            str:リサーチフローイメージのSVGデータ
+
         """
         research_flow_status = self.load_research_flow_status()
         # Update display pahse name
@@ -184,7 +260,15 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         return fd.draw()
 
     def update_display_object(self, research_flow_status:List[PhaseStatus])-> List[PhaseStatus]:
-        """画面表示ように調整する"""
+        """リサーチフローステータス管理情報を画面表示用に調整するメソッドです。
+
+        Args:
+            research_flow_status (List[PhaseStatus]):リサーチフローステータス管理情報
+
+        Returns:
+            List[PhaseStatus]:画面表示用に調整を行ったリサーチフローステータス管理情報
+
+        """
         update_research_flow_status = []
         for phase in research_flow_status:
             phase.update_name(name = msg_config.get('research_flow_phase_display_name', phase._name))
@@ -193,8 +277,8 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
             update_research_flow_status.append(phase)
         return update_research_flow_status
 
-    def init_research_preparation(self, file_path:str):
-        """研究準備ステータスの初期化"""
+    def init_research_preparation(self):
+        """研究準備ステータスの初期化を行うメソッドです。"""
         # 研究準備のサブフローデータのサブフロー作成時間が-1の場合、現在の現時刻に更新する。
         research_flow_status = self.load_research_flow_status()
         for phase_status in research_flow_status:
@@ -212,15 +296,23 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         #リサーチフローステータス管理JSONを更新する。
         self.update_file(research_flow_status)
 
-    def create_sub_flow(self, creating_phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids):
-        """リサーチフローステータスの更新
+    def create_sub_flow(self, creating_phase_seq_number:int, sub_flow_name:str, data_dir_name:str, parent_sub_flow_ids:list[str])->tuple[str, str]:
+        """新規のサブフローを作成し、リサーチフローステータスに追加するメソッドです。
 
         Args:
-            creating_phase_seq_number (int): [作成フェーズ]
+            creating_phase_seq_number(int):サブフローを作成するフェーズのシーケンス番号
+            sub_flow_name(str): 新規サブフロー名
+            date_dir_name(str):作成するディレクトリ名
+            parent_sub_flow_ids(list[str]):親サブフローID
 
-            sub_flow_name (str): [新規サブフロー名]
+        Returns:
+            str:新規のサブフローを作成したフェーズの名前
+            str:新しく作成したサブフローのID
 
-            parent_sub_flow_id (list[str]): [親サブフローID]
+        Raises:
+            Exception:引数で指定しフェーズが存在しない
+            Exception:新しく作成したサブフローのIDが発行できない
+
         """
         # リサーチフローステータス管理JSONの更新
         research_flow_status = self.load_research_flow_status()
@@ -251,7 +343,16 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         self.update_file(research_flow_status)
         return phase_name, new_sub_flow_id
 
-    def del_sub_flow_data_by_sub_flow_id(self, sub_flow_id):
+    def del_sub_flow_data_by_sub_flow_id(self, sub_flow_id:str):
+        """指定したサブフローデータの削除を行うメソッドです。
+
+        Args:
+            sub_flow_id (str):削除対象となるサブフローデータのID
+
+        Raises:
+            NotFoundSubflowDataError:IDが一致するサブフローデータが存在しない
+
+        """
         research_flow_status = self.load_research_flow_status()
 
         for phase_status in research_flow_status:
@@ -270,7 +371,18 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         # リサーチフローステータス管理JSONの上書き
         self.update_file(research_flow_status)
 
-    def relink_sub_flow(self, phase_seq_number, sub_flow_id, parent_sub_flow_ids):
+    def relink_sub_flow(self, phase_seq_number:int, sub_flow_id:str, parent_sub_flow_ids:list[str]):
+        """親サブフローを変更するメソッドです。
+
+        Args:
+            phase_seq_number (int):対象のフェーズシーケンス番号
+            sub_flow_id (str): 対象のサブフローID
+            parent_sub_flow_ids (list[str]):変更後の親サブフローID
+
+        Raises:
+            NotFoundSubflowDataError:IDが一致するサブフローデータが存在しない
+
+        """
         research_flow_status = self.load_research_flow_status()
         for phase_status in research_flow_status:
             if phase_status._seq_number != phase_seq_number:
@@ -284,7 +396,19 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
             break
         self.update_file(research_flow_status)
 
-    def rename_sub_flow(self, phase_seq_number, sub_flow_id, sub_flow_name, data_dir_name):
+    def rename_sub_flow(self, phase_seq_number:int, sub_flow_id:str, sub_flow_name:str, data_dir_name:str):
+        """サブフロー名とディレクトリ名を変更するメソッドです。
+
+        Args:
+            phase_seq_number (int):対象のフェーズシーケンス番号
+            sub_flow_id (str):対象のサブフローID
+            sub_flow_name (str):変更後のサブフロー名
+            data_dir_name (str):変更後のディレクトリ名
+
+        Raises:
+            NotFoundSubflowDataError:IDが一致するサブフローデータが存在しない
+
+        """
         research_flow_status = self.load_research_flow_status()
         for phase_status in research_flow_status:
             if phase_status._seq_number != phase_seq_number:
@@ -299,7 +423,21 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
             break
         self.update_file(research_flow_status)
 
-    def get_flow_name_and_dir_name(self, phase_seq_number, id):
+    def get_flow_name_and_dir_name(self, phase_seq_number:int, id:str)->tuple[str, str]:
+        """指定したサブフローデータのサブフロー名とディレクトリ名を取得するメソッドです。
+
+        Args:
+            phase_seq_number (int):対象のフェーズシーケンス番号
+            id (str):対象のサブフローID
+
+        Returns:
+            str:サブフロー名
+            str:ディレクトリ名
+
+        Raises:
+            NotFoundSubflowDataError:IDが一致するサブフローデータが存在しない
+
+        """
         research_flow_status = self.load_research_flow_status()
         for phase in research_flow_status:
             if phase._seq_number != phase_seq_number:
@@ -310,8 +448,20 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         else:
             raise NotFoundSubflowDataError(f'There Is No Data Directory Name. sub_flow_id : {id}')
 
-    def get_data_dir(self, phase_name, id):
-        """phase nameとidからdata_dirを取得する"""
+    def get_data_dir(self, phase_name:str, id:str)->str:
+        """指定したサブフローデータのディレクトリ名を取得するメソッドです。
+
+        Args:
+            phase_name (str):対象のフェーズ名
+            id (str):対象のサブフローID
+
+        Returns:
+            str:ディレクトリ名
+
+        Raises:
+            NotFoundSubflowDataError:IDが一致するサブフローデータが存在しない
+
+        """
         research_flow_status = self.load_research_flow_status()
         for phase in research_flow_status:
             if phase._name != phase_name:
@@ -322,8 +472,19 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         else:
             raise NotFoundSubflowDataError(f'There Is No Data Directory Name. sub_flow_id : {id}')
 
-    def get_subflow_phase(self, phase_seq_number):
-        """指定するidのphase名を取得する"""
+    def get_subflow_phase(self, phase_seq_number:int)->str:
+        """指定したフェーズの名前を取得するメソッドです。
+
+        Args:
+            phase_seq_number (int):対象のフェーズシーケンス番号
+
+        Returns:
+            str:フェーズ名
+
+        Raises:
+            Exception:フェーズシーケンス番号が一致するフェーズが存在しない
+
+        """
         research_flow_status = self.load_research_flow_status()
         for phase_status in research_flow_status:
             if phase_status._seq_number == phase_seq_number:
@@ -332,7 +493,12 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
             raise Exception(f'There is no phase. phase_seq_number : {phase_seq_number}')
 
     def get_subflow_phases(self)->List[str]:
-        """全てのphase名を取得する"""
+        """リーサーチフローステータスに存在する全てのフェーズ名を取得するメソッドです。
+
+        Returns:
+            List[str]:全フェーズ名のリスト
+
+        """
         research_flow_status = self.load_research_flow_status()
         phase_list = []
         for phase_status in research_flow_status:
@@ -340,7 +506,15 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         return phase_list
 
     def get_subflow_ids(self, phase_name: str)->List[str]:
-        """指定したphaseにあるサブフローのidを全て取得する"""
+        """指定したフェーズの全サブフローIDを取得するメソッドです。
+
+        Args:
+            phase_name (str):対象のフェーズ名
+
+        Returns:
+            List[str]:対象のフェーズに存在する全サブフローIDのリスト
+
+        """
         research_flow_status = self.load_research_flow_status()
         id_list = []
         for phase_status in research_flow_status:
@@ -349,3 +523,4 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
             for subflow_data in phase_status._sub_flow_data:
                 id_list.append(subflow_data._id)
         return id_list
+

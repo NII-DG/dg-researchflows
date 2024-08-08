@@ -1,3 +1,4 @@
+""" タブを開くボタンを表示するモジュールです。"""
 import os
 from pathlib import Path
 
@@ -11,11 +12,12 @@ from .html import create_button
 from .setting import get_data_dir
 
 
-def open_main_menu(working_file):
-    """別タブでメインメニューを開くボタンを表示する
+def open_main_menu(working_file: str) -> None:
+    """ 別タブでメインメニューを開くボタンを表示する関数です。
 
     Args:
-        working_file (str): 移動元のファイルパス
+        working_file(str): 移動元のファイルパスを設定します。
+
     """
     button_width = 500
     root_folder = Path(
@@ -35,7 +37,13 @@ def open_main_menu(working_file):
     display(Javascript('IPython.notebook.save_checkpoint();'))
 
 
-def open_data_folder(working_file):
+def open_data_folder(working_file: str) -> None:
+    """ 別タブでデータフォルダを開くボタンを表示する関数です。
+
+    Args:
+        working_file(str) : 移動元のファイルパスを設定します。
+
+    """
     home = os.environ['HOME']
     # homeからdataディレクトリまで
     data_dir = get_data_dir(working_file)

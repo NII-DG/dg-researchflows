@@ -1,3 +1,4 @@
+""" dg-webと接続するためのパッケージです。"""
 from .api import (
     get_govsheet_schema,
     get_metadata_schema,

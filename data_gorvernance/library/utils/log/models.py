@@ -1,3 +1,4 @@
+"""ログの生成に関するクラスや関数が記載されたモジュールです。"""
 import datetime
 import logging
 from logging import FileHandler
@@ -9,15 +10,39 @@ from library.utils.setting import get_subflow_type_and_id
 
 
 class BaseLogger:
+    """ロギング機能の基本となるメソッドを記載したクラスです。
 
-    def __init__(self, output_dir="."):
+    Attributes:
+        instance:
+            logger(logging.Logger):ロガー
+            date(str):ログが生成された時刻
+            log_dir(str):ログファイルの出力ディレクトリ
+            handler(FileHandler):ログを特定のファイルに出力するためのハンドラー
+
+    """
+
+    def __init__(self, output_dir:str="."):
+        """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
+
+        Args:
+            output_dir(str):ログファイルの出力ディレクトリ。デフォルトはカレントディレクトリ。
+
+        """
         self.logger = logging.getLogger(__name__)
         self.date = datetime.datetime.now().strftime('%Y%m%d')
         self.log_dir = output_dir
         self._update_handler()
         self.logger.propagate = False
 
-    def reset_file(self, fmt):
+    def reset_file(self, fmt:str):
+        """ファイルのリセットを行うメソッドです。
+
+        ログファイルは日付で分割されるため、日付が変わっていた場合のみログハンドラーを更新します。
+
+        Args:
+            fmt(str):フォーマッターを設定
+
+        """
         now_date = datetime.datetime.now().strftime('%Y%m%d')
         if self.date != now_date:
             self.date = now_date
@@ -25,6 +50,11 @@ class BaseLogger:
         self.set_formatter(fmt)
 
     def _update_handler(self):
+        """ロガーのハンドラーを更新するメソッドです。
+
+        ログが複数出力されるのを防ぐため既存のハンドラーを削除した後、新たにハンドラーを生成します。
+
+        """
         if self.logger.hasHandlers():
             handlers = self.logger.handlers
             for handler in handlers:
@@ -35,10 +65,22 @@ class BaseLogger:
         self.logger.addHandler(self.handler)
 
     def set_formatter(self, fmt:str):
+        """フォーマッターを設定するためのメソッドです。
+
+        Args:
+            fmt(str):フォーマッターを生成
+
+        """
         formatter = logging.Formatter(fmt)
         self.handler.setFormatter(formatter)
 
-    def set_log_level(self, level):
+    def set_log_level(self, level:str):
+        """ロガーのログレベルを設定するためのメソッドです。
+
+        Args:
+            level(str):ログレベルを設定
+
+        """
         if level == 'debug':
             self.logger.setLevel(logging.DEBUG)
         elif level == 'info':
@@ -52,11 +94,27 @@ class BaseLogger:
 
 
 class UserActivityLog(BaseLogger):
+    """BaseLoggerクラスを継承し、実際にユーザーがロギング機能を用いることができるよう実装したクラスです。
 
-    def __init__(self, nb_working_file, notebook_name):
-        """
+    親クラスのメソッドを利用してロガーやフォーマッターの設定を行います。
+
+    Attributes:
+        instance:
+            username(str):ユーザー名
+            ipynb_file(str):ノートブックファイルへのパス
+            subflow_id(str):サブフローのID
+            subflow_type(str):サブフローの種別
+            cell_id(str):ノートブックのセルID
+
+    """
+
+    def __init__(self, nb_working_file: str, notebook_name: str):
+        """ クラスのインスタンスを初期化するメソッドです。コンストラクタ
+
         Args:
             nb_working_file (str): ノートブック名を含む絶対パス
+            notebook_name(str):ノートブック名
+
         """
         # set log config
         log_dir = self._get_log_dir(nb_working_file)
@@ -72,7 +130,17 @@ class UserActivityLog(BaseLogger):
         self.subflow_type = subflow_type
         self.cell_id = ""
 
-    def _get_log_dir(self, nb_working_file):
+
+    def _get_log_dir(self, nb_working_file: str)->str:
+        """ログファイルを保存するディレクトリを生成するためのメソッドです。
+
+        Args:
+            nb_working_file (str): ノートブック名を含む絶対パス
+
+        Returns:
+            str:ログファイルを保存するディレクトリへのパス
+
+        """
         root_folder = Path(
             path_config.get_abs_root_form_working_dg_file_path(nb_working_file)
         )
@@ -81,29 +149,72 @@ class UserActivityLog(BaseLogger):
         os.makedirs(log_dir, exist_ok=True)
         return str(log_dir)
 
-    def _get_format(self):
+    def _get_format(self)->str:
+        """フォーマットの定義を取得するメソッドです。
+
+        Returns:
+            str:フォーマットの定義
+
+        """
         return '%(levelname)s\t%(asctime)s\t%(username)s\t%(subflow_id)s\t%(subflow_type)s\t%(ipynb_name)s\t%(cell_id)s\t%(message)s'
 
-    def info(self, message):
+    def info(self, message:str):
+        """INFOレベルのログを出力するためのメソッドです。
+
+        Args:
+            message(str):ログメッセージを設定
+
+        """
         self.reset_file(self._get_format())
         self.logger.info(message, extra=self.record())
 
-    def warning(self, message):
+    def warning(self, message:str):
+        """WARNINGレベルのログを出力するためのメソッドです。
+
+        Args:
+            message(str):ログメッセージを設定
+
+        """
         self.reset_file(self._get_format())
         self.logger.warning(message, extra=self.record())
 
-    def error(self, message):
+    def error(self, message:str):
+        """ERRORレベルのログを出力するためのメソッドです。
+
+        Args:
+            message(str):ログメッセージを設定
+
+        """
         self.reset_file(self._get_format())
         self.logger.error(message, extra=self.record())
 
-    def start(self, detail='', note=''):
+    def start(self, detail:str='', note:str=''):
+        """処理の開始ログを出力するためのメソッドです。
+
+        Args:
+            detail(str):処理内容の詳細。デフォルトは空文字
+            note(str):処理内容の注記。デフォルトは空文字
+
+        """
         self.info("-- " + detail + "処理開始 --" + note)
 
-    def finish(self, detail='', note=''):
+    def finish(self, detail:str='', note:str=''):
+        """処理の終了ログを出力するためのメソッドです。
+
+        Args:
+            detail(str):処理内容の詳細。デフォルトは空文字
+            note(str):処理内容の注記。デフォルトは空文字
+
+        """
         self.info("-- " + detail + "処理終了 --" + note)
 
-    def record(self):
+    def record(self)->dict[str, str]:
+        """インスタンスに保持している情報を辞書形式に変換するためのメソッドです。
 
+        Returns:
+            dict[str, Any]:辞書形式に変換したログデータをデータ
+
+        """
         return {
             'username': self.username,
             'subflow_id': self.subflow_id,

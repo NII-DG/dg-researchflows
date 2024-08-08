@@ -1,3 +1,8 @@
+"""DGカスタマイズJSON定義書に関するモジュールです。
+
+データを解析し、インスタンスとして利用できるリストを作成するメソッドが記載されています。
+
+"""
 import os
 from pathlib import Path
 from typing import Any, Dict, List
@@ -12,10 +17,27 @@ data_governance_customize_file = p.joinpath('../../', 'data/data_governance_cust
 
 
 class AlphaProperty:
+    """受け取ったサブフローに関するデータを解析し、保持するためのクラスです。
+
+    Attributes:
+        class:
+           __ID(str):サブフローidのキー名
+           __CUSTOMIZE(str):カスタマイズデータのキー名
+        instance:
+            _id(dict):サブフローid
+            _customize(List[SubFlowRule]):取り出したデータで初期化したリスト
+
+    """
     __ID = 'id'
     __CUSTOMIZE = 'customize'
 
     def __init__(self, data:Dict[str, Dict]) -> None:
+        """クラスのインスタンスを初期化するメソッドです。コンストラクタ
+
+        Args:
+            data (Dict[str, Dict]): subFlowの情報が格納されたデータ
+
+        """
         self._id = data[self.__ID]
         self._customize:List[SubFlowRule] = []
 
@@ -24,20 +46,40 @@ class AlphaProperty:
 
 
 class SubFlowRule:
+    """DGカスタマイズJSON定義書のインスタンス作成に関するメソッドを記載したクラスです。
+
+    Attributes:
+        class:
+            __TASK_IDS(list[str]):タスクのid群のキー名
+            __VERIFICATION_IDS(list[str]):検証用のid群のキー名
+        instance:
+            _subflow_type_name(str):サブフローの型名
+            _task_ids(list[str]):タスクのID群
+            _verification_ids(list[str]):検証用のid群
+
+    """
     __TASK_IDS = 'task_ids'
     __VERIFICATION_IDS = 'verification_ids'
 
     def __init__(self, subflow_type_name:str, data:Dict[str, Any]) -> None:
+        """クラスのインスタンスを初期化するメソッドです。コンストラクタ
+
+        Args:
+            subflow_type_name (str): サブフローの型名
+            data (Dict[str, Any]): subFlowの情報が格納されたデータ
+
+        """
         self._subflow_type_name = subflow_type_name
         self._task_ids = data[self.__TASK_IDS]
         self._verification_ids = data[self.__VERIFICATION_IDS]
 
 
-def get_dg_customize_config():
-    """DGカスタマイズJSON定義書のインスタンスを取得する
+def get_dg_customize_config()->list[AlphaProperty]:
+    """DGカスタマイズJSON定義書のインスタンスを取得するメソッドです。
 
     Returns:
-        [list[AlphaProperty]]: [DGカスタマイズJSON定義書のインスタンス]
+        list[AlphaProperty]:DGカスタマイズJSON定義書のインスタンス
+
     """
     jf = JsonFile(str(data_governance_customize_file))
     dg_customize_data = jf.read()

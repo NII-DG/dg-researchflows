@@ -1,13 +1,31 @@
+"""DMPデータを操作するクラスが記載されたモジュールです。"""
 from library.utils.file import JsonFile
 
 
 class DMPManager(JsonFile):
+    """DMPデータの操作を行うクラスです。
 
+    """
     def __init__(self, file_path: str):
+        """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
+
+        Args:
+            file_path (str): ファイルパスを表す文字列
+
+        """
         super().__init__(file_path)
 
     @staticmethod
-    def create_dmp_options(contents):
+    def create_dmp_options(contents:dict)->dict:
+        """dmpのタイトルを抽出し、オプションの一覧を作成するメソッドです。
+
+        Args:
+            contents (dict): dmpデータ群
+
+        Returns:
+            dict:dmpのタイトル一覧
+
+        """
         dmps = contents['dmp']
         options = {}
         for i, dmp in enumerate(dmps):
@@ -16,11 +34,30 @@ class DMPManager(JsonFile):
         return options
 
     @staticmethod
-    def get_dmp(contents, index):
+    def get_dmp(contents:dict, index:int)->dict[str, list]:
+        """指定したdmpを取得するためのメソッドです。
+
+        Args:
+            contents (dict):dmpデータ群
+            index (int):索引
+
+        Returns:
+            dict[str, list]:Indexで指定したdmpのデータ
+
+        """
         return {"dmp": [contents['dmp'][index]]}
 
     @staticmethod
-    def display_format(content):
+    def display_format(content:dict)->str:
+        """dmpデータの表示フォーマットを作成するメソッドです。
+
+        Args:
+            content (dict):dmpデータ群
+
+        Returns:
+            str:表示する際のフォーマットに整えたdmpデータ
+
+        """
         dmp = content['dmp'][0]
         dmp_str = f"### {dmp['title']}<br><hr><br>"
         for key, value in dmp.items():

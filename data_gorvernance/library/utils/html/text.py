@@ -1,26 +1,22 @@
-"""メッセージ用HTML生成モジュール
-"""
+""" メッセージ用HTML生成モジュールです。"""
+from typing import Optional
+
 from IPython.core.display import HTML
 from IPython.display import display
 
 
-def creat_html_msg(msg='', fore=None, back=None, tag='p'):
-    """HTMLを生成するメソッド
+def creat_html_msg(msg:str='', fore:Optional[str]=None, back:Optional[str]=None, tag:str='p')->str:
+    """ HTMLを生成する関数です。
 
-    ARG
-    ---------------
-    msg : str
-        Description : メッセージ文字列
-        Default : ''
-    fore : str
-        Description : 文字色
-        Default : None
-    back : str
-        Description : 背景色
-        Default : None
-    tag : str
-        Description : HTMLタグ
-        Default : 'h1'
+    Args:
+        msg (str): メッセージ文字列を設定します。 デフォルトは''です。
+        fore (str|None): 文字色を設定します。 デフォルトはNoneです。
+        back (str|None): 背景色を設定します。 デフォルトはNoneです。
+        tag (str): HTMLタグを設定します。 デフォルトは'p'です。
+
+    Returns:
+        str: htmlコードを返す。
+
     """
     if fore is not None and back is not None:
         style: str = 'color:' + fore + ';' + 'background-color:' + back + ";"
@@ -37,37 +33,101 @@ def creat_html_msg(msg='', fore=None, back=None, tag='p'):
         return "<" + tag + " style='" + style + "'>" + msg + "</" + tag + ">"
 
 
-def creat_html_msg_info(msg='', tag='p'):
+def creat_html_msg_info(msg:str='', tag:str='p')->str:
+    """ infoメッセージを生成する関数です。
+
+    Args:
+        msg (str):メッセージ文字列を設定します。
+        tag (str): HTMLタグを設定します。
+
+    Returns:
+        str: htmlコードを返す。
+
+    """
     return creat_html_msg(msg=msg, back='#9eff9e', tag=tag)
 
 
-def creat_html_msg_warm(msg='', tag='p'):
+def creat_html_msg_warm(msg:str='', tag:str='p')->str:
+    """ warnメッセージを生成する関数です。
+
+    Args:
+        msg (str):メッセージ文字列を設定します。
+        tag (str): HTMLタグを設定します。
+
+    Returns:
+        str: htmlコードを返す。
+
+    """
     return creat_html_msg(msg=msg, back='#ffff93', tag=tag)
 
 
-def creat_html_msg_err(msg='', tag='p'):
+def creat_html_msg_err(msg:str='', tag:str='p')->str:
+    """ errメッセージを生成する関数です。
+
+    Args:
+        msg (str):メッセージ文字列を設定します。
+        tag (str): HTMLタグを設定します。
+
+    Returns:
+        str: htmlコードを返す。
+
+    """
     return creat_html_msg(msg=msg, back='#ffa8a8', tag=tag)
 
 
-def creat_html_msg_log(msg='', tag='p'):
+def creat_html_msg_log(msg:str='', tag:str='p')->str:
+    """ 標準メッセージを生成する関数です。
+
+    Args:
+        msg (str):メッセージ文字列を設定します。
+        tag (str): HTMLタグを設定します。
+
+    Returns:
+        str: htmlコードを返す。
+
+    """
     return creat_html_msg(msg=msg, tag=tag)
 
 
-def display_msg_info(msg='', tag='p'):
-     """Infoメッセージの表示"""
-     display(HTML(creat_html_msg_info(msg, tag)))
+def display_msg_info(msg:str='', tag:str='p')->None:
+    """Infoメッセージを表示する関数です。
+
+    Args:
+        msg (str):メッセージ文字列を設定します。
+        tag (str): HTMLタグを設定します。
+
+    """
+    display(HTML(creat_html_msg_info(msg, tag)))
 
 
-def display_msg_warm(msg='', tag='p'):
-     """Warningメッセージの表示"""
-     display(HTML(creat_html_msg_warm(msg, tag)))
+def display_msg_warm(msg:str='', tag:str='p')->None:
+    """Warningメッセージを表示する関数です。
+
+    Args:
+        msg (str):メッセージ文字列を設定します。
+        tag (str): HTMLタグを設定します。
+
+    """
+    display(HTML(creat_html_msg_warm(msg, tag)))
 
 
-def display_msg_err(msg='', tag='p'):
-     """Errorsメッセージの表示"""
-     display(HTML(creat_html_msg_err(msg, tag)))
+def display_msg_err(msg:str='', tag:str='p')->None:
+    """Errorsメッセージを表示する関数です。
+
+    Args:
+        msg (str):メッセージ文字列を設定します。
+        tag (str): HTMLタグを設定します。
+
+    """
+    display(HTML(creat_html_msg_err(msg, tag)))
 
 
-def display_msg_log(msg='', tag='p'):
-     """標準メッセージの表示"""
-     display(HTML(creat_html_msg_log(msg, tag)))
+def display_msg_log(msg:str='', tag:str='p')->None:
+    """標準メッセージを表示する関数です。
+
+    Args:
+        msg (str):メッセージ文字列を設定します。
+        tag (str): HTMLタグを設定します。
+
+    """
+    display(HTML(creat_html_msg_log(msg, tag)))

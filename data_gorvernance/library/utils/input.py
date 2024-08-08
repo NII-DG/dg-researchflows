@@ -1,5 +1,10 @@
+"""トークン取得のモジュールです。
+
+各種トークンやプロジェクトIDを取得する関数が記載されています。
+
+"""
 import getpass
-from typing import Callable
+from typing import Callable, Tuple
 
 from . import dg_web
 from .config import message as msg_config
@@ -9,8 +14,13 @@ from .string import StringManager
 from .vault import Vault
 
 
-def get_project_id():
-    """プロジェクトIDを取得する"""
+def get_project_id() -> str:
+    """ プロジェクトIDを取得する関数です。
+
+    Returns:
+        str: プロジェクトIDを返す。
+
+    """
     project_id = grdm.get_project_id()
     if project_id:
         return project_id
@@ -26,18 +36,19 @@ def get_project_id():
 
 
 def get_token(key:str, func:Callable[[str], bool], message:str) -> str:
-    """vaultもしくはinputからトークンを取得する
+    """ vaultもしくはinputからトークンを取得する関数です。
 
     Args:
-        key (str): トークンをvaultで保存するときのキー
-        func (Callable[[str], bool]): トークンの有効性を確認するメソッド
-        message(str): inputを求める際の表示メッセージ
+        key (str): トークンをvaultで保存するときのキーを設定します。
+        func (Callable[[str], bool]): トークンの有効性を確認する関数を設定します。
+        message(str): inputを求める際の表示メッセージを設定します。
+
+    Returns:
+        str: トークンを返す。
 
     Raises:
         UnusableVault: vaultの利用に不具合があったときのエラー
 
-    Returns:
-        str: トークン
     """
     try:
         vault = Vault()
@@ -69,46 +80,70 @@ def get_token(key:str, func:Callable[[str], bool], message:str) -> str:
     return token
 
 
-def get_grdm_token(vault_key):
-    """GRDMのパーソナルアクセストークンを取得する
+def get_grdm_token(vault_key: str) -> str:
+    """ GRDMのパーソナルアクセストークンを取得する関数です。
+
+    Returns:
+        str: パーソナルアクセストークンを返す。
 
     Raises:
         UnusableVault: vaultが利用できない
         requests.exceptions.RequestException: 通信不良
 
-    Returns:
-        str: パーソナルアクセストークン
     """
-    def check_auth(token):
+    def check_auth(token: str) -> bool:
+        """ トークンの有効性を検証する関数です。
+
+        Args:
+            token (str): パーソナルアクセストークンを設定します。
+
+        Returns:
+            bool: トークンの有効性を返す。
+
+        """
         return grdm.check_authorization(grdm.BASE_URL, token)
 
     return get_token(vault_key, check_auth, msg_config.get('form', 'pls_input_grdm_token'))
 
 
-def get_goveredrun_token():
-    """Governed Runのトークンを取得する
+def get_goveredrun_token() -> str:
+    """ Governed Runのトークンを取得する関数です。
+
+    Returns:
+        str: Governed Runのトークンを返す。
 
     Raises:
         UnusableVault: vaultが利用できない
         requests.exceptions.RequestException: 通信不良
 
-    Returns:
-        str: Governed Runのトークン
     """
-    def check_auth(token):
+    def check_auth(token: str) -> bool:
+        """ Governed Runのトークンの有効性を確認する関数です。
+
+        Args:
+            token (str): Governed Runのトークンを設定します。
+
+        Returns:
+            bool: Governed Runのトークンの有効性を返す。
+        """
         return dg_web.check_governedrun_token(dg_web.SCHEME, dg_web.DOMAIN, token)
 
     return get_token('govrun_token', check_auth, msg_config.get('form', 'pls_input_govrun_token'))
 
 
-def get_grdm_connection_parameters():
-    """GRDMのトークンとプロジェクトIDを取得する
+def get_grdm_connection_parameters() -> Tuple[str, str]:
+    """GRDMのトークンとプロジェクトIDを取得する関数です。
+
+    Returns:
+        str: GRDMのトークンを返す。
+        str: プロジェクトIDを返す。
 
     Raises:
         PermissionError: プロジェクトの権限が足りない
         ProjectNotExist: プロジェクトIDが存在しない
         UnusableVault: vaultが利用できない
         requests.exceptions.RequestException: 通信不良
+
     """
 
     project_id = get_project_id()

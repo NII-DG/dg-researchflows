@@ -1,9 +1,21 @@
+"""メタデータの整形、取得、返却を行うモジュールです。
+
+このモジュールはメタデータに必要な値を用意します。
+プロジェクトメタデータを整形したり、メタデータのテンプレートを取得したり、メタデータをフォーマットして返却するメソッドがあります。
+"""
 import json
 import requests
 
 
-def format_metadata(metadata):
-    """Gakunin RDMから取得したプロジェクトメタデータを整形する"""
+def format_metadata(metadata:dict) -> dict[str, list]:
+    """Gakunin RDMから取得したプロジェクトメタデータを整形するメソッドです。
+
+    Args:
+        metadata(dict):メタデータの値
+
+    Returns:
+        dict: 整形したプロジェクトメタデータ
+    """
 
     datas = metadata['data']
     # {'dmp': first_value}
@@ -37,21 +49,30 @@ def format_metadata(metadata):
     return {'dmp': first_value}
 
 
-def get_schema(url):
-    """メタデータのテンプレートを取得する"""
+def get_schema(url:str) -> dict:
+    """メタデータのテンプレートを取得するメソッドです。
+
+    リクエストされたURLに接続し、その接続に問題がないかを確認してテンプレート名を取得する。
+
+    Args:
+        url(str):メタデータのテンプレート取得先のURL
+
+    Returns:
+        dict:メタデータのテンプレートの値を返す。
+    """
     response = requests.get(url=url)
     response.raise_for_status()
     return response.json()
 
 
-def format_display_name(schema: dict, page_id: str, qid: str, value=None):
-    """メタデータをフォーマットして返却する
+def format_display_name(schema: dict, page_id: str, qid: str, value=None) -> dict:
+    """メタデータをフォーマットして返却するメソッドです。
 
     Args:
         schema (dict): メタデータのテンプレート
         page_id (str): プロジェクトメタデータ("page1")、ファイルメタデータ("page2")
         qid (str): メタデータのqid
-        value (optional): メタデータに設定された値. Defaults to None.
+        value (list): メタデータに設定された値。 Defaults to None.
 
     Returns:
         dict: フォーマットされたメタデータの値

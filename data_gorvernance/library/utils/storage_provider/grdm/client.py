@@ -1,3 +1,8 @@
+"""ファイルまたはフォルダをアップロードを行うモジュールです。
+
+このモジュールはファイルの内容を取得し、ファイルまたはフォルダをアップロードします。
+ファイルまたはフォルダをアップロードするメソッドやファイルの内容を取得するメソッドがあります。
+"""
 # rdmclientを利用する
 from http import HTTPStatus
 import os
@@ -6,12 +11,13 @@ from osfclient.cli import OSF, split_storage
 from osfclient.exceptions import UnauthorizedException
 from osfclient.utils import norm_remote_path, split_storage, is_path_matched
 from requests.exceptions import RequestException
+from typing import Union
 
 from library.utils.error import UnauthorizedError
 
 
-def upload(token, base_url, project_id, source, destination, recursive=False, force=False):
-    """ファイルまたはフォルダをアップロードする
+def upload(token:str, base_url:str, project_id:str, source:str, destination:str, recursive:bool=False, force:bool=False):
+    """ファイルまたはフォルダをアップロードするメソッドです。
 
     Args:
         token (str): GRDMのパーソナルアクセストークン
@@ -19,18 +25,17 @@ def upload(token, base_url, project_id, source, destination, recursive=False, fo
         project_id (str): プロジェクトID
         source (str): 保存元パス
         destination (str): 保存先パス
-        recursive (bool, optional): 指定したsourceがフォルダかどうか. Defaults to False.
-        force (bool, optional): ファイルが存在した場合に上書きするかどうか. Defaults to False.
+        recursive (bool): 指定したsourceがフォルダかどうか. Defaults to False.
+        force (bool): ファイルが存在した場合に上書きするかどうか. Defaults to False.
 
     Raises:
+        KeyError:必要な引数が与えられなかった
+        RuntimeError:再帰モードを使用している時、ソースがディレクトリであることを期待したエラー
         UnauthorizedError: 認証が通らない
     """
     # Falseで固定
     # Trueにすると指定したパスを見つけ出せずにRuntimeErrorが返ってくる
     update = False
-
-    if source is None or destination is None:
-        raise KeyError("too few arguments: source or destination")
 
     osf = OSF(token=token, base_url=base_url)
     if not osf.has_auth:
@@ -69,18 +74,18 @@ def upload(token, base_url, project_id, source, destination, recursive=False, fo
         raise UnauthorizedError(str(e)) from e
 
 
-def download(token, project_id, base_url, remote_path, base_path=None):
-    """ファイルの内容を取得する。ファイルに保存はしない
+def download(token:str, project_id:str, base_url:str, remote_path:str, base_path=None) -> Union[bytes, None]:
+    """ファイルの内容を取得するメソッドです。
 
     Args:
         token (str): GRDMのパーソナルアクセストークン
         project_id (str): プロジェクトID
         base_url (str): API URL (e.g. https://api.osf.io/v2/)
         remote_path (str): ファイルパス
-        base_path (optional): ファイルを探すディレクトリのパス
+        base_path (str): ファイルを探すディレクトリのパス
 
     Returns:
-        str: 指定したファイルの内容
+        Union[bytes, None]: 指定したファイルの内容
 
     Raises:
         UnauthorizedError: 認証が通らない

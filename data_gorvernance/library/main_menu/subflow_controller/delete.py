@@ -1,4 +1,8 @@
-from typing import Dict, List
+"""サブフローの削除を行うモジュールです。
+
+このモジュールはサブフロー削除クラスを始め、新しいサブフローのデータを削除したりするメソッドなどがあります。
+"""
+from typing import List, Union
 
 from dg_drawer.research_flow import PhaseStatus
 import panel as pn
@@ -9,15 +13,39 @@ from .base import BaseSubflowForm
 
 
 class DeleteSubflowForm(BaseSubflowForm):
-    """サブフロー削除クラス"""
+    """サブフロー削除クラスです。
 
-    def __init__(self, abs_root, message_box) -> None:
+    Attributes:
+        instance:
+            abs_root (str): リサーチフローのルートディレクトリ
+            _sub_flow_type_selector(pn.widgets.Select):サブフロー種別(フェーズ)
+            _sub_flow_name_selector(pn.widgets.Select):サブフロー選択
+            submit_button(Button):ボタンの設定
+            reserch_flow_status_operater(ResearchFlowStatusOperater):リサーチフロー図を生成
+            _err_output(MessageBox):エラーの出力
+    """
+
+    def __init__(self, abs_root:str, message_box:pn.widgets.MessageBox) -> None:
+        """DeleteSubflowForm コンストラクタのメソッドです。
+
+        Args:
+            abs_root (str): リサーチフローのルートディレクトリ
+            message_box (MessageBox): メッセージを格納する。
+        """
         super().__init__(abs_root, message_box)
         # 処理開始ボタン
         self.change_submit_button_init(msg_config.get('main_menu', 'delete_sub_flow'))
 
     # overwrite
-    def generate_sub_flow_name_options(self, phase_seq_number:int, research_flow_status:List[PhaseStatus])->Dict[str, int]:
+    def generate_sub_flow_name_options(self, phase_seq_number:int, research_flow_status:List[PhaseStatus]) -> dict[str, int]:
+        """サブフロー種別(フェーズ)を表示するメソッドです。
+
+        Args:
+            research_flow_status (List[PhaseStatus]): リサーチフローステータス管理情報
+
+        Returns:
+            Dict[str, int]: フェーズ表示名を返す。
+        """
         # サブフロー名(表示名をkey, サブフローIDをVauleとする)
         name_options = {}
         name_options['--'] = 0
@@ -47,7 +75,8 @@ class DeleteSubflowForm(BaseSubflowForm):
 
     # overwrite
     def change_disable_submit_button(self):
-        # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
+        """サブフロー削除フォームの必須項目が選択・入力が満たしている場合、削除ボタンを有効化するメソッドです。"""
+        # サブフロー削除フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
         self.change_submit_button_init(msg_config.get('main_menu', 'delete_sub_flow'))
 
         value = self._sub_flow_type_selector.value
@@ -68,8 +97,12 @@ class DeleteSubflowForm(BaseSubflowForm):
 
         self.submit_button.disabled = False
 
-    def define_input_form(self):
-        """サブフロー削除フォーム"""
+    def define_input_form(self) -> Union[Alert, pn.Column]:
+        """サブフロー削除フォームを定義するメソッドです。
+
+        Retunes:
+            Union[Alert, pn.Column]: フォームに表示する内容
+        """
         sub_flow_type_list = self._sub_flow_type_selector.options
         if len(sub_flow_type_list) < 2:
             # defaultがあるため2未満にする
@@ -82,7 +115,10 @@ class DeleteSubflowForm(BaseSubflowForm):
             )
 
     def main(self):
-        """サブフロー削除処理"""
+        """サブフロー削除処理のメソッドです。
+
+        入力情報やパスを取得し、 削除したいデータを取得する。
+        """
 
         # 新規作成ボタンを処理中ステータスに更新する
         self.change_submit_button_processing(msg_config.get('main_menu', 'update_delete_sub_flow'))

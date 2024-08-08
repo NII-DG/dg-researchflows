@@ -12,13 +12,7 @@ from urllib import parse
 from http import HTTPStatus
 
 from .client import upload, download
-from .api import (
-    get_token_profile,
-    get_user_info,
-    get_projects,
-    get_project_registrations,
-    get_project_collaborators
-)
+from .api import Api
 from .metadata import format_metadata
 from ...error import NotFoundContentsError, UnauthorizedError
 from osfclient.cli import OSF, split_storage
@@ -62,7 +56,7 @@ class GrdmMain():
             bool: 権限に問題が無ければTrue、問題があればFalseを返す。
         """
         try:
-            profile = get_token_profile(base_url=base_url, token=token)
+            profile = Api.get_token_profile(base_url=base_url, token=token)
             scope = profile['scope']
             if all(element in scope for element in NEED_TOKEN_SCOPE):
                 return True
@@ -87,9 +81,9 @@ class GrdmMain():
         Returns:
             bool:パーミッションに問題なければTrue、問題があればFalseの値を返す。
         """
-        response = get_user_info(base_url, token)
+        response = Api.get_user_info(base_url, token)
         user_id = response['data']['id']
-        response = get_project_collaborators(base_url, token, project_id)
+        response = Api.get_project_collaborators(base_url, token, project_id)
         data = response['data']
         for user in data:
             if user['embeds']['users']['data']['id'] == user_id:
@@ -114,7 +108,7 @@ class GrdmMain():
         Returns:
             dict:プロジェクトの一覧のデータの値を返す。
         """
-        response = get_projects(scheme_domain, token)
+        response = Api.get_projects(scheme_domain, token)
         data = response['data']
         return {d['id']: d['attributes']['title'] for d in data}
 
@@ -216,7 +210,7 @@ class GrdmMain():
             ProjectNotExist: 指定されたプロジェクトIDが存在しない
             requests.exceptions.RequestException: その他の通信エラー
         """
-        metadata = get_project_registrations(base_url, token, project_id)
+        metadata = Api.get_project_registrations(base_url, token, project_id)
         if len(metadata['data']) < 1:
             raise NotFoundContentsError(f"Metadata doesn't exist for the project with the specified ID {project_id}.")
         return format_metadata(metadata)
@@ -238,7 +232,7 @@ class GrdmMain():
             ProjectNotExist: 指定されたプロジェクトIDが存在しない
             requests.exceptions.RequestException: その他の通信エラー
         """
-        response = get_project_collaborators(base_url, token, project_id)
+        response = Api.get_project_collaborators(base_url, token, project_id)
         data = response['data']
         return {
             d['embeds']['users']['data']['attributes']['full_name']: d['attributes']['permission']

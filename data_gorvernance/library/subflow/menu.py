@@ -187,7 +187,7 @@ class SubflowMenu(TaskLog):
                 str(parent), str(status_file), str(diag_file), str(using_task_dir)
             )
             subflow.setup_tasks(str(souce_task_dir))
-            subflow_menu.set_diagram(subflow, font_folder, True)
+            subflow_menu.set_diagram(subflow, font_folder)
             subflow_menu.menu_widgetbox.append(subflow_menu.diagram_widgetbox)
         except Exception:
             message_box = MessageBox().update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')

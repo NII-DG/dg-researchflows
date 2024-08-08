@@ -1,14 +1,6 @@
 """ dg-webと接続するためのパッケージです。"""
-from .form import Form
-from .runcrate_form import RunCrateForm
-from .api import (
-    get_govsheet_schema,
-    get_metadata_schema,
-    check_governedrun_token,
-    validate,
-    get_validations,
-    get_validations_validationId
-)
+from .dgform import *
+from .dgweb import *
 from .data import need_govrun_token
 
 SCHEME = 'http'

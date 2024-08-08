@@ -29,11 +29,14 @@ def start_server():
     """サーバーを起動するメソッドです。"""
     config_path = os.path.join(
         os.environ['HOME'], 'data_gorvernance/library/data/vault-config.hcl')
-    subprocess.Popen(
-        ['vault', 'server', '-config', config_path],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
-    )
+    dir_path = os.path.join(os.environ['HOME'], '.vault/log')
+    os.makedirs(dir_path, exist_ok=True)
+    with open(os.path.join(dir_path, 'vault.log'), 'w') as file:
+        process = subprocess.Popen(
+            ['vault', 'server', '-config', config_path],
+            stdout=subprocess.DEVNULL,
+            stderr=file
+        )
 
 
 class Vault():

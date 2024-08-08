@@ -1,7 +1,6 @@
 """ dg-webと接続するためのパッケージです。"""
 from .dgform import *
 from .dgweb import *
-from .data import need_govrun_token
 
 SCHEME = 'http'
 DOMAIN = 'dg02.dg.rcos.nii.ac.jp'

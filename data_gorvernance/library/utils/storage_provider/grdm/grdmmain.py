@@ -25,6 +25,7 @@ from osfclient.cli import OSF, split_storage
 from osfclient.utils import norm_remote_path, split_storage, is_path_matched
 from osfclient.exceptions import UnauthorizedException
 from requests.exceptions import RequestException
+import requests
 
 
 NEED_TOKEN_SCOPE = ["osf.full_write"]

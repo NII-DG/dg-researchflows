@@ -8,8 +8,6 @@ from .api import (
     get_validations,
     get_validations_validationId
 )
-from .dgform import *
-from .dgweb import *
 from .data import need_govrun_token
 
 SCHEME = 'http'

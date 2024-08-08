@@ -4,7 +4,6 @@
 """
 from .main import *
 from .api import *
-from .grdmmain import GrdmMain
 
 BASE_URL = 'https://rdm.nii.ac.jp/'
 

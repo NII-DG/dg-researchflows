@@ -3,9 +3,9 @@
 入力フォーム生成や操作のためのクラスが記載されています。
 
 """
+import json
 import traceback
 from typing import Any, Dict
-import json
 
 import panel as pn
 
@@ -620,7 +620,7 @@ class Form:
             break
         return value
 
-    def sort_order(self, schema, json_path) -> dict:
+    def sort_order(self, schema: dict, json_path: str) -> dict:
         """jsonファイルを読み込みスキーマを並び替える処理を呼ぶメソッドです。
 
         Args:

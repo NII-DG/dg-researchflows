@@ -1,3 +1,7 @@
+"""サブフローの接続編集を行うモジュールです。
+
+このモジュールはサブフロー間接続編集クラスを始め、既存のサブフロー間の接続を編集したりするメソッドなどがあります。
+"""
 from typing import Dict, List
 import traceback
 
@@ -7,17 +11,44 @@ from dg_drawer.research_flow import PhaseStatus
 from ...utils.config import message as msg_config
 from .base import BaseSubflowForm
 from ...utils.widgets import Alert
+from typing import Union
 
 class RelinkSubflowForm(BaseSubflowForm):
-    """サブフロー間接続編集クラス"""
+    """サブフロー間接続編集クラスです。
 
-    def __init__(self, abs_root, message_box) -> None:
+    Attributes:
+        instance:
+            reserch_flow_status_operater(ResearchFlowStatusOperater):リサーチフロー図を生成
+            _sub_flow_type_selector(pn.widgets.Select):サブフロー種別(フェーズ)
+            _sub_flow_name_selector(pn.widgets.Select):サブフロー名
+            _err_output(MessageBox):エラーの出力
+            _parent_sub_flow_type_selector(pn.widgets.Select): 親サブフロー種別(フェーズ)
+            _parent_sub_flow_selector(pn.widgets.Select):親サブフロー選択
+            submit_button(Button):ボタンの設定
+    """
+
+    def __init__(self, abs_root:str, message_box:pn.widgets.MessageBox) -> None:
+        """RelinkSubflowForm コンストラクタのメソッドです。
+
+        Args:
+            abs_root (str): リサーチフローのルートディレクトリ
+            message_box (pn.widgets.MessageBox): メッセージを格納する。
+        """
+
         super().__init__(abs_root, message_box)
         # 処理開始ボタン
         self.change_submit_button_init(msg_config.get('main_menu', 'relink_sub_flow'))
 
     # overwrite
-    def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus])->Dict[str, int]:
+    def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus]) -> dict:
+        """サブフロー種別(フェーズ)を表示するメソッドです。
+
+        Args:
+            research_flow_status (List[PhaseStatus]): リサーチフローステータス管理情報
+
+        Returns:
+            dict: フェーズ表示名を返す。
+        """
         # サブフロー種別(フェーズ)オプション(表示名をKey、順序値をVauleとする)
         pahse_options = {}
         pahse_options['--'] = 0
@@ -33,7 +64,18 @@ class RelinkSubflowForm(BaseSubflowForm):
                 pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
         return pahse_options
 
-    def get_parent_type_and_ids(self, phase_seq_number, sub_flow_id, research_flow_status:List[PhaseStatus]):
+    def get_parent_type_and_ids(self, phase_seq_number:str, sub_flow_id:str, research_flow_status:List[PhaseStatus]) -> tuple[int, list]:
+        """親サブフロー種別(フェーズ)と親サブフローIDを取得するメソッドです。
+
+        Args:
+            phase_seq_number (int): フェーズ番号
+            sub_flow_id (str): サブフローID
+            research_flow_status (List[PhaseStatus]): リサーチフローステータス管理情報
+
+        Returns:
+            int: 親サブフロー種別(フェーズ)
+            list:親サブフローIDの値を返す。
+        """
         parent_ids = []
         parent_sub_flow_type = 0
         if phase_seq_number == 0:
@@ -57,6 +99,7 @@ class RelinkSubflowForm(BaseSubflowForm):
 
     # overwrite
     def callback_sub_flow_name_selector(self, event):
+        """サブフロー種別(フェーズ)を表示するメソッドです。"""
         # サブフロー名称：シングルセレクトコールバックファンクション
         try:
             # リサーチフローステータス管理情報の取得
@@ -77,6 +120,7 @@ class RelinkSubflowForm(BaseSubflowForm):
 
     # overwrite
     def callback_parent_sub_flow_type_selector(self, event):
+        """親サブフロー種別(フェーズ)を表示するメソッドです。"""
         # 親サブフロー種別(フェーズ)のコールバックファンクション
         try:
             # リサーチフローステータス管理情報の取得
@@ -109,7 +153,8 @@ class RelinkSubflowForm(BaseSubflowForm):
 
     # overwrite
     def change_disable_submit_button(self):
-        # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
+        """サブフロー編集フォームの必須項目が選択・入力が満たしている場合、編集ボタンを有効化するメソッドです。"""
+        # サブフロー編集フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
         self.change_submit_button_init(msg_config.get('main_menu', 'relink_sub_flow'))
 
         value = self._sub_flow_type_selector.value
@@ -146,8 +191,12 @@ class RelinkSubflowForm(BaseSubflowForm):
 
         self.submit_button.disabled = False
 
-    def define_input_form(self):
-        """サブフロー間接続編集フォーム"""
+    def define_input_form(self) -> Union[Alert, pn.Column]:
+        """サブフロー間接続編集フォームのメソッドです。
+
+        Returns:
+            Union[Alert, pn.Column]:サブフロー間接続編集フォームに必要な値を返す。
+        """
         sub_flow_type_list = self._sub_flow_type_selector.options
         if len(sub_flow_type_list) < 2:
             # defaultがあるため2未満にする
@@ -163,7 +212,7 @@ class RelinkSubflowForm(BaseSubflowForm):
             )
 
     def main(self):
-        """サブフロー間接続編集処理"""
+        """サブフロー間接続編集処理のメソッドです。"""
 
         # 新規作成ボタンを処理中ステータスに更新する
         self.change_submit_button_processing(msg_config.get('main_menu', 'update_relink_sub_flow'))

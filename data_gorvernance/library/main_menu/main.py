@@ -1,3 +1,7 @@
+"""メインメニュー画面での操作のモジュールです。
+
+このモジュールはメインメニューの画面やボタンを表示するメソッドやサブフローメニューの画面の表示、操作を行えるメソッドなどがあります。
+"""
 import os
 import traceback
 
@@ -19,27 +23,43 @@ from .subflow_controller import (
 from ..utils.vault import Vault
 from ..utils.error import InputWarning
 
-
 # git clone https://github.com/NII-DG/dg-researchflows.git -b feature/main_menu_v2 ./demo
 # mv ./demo/* ./
 # rm -rf ./demo
 
 class MainMenu(TaskLog):
-    """MainMenu Class
+    """メインメニューのクラスです。
 
-    FUNCTION:
+    Attributes:
 
-    1. Display the Research Flow Main Menu
-    2. View Research Flow Image
-    3. When the initial setup has not been performed, the user is guided to the initial setup.
+        instance:
+            abs_root(str): リサーチフローのルートディレクトリ
+            _research_flow_status_file_path(str): リサーチフロー図があるパス
+            reserch_flow_status_operater(ResearchFlowStatusOperater):リサーチフロー図の生成
+            _research_flow_image(pn.pane.HTML): リサーチフロー図オブジェクトの定義
+            _err_output(MessageBox):エラーの出力
+            _menu_tabs(pn.Tabs):メニュータブ
+            button_for_project_menu(pn.pane.HTML):メインメニューに遷移するためのボタン
+            _project_menu(pn.pane.HTML):プロジェクトメニュー
+            _project_widget_box(pn.WidgetBox):サブフロー操作コントローラーウェジットボックス
+            _sub_flow_menu(pn.widgets.Select):サブフローメニュー
+            _sub_flow_widget_box(pn.WidgetBox):サブフロー操作コントローラーウェジットボックス
+            callback_type(str):呼び出すメソッドのタイプ
+            subflow_form(CreateSubflowForm | RelinkSubflowForm | RenameSubflowForm | DeleteSubflowForm):サブフローのフォーム
 
     NOTE:
-
     Called from data_gorvernance/researchflow/main.ipynb
     """
 
-    def __init__(self, working_file) -> None:
+    def __init__(self, working_file:str) -> None:
+        """MainMenu コンストラクタのメソッドです。
+
+        Args:
+            working_file(str):実行Notebookファイルパス
+
+        """
         super().__init__(working_file, 'main.ipynb')
+
 
         ##############################
         # リサーチフロー図オブジェクト #
@@ -128,6 +148,7 @@ class MainMenu(TaskLog):
         self.check_status_research_preparation_flow()
 
     def check_status_research_preparation_flow(self):
+        """研究準備の実行ステータス確認をするメソッドです。"""
         sf = SubflowStatusFile(os.path.join(self.abs_root, path_config.PLAN_TASK_STATUS_FILE_PATH))
         plan_sub_flow_status = sf.read()
         # 研究準備サブフローの進行状況をチェックする。
@@ -151,6 +172,11 @@ class MainMenu(TaskLog):
     ######################################
 
     def callback_menu_tabs(self, event):
+        """サブフロー操作で選択ができるようにするメソッドです。
+
+        Args:
+            event: 機能コントローラーのイベントリスナー
+        """
         try:
             self._err_output.clear()
             tab_index = event.new
@@ -168,7 +194,7 @@ class MainMenu(TaskLog):
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_project_menu(self, event):
-        """遷移ボタン for プロジェクト操作コントローラーの更新"""
+        """プロジェクト操作コントローラーの更新をするための遷移ボタンのメソッドです。"""
         # 開発中のためアラートを表示する。
         try:
             self._err_output.clear()
@@ -179,7 +205,7 @@ class MainMenu(TaskLog):
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_sub_flow_menu(self, event):
-        """サブフロー操作フォーム by サブフロー操作コントローラーオプション"""
+        """サブフロー操作コントローラーオプションによるサブフロー操作フォームを表示するメソッドです。"""
         try:
             self._err_output.clear()
             selected_value = self._sub_flow_menu.value
@@ -208,13 +234,13 @@ class MainMenu(TaskLog):
     #########################
 
     def update_sub_flow_widget_box_for_init(self):
-        """サブフロー操作オプションの選択誘導"""
+        """サブフロー操作オプションの選択誘導するメソッドです。"""
         self._sub_flow_widget_box.clear()
         alert = pn.pane.Alert(msg_config.get('main_menu','guide_select_action'),sizing_mode="stretch_width",alert_type='info')
         self._sub_flow_widget_box.append(alert)
 
     def update_sub_flow_widget_box(self):
-        """サブフロー操作フォームの表示"""
+        """サブフロー操作フォームの表示するメソッドです。"""
         # ボタンのイベントリスナー
         self.subflow_form.set_submit_button_on_click(self.callback_submit_button)
 
@@ -225,6 +251,7 @@ class MainMenu(TaskLog):
         self.subflow_form.submit_button.disabled=True
 
     def callback_submit_button(self, event):
+        """サブフローのボタンを呼び戻すメソッドです。"""
         try:
             # start
             self.log.start(detail=self.callback_type)
@@ -248,9 +275,10 @@ class MainMenu(TaskLog):
 
     @classmethod
     def generate(cls, working_path:str):
-        """Generate main menu
+        """メインメニューを生成するメソッドです。
 
-        working_path : Notebookのファイルの位置
+        Args:
+            working_path(str) : Notebookのファイルのパス
         """
         # panel activation
         pn.extension()

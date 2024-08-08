@@ -107,12 +107,7 @@ class SubFlowManager:
         update_svg(svg_path, self.current_dir, self.svg_config)
 
     def _update(self) -> None:
-        """ タスクの状態に基づいてダイアグラムを更新するメソッドです。
-
-        Args:
-            display_all (bool): 非推奨のタスクを推奨タスクと同じように表示するかどうかを設定します。
-
-        """
+        """ タスクの状態に基づいてダイアグラムを更新するメソッドです。"""
         for task in self.tasks:
             self._adjust_by_status(task)
 
@@ -121,7 +116,6 @@ class SubFlowManager:
 
         Args:
             task (SubflowTask): 調整するタスクを設定します。
-            display_all (bool): 非推奨のタスクを推奨タスクと同じように調整するかどうかを設定します。
 
         """
         if task.is_multiple:

@@ -35,7 +35,7 @@ class CreateSubflowForm(BaseSubflowForm):
     """
 
     def __init__(self, abs_root:str, message_box:pn.widgets.MessageBox) -> None:
-        """CreateSubflowForm コンストラクタのメソッドです
+        """CreateSubflowForm コンストラクタのメソッドです。
 
         Args:
             abs_root (str): リサーチフローのルートディレクトリ

@@ -28,7 +28,7 @@ class RelinkSubflowForm(BaseSubflowForm):
     """
 
     def __init__(self, abs_root:str, message_box:pn.widgets.MessageBox) -> None:
-        """RelinkSubflowForm コンストラクタのメソッドです
+        """RelinkSubflowForm コンストラクタのメソッドです。
 
         Args:
             abs_root (str): リサーチフローのルートディレクトリ

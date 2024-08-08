@@ -83,7 +83,7 @@ class TaskDirector(TaskSave):
     #  update task status  #
     ########################
     def doing_task(self):
-        """タスク開始によるサブフローステータス管理JSONの更新をするメソッドです"""
+        """タスク開始によるサブフローステータス管理JSONの更新をするメソッドです。"""
         # タスク開始によるサブフローステータス管理JSONの更新
         sf = SubflowStatusFile(self._sub_flow_status_file_path)
         sf_status: SubflowStatus = sf.read()
@@ -92,7 +92,7 @@ class TaskDirector(TaskSave):
         sf.write(sf_status)
 
     def done_task(self):
-        """タスク完了によるサブフローステータス管理JSONの更新をするメソッドです"""
+        """タスク完了によるサブフローステータス管理JSONの更新をするメソッドです。"""
         sf = SubflowStatusFile(self._sub_flow_status_file_path)
         sf_status: SubflowStatus = sf.read()
         sf_status.completed_task_by_task_name(self._script_file_name, os.environ["JUPYTERHUB_SERVER_NAME"])
@@ -132,7 +132,7 @@ class TaskDirector(TaskSave):
 
     # override
     def _save(self):
-        """ファイルをストレージへ保存するメソッドです"""
+        """ファイルをストレージへ保存するメソッドです。"""
         # uploadしたときにタスク完了とするため
         super()._save()
         self.done_task()

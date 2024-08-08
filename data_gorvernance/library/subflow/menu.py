@@ -62,7 +62,7 @@ class SubflowMenu(TaskLog):
     """
 
     def __init__(self, working_file:str) -> None:
-        """SubflowMenu コンストラクタのメソッドです
+        """SubflowMenu コンストラクタのメソッドです。
 
         Args:
             working_file (str): 実行Notebookファイルパス

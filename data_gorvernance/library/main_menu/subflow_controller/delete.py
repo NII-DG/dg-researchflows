@@ -26,7 +26,7 @@ class DeleteSubflowForm(BaseSubflowForm):
     """
 
     def __init__(self, abs_root:str, message_box:pn.widgets.MessageBox) -> None:
-        """DeleteSubflowForm コンストラクタのメソッドです
+        """DeleteSubflowForm コンストラクタのメソッドです。
 
         Args:
             abs_root (str): リサーチフローのルートディレクトリ

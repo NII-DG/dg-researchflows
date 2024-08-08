@@ -281,7 +281,7 @@ class BaseSubflowForm():
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_sub_flow_name_selector(self, event):
-        """サブフロー名称のボタンが操作できるように有効化するメソッドです"""
+        """サブフロー名称のボタンが操作できるように有効化するメソッドです。"""
         # サブフロー名称：シングルセレクトコールバックファンクション
         # relinkとrenameで継承するため個別処理
         try:
@@ -291,7 +291,7 @@ class BaseSubflowForm():
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_parent_sub_flow_type_selector(self, event):
-        """親サブフロー種別(フェーズ)のボタンが操作できるように有効化するメソッドです"""
+        """親サブフロー種別(フェーズ)のボタンが操作できるように有効化するメソッドです。"""
         # 親サブフロー種別(フェーズ)のコールバックファンクション
         try:
             # リサーチフローステータス管理情報の取得

@@ -36,9 +36,6 @@ def upload(token:str, base_url:str, project_id:str, source:str, destination:str,
     # Trueにすると指定したパスを見つけ出せずにRuntimeErrorが返ってくる
     update = False
 
-    if source is None or destination is None:
-        raise KeyError("too few arguments: source or destination")
-
     osf = OSF(token=token, base_url=base_url)
     if not osf.has_auth:
         raise KeyError('To upload a file you need to provide a username and'

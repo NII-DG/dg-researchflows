@@ -1,27 +1,33 @@
 """GINを用いた通信に用いられる関数を記載したモジュールです。"""
+import hashlib
+import json
+import os
 import re
 import shutil
 import subprocess
 import traceback
-import os
-import json
+from http import HTTPStatus
+from pathlib import Path
 from typing import Optional
 from urllib import parse
-from pathlib import Path
-from http import HTTPStatus
-from ..gin import api as gin_api, git
-from ....utils.config.param import ParamConfig
-from ...error import UnauthorizedError, RepositoryNotExist, UrlUpdateError, NoValueInDgFileError
-from ...config import path_config, message as msg_config
-from ....utils.cmd import Cmd
-from datalad import api as datalad_api
-from datalad.api import Dataset
-import requests
-import hashlib
+
 import magic
-from IPython.display import clear_output, display
+import requests
+from datalad import api as datalad_api
 from IPython.core.display import HTML
+from IPython.display import clear_output, display
+
+from library.utils.cmd import Cmd
+from library.utils.config import message as msg_config
+from library.utils.config import path_config
+from library.utils.config.param import ParamConfig
+from library.utils.error import (NoValueInDgFileError, RepositoryNotExist,
+                                 UnauthorizedError, UrlUpdateError)
+from . import api as gin_api
+from . import git
+
 clear_output()
+
 
 SIBLING = 'gin'
 
@@ -52,7 +58,7 @@ srp_path = Path(script_dir_path)
 ORIG_GITIGNORE_PATH  = srp_path.joinpath('../../..', 'data/original_gitignore').resolve()
 
 
-def extract_url_and_auth_info_from_git_url(git_url:str)->tuple[str, str, str]:
+def extract_url_and_auth_info_from_git_url(git_url:str) -> tuple[str, str, str]:
     """指定したGitのURLからプロトコル、ユーザ名、パスワード、ドメインを抜き出すメソッドです。
 
     Args:
@@ -85,6 +91,7 @@ def extract_url_and_auth_info_from_git_url(git_url:str)->tuple[str, str, str]:
 
     return git_url, "", "" # Returns the original URL if it cannot be converted
 
+
 def get_gin_base_url_from_git_config()->str:
     """GINのベースurlを作成するメソッドです。
 
@@ -98,7 +105,8 @@ def get_gin_base_url_from_git_config()->str:
     gin_base_url = parse.urlunparse((pr.scheme, pr.netloc, "", "", "", ""))
     return gin_base_url
 
-def get_gin_base_url_and_auth_info_from_git_config()->tuple[str, str, str]:
+
+def get_gin_base_url_and_auth_info_from_git_config() -> tuple[str, str, str]:
     """GINのベースurlの作成と認証情報の取得を行うメソッドです。
 
     Returns:
@@ -112,6 +120,7 @@ def get_gin_base_url_and_auth_info_from_git_config()->tuple[str, str, str]:
     pr = parse.urlparse(url)
     gin_base_url = parse.urlunparse((pr.scheme, pr.netloc, "", "", "", ""))
     return gin_base_url, username, password
+
 
 def init_param_url():
     """パラメーター設定の初期化を行うメソッドです。
@@ -129,7 +138,6 @@ def init_param_url():
     """
     gin_base_url = get_gin_base_url_from_git_config()
 
-
     pr = parse.urlparse(gin_base_url)
     retry_num = 6
     flg = True
@@ -140,7 +148,6 @@ def init_param_url():
 
             pc = ParamConfig.get_param_data()
 
-
             response_data = response.json()
             http_url = response_data["http"]
             if http_url[-1] == '/':
@@ -148,7 +155,6 @@ def init_param_url():
 
             pc._siblings._ginHttp = http_url
             pc._siblings._ginSsh = response_data["ssh"]
-
 
             with open(REPOSITORY_ID_FILE_PATH, 'r') as file:
                 repo_id = file.read()
@@ -162,6 +168,7 @@ def init_param_url():
             if retry_num == 0:
                 flg = False
                 raise Exception('Not Found GIN-Fork Server Info')
+
 
 def setup_local(user_name:str, password:str):
     """ローカル環境のセットアップを行うメソッドです。
@@ -206,6 +213,7 @@ def setup_local(user_name:str, password:str):
     Cmd.exec_subprocess(cmd='git config --global user.name {}'.format(res_data['username']))
     Cmd.exec_subprocess(cmd='git config --global user.email {}'.format(res_data['email']))
 
+
 def set_ginfork_token(token:str):
     """トークンをファイルに保存するためのメソッドです。
 
@@ -218,6 +226,7 @@ def set_ginfork_token(token:str):
     with TOKEN_FILE_PATH.open('w') as f:
         json.dump(token_dict, f, indent=4)
 
+
 def get_ginfork_token()->str:
     """保存されているトークンを取得するためのメソッドです。
 
@@ -228,6 +237,7 @@ def get_ginfork_token()->str:
     with TOKEN_FILE_PATH.open('r') as f:
         data = json.loads(f.read())
     return data['ginfork_token']
+
 
 def set_user_info(user_id:str):
     """指定したユーザーIDを保存するためのメソッドです。
@@ -241,6 +251,7 @@ def set_user_info(user_id:str):
     with USER_INFO_PATH.open( 'w') as f:
         json.dump(user_info, f, indent=4)
 
+
 def get_user_id_from_user_info()->str:
     """保存されたユーザーIDを取得するメソッドです。
 
@@ -252,6 +263,7 @@ def get_user_id_from_user_info()->str:
         data = json.loads(f.read())
     return data['user_id']
 
+
 def exist_user_info()->bool:
     """ユーザー情報が保存されているファイルが存在しているかを確認するメソッドです。
 
@@ -260,6 +272,7 @@ def exist_user_info()->bool:
 
     """
     return os.path.exists(USER_INFO_PATH)
+
 
 def del_build_token()->tuple[bool, Optional[str]]:
     """トークンの削除を行うメソッドです。
@@ -285,6 +298,7 @@ def del_build_token()->tuple[bool, Optional[str]]:
     else:
         return True , None
 
+
 def datalad_create(dir_path:str)->bool:
     """指定したディレクトリをdataladのデータセット化するメソッドです。
 
@@ -300,6 +314,7 @@ def datalad_create(dir_path:str)->bool:
         return True
     else:
         return False
+
 
 def create_key(root_path:str)->bool:
     """SSHキーを作成するメソッドです。
@@ -317,6 +332,7 @@ def create_key(root_path:str)->bool:
         return True
     else:
         return False
+
 
 def upload_ssh_key(root_path:str)->str:
     """GIN-forkへ公開鍵をアップロードするメソッドです。
@@ -347,6 +363,7 @@ def upload_ssh_key(root_path:str)->str:
     else:
         raise Exception(f'Fial Upload pub-SSH key. Response Code [{response.status_code}]')
 
+
 def trust_gin(root_path:str):
     """GINの信頼設定を行うメソッドです。
 
@@ -356,6 +373,7 @@ def trust_gin(root_path:str):
     """
     ginHttp = ParamConfig.get_siblings_ginHttp()
     config_GIN(root_path, ginHttp)
+
 
 def config_GIN(root_path:str, ginHttp:str):
     """ドメインを信頼するための設定を行うメソッドです。
@@ -388,6 +406,7 @@ def config_GIN(root_path:str, ginHttp:str):
         with open(ssh_config_path, mode='w') as f:
             write_GIN_config(mode='w', ginDomain=ginDomain, ssh_config_path=ssh_config_path)
 
+
 def write_GIN_config(mode:str, ginDomain:str, ssh_config_path:str):
     """SSH設定ファイルに特定のドメインを信頼する設定を書き込むメソッドです。
 
@@ -401,6 +420,7 @@ def write_GIN_config(mode:str, ginDomain:str, ssh_config_path:str):
         f.write('\nhost ' + ginDomain + '\n')
         f.write('\tStrictHostKeyChecking no\n')
         f.write('\tUserKnownHostsFile=/dev/null\n')
+
 
 def prepare_sync(root:str):
     """同期するコンテンツの調整を行うメソッドです。
@@ -419,6 +439,7 @@ def prepare_sync(root:str):
     if not os.path.isfile(file_path):
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         shutil.copyfile(orig_file_path, file_path)
+
 
 def setup_sibling_to_local():
     """リポジトリをローカルのデータセットに設定するためのメソッドです。
@@ -446,6 +467,7 @@ def setup_sibling_to_local():
     datalad_api.siblings(action='configure', name='origin', url=http_url)
     datalad_api.siblings(action='configure', name=SIBLING, url=ssh_url)
 
+
 def push_annex_branch(cwd:str):
     """git-annexブランチをプッシュするメソッドです。
 
@@ -458,6 +480,7 @@ def push_annex_branch(cwd:str):
         pass
     else:
         Cmd.exec_subprocess(cmd=f'git push {SIBLING} git-annex:git-annex', cwd=cwd)
+
 
 def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str], gitannex_files :list[str], message:str, get_paths:list[str],)->bool:
     """Git Annexリポジトリの同期を行うメソッドです。
@@ -609,6 +632,7 @@ def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str], gitann
             display_log(datalad_error)
             return False
 
+
 def save_annex_and_register_metadata(cwd:str, gitannex_path :list[str], gitannex_files:list[str], message:str):
     """detaladの保存とメタデータの登録を行うメソッドです。
 
@@ -635,6 +659,7 @@ def save_annex_and_register_metadata(cwd:str, gitannex_path :list[str], gitannex
             # if gitannex_files is not defined as a single file path (str) or multiple file paths (list), no metadata is given.
             pass
 
+
 def register_metadata_for_annexdata(cwd:str, file_path:str):
     """指定したファイルにメタデータの登録を行うメソッドです。
 
@@ -659,6 +684,7 @@ def register_metadata_for_annexdata(cwd:str, file_path:str):
     else:
         pass
 
+
 def save_git(git_path:list[str], message:str):
     """変更をgitに保存するためのメソッドです。
 
@@ -670,13 +696,16 @@ def save_git(git_path:list[str], message:str):
     if len(git_path) > 0:
         datalad_api.save(message=message + ' (git)', path=git_path, to_git=True)
 
+
 def update():
     """データセットの更新を行うメソッドです。"""
     datalad_api.update(sibling=SIBLING, how='merge')
 
+
 def push():
     """データセットのプッシュを行うメソッドです。"""
     datalad_api.push(to=SIBLING, data='auto')
+
 
 def is_should_annex_content_path(file_path : str)->bool:
     """指定したファイルパスがannexの条件を満たすかを調べるメソッドです。
@@ -707,6 +736,7 @@ def is_should_annex_content_path(file_path : str)->bool:
     else:
         return False
 
+
 def get_filepaths_from_dalalad_error(err_info: str)->list[str]:
     """エラー情報から特定の文字列を抽出するメソッドです。
 
@@ -719,6 +749,7 @@ def get_filepaths_from_dalalad_error(err_info: str)->list[str]:
     """
     pattern = r"'\\t(.+?)\\n'"
     return re.findall(pattern, err_info)
+
 
 def extract_info_from_datalad_update_err(raw_msg:str)->str:
     """エラーメッセージから特定の文章を抜き出すためのメソッドです。
@@ -739,6 +770,7 @@ def extract_info_from_datalad_update_err(raw_msg:str)->str:
     start_index = err_detail_info.find("[") + 1
     end_index= err_detail_info.find("]")
     return err_detail_info[start_index:end_index]
+
 
 def creat_html_msg(msg:str='', fore:Optional[str]=None, back:Optional[str]=None, tag:str='h1')->str:
     """HTMLタグを生成するメソッドです。
@@ -767,6 +799,7 @@ def creat_html_msg(msg:str='', fore:Optional[str]=None, back:Optional[str]=None,
     else:
         return "<" + tag + " style='" + style + "'>" + msg + "</" + tag + ">"
 
+
 def creat_html_msg_info_p(msg:str='')->str:
     """情報メッセージのHTMLタグを作成するためのメソッドです。
 
@@ -778,6 +811,7 @@ def creat_html_msg_info_p(msg:str='')->str:
 
     """
     return creat_html_msg(msg=msg, back='#9eff9e', tag='p')
+
 
 def creat_html_msg_err_p(msg:str='')->str:
     """エラーメッセージのHTMLタグを作成するためのメソッドです。
@@ -805,6 +839,7 @@ def display_html_msg(msg:str='', fore:Optional[str]=None, back:Optional[str]=Non
     html_text = creat_html_msg(msg, fore, back, tag)
     display(HTML(html_text))
 
+
 def display_log(msg:str='', tag:str='p'):
     """赤文字でメッセージを出力するメソッド(文字色(#ff0000))です。
 
@@ -830,6 +865,7 @@ def display_msg(msg:str='', back:Optional[str]=None):
     """
     display_html_msg(msg, None, back, default_tag)
 
+
 def display_info(msg:str=''):
     """正常メッセージ出力メソッド(pタグの背景色(#9eff9e))です。
 
@@ -839,6 +875,7 @@ def display_info(msg:str=''):
     """
     back = "#9eff9e"
     display_html_msg(msg, None, back, default_tag)
+
 
 def display_err(msg:str=''):
     """異常メッセージ出力メソッド(pタグの背景色(#ffa8a8))です。
@@ -850,6 +887,7 @@ def display_err(msg:str=''):
     back = "#ffa8a8"
     display_html_msg(msg, None, back, default_tag)
 
+
 def display_warm(msg:str=''):
     """警告メッセージ出力メソッド(pタグの背景色(#ffff93))です。
 
@@ -860,6 +898,7 @@ def display_warm(msg:str=''):
     back = "#ffff93"
     display_html_msg(msg, None, back, default_tag)
 
+
 def display_debug(msg:str=''):
     """デバッグ用出力メソッド(pタグの背景色(#dcdcdc))です。
 
@@ -869,6 +908,7 @@ def display_debug(msg:str=''):
     """
     back = "#dcdcdc"
     display_html_msg(msg, None, back, default_tag)
+
 
 def update_repo_url()->bool:
     """HTTPとSSHのリモートURLを最新化するメソッドです。

@@ -4,15 +4,15 @@
 """
 import os
 import traceback
+from typing import Union
 
 import panel as pn
 
-from ...utils.config import path_config, message as msg_config
+from library.utils.config import path_config, message as msg_config
+from library.utils.error import InputWarning
+from library.utils.string import StringManager
+from library.utils.widgets import Alert
 from .base import BaseSubflowForm
-from ...utils.string import StringManager
-from ...utils.widgets import Alert
-from ...utils.error import InputWarning
-from typing import Union
 
 
 class RenameSubflowForm(BaseSubflowForm):

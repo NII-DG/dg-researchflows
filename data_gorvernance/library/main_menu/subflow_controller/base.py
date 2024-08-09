@@ -4,18 +4,18 @@
 ボタンを制御したり、値が入力されているか、あるいはユニークの値になっているかなどを確認するメソッドがあります。
 """
 import re
-from typing import Dict, List
 import traceback
+from typing import List, Callable
 
-import panel as pn
 from dg_drawer.research_flow import PhaseStatus
+import panel as pn
 
-from ...utils.setting import ResearchFlowStatusOperater
-from ...utils.config import path_config, message as msg_config
-from ...utils.string import StringManager
-from ...utils.widgets import Button, MessageBox
-from ...utils.error import InputWarning
-from typing import Callable
+from library.utils.config import path_config, message as msg_config
+from library.utils.error import InputWarning
+from library.utils.setting import ResearchFlowStatusOperater
+from library.utils.string import StringManager
+from library.utils.widgets import Button, MessageBox
+
 
 class BaseSubflowForm():
     """サブフロー操作基底クラス
@@ -120,7 +120,7 @@ class BaseSubflowForm():
         """
         self.submit_button.on_click(callback_function)
 
-    def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus]) -> dict:
+    def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus]) -> dict[str, int]:
         """サブフロー種別(フェーズ)を表示するメソッドです。
 
         Args:
@@ -141,7 +141,7 @@ class BaseSubflowForm():
                 pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
         return pahse_options
 
-    def generate_sub_flow_name_options(self, phase_seq_number:int, research_flow_status:List[PhaseStatus]) -> dict:
+    def generate_sub_flow_name_options(self, phase_seq_number:int, research_flow_status:List[PhaseStatus]) -> dict[str, int]:
         """サブフロー名を表示するメソッドです。
 
         Args:
@@ -164,8 +164,7 @@ class BaseSubflowForm():
 
         return name_options
 
-
-    def generate_parent_sub_flow_type_options(self, pahase_seq_number:int, research_flow_status:List[PhaseStatus]) -> dict:
+    def generate_parent_sub_flow_type_options(self, pahase_seq_number:int, research_flow_status:List[PhaseStatus]) -> dict[str, int]:
         """親サブフロー種別を表示するメソッドです。
 
         Args:
@@ -183,11 +182,10 @@ class BaseSubflowForm():
         else:
             for phase_status in research_flow_status:
                 if phase_status._seq_number < pahase_seq_number:
-                    pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
+                    pahse_options[msg_config.get('research_flow_phase_display_name', phase_status._name)] = phase_status._seq_number
         return pahse_options
 
-
-    def generate_parent_sub_flow_options(self, pahase_seq_number:int, research_flow_status:List[PhaseStatus]) -> dict:
+    def generate_parent_sub_flow_options(self, pahase_seq_number:int, research_flow_status:List[PhaseStatus]) -> dict[str, str]:
         """親サブフロー選択オプションで選択した値を表示するメソッドです。
 
         Args:

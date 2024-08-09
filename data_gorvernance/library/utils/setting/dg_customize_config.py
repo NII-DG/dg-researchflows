@@ -7,7 +7,8 @@ import os
 from pathlib import Path
 from typing import Any, Dict, List
 
-from ..file import JsonFile
+from library.utils.file import JsonFile
+
 
 script_dir_path = os.path.dirname(__file__)
 p = Path(script_dir_path)
@@ -43,6 +44,7 @@ class AlphaProperty:
         for subflow_type_name, subflow_rule_data in data[self.__CUSTOMIZE].items():
             self._customize.append(SubFlowRule(subflow_type_name, subflow_rule_data))
 
+
 class SubFlowRule:
     """DGカスタマイズJSON定義書のインスタンス作成に関するメソッドを記載したクラスです。
 
@@ -70,6 +72,7 @@ class SubFlowRule:
         self._subflow_type_name = subflow_type_name
         self._task_ids = data[self.__TASK_IDS]
         self._verification_ids = data[self.__VERIFICATION_IDS]
+
 
 def get_dg_customize_config()->list[AlphaProperty]:
     """DGカスタマイズJSON定義書のインスタンスを取得するメソッドです。

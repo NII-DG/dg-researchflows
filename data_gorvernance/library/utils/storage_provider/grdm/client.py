@@ -8,12 +8,13 @@ from http import HTTPStatus
 import os
 
 from osfclient.cli import OSF, split_storage
-from osfclient.utils import norm_remote_path, split_storage, is_path_matched
 from osfclient.exceptions import UnauthorizedException
+from osfclient.utils import norm_remote_path, split_storage, is_path_matched
 from requests.exceptions import RequestException
 from typing import Union
 
-from ...error import UnauthorizedError
+from library.utils.error import UnauthorizedError
+
 
 def upload(token:str, base_url:str, project_id:str, source:str, destination:str, recursive:bool=False, force:bool=False):
     """ファイルまたはフォルダをアップロードするメソッドです。
@@ -71,7 +72,6 @@ def upload(token:str, base_url:str, project_id:str, source:str, destination:str,
                                     update=update)
     except UnauthorizedException as e:
         raise UnauthorizedError(str(e)) from e
-
 
 
 def download(token:str, project_id:str, base_url:str, remote_path:str, base_path=None) -> Union[bytes, None]:

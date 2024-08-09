@@ -4,8 +4,8 @@ data_gorvernance.library.utils.config.path_configモジュールのテストを�
 
 """
 from unittest import TestCase
+
 from data_gorvernance.library.utils.config import path_config
-import os
 
 class TestPathConfig(TestCase):
     """data_gorvernance.library.utils.config.path_configモジュールのテストを行うクラスです。"""

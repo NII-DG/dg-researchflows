@@ -1,9 +1,11 @@
 """APIリクエストを行う関数が記載されたモジュールです。"""
-from urllib import parse
-from httplib2 import Response
-import requests
-import time
 import os
+import time
+from urllib import parse
+
+import requests
+from requests import Response
+
 
 def get_server_info(scheme:str, domain:str)->Response:
     """サーバー情報を取得するための関数です。
@@ -27,6 +29,7 @@ def get_server_info(scheme:str, domain:str)->Response:
     except Exception as e:
         raise Exception(f'Fail Request to GIN fork url:{api_url}') from e
 
+
 def get_token_for_auth(scheme:str, domain:str, user_name:str, password:str)->Response:
     """指定したユーザー名とパスワードから認証トークンを取得するメソッドです。
 
@@ -44,6 +47,7 @@ def get_token_for_auth(scheme:str, domain:str, user_name:str, password:str)->Res
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     auth = (user_name, password)
     return requests.get(url=api_url, auth=auth)
+
 
 def create_token_for_auth(scheme:str, domain:str, user_name:str, password:str)->Response:
     """指定したユーザー名とパスワードから認証トークンを作成するメソッドです。
@@ -64,6 +68,7 @@ def create_token_for_auth(scheme:str, domain:str, user_name:str, password:str)->
     data={"name": "system-generated"}
     return requests.post(url=api_url, auth=auth, data=data)
 
+
 def get_user_info(scheme:str, domain:str, token:str)->Response:
     """指定したユーザーの情報を取得するためのメソッドです。
 
@@ -81,6 +86,7 @@ def get_user_info(scheme:str, domain:str, token:str)->Response:
     params = {'token' : token}
     return requests.get(url=api_url, params=params)
 
+
 def delete_access_token(scheme:str, domain:str, token:str)->Response:
     """指定したアクセストークンを削除するメソッドです。
 
@@ -97,6 +103,7 @@ def delete_access_token(scheme:str, domain:str, token:str)->Response:
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     params = {'token' : token}
     return requests.delete(url=api_url, params=params)
+
 
 def upload_key(scheme:str, domain:str, token:str, pubkey:str)->Response:
     """指定した公開鍵をアップロードするメソッドです。
@@ -119,6 +126,7 @@ def upload_key(scheme:str, domain:str, token:str, pubkey:str)->Response:
         "key": pubkey
     }
     return requests.post(url=api_url, params=params, data=data)
+
 
 def search_repo(scheme:str, domain:str, repo_id:str, user_id:str, token:str)->Response:
     """指定したリポジトリの検索を行うメソッドです。
@@ -143,6 +151,7 @@ def search_repo(scheme:str, domain:str, repo_id:str, user_id:str, token:str)->Re
     }
     return requests.get(url=api_url, params=params)
 
+
 def patch_container(scheme:str, domain:str, token:str, server_name:str, user_id:str)->Response:
     """指定したコンテナの更新を行うメソッドです。
 
@@ -165,6 +174,7 @@ def patch_container(scheme:str, domain:str, token:str, server_name:str, user_id:
         'user_id' : user_id
     }
     return requests.patch(url=api_url, params=params)
+
 
 def search_public_repo(scheme:str, domain:str, repo_id:str,)->Response:
     """指定した公開リポジトリの検索を行うメソッドです。

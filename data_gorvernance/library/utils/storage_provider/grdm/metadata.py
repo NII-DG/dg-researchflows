@@ -6,6 +6,7 @@
 import json
 import requests
 
+
 def format_metadata(metadata:dict) -> dict[str, list]:
     """Gakunin RDMから取得したプロジェクトメタデータを整形するメソッドです。
 

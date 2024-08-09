@@ -1,8 +1,11 @@
 """ メッセージ用HTML生成モジュールです。"""
-from IPython.display import display
-from IPython.core.display import HTML
+from typing import Optional
 
-def creat_html_msg(msg:str='', fore:str=None, back:str=None, tag:str='p')->str:
+from IPython.core.display import HTML
+from IPython.display import display
+
+
+def creat_html_msg(msg:str='', fore:Optional[str]=None, back:Optional[str]=None, tag:str='p')->str:
     """ HTMLを生成する関数です。
 
     Args:
@@ -29,6 +32,7 @@ def creat_html_msg(msg:str='', fore:str=None, back:str=None, tag:str='p')->str:
     else:
         return "<" + tag + " style='" + style + "'>" + msg + "</" + tag + ">"
 
+
 def creat_html_msg_info(msg:str='', tag:str='p')->str:
     """ infoメッセージを生成する関数です。
 
@@ -41,6 +45,7 @@ def creat_html_msg_info(msg:str='', tag:str='p')->str:
 
     """
     return creat_html_msg(msg=msg, back='#9eff9e', tag=tag)
+
 
 def creat_html_msg_warm(msg:str='', tag:str='p')->str:
     """ warnメッセージを生成する関数です。
@@ -55,6 +60,7 @@ def creat_html_msg_warm(msg:str='', tag:str='p')->str:
     """
     return creat_html_msg(msg=msg, back='#ffff93', tag=tag)
 
+
 def creat_html_msg_err(msg:str='', tag:str='p')->str:
     """ errメッセージを生成する関数です。
 
@@ -67,6 +73,7 @@ def creat_html_msg_err(msg:str='', tag:str='p')->str:
 
     """
     return creat_html_msg(msg=msg, back='#ffa8a8', tag=tag)
+
 
 def creat_html_msg_log(msg:str='', tag:str='p')->str:
     """ 標準メッセージを生成する関数です。
@@ -81,6 +88,7 @@ def creat_html_msg_log(msg:str='', tag:str='p')->str:
     """
     return creat_html_msg(msg=msg, tag=tag)
 
+
 def display_msg_info(msg:str='', tag:str='p')->None:
     """Infoメッセージを表示する関数です。
 
@@ -90,6 +98,7 @@ def display_msg_info(msg:str='', tag:str='p')->None:
 
     """
     display(HTML(creat_html_msg_info(msg, tag)))
+
 
 def display_msg_warm(msg:str='', tag:str='p')->None:
     """Warningメッセージを表示する関数です。
@@ -101,6 +110,7 @@ def display_msg_warm(msg:str='', tag:str='p')->None:
     """
     display(HTML(creat_html_msg_warm(msg, tag)))
 
+
 def display_msg_err(msg:str='', tag:str='p')->None:
     """Errorsメッセージを表示する関数です。
 
@@ -110,6 +120,7 @@ def display_msg_err(msg:str='', tag:str='p')->None:
 
     """
     display(HTML(creat_html_msg_err(msg, tag)))
+
 
 def display_msg_log(msg:str='', tag:str='p')->None:
     """標準メッセージを表示する関数です。

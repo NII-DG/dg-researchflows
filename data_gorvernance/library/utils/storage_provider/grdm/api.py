@@ -5,7 +5,7 @@ from urllib import parse
 import requests
 from requests.exceptions import RequestException
 
-from ...error import UnauthorizedError, ProjectNotExist
+from library.utils.error import UnauthorizedError, ProjectNotExist
 
 
 def build_api_url(base_url: str, endpoint=''):

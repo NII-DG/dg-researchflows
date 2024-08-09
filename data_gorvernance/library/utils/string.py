@@ -1,6 +1,7 @@
 """ 文字列を操作するモジュールです。"""
 import re
 
+
 class StringManager:
     """ 文字列を操作するクラスです。"""
     @staticmethod

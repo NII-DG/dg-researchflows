@@ -1,7 +1,9 @@
 """ コマンドを実行するモジュールです。"""
 import subprocess
 from typing import Tuple
-from ..utils.error import ExecCmdError
+
+from .error import ExecCmdError
+
 
 class Cmd():
     """ シェルコマンド実行のクラスです。"""

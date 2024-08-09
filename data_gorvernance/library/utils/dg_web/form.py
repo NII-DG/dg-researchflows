@@ -4,11 +4,12 @@
 
 """
 import traceback
-from typing import Any, Dict
+from typing import Any, Optional
 
 import panel as pn
 
 from library.utils.widgets import MessageBox, Button
+
 
 # (vertical, horizontal)
 # (top, right, bottom, and left)
@@ -116,11 +117,11 @@ class Title(pn.pane.Markdown):
 
     """
 
-    def __init__(self, object: str=None, **params: dict)->None:
+    def __init__(self, object: Optional[str]=None, **params: Any)->None:
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
-            object(str): Markdownを含む文字列を設定します。
+            object(str|None): Markdownを含む文字列を設定します。
             **params(dict): pn.pane.Markdownのその他のパラメータを設定します。
 
         """
@@ -141,6 +142,7 @@ class Title(pn.pane.Markdown):
         """
         self.object = f"### {text}"
 
+
 class Description(pn.pane.Markdown):
     """ マークダウン形式の説明のクラスです。
 
@@ -150,7 +152,7 @@ class Description(pn.pane.Markdown):
 
     """
 
-    def __init__(self, object: str=None, **params: dict)->None:
+    def __init__(self, object: Optional[str]=None, **params: Any)->None:
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
@@ -163,6 +165,7 @@ class Description(pn.pane.Markdown):
         if "margin" not in params:
             params["margin"] = (0, 10, 0, 20)
         super().__init__(object=object, **params)
+
 
 class Column(pn.Column):
     """ タイトルや入力欄をまとめるクラスです。
@@ -186,6 +189,7 @@ class Column(pn.Column):
             params["margin"] = (5, 10, 5, 10)
         super().__init__(**params)
 
+
 class ArrayBox(pn.WidgetBox):
     """ 入力欄が増減する項目をまとめたクラスです。
 
@@ -207,6 +211,7 @@ class ArrayBox(pn.WidgetBox):
         if "margin" not in params:
             params["margin"] = 15
         super().__init__(**params)
+
 
 class ObjectBox(pn.WidgetBox):
     """ 入力欄を大項目でまとめるクラスです。
@@ -230,6 +235,7 @@ class ObjectBox(pn.WidgetBox):
             params["margin"] = 10
         super().__init__(**params)
 
+
 class Form:
     """入力フォームの操作のクラスです。
 
@@ -251,7 +257,7 @@ class Form:
 
         self.schema = {}
 
-    def create_widgets(self, schema: dict, data: dict=None) -> None:
+    def create_widgets(self, schema: dict, data: Optional[dict]=None) -> None:
         """jsonchemaの形式に沿った入力欄をpanelで作成するメソッドです。
 
         Args:
@@ -268,7 +274,7 @@ class Form:
                 value = data.get(key, {})
             self.form_box.append(self._generate_widget(properties, key, value))
 
-    def _generate_widget(self, definition:dict, key:str, value:dict=None)->ArrayBox | ObjectBox | Column:
+    def _generate_widget(self, definition:dict, key:str, value:Optional[dict]=None)->ArrayBox | ObjectBox | Column:
         """jsonschemaの設定値からpanelのwidgetを作成するメソッドです。
 
         Args:
@@ -380,7 +386,7 @@ class Form:
             box.append(Description(description, schema_key=key))
         column = pn.Column()
 
-        def create_items(value: dict=None)->pn.Row:
+        def create_items(value: Optional[dict]=None)->pn.Row:
             """arrayのひとつの要素を作成するメソッドです。
 
             Args:

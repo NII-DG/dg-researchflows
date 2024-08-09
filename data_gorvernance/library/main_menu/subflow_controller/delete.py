@@ -2,15 +2,15 @@
 
 このモジュールはサブフロー削除クラスを始め、新しいサブフローのデータを削除したりするメソッドなどがあります。
 """
-from typing import Dict, List
+from typing import List, Union
 
-import panel as pn
 from dg_drawer.research_flow import PhaseStatus
+import panel as pn
 
-from ...utils.config import path_config, message as msg_config
+from library.utils.config import path_config, message as msg_config
+from library.utils.widgets import Alert
 from .base import BaseSubflowForm
-from ...utils.widgets import Alert
-from typing import Union
+
 
 class DeleteSubflowForm(BaseSubflowForm):
     """サブフロー削除クラスです。
@@ -37,7 +37,7 @@ class DeleteSubflowForm(BaseSubflowForm):
         self.change_submit_button_init(msg_config.get('main_menu', 'delete_sub_flow'))
 
     # overwrite
-    def generate_sub_flow_name_options(self, phase_seq_number:int, research_flow_status:List[PhaseStatus]) -> dict:
+    def generate_sub_flow_name_options(self, phase_seq_number:int, research_flow_status:List[PhaseStatus]) -> dict[str, int]:
         """サブフロー種別(フェーズ)を表示するメソッドです。
 
         Args:

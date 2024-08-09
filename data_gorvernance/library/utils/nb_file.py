@@ -7,6 +7,7 @@ import nbformat
 from .file import File
 from .html import security
 
+
 class NbFile(File):
     """ Notebookファイル操作のクラスです。"""
 

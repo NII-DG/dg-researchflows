@@ -8,10 +8,10 @@ from typing import Callable, Tuple
 
 from . import dg_web
 from .config import message as msg_config
+from .error import UnusableVault, UnauthorizedError, ProjectNotExist, PermissionError
 from .storage_provider import grdm
 from .string import StringManager
 from .vault import Vault
-from .error import UnusableVault, UnauthorizedError, ProjectNotExist, PermissionError
 
 
 def get_project_id() -> str:

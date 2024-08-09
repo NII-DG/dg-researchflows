@@ -4,12 +4,13 @@ dg-webからガバナンスシートやメタデータのスキーマの取得�
 
 """
 from http import HTTPStatus
+from typing import Optional
 from urllib import parse
 
 import requests
 from requests.exceptions import RequestException
 
-from ..error import UnauthorizedError, NotFoundContentsError
+from library.utils.error import UnauthorizedError, NotFoundContentsError
 
 
 def get_govsheet_schema(scheme:str, domain:str)->dict:
@@ -78,7 +79,7 @@ def check_governedrun_token(scheme:str, domain:str, token:str)->bool:
     return False
 
 
-def validate(scheme:str, domain:str, grdm_token:str, project_id:str, govrun_token:str=None, govsheet:dict=None, metadata:dict=None)->dict:
+def validate(scheme:str, domain:str, grdm_token:str, project_id:str, govrun_token:Optional[str]=None, govsheet:Optional[dict]=None, metadata:Optional[dict]=None)->dict:
     """ 検証する関数です。
 
     Args:

@@ -1,5 +1,5 @@
 """DMPデータを操作するクラスが記載されたモジュールです。"""
-from ..file import JsonFile
+from library.utils.file import JsonFile
 
 
 class DMPManager(JsonFile):
@@ -72,4 +72,3 @@ class DMPManager(JsonFile):
         for file in value:
             dmp_str += f'&emsp;{file.get("path")}<br>'
         return dmp_str
-

@@ -7,6 +7,7 @@ import panel as pn
 
 from .config import message as msg_config
 
+
 class Button(pn.widgets.Button):
     """ pn.widgets.Buttonクラスを拡張したクラスです。
 
@@ -134,6 +135,7 @@ class Alert(pn.pane.Alert):
 
         """
         return cls(msg, sizing_mode="stretch_width", alert_type='danger')
+
 
 class MessageBox(pn.WidgetBox):
     """ メッセージを表示するためのwidgetBoxのクラスです。"""

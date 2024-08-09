@@ -1,12 +1,12 @@
 """ログの生成に関するクラスや関数が記載されたモジュールです。"""
+import datetime
 import logging
 from logging import FileHandler
 import os
 from pathlib import Path
-import datetime
 
-from ..config import path_config
-from ..setting import get_subflow_type_and_id
+from library.utils.config import path_config
+from library.utils.setting import get_subflow_type_and_id
 
 
 class BaseLogger:
@@ -37,7 +37,7 @@ class BaseLogger:
     def reset_file(self, fmt:str):
         """ファイルのリセットを行うメソッドです。
 
-       ログファイルは日付で分割されるため、日付が変わっていた場合のみログハンドラーを更新します。
+        ログファイルは日付で分割されるため、日付が変わっていた場合のみログハンドラーを更新します。
 
         Args:
             fmt(str):フォーマッターを設定
@@ -92,6 +92,7 @@ class BaseLogger:
         elif level == 'critical':
             self.logger.setLevel(logging.CRITICAL)
 
+
 class UserActivityLog(BaseLogger):
     """BaseLoggerクラスを継承し、実際にユーザーがロギング機能を用いることができるよう実装したクラスです。
 
@@ -107,7 +108,7 @@ class UserActivityLog(BaseLogger):
 
     """
 
-    def __init__(self, nb_working_file=str, notebook_name=str):
+    def __init__(self, nb_working_file: str, notebook_name: str):
         """ クラスのインスタンスを初期化するメソッドです。コンストラクタ
 
         Args:
@@ -130,7 +131,7 @@ class UserActivityLog(BaseLogger):
         self.cell_id = ""
 
 
-    def _get_log_dir(self, nb_working_file=str)->str:
+    def _get_log_dir(self, nb_working_file: str)->str:
         """ログファイルを保存するディレクトリを生成するためのメソッドです。
 
         Args:
@@ -152,7 +153,7 @@ class UserActivityLog(BaseLogger):
         """フォーマットの定義を取得するメソッドです。
 
         Returns:
-           str:フォーマットの定義
+            str:フォーマットの定義
 
         """
         return '%(levelname)s\t%(asctime)s\t%(username)s\t%(subflow_id)s\t%(subflow_type)s\t%(ipynb_name)s\t%(cell_id)s\t%(message)s'

@@ -1,12 +1,12 @@
 """ ダイアグラムの管理を行うモジュールです。"""
 from pathlib import Path
-import traceback
 from subprocess import run
+import traceback
 
 from blockdiag.command import BlockdiagApp
 from blockdiag.utils.logging import error
 
-from ..file import File
+from library.utils.file import File
 
 
 class DiagManager:
@@ -55,8 +55,6 @@ class DiagManager:
             else:
                 new_lines.append(line)
         self.content = '\n'.join(new_lines)
-
-
 
     def update_node_color(self, node_id: str, color: str) -> None:
         """ ノードの色を設定するメソッドです。
@@ -147,4 +145,3 @@ class DiagManager:
             return -1
         finally:
             app.cleanup()
-

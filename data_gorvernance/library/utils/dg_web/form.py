@@ -3,6 +3,7 @@
 入力フォーム生成や操作のためのクラスが記載されています。
 
 """
+import json
 import traceback
 from typing import Any, Optional
 
@@ -624,3 +625,49 @@ class Form:
             # Columnの値が取得できたら終わる
             break
         return value
+
+    def sort_order(self, schema: dict, json_path: str) -> dict:
+        """jsonファイルを読み込みスキーマを並び替える処理を呼ぶメソッドです。
+
+        Args:
+            schema (dict): 元のスキーマ
+            json_path (str): jsonファイルのパス
+
+        Returns:
+            dict: 並び替えたスキーマを返す。
+        """
+        update_schema = {}
+        with open(json_path, 'r') as f:
+            order = json.load(f)
+        order_schema = self.sort_schema(schema['properties'], order)
+        update_schema.update({'properties':order_schema})
+        return update_schema
+
+    def sort_schema(self, properties:dict, order:dict) -> dict:
+        """jsonファイルのkeyに合わせてスキーマを並び替えるメソッドです。
+
+        Args:
+            properties (dict): スキーマのproperties要素を設定する。
+            order (dict): jsonファイルの要素を設定する。
+
+        Returns:
+            dict: 並び替えたスキーマを返す。
+
+        """
+        new_schema = {}
+        for order_key in order['ui:order']:
+            if properties.get(order_key):
+                if order.get(order_key) and properties[order_key].get("type") == "object":
+                    schema_value = self.sort_schema(properties[order_key]['properties'], order[order_key])
+                    new_schema.update({order_key:properties[order_key]})
+                    new_schema[order_key]['properties'] = schema_value
+                elif order.get(order_key) and properties[order_key].get("type") == "array":
+                    if properties[order_key]['items'].get("type") == "object":
+                        schema_value = self.sort_schema(properties[order_key]['items']['properties'], order[order_key]['items'])
+                        new_schema.update({order_key:properties[order_key]})
+                        new_schema[order_key]['items']['properties'] = schema_value
+                    else:
+                        new_schema[order_key] = schema_value
+                else:
+                    new_schema[order_key] = properties[order_key]
+        return new_schema

@@ -1,29 +1,31 @@
 """GINを用いた通信に用いられる関数を記載したモジュールです。"""
 import hashlib
-from http import HTTPStatus
 import json
 import os
-from pathlib import Path
 import re
 import shutil
 import subprocess
 import traceback
-import os
-import json
+from http import HTTPStatus
+from pathlib import Path
 from typing import Optional
 from urllib import parse
 
-from datalad import api as datalad_api
-from IPython.display import clear_output, display
-from IPython.core.display import HTML
 import magic
 import requests
+from datalad import api as datalad_api
+from IPython.core.display import HTML
+from IPython.display import clear_output, display
 
-from library.utils.config.param import ParamConfig
-from library.utils.error import UnauthorizedError, RepositoryNotExist, UrlUpdateError, NoValueInDgFileError
-from library.utils.config import path_config, message as msg_config
 from library.utils.cmd import Cmd
-from . import api as gin_api, git
+from library.utils.config import message as msg_config
+from library.utils.config import path_config
+from library.utils.config.param import ParamConfig
+from library.utils.error import (NoValueInDgFileError, RepositoryNotExist,
+                                 UnauthorizedError, UrlUpdateError)
+from . import api as gin_api
+from . import git
+
 clear_output()
 
 

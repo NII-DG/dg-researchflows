@@ -1,5 +1,6 @@
 """サブフローステータスに関連する処理が記載されたモジュールです。"""
-from ..file import JsonFile
+from library.utils.file import JsonFile
+
 
 _IS_COMPLETED = 'is_completed'
 _TASKS = 'tasks'

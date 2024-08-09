@@ -2,16 +2,15 @@
 
 このモジュールはサブフロー間接続編集クラスを始め、既存のサブフロー間の接続を編集したりするメソッドなどがあります。
 """
-from typing import Dict, List
 import traceback
+from typing import List, Union
 
-import panel as pn
 from dg_drawer.research_flow import PhaseStatus
+import panel as pn
 
-from ...utils.config import message as msg_config
+from library.utils.config import message as msg_config
+from library.utils.widgets import Alert
 from .base import BaseSubflowForm
-from ...utils.widgets import Alert
-from typing import Union
 
 class RelinkSubflowForm(BaseSubflowForm):
     """サブフロー間接続編集クラスです。
@@ -40,7 +39,7 @@ class RelinkSubflowForm(BaseSubflowForm):
         self.change_submit_button_init(msg_config.get('main_menu', 'relink_sub_flow'))
 
     # overwrite
-    def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus]) -> dict:
+    def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus]) -> dict[str, int]:
         """サブフロー種別(フェーズ)を表示するメソッドです。
 
         Args:
@@ -231,4 +230,3 @@ class RelinkSubflowForm(BaseSubflowForm):
         # フォームの初期化
         self._sub_flow_type_selector.value = 0
         self.change_submit_button_init(msg_config.get('main_menu', 'relink_sub_flow'))
-

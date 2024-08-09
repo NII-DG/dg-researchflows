@@ -2,15 +2,17 @@
 
 このモジュールはVaultサーバーに接続するために必要な値の設定とチェックを行い、キーやポリシーを作成してサーバーを起動させ、接続確認を行うメソッドがあります。
 """
-import hvac
 import os
 import requests
 import subprocess
 import threading
 import time
 
+import hvac
+
 from .error import UnusableVault
 from typing import Union
+
 
 VAULT_ADDR = 'http://127.0.0.1:8200'
 TOKEN_PATH = '/home/jovyan/.vault/token'
@@ -29,11 +31,14 @@ def start_server():
     """サーバーを起動するメソッドです。"""
     config_path = os.path.join(
         os.environ['HOME'], 'data_gorvernance/library/data/vault-config.hcl')
-    subprocess.Popen(
-        ['vault', 'server', '-config', config_path],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL
-    )
+    dir_path = os.path.join(os.environ['HOME'], '.vault/log')
+    os.makedirs(dir_path, exist_ok=True)
+    with open(os.path.join(dir_path, 'vault.log'), 'w') as file:
+        process = subprocess.Popen(
+            ['vault', 'server', '-config', config_path],
+            stdout=subprocess.DEVNULL,
+            stderr=file
+        )
 
 
 class Vault():

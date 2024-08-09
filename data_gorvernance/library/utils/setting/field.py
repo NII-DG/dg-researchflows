@@ -3,7 +3,8 @@ import os
 from pathlib import Path
 from typing import List
 
-from ..file import JsonFile
+from library.utils.file import JsonFile
+
 
 # field.jsonのファイルパス
 script_dir_path = os.path.dirname(__file__)

@@ -93,8 +93,10 @@ class MainMenu(TaskLog):
         ## プロジェクト操作コントローラーの定義
         ### 遷移ボタン for プロジェクト操作コントローラー
         self.button_for_project_menu = pn.pane.HTML()
-        self.button_for_project_menu.object = html_button.create_button(msg=msg_config.get('main_menu', 'disable_jump_button'), disable=True, border=['dashed', '1px'],button_background_color='#ffffff')
-
+        self.button_for_project_menu.object = html_button.create_button(
+            msg=msg_config.get('main_menu', 'disable_jump_button'),
+            disable=True, border=['dashed', '1px'],button_background_color='#ffffff'
+            )
         ### プロジェクト操作アクションセレクタ―
         project_menu_title = msg_config.get('main_menu', 'project_menu_title')
         project_menu_options = dict()
@@ -190,7 +192,7 @@ class MainMenu(TaskLog):
                 # プロジェクト操作が選択
                 self._project_menu.value = 0
                 self._sub_flow_widget_box.clear()
-        except Exception as e:
+        except Exception:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_project_menu(self, event):
@@ -199,9 +201,11 @@ class MainMenu(TaskLog):
         try:
             self._err_output.clear()
             self._project_widget_box.clear()
-            alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
+            alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),
+                sizing_mode="stretch_width",alert_type='warning'
+                )
             self._project_widget_box.append(alert)
-        except Exception as e:
+        except Exception:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_sub_flow_menu(self, event):
@@ -262,7 +266,7 @@ class MainMenu(TaskLog):
             display(Javascript('IPython.notebook.save_checkpoint();'))
             # end
             self.log.finish(detail=self.callback_type)
-        except InputWarning as e:
+        except InputWarning:
             self.log.warning(traceback.format_exc())
         except  Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
@@ -305,10 +309,14 @@ class MainMenu(TaskLog):
 
         ## 機能コントローラーを配置
         main_menu_title = 'メインメニュー'
-        main_menu_box = pn.WidgetBox(f'## {main_menu_title}', main_menu._menu_tabs, main_menu._err_output)
+        main_menu_box = pn.WidgetBox(f'## {main_menu_title}',
+            main_menu._menu_tabs, main_menu._err_output
+            )
         display(main_menu_box)
         ## リサーチフロー図を配置
-        research_flow_image_title = pn.pane.Markdown(f'### {msg_config.get("main_menu", "subflow_relationship_diagram")}')
+        research_flow_image_title = pn.pane.Markdown(
+            f'### {msg_config.get("main_menu", "subflow_relationship_diagram")}'
+            )
         display(research_flow_image_title)
         display(main_menu._research_flow_image)
 

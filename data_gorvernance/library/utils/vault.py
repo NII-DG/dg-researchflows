@@ -20,7 +20,7 @@ DG_ENGINE_NAME = 'dg-kv'
 DG_POLICY_NAME = 'dg-policy'
 DG_POLICY = '''\
 path "dg-kv/*" {
-  capabilities = [ "create", "read", "update", "delete", "list" ]
+    capabilities = [ "create", "read", "update", "delete", "list" ]
 }
 '''
 TOKEN_TTL = '1m'

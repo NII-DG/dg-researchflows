@@ -153,8 +153,8 @@ def init_param_url():
             if http_url[-1] == '/':
                 http_url = http_url.rstrip('/')
 
-            pc._siblings._ginHttp = http_url
-            pc._siblings._ginSsh = response_data["ssh"]
+            pc._siblings._gin_http = http_url
+            pc._siblings._gin_ssh = response_data["ssh"]
 
             with open(REPOSITORY_ID_FILE_PATH, 'r') as file:
                 repo_id = file.read()
@@ -181,7 +181,7 @@ def setup_local(user_name:str, password:str):
         UnauthorizedError:認証情報が無効である
 
     """
-    pr = parse.urlparse(ParamConfig.get_siblings_ginHttp())
+    pr = parse.urlparse(ParamConfig.get_siblings_gin_http())
     response = gin_api.get_token_for_auth(pr.scheme, pr.netloc, user_name, password)
 
     ## Unauthorized
@@ -210,8 +210,8 @@ def setup_local(user_name:str, password:str):
     # Set user info
     res_data = response.json()
     set_user_info(user_id=res_data['id'])
-    Cmd.exec_subprocess(cmd='git config --global user.name {}'.format(res_data['username']))
-    Cmd.exec_subprocess(cmd='git config --global user.email {}'.format(res_data['email']))
+    Cmd.exec_subprocess(cmd=f'git config --global user.name {res_data["username"]}')
+    Cmd.exec_subprocess(cmd=f'git config --global user.email {res_data["email"]}')
 
 
 def set_ginfork_token(token:str):
@@ -294,7 +294,7 @@ def del_build_token()->tuple[bool, Optional[str]]:
         elif response.status_code == HTTPStatus.UNAUTHORIZED:
             return True, msg_config.get('build_token', 'already_delete')
         else:
-            return False, msg_config.get('build_token', 'error') + 'Code[{}]'.format(response.status_code)
+            return False, msg_config.get('build_token', 'error') + f'Code[{response.status_code}]'
     else:
         return True , None
 
@@ -352,7 +352,7 @@ def upload_ssh_key(root_path:str)->str:
     with open(ssh_pub_key_path, mode='r') as f:
         ssh_key = f.read()
 
-    pr = parse.urlparse(ParamConfig.get_siblings_ginHttp())
+    pr = parse.urlparse(ParamConfig.get_siblings_gin_http())
     response = gin_api.upload_key(pr.scheme, pr.netloc, get_ginfork_token(), ssh_key)
     msg = response.json()
 
@@ -371,16 +371,16 @@ def trust_gin(root_path:str):
         root_path (str):設定ファイルの保存されているディレクトリのルートパス
 
     """
-    ginHttp = ParamConfig.get_siblings_ginHttp()
-    config_GIN(root_path, ginHttp)
+    gin_http = ParamConfig.get_siblings_gin_http()
+    config_gin(root_path, gin_http)
 
 
-def config_GIN(root_path:str, ginHttp:str):
+def config_gin(root_path:str, gin_http:str):
     """ドメインを信頼するための設定を行うメソッドです。
 
     Args:
         root_path(str):設定値を出力するファイルのルートパス
-        ginHttp(str):リポジトリホスティングサーバのURL  ex : http://dg01.dg.rcos.nii.ac.jp
+        gin_http(str):リポジトリホスティングサーバのURL  ex : http://dg01.dg.rcos.nii.ac.jp
 
     note:
         設定値は/home/jovyan/.ssh/configファイルに出力される。
@@ -389,35 +389,35 @@ def config_GIN(root_path:str, ginHttp:str):
     # SSHホスト（＝GIN）を信頼する設定
     ssh_config_path = os.path.join(root_path, __SSH_CONFIG)
     s = ''
-    pr = parse.urlparse(ginHttp)
-    ginDomain = pr.netloc
+    pr = parse.urlparse(gin_http)
+    gin_domain = pr.netloc
     if os.path.exists(ssh_config_path):
         with open(ssh_config_path, 'r') as f:
             s = f.read()
-        if s.find('host ' + ginDomain + '\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null') == -1:
+        if s.find('host ' + gin_domain + '\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null') == -1:
             # 設定が無い場合は追記する
             with open(ssh_config_path, mode='a') as f:
-                write_GIN_config(mode='a', ginDomain=ginDomain, ssh_config_path=ssh_config_path)
+                write_gin_config(mode='a', gin_domain=gin_domain, ssh_config_path=ssh_config_path)
         else:
             # すでにGINを信頼する設定があれば何もしない
             pass
     else:
         # 設定ファイルが無い場合は新規作成して設定を書きこむ
         with open(ssh_config_path, mode='w') as f:
-            write_GIN_config(mode='w', ginDomain=ginDomain, ssh_config_path=ssh_config_path)
+            write_gin_config(mode='w', gin_domain=gin_domain, ssh_config_path=ssh_config_path)
 
 
-def write_GIN_config(mode:str, ginDomain:str, ssh_config_path:str):
+def write_gin_config(mode:str, gin_domain:str, ssh_config_path:str):
     """SSH設定ファイルに特定のドメインを信頼する設定を書き込むメソッドです。
 
     Args:
         mode (str):ファイルを開くモード
-        ginDomain (str):信頼させるドメイン
+        gin_domain (str):信頼させるドメイン
         ssh_config_path (str):SSH設定ファイルへのパス
 
     """
     with open(ssh_config_path, mode) as f:
-        f.write('\nhost ' + ginDomain + '\n')
+        f.write('\nhost ' + gin_domain + '\n')
         f.write('\tStrictHostKeyChecking no\n')
         f.write('\tUserKnownHostsFile=/dev/null\n')
 
@@ -451,13 +451,13 @@ def setup_sibling_to_local():
     ginfork_token = get_ginfork_token()
     repo_id = ParamConfig.get_repo_id()
     user_id =get_user_id_from_user_info()
-    ginHttp = ParamConfig.get_siblings_ginHttp()
-    pr = parse.urlparse(ginHttp)
+    gin_http = ParamConfig.get_siblings_gin_http()
+    pr = parse.urlparse(gin_http)
     response = gin_api.search_repo(pr.scheme, pr.netloc, repo_id, user_id, ginfork_token)
     response.raise_for_status() # ステータスコードが200番台でない場合はraise HTTPError
     res_data = response.json()
     if len(res_data['data']) == 0:
-            raise RepositoryNotExist
+        raise RepositoryNotExist
     ssh_url = res_data['data'][0]['ssh_url']
     http_url = res_data['data'][0]['html_url'] + '.git'
     # Note:
@@ -482,7 +482,8 @@ def push_annex_branch(cwd:str):
         Cmd.exec_subprocess(cmd=f'git push {SIBLING} git-annex:git-annex', cwd=cwd)
 
 
-def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str], gitannex_files :list[str], message:str, get_paths:list[str],)->bool:
+def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str],
+    gitannex_files :list[str], message:str, get_paths:list[str],)->bool:
     """Git Annexリポジトリの同期を行うメソッドです。
 
     Args:
@@ -505,7 +506,6 @@ def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str], gitann
     error_message = ''
     datalad_error = ''
     try:
-
         # os.chdir(p.HOME_PATH)
         print('[INFO] Lock git-annex content')
         # os.system('git annex lock')
@@ -524,7 +524,7 @@ def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str], gitann
         update()
         if len(get_paths)>0:
             datalad_api.get(path=get_paths)
-    except:
+    except Exception:
         datalad_error = traceback.format_exc()
         # if there is a connection error to the remote, try recovery
         if 'Repository does not exist' in datalad_error or 'failed with exitcode 128' in datalad_error:
@@ -542,7 +542,7 @@ def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str], gitann
                 error_message = msg_config.get('sync', 'unexpected')
         elif 'files would be overwritten by merge:' in datalad_error:
             print('[INFO] Files would be overwritten by merge')
-            git_commit_msg = '{}(auto adjustment)'.format(message)
+            git_commit_msg = f'{message}(auto adjustment)'
             err_key_info = extract_info_from_datalad_update_err(datalad_error)
             file_paths = list[str]()
             # os.chdir(p.HOME_PATH)
@@ -561,12 +561,14 @@ def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str], gitann
                         adjust_add_annex_paths.append(path)
                     else:
                         if not path.startswith(cwd):
-                             path = os.path.join(cwd, path)
+                            path = os.path.join(cwd, path)
                         adjust_add_git_paths.append(path)
-                print('[INFO] git add. path : {}'.format(adjust_add_git_paths))
-                print('[INFO] git annex add. path : {}'.format(adjust_add_annex_paths))
+                print(f'[INFO] git add. path : {adjust_add_git_paths}')
+                print(f'[INFO] git annex add. path : {adjust_add_annex_paths}')
                 print('[INFO] Save git-annex content and Register metadata(auto adjustment)')
-                save_annex_and_register_metadata(cwd, adjust_add_annex_paths, adjust_add_annex_paths, git_commit_msg)
+                save_annex_and_register_metadata(cwd, adjust_add_annex_paths,
+                    adjust_add_annex_paths, git_commit_msg
+                    )
                 #os.system('git annex unlock')
                 git.git_annex_unlock(cwd)
                 print('[INFO] Save git content(auto adjustment)')
@@ -587,10 +589,12 @@ def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str], gitann
                             if not path.startswith(cwd):
                                 path = os.path.join(cwd, path)
                             adjust_add_git_paths.append(path)
-                    print('[INFO] git add. path : {}'.format(adjust_add_git_paths))
-                    print('[INFO] git annex add. path : {}'.format(adjust_add_annex_paths))
+                    print(f'[INFO] git add. path : {adjust_add_git_paths}')
+                    print(f'[INFO] git annex add. path : {adjust_add_annex_paths}')
                     print('[INFO] Save git-annex content and Register metadata(auto adjustment)')
-                    save_annex_and_register_metadata(cwd, adjust_add_annex_paths, adjust_add_annex_paths, git_commit_msg)
+                    save_annex_and_register_metadata(cwd, adjust_add_annex_paths,
+                        adjust_add_annex_paths, git_commit_msg
+                        )
                     # os.system('git annex unlock')
                     git.git_annex_unlock(cwd)
                     print('[INFO] Save git content(auto adjustment)')
@@ -613,7 +617,7 @@ def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str], gitann
             print('[INFO] Unlock git-annex content')
             #os.system('git annex unlock')
             git.git_annex_unlock(cwd)
-        except:
+        except Exception:
             datalad_error = traceback.format_exc()
             error_message = msg_config.get('sync', 'push_error')
         else:
@@ -633,7 +637,9 @@ def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str], gitann
             return False
 
 
-def save_annex_and_register_metadata(cwd:str, gitannex_path :list[str], gitannex_files:list[str], message:str):
+def save_annex_and_register_metadata(cwd:str, gitannex_path :list[str],
+    gitannex_files:list[str], message:str
+    ):
     """detaladの保存とメタデータの登録を行うメソッドです。
 
     Args:
@@ -680,7 +686,9 @@ def register_metadata_for_annexdata(cwd:str, file_path:str):
 
         # register_metadata
         #os.system(f'git annex metadata "{file_path}" -s mime_type={mime_type} -s sha256={sha256} -s content_size={content_size}')
-        git.git_annex_metadata_add_minetype_sha256_contentsize(file_path, mime_type, sha256, content_size, cwd)
+        git.git_annex_metadata_add_minetype_sha256_contentsize(file_path,
+            mime_type, sha256, content_size, cwd
+            )
     else:
         pass
 
@@ -851,7 +859,7 @@ def display_log(msg:str='', tag:str='p'):
     fore = "#ff0000"
     display_html_msg(msg, fore, None, tag)
 
-default_tag = "p"
+DEFAULT_TAG = "p"
 """メソッド : display_msg()、display_info()、display_err()、display_warm()のデフォルトのHTMLタグ種"""
 
 
@@ -863,7 +871,7 @@ def display_msg(msg:str='', back:Optional[str]=None):
         back (Optional[str]):背背景
 
     """
-    display_html_msg(msg, None, back, default_tag)
+    display_html_msg(msg, None, back, DEFAULT_TAG)
 
 
 def display_info(msg:str=''):
@@ -874,7 +882,7 @@ def display_info(msg:str=''):
 
     """
     back = "#9eff9e"
-    display_html_msg(msg, None, back, default_tag)
+    display_html_msg(msg, None, back, DEFAULT_TAG)
 
 
 def display_err(msg:str=''):
@@ -885,7 +893,7 @@ def display_err(msg:str=''):
 
     """
     back = "#ffa8a8"
-    display_html_msg(msg, None, back, default_tag)
+    display_html_msg(msg, None, back, DEFAULT_TAG)
 
 
 def display_warm(msg:str=''):
@@ -896,7 +904,7 @@ def display_warm(msg:str=''):
 
     """
     back = "#ffff93"
-    display_html_msg(msg, None, back, default_tag)
+    display_html_msg(msg, None, back, DEFAULT_TAG)
 
 
 def display_debug(msg:str=''):
@@ -907,7 +915,7 @@ def display_debug(msg:str=''):
 
     """
     back = "#dcdcdc"
-    display_html_msg(msg, None, back, default_tag)
+    display_html_msg(msg, None, back, DEFAULT_TAG)
 
 
 def update_repo_url()->bool:
@@ -924,7 +932,7 @@ def update_repo_url()->bool:
     """
     try:
         # APIリクエストに必要な情報を取得する
-        gin_http_url = ParamConfig.get_siblings_ginHttp()
+        gin_http_url = ParamConfig.get_siblings_gin_http()
         pr = parse.urlparse(gin_http_url)
         repo_id = ParamConfig.get_repo_id()
 

@@ -76,9 +76,13 @@ class ContainerSetter():
     def define_setup_form(self):
         """セットアップフォームを定義するメソッドです。"""
         # ユーザ名
-        self._user_name_form = pn.widgets.TextInput(name=msg_config.get('user_auth','username_title'), placeholder=msg_config.get('user_auth','username_help'), width=DEFAULT_WIDTH)
+        self._user_name_form = pn.widgets.TextInput(name=msg_config.get('user_auth','username_title'),
+            placeholder=msg_config.get('user_auth','username_help'), width=DEFAULT_WIDTH
+            )
         # パスワード
-        self._password_form = pn.widgets.PasswordInput(name=msg_config.get('user_auth','password_title'), placeholder=msg_config.get('user_auth','password_help'), width=DEFAULT_WIDTH)
+        self._password_form = pn.widgets.PasswordInput(name=msg_config.get('user_auth','password_title'),
+            placeholder=msg_config.get('user_auth','password_help'), width=DEFAULT_WIDTH
+            )
         # 送信ボタン
         self._submit_button = pn.widgets.Button()
         self.change_submit_button_init(msg_config.get('form','submit_button'))
@@ -97,28 +101,38 @@ class ContainerSetter():
         # 入力値のバリエーション
         ## user_name
         if user_name is None or len(user_name)<= 0:
-            self.change_submit_button_warning(name=msg_config.get('form', 'none_input_value').format(msg_config.get('form', 'user_name')))
+            self.change_submit_button_warning(
+                name=msg_config.get('form', 'none_input_value').format(msg_config.get('form', 'user_name'))
+                )
             return
 
         if not self.validate_format_username(user_name):
-            self.change_submit_button_warning(name=msg_config.get('form', 'invali_input_value').format(msg_config.get('form', 'user_name')))
+            self.change_submit_button_warning(
+                name=msg_config.get('form', 'invali_input_value').format(msg_config.get('form', 'user_name'))
+                )
             self._msg_output.clear()
-            alert = pn.pane.Alert(msg_config.get('form', 'username_pattern_error'), sizing_mode="stretch_width",alert_type='warning')
+            alert = pn.pane.Alert(msg_config.get('form', 'username_pattern_error'),
+                sizing_mode="stretch_width",alert_type='warning'
+                )
             self._msg_output.append(alert)
             return
 
         ## password
         if password is None or len(password) <= 0:
-            self.change_submit_button_warning(name=msg_config.get('form', 'none_input_value').format(msg_config.get('form', 'password')))
+            self.change_submit_button_warning(
+                name=msg_config.get('form', 'none_input_value').format(msg_config.get('form', 'password'))
+                )
             return
 
         #認証検証準備（GIN-forkのドメインをparam.jsonに用意する）
         try:
             gin.init_param_url()
-        except:
+        except Exception:
             self.change_submit_button_error(name=msg_config.get('DEFAULT', 'unexpected_error'))
             self._msg_output.clear()
-            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
+            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',
+                sizing_mode="stretch_width", alert_type='danger'
+                )
             self._msg_output.append(alert)
             return
 
@@ -126,19 +140,25 @@ class ContainerSetter():
         try:
             gin.setup_local(user_name, password)
         except UnauthorizedError:
-            self.change_submit_button_warning(name=msg_config.get('form', 'invali_input_value').format(msg_config.get('form', 'user_name')+'/'+ msg_config.get('form', 'password')))
+            self.change_submit_button_warning(
+                name=msg_config.get('form', 'invali_input_value').format(msg_config.get('form', 'user_name')+'/'+ msg_config.get('form', 'password'))
+                )
             self._msg_output.clear()
-            alert = pn.pane.Alert(msg_config.get('user_auth','UnauthorizedError'), sizing_mode="stretch_width",alert_type='warning')
+            alert = pn.pane.Alert(msg_config.get('user_auth','UnauthorizedError'),
+                sizing_mode="stretch_width",alert_type='warning'
+                )
             self._msg_output.append(alert)
             return
-        except Exception as e:
+        except Exception:
             self.change_submit_button_error(name=msg_config.get('DEFAULT', 'unexpected_error'))
             self._msg_output.clear()
-            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',sizing_mode="stretch_width",alert_type='danger')
+            alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',
+                sizing_mode="stretch_width", alert_type='danger'
+                )
             self._msg_output.append(alert)
             return
         else:
-            self.change_submit_button_success(msg_config.get('user_auth','success'))
+            self.change_submit_button_success(msg_config.get('user_auth', 'success'))
             self._msg_output.clear()
             return
 
@@ -155,7 +175,9 @@ class ContainerSetter():
 
     def already_setup(self):
         """セットアップが完了していることを画面に表示するメソッドです。"""
-        alert = pn.pane.Alert(msg_config.get('setup', 'setup_completed'),sizing_mode="stretch_width",alert_type='warning')
+        alert = pn.pane.Alert(msg_config.get('setup', 'setup_completed'),
+            sizing_mode="stretch_width",alert_type='warning'
+            )
         display(alert)
 
     def change_submit_button_init(self, name:str):
@@ -251,12 +273,16 @@ class ContainerSetter():
         ok, msg =gin.del_build_token()
         if ok and msg is None:
             # パブリックのためのリクエストしなかった
-            alert = pn.pane.Alert(msg_config.get('build_token', 'not_need_del'),sizing_mode="stretch_width",alert_type='info')
+            alert = pn.pane.Alert(msg_config.get('build_token', 'not_need_del'),
+                sizing_mode="stretch_width", alert_type='info'
+                )
             display(alert)
             return
         elif ok and msg is not None and msg == '':
             # 削除成功
-            alert = pn.pane.Alert(msg_config.get('build_token', 'success'),sizing_mode="stretch_width",alert_type='success')
+            alert = pn.pane.Alert(msg_config.get('build_token', 'success'),
+                sizing_mode="stretch_width", alert_type='success'
+                )
             display(alert)
             return
         elif ok and msg is not None and len(msg) > 0:
@@ -265,7 +291,9 @@ class ContainerSetter():
             display(alert)
             return
         elif not ok:
-            alert = pn.pane.Alert(msg_config.get('build_token', 'error'),sizing_mode="stretch_width",alert_type='danger')
+            alert = pn.pane.Alert(msg_config.get('build_token', 'error'),
+                sizing_mode="stretch_width", alert_type='danger'
+                )
             display(alert)
             raise Exception('Failed to delete token.')
 
@@ -287,14 +315,20 @@ class ContainerSetter():
             ok = gin.datalad_create(cs._abs_root_path)
             clear_output()
             if ok:
-                alert = pn.pane.Alert(msg_config.get('setup','datalad_create_success'),sizing_mode="stretch_width",alert_type='info')
+                alert = pn.pane.Alert(msg_config.get('setup','datalad_create_success'),
+                    sizing_mode="stretch_width", alert_type='info'
+                    )
                 display(alert)
             else:
-                alert = pn.pane.Alert(msg_config.get('setup','datalad_create_already'),sizing_mode="stretch_width",alert_type='info')
+                alert = pn.pane.Alert(msg_config.get('setup','datalad_create_already'),
+                    sizing_mode="stretch_width", alert_type='info'
+                    )
                 display(alert)
 
         except Exception as e:
-            alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),sizing_mode="stretch_width",alert_type='danger')
+            alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),
+                sizing_mode="stretch_width", alert_type='danger'
+                )
             display(alert)
             raise e
 
@@ -314,12 +348,18 @@ class ContainerSetter():
 
         try:
             if gin.create_key(cs._abs_root_path):
-                alert = pn.pane.Alert(msg_config.get('setup','ssh_create_success'),sizing_mode="stretch_width",alert_type='info')
+                alert = pn.pane.Alert(msg_config.get('setup','ssh_create_success'),
+                    sizing_mode="stretch_width", alert_type='info'
+                    )
             else:
-                alert = pn.pane.Alert(msg_config.get('setup','ssh_already_create'),sizing_mode="stretch_width",alert_type='info')
+                alert = pn.pane.Alert(msg_config.get('setup','ssh_already_create'),
+                    sizing_mode="stretch_width", alert_type='info'
+                    )
             display(alert)
         except Exception as e:
-            alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),sizing_mode="stretch_width",alert_type='danger')
+            alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),
+                sizing_mode="stretch_width",alert_type='danger'
+                )
             display(alert)
             raise e
 
@@ -342,7 +382,9 @@ class ContainerSetter():
             alert = pn.pane.Alert(msg ,sizing_mode="stretch_width",alert_type='info')
             display(alert)
         except Exception as e:
-            alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),sizing_mode="stretch_width",alert_type='danger')
+            alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),
+                sizing_mode="stretch_width", alert_type='danger'
+                )
             display(alert)
             raise e
 
@@ -362,10 +404,14 @@ class ContainerSetter():
 
         try:
             gin.trust_gin(cs._abs_root_path)
-            alert = pn.pane.Alert(msg_config.get('setup','trust_gin') ,sizing_mode="stretch_width",alert_type='info')
+            alert = pn.pane.Alert(msg_config.get('setup','trust_gin'),
+                sizing_mode="stretch_width", alert_type='info'
+                )
             display(alert)
         except Exception as e:
-            alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),sizing_mode="stretch_width",alert_type='danger')
+            alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),
+                sizing_mode="stretch_width", alert_type='danger'
+                )
             display(alert)
             raise e
 
@@ -385,16 +431,19 @@ class ContainerSetter():
 
         try:
             gin.prepare_sync(cs._abs_root_path)
-            alert = pn.pane.Alert(msg_config.get('setup','prepare_sync') ,sizing_mode="stretch_width",alert_type='info')
+            alert = pn.pane.Alert(msg_config.get('setup','prepare_sync') ,
+                sizing_mode="stretch_width", alert_type='info'
+                )
             display(alert)
         except Exception as e:
-            alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),sizing_mode="stretch_width",alert_type='danger')
+            alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),
+                sizing_mode="stretch_width", alert_type='danger'
+                )
             display(alert)
             raise e
 
     @classmethod
     def setup_sibling(cls, nb_working_file_path:str):
-        pn.extension()
         """siblingの登録をするメソッドです。
 
         Args:
@@ -404,6 +453,7 @@ class ContainerSetter():
             Exception: 予期しないエラーが発生した
 
         """
+        pn.extension()
         cls.check_imcomplete_auth()
 
         cs = ContainerSetter(nb_working_file_path)
@@ -413,11 +463,15 @@ class ContainerSetter():
             # annexブランチの作成とプッシュ
             gin.push_annex_branch(cs._abs_root_path)
             clear_output()
-            alert = pn.pane.Alert(msg_config.get('setup','setup_sibling') ,sizing_mode="stretch_width",alert_type='info')
+            alert = pn.pane.Alert(msg_config.get('setup','setup_sibling'),
+                sizing_mode="stretch_width", alert_type='info'
+                )
             display(alert)
 
         except Exception as e:
-            alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),sizing_mode="stretch_width",alert_type='danger')
+            alert = pn.pane.Alert(msg_config.get('DEFAULT', 'unexpected_error'),
+                sizing_mode="stretch_width", alert_type='danger'
+                )
             display(alert)
             raise e
 
@@ -440,7 +494,9 @@ class ContainerSetter():
         if os.path.exists(cs.setup_completed_file_path):
             # 存在する場合
             # 初期セットアップ済みとして、エラーにする
-            alert = pn.pane.Alert(msg_config.get('setup', 'setup_completed'),sizing_mode="stretch_width",alert_type='warning')
+            alert = pn.pane.Alert(msg_config.get('setup', 'setup_completed'),
+                sizing_mode="stretch_width", alert_type='warning'
+                )
             display(alert)
             cs.display_main_menu(nb_working_file_path)
             raise Exception('Cannot run because initial setup is complete')
@@ -449,21 +505,23 @@ class ContainerSetter():
             # 初期セットアップ完了ステータスファイルを作成する
             setup_flag_file = Path(cs.setup_completed_file_path)
             setup_flag_file.touch()
-            alert = pn.pane.Alert(msg_config.get('setup','recoed_setup_completed') ,sizing_mode="stretch_width",alert_type='info')
+            alert = pn.pane.Alert(msg_config.get('setup','recoed_setup_completed'),
+                sizing_mode="stretch_width", alert_type='info'
+                )
             display(alert)
 
     @classmethod
     def syncs_config(cls, nb_working_file_path:str) -> tuple[list, str]:
-        pn.extension()
         """同期のためにファイルとメッセージの設定をするメソッドです。
 
-         Args:
+        Args:
             nb_working_file_path (str): 実行Notebookパス
 
         Returns:
             list:Gitのパス
             str:コミットメッセージ
         """
+        pn.extension()
         cls.check_imcomplete_auth()
         display(Javascript('IPython.notebook.save_checkpoint();'))
         cs = ContainerSetter(nb_working_file_path)
@@ -490,7 +548,6 @@ class ContainerSetter():
 
     @classmethod
     def sync(cls, nb_working_file_path:str, git_path:list[str], commit_message:str):
-        pn.extension()
         """Gin_forkに実行結果を同期するメソッドです。
 
         Args:
@@ -498,6 +555,7 @@ class ContainerSetter():
             git_path(list[str]):Gitのパス
             commit_message(str):コミットメッセージ
         """
+        pn.extension()
         cs = ContainerSetter(nb_working_file_path)
 
         gin.syncs_with_repo(
@@ -517,7 +575,9 @@ class ContainerSetter():
             Exception: 認証が完了していない
         """
         if not gin.exist_user_info():
-            alert = pn.pane.Alert(msg_config.get('user_auth', 'imcomplete_auth'),sizing_mode="stretch_width",alert_type='warning')
+            alert = pn.pane.Alert(msg_config.get('user_auth', 'imcomplete_auth'),
+                sizing_mode="stretch_width", alert_type='warning'
+                )
             display(alert)
             raise Exception('Authentication not completed')
 

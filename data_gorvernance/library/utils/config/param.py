@@ -21,19 +21,19 @@ class ParamConfig():
     Attributes:
         class:
             __SIBLINGS(str): siblingsのキー
-            __RCOSBINDERURL(str): rcosBinderUrlのキー
+            __RCOS_BINDER_URL(str): rcosBinderUrlのキー
             __DGCORE(str): dgCoreのキー
             __REPOSITORY(str): repositoryのキー
         instance:
             _param_file(JsonFile): 設定ファイルを操作するためのインスタンス
             _siblings(Siblings): Siblingsクラスのインスタンス
-            _rcosBinderUrl: RCOSのBinderのURL
+            _rcos_binder_url: RCOSのBinderのURL
             _dg_core(GgCore): GgCoreクラスのインスタンス
             _repository(Repository): Repositoryクラスのインスタンス
 
     """
     __SIBLINGS = 'siblings'
-    __RCOSBINDERURL = 'rcosBinderUrl'
+    __RCOS_BINDER_URL = 'rcosBinderUrl'
     __DGCORE = 'dgCore'
     __REPOSITORY = 'repository'
 
@@ -43,7 +43,7 @@ class ParamConfig():
         data = self._param_file.read()
 
         self._siblings = Siblings(data[self.__SIBLINGS])
-        self._rcosBinderUrl = data[self.__RCOSBINDERURL]
+        self._rcos_binder_url = data[self.__RCOS_BINDER_URL]
         self._dg_core = GgCore(data[self.__DGCORE])
         self._repository = Repository(data[self.__REPOSITORY])
 
@@ -51,7 +51,7 @@ class ParamConfig():
         """ JSONファイルを書き換えるメソッドです。"""
         data = {}
         data[self.__SIBLINGS] = self._siblings.to_dict()
-        data[self.__RCOSBINDERURL] = self._rcosBinderUrl
+        data[self.__RCOS_BINDER_URL] = self._rcos_binder_url
         data[self.__DGCORE] = self._dg_core.to_dict()
         data[self.__REPOSITORY] = self._repository.to_dict()
         self._param_file.write(data)
@@ -68,15 +68,15 @@ class ParamConfig():
         return pc
 
     @classmethod
-    def get_siblings_ginHttp(cls) -> str:
+    def get_siblings_gin_http(cls) -> str:
         """ ginHTTPを取得するメソッドです。
 
         Returns:
-            str: ginHttpの値を返す。
+            str: gin_httpの値を返す。
 
         """
         pc = ParamConfig()
-        return pc._siblings._ginHttp
+        return pc._siblings._gin_http
 
     @classmethod
     def get_repo_id(cls) -> str:
@@ -95,21 +95,21 @@ class Siblings():
 
     Attributes:
         class:
-            __GINHTTP(str): ginHttpのキー
-            __GINSSH(str): ginSshのキー
-            __GITHUGIBHTTP(str): gitHugibHttpのキー
-            __GITHUBSSH(str): gitHubSshのキー
+            __GINHTTP(str): gin_httpのキー
+            __GINSSH(str): gin_sshのキー
+            __GITHUGIBHTTP(str): git_hugib_httpのキー
+            __GITHUBSSH(str): git_hub_sshのキー
         instance:
-            _ginHttp(str): ginHttpの値
-            _ginSsh(str): ginSshの値
-            _gitHugibHttp(str): gitHugibHttpの値
-            _gitHubSsh(str): gitHubSshの値
+            _gin_http(str): gin_httpの値
+            _gin_ssh(str): gin_sshの値
+            _git_hugib_http(str): git_hugib_httpの値
+            _git_hub_ssh(str): git_hub_sshの値
 
     """
-    __GINHTTP = 'ginHttp'
-    __GINSSH = 'ginSsh'
-    __GITHUGIBHTTP = 'gitHugibHttp'
-    __GITHUBSSH = 'gitHubSsh'
+    __GINHTTP = 'gin_http'
+    __GINSSH = 'gin_ssh'
+    __GITHUGIBHTTP = 'git_hugib_http'
+    __GITHUBSSH = 'git_hub_ssh'
 
     def __init__(self, siblings_data: dict) -> None:
         """ インスタンスの初期化処理を実行するメソッドです。
@@ -118,10 +118,10 @@ class Siblings():
             siblings_data (dict): 設定する値を含む辞書
 
         """
-        self._ginHttp = siblings_data[self.__GINHTTP]
-        self._ginSsh = siblings_data[self.__GINSSH]
-        self._gitHugibHttp = siblings_data[self.__GITHUGIBHTTP]
-        self._gitHubSsh = siblings_data[self.__GITHUBSSH]
+        self._gin_http = siblings_data[self.__GINHTTP]
+        self._gin_ssh = siblings_data[self.__GINSSH]
+        self._git_hugib_http = siblings_data[self.__GITHUGIBHTTP]
+        self._git_hub_ssh = siblings_data[self.__GITHUBSSH]
 
     def to_dict(self) -> dict:
         """ インスタンス変数を辞書に変換するメソッドです。
@@ -131,10 +131,10 @@ class Siblings():
 
         """
         data = {}
-        data[self.__GINHTTP] = self._ginHttp
-        data[self.__GINSSH] = self._ginSsh
-        data[self.__GITHUGIBHTTP] = self._gitHugibHttp
-        data[self.__GITHUBSSH] = self._gitHubSsh
+        data[self.__GINHTTP] = self._gin_http
+        data[self.__GINSSH] = self._gin_ssh
+        data[self.__GITHUGIBHTTP] = self._git_hugib_http
+        data[self.__GITHUBSSH] = self._git_hub_ssh
         return data
 
 

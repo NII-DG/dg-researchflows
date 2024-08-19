@@ -1,7 +1,5 @@
 """リサーチフローで利用するパスを一括管理するモジュールです。"""
 import os
-from typing import List, Any
-
 
 # Folder
 DATA_GOVERNANCE = 'data_gorvernance'
@@ -171,11 +169,11 @@ def get_ocs_template_dir( subflow_id:str='' ):
         return os.path.join( '../../../../../../', DG_WORKING_RESEARCHFLOW_FOLDER, PLAN, TASK, PLAN, OCS_TEMPLATES)
 
 # other method
-def get_prepare_file_name_list_for_subflow()->List[str]:
+def get_prepare_file_name_list_for_subflow()->list[str]:
     """ 新規サブフローデータ作成時にコピーするファイルのリストを取得する関数です。
 
     Returns:
-        List[str]: 新規サブフローデータ作成時にコピーするファイルのリストを返す。
+        list[str]: 新規サブフローデータ作成時にコピーするファイルのリストを返す。
 
     """
     return [MENU_NOTEBOOK, STATUS_JSON, PROPERTY_JSON]

@@ -5,7 +5,7 @@
 """
 import json
 import traceback
-from typing import Any, Dict, Union
+from typing import Any, Optional, Union
 
 import panel as pn
 
@@ -30,7 +30,7 @@ class TextInput(pn.widgets.TextInput):
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
-            **params(Dict[str, Any): pn.widgets.TextInputのその他のパラメータを設定します。
+            **params(dict[str, Any): pn.widgets.TextInputのその他のパラメータを設定します。
 
         """
         if 'schema_key' in params:
@@ -53,7 +53,7 @@ class Select(pn.widgets.Select):
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
-            **params(Dict[str, Any]): pn.widgets.Selectのその他のパラメータを設定します。
+            **params(dict[str, Any]): pn.widgets.Selectのその他のパラメータを設定します。
 
         """
         if 'schema_key' in params:
@@ -76,7 +76,7 @@ class IntInput(pn.widgets.IntInput):
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
-            **params(Dict[str, Any]): pn.widgets.IntInputのその他のパラメータを設定します。
+            **params(dict[str, Any]): pn.widgets.IntInputのその他のパラメータを設定します。
 
         """
         if 'schema_key' in params:
@@ -99,7 +99,7 @@ class Checkbox(pn.widgets.Checkbox):
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
-            **params(Dict[ste, Any]): pn.widgets.Checkboxのその他のパラメータを設定します。
+            **params(dict[ste, Any]): pn.widgets.Checkboxのその他のパラメータを設定します。
 
         """
         if 'schema_key' in params:
@@ -118,7 +118,7 @@ class Title(pn.pane.Markdown):
 
     """
 
-    def __init__(self, object: Optional[str]=None, **params: Any)->None:
+    def __init__(self, obj: Optional[str]=None, **params: Any)->None:
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
@@ -130,9 +130,9 @@ class Title(pn.pane.Markdown):
             self.schema_key = params.pop('schema_key')
         if "margin" not in params:
             params["margin"] = (10, 10, 0, 10)
-        if object:
-            object = "### " + object
-        super().__init__(object=object, **params)
+        if obj:
+            obj = "### " + obj
+        super().__init__(object=obj, **params)
 
     def set_text(self, text: str)->None:
         """ タイトルを設定するメソッドです。
@@ -141,7 +141,7 @@ class Title(pn.pane.Markdown):
             text (str): タイトルのテキストを設定します。。
 
         """
-        self.object = f"### {text}"
+        self.obj = f"### {text}"
 
 
 class Description(pn.pane.Markdown):
@@ -153,19 +153,19 @@ class Description(pn.pane.Markdown):
 
     """
 
-    def __init__(self, object: Optional[str]=None, **params: Any)->None:
+    def __init__(self, obj: Optional[str]=None, **params: Any)->None:
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
-            object(str): Markdownを含む文字列を設定する。
-            **params(Dict[str, Any]): pn.pane.Markdownのその他のパラメータを設定する。
+            obj(str): Markdownを含む文字列を設定する。
+            **params(dict[str, Any]): pn.pane.Markdownのその他のパラメータを設定する。
 
         """
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
         if "margin" not in params:
             params["margin"] = (0, 10, 0, 20)
-        super().__init__(object=object, **params)
+        super().__init__(object=obj, **params)
 
 
 class Column(pn.Column):
@@ -181,7 +181,7 @@ class Column(pn.Column):
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
-            **params(Dict[str, Any]: pn.Columnのその他のパラメータを設定する。
+            **params(dict[str, Any]: pn.Columnのその他のパラメータを設定する。
 
         """
         if 'schema_key' in params:
@@ -204,7 +204,7 @@ class ArrayBox(pn.WidgetBox):
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
-            **params(Dict[str, Any]): pn.WidgetBoxのその他のパラメータを設定する。
+            **params(dict[str, Any]): pn.WidgetBoxのその他のパラメータを設定する。
 
         """
         if 'schema_key' in params:
@@ -227,7 +227,7 @@ class ObjectBox(pn.WidgetBox):
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
-            **params(Dict[str, Any]): pn.WidgetBoxのその他のパラメータを設定する。
+            **params(dict[str, Any]): pn.WidgetBoxのその他のパラメータを設定する。
 
         """
         if 'schema_key' in params:
@@ -275,7 +275,7 @@ class Form:
                 value = data.get(key, {})
             self.form_box.append(self._generate_widget(properties, key, value))
 
-    def _generate_widget(self, definition:dict, key:str, value:dict=None)->Union[ArrayBox, ObjectBox, Column]:
+    def _generate_widget(self, definition:dict, key:str, value:Optional[dict]=None)->Union[ArrayBox, ObjectBox, Column]:
         """jsonschemaの設定値からpanelのwidgetを作成するメソッドです。
 
         Args:

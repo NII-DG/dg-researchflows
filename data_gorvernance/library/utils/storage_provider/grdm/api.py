@@ -33,7 +33,7 @@ def build_api_url(base_url: str, endpoint=''):
         endpoint = endpoint.lstrip('/')
         endpoint = base_path + endpoint
     if not endpoint.endswith('/'):
-            endpoint = endpoint + '/'
+        endpoint = endpoint + '/'
     return parse.urlunparse((parsed.scheme, netloc, endpoint, '', '', ''))
 
 
@@ -67,7 +67,7 @@ def get_token_profile(base_url: str, token: str):
     endpoint = '/oauth2/profile'
     api_url = build_oauth_url(base_url, endpoint)
     headers = {
-        'Authorization': 'Bearer {}'.format(token)
+        'Authorization': f'Bearer {token}'
     }
     response = requests.get(url=api_url, headers=headers)
     try:
@@ -98,7 +98,7 @@ def get_user_info(base_url: str, token: str):
     endpoint = '/users/me/'
     api_url = build_api_url(base_url, endpoint)
     headers = {
-        'Authorization': 'Bearer {}'.format(token)
+        'Authorization': f'Bearer {token}'
     }
     response = requests.get(url=api_url, headers=headers)
     try:
@@ -120,7 +120,7 @@ def get_projects(scheme, domain, token):
     sub_url = 'v2/nodes/'
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     headers = {
-        'Authorization': 'Bearer {}'.format(token)
+        'Authorization': f'Bearer {token}'
     }
     response = requests.get(url=api_url, headers=headers)
     try:
@@ -145,7 +145,7 @@ def get_project_registrations(base_url, token, project_id):
     endpoint = f'/nodes/{project_id}/registrations/'
     api_url = build_api_url(base_url, endpoint)
     headers = {
-        'Authorization': 'Bearer {}'.format(token)
+        'Authorization': f'Bearer {token}'
     }
     response = requests.get(url=api_url, headers=headers)
     try:
@@ -181,7 +181,7 @@ def get_project_collaborators(base_url: str, token: str, project_id: str):
     endpoint = f'/nodes/{project_id}/contributors/'
     api_url = build_api_url(base_url, endpoint)
     headers = {
-        'Authorization': 'Bearer {}'.format(token)
+        'Authorization': f'Bearer {token}'
     }
     response = requests.get(url=api_url, headers=headers)
     try:

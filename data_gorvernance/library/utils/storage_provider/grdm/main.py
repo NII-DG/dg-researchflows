@@ -11,7 +11,7 @@ from urllib import parse
 
 from library.utils.error import NotFoundContentsError, UnauthorizedError
 from .api import (get_project_collaborators, get_project_registrations,
-                  get_projects, get_token_profile, get_user_info)
+                    get_projects, get_token_profile, get_user_info)
 from .client import download, upload
 from .metadata import format_metadata
 
@@ -142,7 +142,9 @@ def sync(token: str, api_url: str, project_id: str, abs_source: str, abs_root:st
     )
 
 
-def download_text_file(token: str, api_url: str, project_id: str, remote_path: str, encoding='utf-8'):
+def download_text_file(token: str, api_url: str,
+    project_id: str, remote_path: str, encoding='utf-8'
+    ):
     """テキストファイルの中身を取得するメソッドです。
 
     Args:
@@ -201,7 +203,9 @@ def get_project_metadata(base_url: str, token: str, project_id: str):
     """
     metadata = get_project_registrations(base_url, token, project_id)
     if len(metadata['data']) < 1:
-        raise NotFoundContentsError(f"Metadata doesn't exist for the project with the specified ID {project_id}.")
+        raise NotFoundContentsError(
+            f"Metadata doesn't exist for the project with the specified ID {project_id}."
+            )
     return format_metadata(metadata)
 
 

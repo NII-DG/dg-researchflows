@@ -30,7 +30,7 @@ class RenameSubflowForm(BaseSubflowForm):
             _err_output(MessageBox):エラーの出力
     """
 
-    def __init__(self, abs_root:str, message_box:pn.widgets.MessageBox) -> None:
+    def __init__(self, abs_root:str, message_box:pn.MessageBox) -> None:
         """RenameSubflowForm コンストラクタのメソッドです。
 
         Args:
@@ -59,7 +59,9 @@ class RenameSubflowForm(BaseSubflowForm):
                 self._data_dir_name_form.value = ''
                 self._data_dir_name_form.value_input = ''
             else:
-                old_sub_flow_name, old_data_dir_name = self.reserch_flow_status_operater.get_flow_name_and_dir_name(selected_sub_flow_type, selected_sub_flow_id)
+                old_sub_flow_name, old_data_dir_name = self.reserch_flow_status_operater.get_flow_name_and_dir_name(
+                    selected_sub_flow_type, selected_sub_flow_id
+                    )
                 self._sub_flow_name_form.value = old_sub_flow_name
                 self._sub_flow_name_form.value_input = old_sub_flow_name
                 self._data_dir_name_form.value = old_data_dir_name
@@ -67,7 +69,7 @@ class RenameSubflowForm(BaseSubflowForm):
 
             # 新規作成ボタンのボタンの有効化チェック
             self.change_disable_submit_button()
-        except Exception as e:
+        except Exception:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     # overwrite
@@ -146,8 +148,9 @@ class RenameSubflowForm(BaseSubflowForm):
         sub_flow_name = self._sub_flow_name_form.value_input
         data_dir_name = self._data_dir_name_form.value_input
 
-        old_sub_flow_name, old_data_dir_name = self.reserch_flow_status_operater.get_flow_name_and_dir_name(phase_seq_number, sub_flow_id)
-
+        old_sub_flow_name, old_data_dir_name = self.reserch_flow_status_operater.get_flow_name_and_dir_name(
+            phase_seq_number, sub_flow_id
+            )
         # 入力値の検証
         try:
             sub_flow_name = StringManager.strip(sub_flow_name)
@@ -190,7 +193,9 @@ class RenameSubflowForm(BaseSubflowForm):
                 raise
 
         try:
-            self.reserch_flow_status_operater.rename_sub_flow(phase_seq_number, sub_flow_id, sub_flow_name, data_dir_name)
+            self.reserch_flow_status_operater.rename_sub_flow(
+                phase_seq_number, sub_flow_id, sub_flow_name, data_dir_name
+                )
         except Exception:
             self.change_submit_button_error(msg_config.get('main_menu', 'error_rename_sub_flow'))
             # エラーの場合は変更したディレクトリ名を元に戻す

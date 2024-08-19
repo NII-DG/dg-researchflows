@@ -1,7 +1,6 @@
 """ocs_template.jsonのファイルのデータを扱うモジュールです。"""
 import os
 from pathlib import Path
-from typing import List
 
 from library.utils.file import JsonFile
 
@@ -50,7 +49,7 @@ class OCSTemplate:
         """
         return [fld[self.__FIELD_NAME] for fld in self.ocs_template]
 
-    def get_disabled_ids(self)->List[str]:
+    def get_disabled_ids(self)->list[str]:
         """アクティブ状態でないデータのリストを作成するメソッドです。
 
         Returns:

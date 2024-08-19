@@ -16,7 +16,9 @@ from typing import Union
 from library.utils.error import UnauthorizedError
 
 
-def upload(token:str, base_url:str, project_id:str, source:str, destination:str, recursive:bool=False, force:bool=False):
+def upload(token:str, base_url:str, project_id:str, source:str,
+    destination:str, recursive:bool=False, force:bool=False
+    ):
     """ファイルまたはフォルダをアップロードするメソッドです。
 
     Args:
@@ -49,9 +51,9 @@ def upload(token:str, base_url:str, project_id:str, source:str, destination:str,
         store = project.storage(storage)
         if recursive:
             if not os.path.isdir(source):
-                raise RuntimeError("Expected source ({}) to be a directory when "
-                                    "using recursive mode.".format(source))
-
+                raise RuntimeError(
+                    f"Expected source ({source}) to be a directory when using recursive mode."
+                    )
             # local name of the directory that is being uploaded
             _, dir_name = os.path.split(source)
 
@@ -74,7 +76,8 @@ def upload(token:str, base_url:str, project_id:str, source:str, destination:str,
         raise UnauthorizedError(str(e)) from e
 
 
-def download(token:str, project_id:str, base_url:str, remote_path:str, base_path=None) -> Union[bytes, None]:
+def download(token:str, project_id:str, base_url:str,
+    remote_path:str, base_path=None) -> Union[bytes, None]:
     """ファイルの内容を取得するメソッドです。
 
     Args:

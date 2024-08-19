@@ -20,7 +20,7 @@ class SubFlowManager:
     Attributes:
         instance:
             current_dir(str): サブフローメニューの親ディレクトリ
-            tasks(List[SubflowTask]): サブフローのタスクの設定値
+            tasks(list[SubflowTask]): サブフローのタスクの設定値
             diag_file(str): ダイアグラムのファイルへのパス
             task_dir(str): タスクが格納されているディレクトリ
             diag(DiagManager): ダイアグラムを管理するインスタンス
@@ -28,7 +28,8 @@ class SubFlowManager:
 
     """
 
-    def __init__(self, current_dir: str, status_file :str, diag_file :str, using_task_dir: str) -> None:
+    def __init__(self, current_dir: str, status_file :str,
+        diag_file :str, using_task_dir: str) -> None:
         """ インスタンスの初期化処理を実行するメソッドです。
 
         Args:
@@ -54,7 +55,8 @@ class SubFlowManager:
             for task in self.tasks:
                 self._copy_file_by_name(task.name, souce_task_dir, self.task_dir)
 
-    def _copy_file_by_name(self, target_file: str, search_directory :str, destination_directory: str) -> None:
+    def _copy_file_by_name(self, target_file: str, search_directory :str,
+        destination_directory: str) -> None:
         """ 指定した名前のファイルを検索ディレクトリから目的のディレクトリにコピーするメソッドです。
 
         Args:

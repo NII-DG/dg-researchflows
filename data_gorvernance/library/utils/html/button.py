@@ -1,5 +1,4 @@
 """ HTMLボタン生成のモジュールです。"""
-from typing import List
 
 
 def create_button(
@@ -12,7 +11,7 @@ def create_button(
             button_width:str='300px',
             button_height:str='30px',
             button_border_radius:str='5px',
-            border:List[str] = [],
+            border:list[str] = [],
             button_background_color:str='#0072B5',
 ) -> str:
     """ HTMLのボタンを作成する関数です。
@@ -27,7 +26,7 @@ def create_button(
         button_width (str: ボタンの幅を指定します。
         button_height (str): ボタンの高さを指定します。
         button_border_radius (str): ボタンの角の丸みを指定します。
-        border (List[str]): ボタンの枠線のスタイルを指定します。
+        border (list[str]): ボタンの枠線のスタイルを指定します。
         button_background_color (str): ボタンの背景色を指定します。
 
     Returns:

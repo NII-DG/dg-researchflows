@@ -268,7 +268,9 @@ class SubflowMenu(TaskLog):
                 subflow_menu.set_diagram(subflow, font_folder, True)
             subflow_menu.menu_widgetbox.append(subflow_menu.diagram_widgetbox)
         except Exception:
-            message_box = MessageBox().update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
+            message_box = MessageBox().update_error(
+                f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+                )
             subflow_menu.menu_widgetbox.append(message_box)
         display(subflow_menu.menu_widgetbox)
         display(Javascript('IPython.notebook.save_checkpoint();'))

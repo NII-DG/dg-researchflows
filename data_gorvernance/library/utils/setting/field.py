@@ -1,7 +1,6 @@
 """field.jsonファイルのデータを操作するクラスを記載したモジュールです。"""
 import os
 from pathlib import Path
-from typing import List
 
 from library.utils.file import JsonFile
 
@@ -49,7 +48,7 @@ class Field:
         """
         return [fld[self.__FIELD_NAME] for fld in self.field]
 
-    def get_disabled_ids(self)->List[str]:
+    def get_disabled_ids(self)->list[str]:
         """アクティブ状態でないフィールドのリストを作成するメソッドです。
 
         Returns:

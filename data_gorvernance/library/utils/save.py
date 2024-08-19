@@ -1,18 +1,18 @@
 """ タスクを保存するモジュールです。"""
 import os
 import traceback
-from typing import Any, Tuple, List, Union
+from typing import Any, Union
 
 from IPython.display import clear_output
 import panel as pn
 from requests.exceptions import RequestException
 
 from .config import path_config, message as msg_config
-from .error import UnusableVault, ProjectNotExist, UnauthorizedError, PermissionError
+from .error import UnusableVault, ProjectNotExist, UnauthorizedError, RepoPermissionError
 from .input import get_grdm_connection_parameters
 from .log import TaskLog
 from .storage_provider import grdm
-from .time import TimeDiff
+from .time_tracker import TimeDiff
 from .widgets import Button, MessageBox
 
 
@@ -76,7 +76,7 @@ class TaskSave(TaskLog):
         # 確定ボタン
         self._save_submit_button = Button(width=500)
 
-    def get_grdm_params(self) -> Tuple[str, str]:
+    def get_grdm_params(self) -> tuple[str, str]:
         """ GRDMのトークンとプロジェクトIDを取得するメソッドです。
 
         Returns:
@@ -88,11 +88,11 @@ class TaskSave(TaskLog):
         project_id = ""
         try:
             token, project_id = get_grdm_connection_parameters()
-        except UnusableVault as e:
+        except UnusableVault:
             message = msg_config.get('form', 'no_vault')
             self.save_msg_output.update_error(message)
             self.log.error(traceback.format_exc())
-        except PermissionError:
+        except RepoPermissionError:
             message = msg_config.get('form', 'insufficient_permission')
             self.save_msg_output.update_error(message)
             self.log.error(traceback.format_exc())
@@ -109,11 +109,11 @@ class TaskSave(TaskLog):
             self.log.error(message)
         return token, project_id
 
-    def define_save_form(self, source: Union[str, List[str]]) -> None:
+    def define_save_form(self, source: Union[str, list[str]]) -> None:
         """ GRDMに保存するフォームを作成するメソッドです。
 
         Args:
-            source (Union[str, List[str]]): 保存するファイルを設定します。
+            source (Union[str, list[str]]): 保存するファイルを設定します。
 
         Raises:
             TypeError: sourceがstrまたはlistでない

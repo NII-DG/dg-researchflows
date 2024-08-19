@@ -2,7 +2,7 @@
 
 このモジュールはサブフロー削除クラスを始め、新しいサブフローのデータを削除したりするメソッドなどがあります。
 """
-from typing import List, Union
+from typing import Union
 
 from dg_drawer.research_flow import PhaseStatus
 import panel as pn
@@ -25,7 +25,7 @@ class DeleteSubflowForm(BaseSubflowForm):
             _err_output(MessageBox):エラーの出力
     """
 
-    def __init__(self, abs_root:str, message_box:pn.widgets.MessageBox) -> None:
+    def __init__(self, abs_root:str, message_box:pn.MessageBox) -> None:
         """DeleteSubflowForm コンストラクタのメソッドです。
 
         Args:
@@ -37,14 +37,15 @@ class DeleteSubflowForm(BaseSubflowForm):
         self.change_submit_button_init(msg_config.get('main_menu', 'delete_sub_flow'))
 
     # overwrite
-    def generate_sub_flow_name_options(self, phase_seq_number:int, research_flow_status:List[PhaseStatus]) -> dict[str, int]:
+    def generate_sub_flow_name_options(
+            self, phase_seq_number:int, research_flow_status:list[PhaseStatus]) -> dict[str, int]:
         """サブフロー種別(フェーズ)を表示するメソッドです。
 
         Args:
-            research_flow_status (List[PhaseStatus]): リサーチフローステータス管理情報
+            research_flow_status (list[PhaseStatus]): リサーチフローステータス管理情報
 
         Returns:
-            Dict[str, int]: フェーズ表示名を返す。
+            dict[str, int]: フェーズ表示名を返す。
         """
         # サブフロー名(表示名をkey, サブフローIDをVauleとする)
         name_options = {}

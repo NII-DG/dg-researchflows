@@ -1,6 +1,6 @@
 """ 処理時間を計測するためのモジュールです。"""
 import time
-from typing import Tuple, Union
+from typing import Union
 
 class TimeDiff:
     """ 処理時間を計測するためのクラスです。
@@ -30,7 +30,7 @@ class TimeDiff:
         self.end_time = time.perf_counter()
         self.time_diff = self.end_time - self.start_time
 
-    def get_diff_minute(self) -> Union[Tuple[int, float], Tuple[None, None]]:
+    def get_diff_minute(self) -> Union[tuple[int, float], tuple[None, None]]:
         """ 処理時間を分と秒に変換して返すメソッドです。
 
         Returns:
@@ -42,7 +42,7 @@ class TimeDiff:
             return None, None
         return self._format_time(self.time_diff)
 
-    def _format_time(self, seconds: float) -> Tuple[int, float]:
+    def _format_time(self, seconds: float) -> tuple[int, float]:
         """ 与えられた秒数を分と秒に変換するメソッドです。
 
         Args:

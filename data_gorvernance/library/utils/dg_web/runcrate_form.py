@@ -1,4 +1,5 @@
 """ RunCrateの入力フォームのモジュールです。"""
+from typing import Optional
 import panel as pn
 
 from library.utils.widgets import MessageBox
@@ -46,7 +47,7 @@ class RunCrateForm:
         self.definition = properties.pop(self.key, {})
         return schema
 
-    def create_widget(self, crates: list, data: dict=None)->None:
+    def create_widget(self, crates: list, data: Optional[dict]=None)->None:
         """RunCrate選択の入力欄を生成するメソッドです。
 
         Args:

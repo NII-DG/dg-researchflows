@@ -1,4 +1,4 @@
-""" メッセージ取得のモジュールです。"""
+""" 設定ファイルからメッセージを取得するためのモジュールです。"""
 import configparser
 import os
 
@@ -6,37 +6,57 @@ MESSAGE_CONFIG_PATH = '../../data/message.ini'
 script_dir = os.path.dirname(os.path.abspath(__file__))
 message_ini_path = os.path.abspath(os.path.join(script_dir, MESSAGE_CONFIG_PATH))
 
-class Message(configparser.ConfigParser):
-    """ メッセージファイルを保持するためのシングルトンなクラスです。
+class ConfigParserBase:
+    """ 設定ファイルを保持するシングルトンクラスです。
 
     Args:
         class:
             _instance (Message): シングルトンインスタンスを格納する
 
     """
+    _instance = None
 
-    def __new__(cls, *args, **kwargs)->'Message':
+    def __new__(cls, *args, **kwargs) -> "ConfigParserBase":
         """ 新しいインスタンス作成時に既存のインスタンスを返すメソッドです。
 
         Returns:
-            Message: シングルトンインスタンスを返す。
+            ConfigParserBase: このクラスのシングルトンインスタンスを返す。
 
         """
-        if not hasattr(cls, "_instance"):
-            cls._instance = super().__new__(cls, *args, **kwargs)
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+            cls._instance.initialize(*args, **kwargs)
         return cls._instance
 
-    def __init__(self, *args, **kwargs):
-        """ インスタンスの初期化処理を実行するメソッドです。
+    def initialize(self, config_path: str, encoding: str = 'utf-8'):
+        """  設定ファイルを読み込むメソッドです。
 
-        インスタンス初期化時に設定ファイルを読み込みます。
+        Args:
+            config_path (str): 設定ファイルのパス
+            encoding (str): 設定ファイルのエンコーディング
+        """
+        self._config_path = config_path
+        self._config_file = configparser.ConfigParser()
+        self._config_file.read(config_path, encoding=encoding)
+
+    def get(self, section: str, option: str) -> str:
+        """ 指名されたセクションの項目名に対応する値を取得するメソッドです。
+
+        Args:
+            section (str): 設定ファイルのセクションを設定します。
+            option (str): 設定ファイルの項目名を設定します。
+        Returns:
+            str: 設定値を返す。
 
         """
-        super().__init__(*args, **kwargs)
-        self.read(message_ini_path, encoding='utf-8')
+        return self._config_file.get(section,option)
 
 
-def get(section:str, option:str) -> str:
+class Message(ConfigParserBase):
+    """ message.iniを読み込むためのクラスです。"""
+
+
+def get(section: str, option: str) -> str:
     """ メッセージを取得する関数です。
 
     Args:
@@ -46,5 +66,5 @@ def get(section:str, option:str) -> str:
         str: メッセージを返す。
 
     """
-    config = Message()
-    return config[section][option]
+    config = Message(message_ini_path)
+    return config.get(section, option)

@@ -20,9 +20,9 @@ def download_file(s3_client, bucket_name:str, aws_path:str, local_path:str):
     try:
         # キーの確認
         contents = response['Contents']
-    except KeyError:
+    except KeyError as e:
         # 転送元が存在しない
-        raise FileNotFoundError
+        raise FileNotFoundError from e
     if os.path.exists(local_path):
         raise FileExistsError
     os.makedirs(os.path.dirname(local_path), exist_ok=True)
@@ -53,9 +53,9 @@ def download_dir(s3_client, bucket_name:str, aws_dir:str, local_dir:str):
 
         try:
             contents = response['Contents']
-        except KeyError:
+        except KeyError as e:
             # 転送元が存在しない
-            raise FileNotFoundError
+            raise FileNotFoundError from e
 
         for s3_object_response in contents:
             # S3オブジェクト側のファイルパスを取得する

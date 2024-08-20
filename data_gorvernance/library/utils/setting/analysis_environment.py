@@ -38,7 +38,7 @@ class AnalysisEnvironment:
         contents = JsonFile(str(json_path)).read()
         self.analysis_environment = contents[self.__FIELD]
 
-    def get_names(self)->list:
+    def get_names(self) -> list:
         """保存されている環境名をリストで取得するメソッドです。
 
         Returns:
@@ -47,7 +47,7 @@ class AnalysisEnvironment:
         """
         return [fld[self.__NAME] for fld in self.analysis_environment]
 
-    def get_id(self, target_name:str)->str:
+    def get_id(self, target_name:str) -> str:
         """指定した解析環境のidを取得するメソッドです。
 
         Args:
@@ -61,7 +61,7 @@ class AnalysisEnvironment:
             if fld[self.__NAME] == target_name:
                 return fld[self.__ID]
 
-    def get_description(self, target_name:str)->str:
+    def get_description(self, target_name:str) -> str:
         """指定した解析環境の概要を取得するメソッドです。
 
         Args:

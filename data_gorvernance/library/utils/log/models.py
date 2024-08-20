@@ -108,7 +108,7 @@ class UserActivityLog(BaseLogger):
 
     """
 
-    def __init__(self, nb_working_file: str, notebook_name: str):
+    def __init__(self, nb_working_file:str, notebook_name:str):
         """ クラスのインスタンスを初期化するメソッドです。コンストラクタ
 
         Args:
@@ -131,7 +131,7 @@ class UserActivityLog(BaseLogger):
         self.cell_id = ""
 
 
-    def _get_log_dir(self, nb_working_file: str)->str:
+    def _get_log_dir(self, nb_working_file:str) -> str:
         """ログファイルを保存するディレクトリを生成するためのメソッドです。
 
         Args:
@@ -149,7 +149,7 @@ class UserActivityLog(BaseLogger):
         os.makedirs(log_dir, exist_ok=True)
         return str(log_dir)
 
-    def _get_format(self)->str:
+    def _get_format(self) -> str:
         """フォーマットの定義を取得するメソッドです。
 
         Returns:
@@ -208,7 +208,7 @@ class UserActivityLog(BaseLogger):
         """
         self.info("-- " + detail + "処理終了 --" + note)
 
-    def record(self)->dict[str, str]:
+    def record(self) -> dict[str, str]:
         """インスタンスに保持している情報を辞書形式に変換するためのメソッドです。
 
         Returns:

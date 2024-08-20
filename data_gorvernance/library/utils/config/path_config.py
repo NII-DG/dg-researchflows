@@ -88,7 +88,7 @@ USER_INFO_PATH = os.path.join(DG_WORKING_FOLDER, USER_INFO)
 PLAN_TASK_STATUS_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, STATUS_JSON)
 PLAN_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, PLAN_JSON)
 
-def get_research_flow_status_file_path(abs_root:str)->str:
+def get_research_flow_status_file_path(abs_root:str) -> str:
     """ リサーチフローのステータスファイルのパスを取得する関数です。
 
     Args:
@@ -100,7 +100,7 @@ def get_research_flow_status_file_path(abs_root:str)->str:
     """
     return os.path.join(abs_root, DG_RESEARCHFLOW_FOLDER, 'research_flow_status.json')
 
-def get_base_subflow_pahse_status_file_path(pahse:str)->str:
+def get_base_subflow_pahse_status_file_path(pahse:str) -> str:
     """ baseディレクトリの指定されたサブフロー種別（フェーズ）のステータスファイルへのパスを取得する関数です。
 
     Args:
@@ -113,7 +113,7 @@ def get_base_subflow_pahse_status_file_path(pahse:str)->str:
     # data_gorvernance\base\subflow\<フェーズ>\status.jsonを更新する。
     return os.path.join(DG_SUB_FLOW_BASE_DATA_FOLDER, pahse, STATUS_JSON)
 
-def get_sub_flow_menu_path(phase:str, subflow_id:str='')->str:
+def get_sub_flow_menu_path(phase:str, subflow_id:str='') -> str:
     """各サブフロー種別（フェーズ）のサブフローメニューNotebookへのパスを取得する関数です。
 
     Args:
@@ -134,7 +134,7 @@ def get_sub_flow_menu_path(phase:str, subflow_id:str='')->str:
     else:
         return os.path.join(RESEARCHFLOW, phase, MENU_NOTEBOOK)
 
-def get_sub_flow_status_file_path(phase:str, subflow_id:str='')->str:
+def get_sub_flow_status_file_path(phase:str, subflow_id:str='') -> str:
     """ researchflowディレクトリの指定されたサブフロー種別（フェーズ）のステータスファイルへのパスを取得する関数です。
 
     Args:
@@ -169,7 +169,7 @@ def get_ocs_template_dir( subflow_id:str='' ):
         return os.path.join( '../../../../../../', DG_WORKING_RESEARCHFLOW_FOLDER, PLAN, TASK, PLAN, OCS_TEMPLATES)
 
 # other method
-def get_prepare_file_name_list_for_subflow()->list[str]:
+def get_prepare_file_name_list_for_subflow() -> list[str]:
     """ 新規サブフローデータ作成時にコピーするファイルのリストを取得する関数です。
 
     Returns:

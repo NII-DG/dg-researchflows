@@ -387,7 +387,7 @@ class SubflowStatus:
 class SubflowStatusFile(JsonFile):
     """サブフローステータス管理JSON(status.json)のファイル操作を行うためのクラスです。"""
 
-    def __init__(self, file_path: str):
+    def __init__(self, file_path:str):
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
         Args:

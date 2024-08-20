@@ -14,7 +14,7 @@ text_font_color = 'rgb(0,0,0)'
 SVG_TEXT = '{http://www.w3.org/2000/svg}text'
 
 
-def init_config(id: str, name: str) -> dict:
+def init_config(id:str, name:str) -> dict:
     """ 初期設定を行う関数です。
 
     Args:
@@ -33,7 +33,7 @@ def init_config(id: str, name: str) -> dict:
     }
 
 
-def update_svg(output: str, current_dir:str, config: dict) -> None:
+def update_svg(output:str, current_dir:str, config:dict) -> None:
     """ svgファイルを更新する関数です。
 
     Args:
@@ -45,7 +45,7 @@ def update_svg(output: str, current_dir:str, config: dict) -> None:
     _embed_detail_information(current_dir, Path(output), config)
 
 
-def _embed_detail_information(current_dir: str, skeleton: Path, config: dict) -> None:
+def _embed_detail_information(current_dir:str, skeleton:Path, config:dict) -> None:
     """ 詳細情報を埋め込む関数です。
 
     Args:
@@ -66,7 +66,7 @@ def _embed_detail_information(current_dir: str, skeleton: Path, config: dict) ->
         f.write(etree.tostring(tree, method='xml', pretty_print=True))
 
 
-def _embed_info_in_one_rect(elem: etree.Element, current_dir: str, config: dict)->None:
+def _embed_info_in_one_rect(elem:etree.Element, current_dir:str, config:dict) -> None:
     """ 一つの矩形に情報を埋め込む関数です。
 
     Args:
@@ -100,7 +100,7 @@ def _embed_info_in_one_rect(elem: etree.Element, current_dir: str, config: dict)
         parent_elem.insert(childpos, inseet_elem)
 
 
-def create_anchor(elems: list, link: str):
+def create_anchor(elems:list, link:str):
     """リンクを付与する関数です。
 
     Args:

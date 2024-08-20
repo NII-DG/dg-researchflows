@@ -11,7 +11,7 @@ from library.utils.file import JsonFile
 from library.utils.html.security import escape_html_text
 
 
-def get_subflow_type_and_id(working_file_path:str)->tuple[str, str]:
+def get_subflow_type_and_id(working_file_path:str) -> tuple[str, str]:
     """サブフローの種別とidを取得するメソッドです。
 
     Args:
@@ -35,8 +35,8 @@ def get_subflow_type_and_id(working_file_path:str)->tuple[str, str]:
 
     abs_root = path_config.get_abs_root_form_working_dg_file_path(working_file_path)
     rf_status = ResearchFlowStatusOperater(
-                    path_config.get_research_flow_status_file_path(abs_root)
-                )
+        path_config.get_research_flow_status_file_path(abs_root)
+    )
 
     phase_index = index + 1
     if phase_index < len(parts):
@@ -55,7 +55,7 @@ def get_subflow_type_and_id(working_file_path:str)->tuple[str, str]:
     return subflow_type, subflow_id
 
 
-def get_data_dir(working_file_path: str)->str:
+def get_data_dir(working_file_path:str) -> str:
     """該当するデータディレクトリまでの絶対パスを取得するメソッドです。
 
     Args:
@@ -80,15 +80,15 @@ def get_data_dir(working_file_path: str)->str:
         rf_status = ResearchFlowStatusOperater(rf_status_file)
         data_dir_name = rf_status.get_data_dir(subflow_type, subflow_id)
 
-    except Exception:
-        raise Exception(f'## [INTERNAL ERROR] : don\'t get directory name of data')
+    except Exception as e:
+        raise Exception(f'## [INTERNAL ERROR] : don\'t get directory name of data') from e
     return path_config.get_task_data_dir(abs_root, subflow_type, data_dir_name)
 
 
 class ResearchFlowStatusFile(JsonFile):
     """リサーチフローステータスの参照や操作を行うクラスです。"""
 
-    def __init__(self, file_path: str):
+    def __init__(self, file_path:str):
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
         Args:
@@ -103,7 +103,7 @@ class ResearchFlowStatusFile(JsonFile):
         else:
             raise FileNotFoundError(f'[ERROR] : Not Found File. File Path : {file_path}')
 
-    def load_research_flow_status(self)->list[PhaseStatus]:
+    def load_research_flow_status(self) -> list[PhaseStatus]:
         """リサーチフローステータス管理JSONからリサーチフローステータスのインスタンスを取得するメソッドです。
 
         Returns:
@@ -141,7 +141,7 @@ class ResearchFlowStatusFile(JsonFile):
         # リサーチフローステータス管理JSONをアップデート
         super().write(research_flow_status_data)
 
-    def issue_uuidv4(self)->str:
+    def issue_uuidv4(self) -> str:
         """UUIDv4の発行を行うメソッドです。
 
         Returns:
@@ -150,7 +150,9 @@ class ResearchFlowStatusFile(JsonFile):
         """
         return str(uuid.uuid4())
 
-    def exist_sub_flow_id_in_research_flow_status(self, research_flow_status:list[PhaseStatus], target_id:str)->bool:
+    def exist_sub_flow_id_in_research_flow_status(
+        self, research_flow_status:list[PhaseStatus], target_id:str
+    ) -> bool:
         """リサーチフローステータス管理情報に同一のサブフローIDが存在するか確認するメソッドです。
 
         Args:
@@ -166,7 +168,7 @@ class ResearchFlowStatusFile(JsonFile):
                     return True
         return False
 
-    def issue_unique_sub_flow_id(self)->str:
+    def issue_unique_sub_flow_id(self) -> str:
         """固有のサブフローIDを発行するメソッドです。
 
         Returns:
@@ -213,7 +215,7 @@ class ResearchFlowStatusFile(JsonFile):
 
         return True
 
-    def is_unique_data_dir(self, phase_seq_number:int, data_dir_name:str)->bool:
+    def is_unique_data_dir(self, phase_seq_number:int, data_dir_name:str) -> bool:
         """フェーズ内に同じ名前のデータフォルダが存在するかの確認を行うメソッドです。
 
         Args:
@@ -298,7 +300,10 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         #リサーチフローステータス管理JSONを更新する。
         self.update_file(research_flow_status)
 
-    def create_sub_flow(self, creating_phase_seq_number:int, sub_flow_name:str, data_dir_name:str, parent_sub_flow_ids:list[str])->tuple[str, str]:
+    def create_sub_flow(
+        self, creating_phase_seq_number:int, sub_flow_name:str,
+        data_dir_name:str, parent_sub_flow_ids:list[str]
+    ) -> tuple[str, str]:
         """新規のサブフローを作成し、リサーチフローステータスに追加するメソッドです。
 
         Args:
@@ -398,7 +403,9 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
             break
         self.update_file(research_flow_status)
 
-    def rename_sub_flow(self, phase_seq_number:int, sub_flow_id:str, sub_flow_name:str, data_dir_name:str):
+    def rename_sub_flow(
+        self, phase_seq_number:int, sub_flow_id:str, sub_flow_name:str, data_dir_name:str
+    ):
         """サブフロー名とディレクトリ名を変更するメソッドです。
 
         Args:
@@ -425,7 +432,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
             break
         self.update_file(research_flow_status)
 
-    def get_flow_name_and_dir_name(self, phase_seq_number:int, id:str)->tuple[str, str]:
+    def get_flow_name_and_dir_name(self, phase_seq_number:int, id:str) -> tuple[str, str]:
         """指定したサブフローデータのサブフロー名とディレクトリ名を取得するメソッドです。
 
         Args:
@@ -450,7 +457,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         else:
             raise NotFoundSubflowDataError(f'There Is No Data Directory Name. sub_flow_id : {id}')
 
-    def get_data_dir(self, phase_name:str, id:str)->str:
+    def get_data_dir(self, phase_name:str, id:str) -> str:
         """指定したサブフローデータのディレクトリ名を取得するメソッドです。
 
         Args:
@@ -474,7 +481,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         else:
             raise NotFoundSubflowDataError(f'There Is No Data Directory Name. sub_flow_id : {id}')
 
-    def get_subflow_phase(self, phase_seq_number:int)->str:
+    def get_subflow_phase(self, phase_seq_number:int) -> str:
         """指定したフェーズの名前を取得するメソッドです。
 
         Args:

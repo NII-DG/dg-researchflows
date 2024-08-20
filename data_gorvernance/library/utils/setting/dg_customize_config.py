@@ -21,8 +21,8 @@ class AlphaProperty:
 
     Attributes:
         class:
-           __ID(str):サブフローidのキー名
-           __CUSTOMIZE(str):カスタマイズデータのキー名
+            __ID(str):サブフローidのキー名
+            __CUSTOMIZE(str):カスタマイズデータのキー名
         instance:
             _id(dict):サブフローid
             _customize(list[SubFlowRule]):取り出したデータで初期化したリスト
@@ -74,7 +74,7 @@ class SubFlowRule:
         self._verification_ids = data[self.__VERIFICATION_IDS]
 
 
-def get_dg_customize_config()->list[AlphaProperty]:
+def get_dg_customize_config() -> list[AlphaProperty]:
     """DGカスタマイズJSON定義書のインスタンスを取得するメソッドです。
 
     Returns:

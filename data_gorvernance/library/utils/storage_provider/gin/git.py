@@ -2,7 +2,7 @@
 from library.utils.cmd import Cmd
 
 
-def get_remote_url()->str:
+def get_remote_url() -> str:
     """gitリポジトリのリモートurlを取得するためのメソッドです。
 
     Returns:
@@ -13,7 +13,7 @@ def get_remote_url()->str:
     return stdout.replace('\n', '')
 
 
-def git_annex_untrust(cwd:str)->str:
+def git_annex_untrust(cwd:str) -> str:
     """ルートディレクトリを信頼できない設定にするメソッドです。
 
     Args:
@@ -39,7 +39,7 @@ def git_annex_trust(cwd:str):
     result = stdout.decode('utf-8')
 
 
-def git_annex_lock(path:str)->str:
+def git_annex_lock(path:str) -> str:
     """ファイルを編集不可能にするメソッドです。
 
     Args:
@@ -54,7 +54,7 @@ def git_annex_lock(path:str)->str:
     return result
 
 
-def git_annex_unlock(path:str)->str:
+def git_annex_unlock(path:str) -> str:
     """ファイルを編集可能にするメソッドです。
 
     Args:
@@ -69,9 +69,9 @@ def git_annex_unlock(path:str)->str:
     return result
 
 
-def git_annex_metadata_add_minetype_sha256_contentsize(file_path:str, mime_type:str,
-    sha256:str, content_size:int, exec_path:str
-    ):
+def git_annex_metadata_add_minetype_sha256_contentsize(
+    file_path:str, mime_type:str, sha256:str, content_size:int, exec_path:str
+):
     """指定したファイルにGit Annexのメタデータ(mime_type, sha256, content_size) を追加するメソッドです。
 
     Args:
@@ -89,8 +89,8 @@ def git_annex_metadata_add_minetype_sha256_contentsize(file_path:str, mime_type:
 
 
 def git_annex_metadata_add_sd_date_published(
-        file_path:str,sd_date_published:str, exec_path:str
-        ):
+    file_path:str,sd_date_published:str, exec_path:str
+):
     """指定したファイルにGit Annexのメタデータ(sd_date_published)を追加するメソッドです。
 
     Args:
@@ -104,7 +104,7 @@ def git_annex_metadata_add_sd_date_published(
         cwd=exec_path
         )
 
-def git_commmit(msg:str, cwd:str)->str:
+def git_commmit(msg:str, cwd:str) -> str:
     """コミットを作成するためのメソッドです。
 
     Args:
@@ -120,7 +120,7 @@ def git_commmit(msg:str, cwd:str)->str:
     return result
 
 
-def git_pull(cwd:str)->str:
+def git_pull(cwd:str) -> str:
     """指定したディレクトリでプルを行うメソッドです。
 
     Args:
@@ -135,7 +135,7 @@ def git_pull(cwd:str)->str:
     return result
 
 
-def git_branch(cwd:str, option:str='')->str:
+def git_branch(cwd:str, option:str='') -> str:
     """指定したディレクトリでブランチを操作するメソッドです。
 
     Args:
@@ -154,7 +154,7 @@ def git_branch(cwd:str, option:str='')->str:
     return result
 
 
-def git_branch_for_remote(cwd:str)->str:
+def git_branch_for_remote(cwd:str) -> str:
     """指定したディレクトリ内のGitリポジトリでリモートブランチの一覧を取得するためのメソッドです。
 
     Args:
@@ -167,7 +167,7 @@ def git_branch_for_remote(cwd:str)->str:
     return git_branch(cwd, '-r')
 
 
-def is_annex_branch_in_repote(cwd:str)->bool:
+def is_annex_branch_in_repote(cwd:str) -> bool:
     """origin/git-annexのリモートブランチが存在するか確認するメソッドです。
 
     Args:
@@ -184,7 +184,7 @@ def is_annex_branch_in_repote(cwd:str)->bool:
         return False
 
 
-def exec_git_status(cwd:str)->str:
+def exec_git_status(cwd:str) -> str:
     """現在のgitリポジトリの状態を表示するメソッドです。
 
     Args:

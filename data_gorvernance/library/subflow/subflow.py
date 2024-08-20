@@ -28,8 +28,9 @@ class SubFlowManager:
 
     """
 
-    def __init__(self, current_dir: str, status_file :str,
-        diag_file :str, using_task_dir: str) -> None:
+    def __init__(self, current_dir:str, status_file:str,
+        diag_file:str, using_task_dir:str
+    ) -> None:
         """ インスタンスの初期化処理を実行するメソッドです。
 
         Args:
@@ -44,7 +45,7 @@ class SubFlowManager:
         self.diag_file = diag_file
         self.task_dir = using_task_dir
 
-    def setup_tasks(self, souce_task_dir: str):
+    def setup_tasks(self, souce_task_dir:str):
         """ タスクの原本があるディレクトリからタスクファイルをコピーするメソッドです。
 
         Args:
@@ -55,8 +56,9 @@ class SubFlowManager:
             for task in self.tasks:
                 self._copy_file_by_name(task.name, souce_task_dir, self.task_dir)
 
-    def _copy_file_by_name(self, target_file: str, search_directory :str,
-        destination_directory: str) -> None:
+    def _copy_file_by_name(self, target_file:str, search_directory:str,
+        destination_directory:str
+    ) -> None:
         """ 指定した名前のファイルを検索ディレクトリから目的のディレクトリにコピーするメソッドです。
 
         Args:
@@ -87,7 +89,7 @@ class SubFlowManager:
                 if not os.path.isdir(destination_images):
                     os.symlink(source_images, destination_images, target_is_directory=True)
 
-    def generate(self, svg_path: str, tmp_diag: str, font: str, display_all:bool = True) -> None:
+    def generate(self, svg_path:str, tmp_diag:str, font:str, display_all:bool =True) -> None:
         """ ダイアグラムを生成するメソッドです。
 
         Args:
@@ -110,7 +112,7 @@ class SubFlowManager:
         self.diag.generate_svg(tmp_diag, svg_path, font)
         update_svg(svg_path, self.current_dir, self.svg_config)
 
-    def _update(self, display_all: bool = True) -> None:
+    def _update(self, display_all:bool=True) -> None:
         """ タスクの状態に基づいてダイアグラムを更新するメソッドです。
 
         Args:
@@ -121,7 +123,7 @@ class SubFlowManager:
             self._adjust_by_status(task, display_all)
             self._adjust_by_optional(task, display_all)
 
-    def _adjust_by_optional(self, task: SubflowTask, display_all: bool = True) -> None:
+    def _adjust_by_optional(self, task:SubflowTask, display_all:bool=True) -> None:
         """ 非推奨のタスクをグレーアウトし、リンクが押せない状態にするメソッドです。
 
         Args:
@@ -139,7 +141,7 @@ class SubFlowManager:
                 self.diag.update_node_color(task.id, "#77787B")
                 self.svg_config[task.id]['is_link'] = False
 
-    def _adjust_by_status(self, task: SubflowTask, display_all: bool = True) -> None:
+    def _adjust_by_status(self, task:SubflowTask, display_all:bool=True) -> None:
         """ フロー図の見た目をタスクの状態によって変えるメソッドです。
 
         Args:
@@ -169,7 +171,7 @@ class SubFlowManager:
         elif task.status == task.STATUS_DOING:
             self.diag.update_node_icon(task.id, icon_dir + "/loading.png")
 
-    def parse_headers(self, task: SubflowTask) -> None:
+    def parse_headers(self, task:SubflowTask) -> None:
         """ タスクタイトルとパスを取得するメソッドです。
 
         Args:
@@ -202,7 +204,7 @@ class SubFlowManager:
                 self.svg_config[task.id]['text'] = title
                 break
 
-    def change_id(self, task: SubflowTask) -> None:
+    def change_id(self, task:SubflowTask) -> None:
         """diagファイルのタスクIDをタスクタイトルに置き換えるメソッドです。
 
         Args:

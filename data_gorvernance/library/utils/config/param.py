@@ -28,7 +28,7 @@ class ParamConfig():
             _param_file(JsonFile): 設定ファイルを操作するためのインスタンス
             _siblings(Siblings): Siblingsクラスのインスタンス
             _rcos_binder_url: RCOSのBinderのURL
-            _dg_core(GgCore): GgCoreクラスのインスタンス
+            _dg_core(Dgcore): Dgcoreクラスのインスタンス
             _repository(Repository): Repositoryクラスのインスタンス
 
     """
@@ -44,7 +44,7 @@ class ParamConfig():
 
         self._siblings = Siblings(data[self.__SIBLINGS])
         self._rcos_binder_url = data[self.__RCOS_BINDER_URL]
-        self._dg_core = GgCore(data[self.__DGCORE])
+        self._dg_core = Dgcore(data[self.__DGCORE])
         self._repository = Repository(data[self.__REPOSITORY])
 
     def update(self) -> None:
@@ -111,7 +111,7 @@ class Siblings():
     __GITHUGIBHTTP = 'git_hugib_http'
     __GITHUBSSH = 'git_hub_ssh'
 
-    def __init__(self, siblings_data: dict) -> None:
+    def __init__(self, siblings_data:dict) -> None:
         """ インスタンスの初期化処理を実行するメソッドです。
 
         Args:
@@ -138,7 +138,7 @@ class Siblings():
         return data
 
 
-class GgCore():
+class Dgcore():
     """ dgcoreの情報を保持するクラスです。
 
     Attributes:
@@ -153,7 +153,7 @@ class GgCore():
     __SCHEME = 'Scheme'
     __NETLOC = 'Netloc'
 
-    def __init__(self, dg_core_data: dict) -> None:
+    def __init__(self, dg_core_data:dict) -> None:
         """ インスタンスの初期化処理を実行するメソッドです。
 
         Args:
@@ -188,7 +188,7 @@ class Repository():
     """
     __ID = 'id'
 
-    def __init__(self, repo_data: dict) -> None:
+    def __init__(self, repo_data:dict) -> None:
         """ インスタンスの初期化処理を実行するメソッドです。
 
         Args:

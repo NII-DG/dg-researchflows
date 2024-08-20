@@ -92,7 +92,7 @@ def extract_url_and_auth_info_from_git_url(git_url:str) -> tuple[str, str, str]:
     return git_url, "", "" # Returns the original URL if it cannot be converted
 
 
-def get_gin_base_url_from_git_config()->str:
+def get_gin_base_url_from_git_config() -> str:
     """GINのベースurlを作成するメソッドです。
 
     Returns:
@@ -227,7 +227,7 @@ def set_ginfork_token(token:str):
         json.dump(token_dict, f, indent=4)
 
 
-def get_ginfork_token()->str:
+def get_ginfork_token() -> str:
     """保存されているトークンを取得するためのメソッドです。
 
     Returns:
@@ -252,7 +252,7 @@ def set_user_info(user_id:str):
         json.dump(user_info, f, indent=4)
 
 
-def get_user_id_from_user_info()->str:
+def get_user_id_from_user_info() -> str:
     """保存されたユーザーIDを取得するメソッドです。
 
     Returns:
@@ -299,7 +299,7 @@ def del_build_token()->tuple[bool, Optional[str]]:
         return True , None
 
 
-def datalad_create(dir_path:str)->bool:
+def datalad_create(dir_path:str) -> bool:
     """指定したディレクトリをdataladのデータセット化するメソッドです。
 
     Args:
@@ -316,7 +316,7 @@ def datalad_create(dir_path:str)->bool:
         return False
 
 
-def create_key(root_path:str)->bool:
+def create_key(root_path:str) -> bool:
     """SSHキーを作成するメソッドです。
 
     Args:
@@ -334,7 +334,7 @@ def create_key(root_path:str)->bool:
         return False
 
 
-def upload_ssh_key(root_path:str)->str:
+def upload_ssh_key(root_path:str) -> str:
     """GIN-forkへ公開鍵をアップロードするメソッドです。
 
     Args:
@@ -483,7 +483,8 @@ def push_annex_branch(cwd:str):
 
 
 def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str],
-    gitannex_files :list[str], message:str, get_paths:list[str],)->bool:
+    gitannex_files :list[str], message:str, get_paths:list[str],
+) -> bool:
     """Git Annexリポジトリの同期を行うメソッドです。
 
     Args:
@@ -639,7 +640,7 @@ def syncs_with_repo(cwd:str, git_path:list[str], gitannex_path:list[str],
 
 def save_annex_and_register_metadata(cwd:str, gitannex_path :list[str],
     gitannex_files:list[str], message:str
-    ):
+):
     """detaladの保存とメタデータの登録を行うメソッドです。
 
     Args:
@@ -715,7 +716,7 @@ def push():
     datalad_api.push(to=SIBLING, data='auto')
 
 
-def is_should_annex_content_path(file_path : str)->bool:
+def is_should_annex_content_path(file_path : str) -> bool:
     """指定したファイルパスがannexの条件を満たすかを調べるメソッドです。
 
     Args:
@@ -745,7 +746,7 @@ def is_should_annex_content_path(file_path : str)->bool:
         return False
 
 
-def get_filepaths_from_dalalad_error(err_info: str)->list[str]:
+def get_filepaths_from_dalalad_error(err_info: str) -> list[str]:
     """エラー情報から特定の文字列を抽出するメソッドです。
 
     Args:
@@ -759,7 +760,7 @@ def get_filepaths_from_dalalad_error(err_info: str)->list[str]:
     return re.findall(pattern, err_info)
 
 
-def extract_info_from_datalad_update_err(raw_msg:str)->str:
+def extract_info_from_datalad_update_err(raw_msg:str) -> str:
     """エラーメッセージから特定の文章を抜き出すためのメソッドです。
 
     Args:
@@ -780,7 +781,9 @@ def extract_info_from_datalad_update_err(raw_msg:str)->str:
     return err_detail_info[start_index:end_index]
 
 
-def creat_html_msg(msg:str='', fore:Optional[str]=None, back:Optional[str]=None, tag:str='h1')->str:
+def create_html_msg(msg:str='', fore:Optional[str]=None,
+    back:Optional[str]=None, tag:str='h1'
+) -> str:
     """HTMLタグを生成するメソッドです。
 
     Args:
@@ -808,7 +811,7 @@ def creat_html_msg(msg:str='', fore:Optional[str]=None, back:Optional[str]=None,
         return "<" + tag + " style='" + style + "'>" + msg + "</" + tag + ">"
 
 
-def creat_html_msg_info_p(msg:str='')->str:
+def create_html_msg_info_p(msg:str='') -> str:
     """情報メッセージのHTMLタグを作成するためのメソッドです。
 
     Args:
@@ -818,10 +821,10 @@ def creat_html_msg_info_p(msg:str='')->str:
         str: 生成した情報メッセージのHTMLタグ
 
     """
-    return creat_html_msg(msg=msg, back='#9eff9e', tag='p')
+    return create_html_msg(msg=msg, back='#9eff9e', tag='p')
 
 
-def creat_html_msg_err_p(msg:str='')->str:
+def create_html_msg_err_p(msg:str='') -> str:
     """エラーメッセージのHTMLタグを作成するためのメソッドです。
 
     Args:
@@ -831,7 +834,7 @@ def creat_html_msg_err_p(msg:str='')->str:
         str: 生成したエラーメッセージのHTMLタグ
 
     """
-    return creat_html_msg(msg=msg, back='#ffa8a8', tag='p')
+    return create_html_msg(msg=msg, back='#ffa8a8', tag='p')
 
 
 def display_html_msg(msg:str='', fore:Optional[str]=None, back:Optional[str]=None, tag:str='h1'):
@@ -844,7 +847,7 @@ def display_html_msg(msg:str='', fore:Optional[str]=None, back:Optional[str]=Non
         tag (str):タグ
 
     """
-    html_text = creat_html_msg(msg, fore, back, tag)
+    html_text = create_html_msg(msg, fore, back, tag)
     display(HTML(html_text))
 
 

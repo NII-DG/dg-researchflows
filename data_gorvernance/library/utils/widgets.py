@@ -152,7 +152,7 @@ class MessageBox(pn.WidgetBox):
         else:
             return False
 
-    def update_info(self, msg: str="")->Alert:
+    def update_info(self, msg: str="") -> Alert:
         """ infoアラートに更新するメソッドです。
 
         Args:
@@ -167,7 +167,7 @@ class MessageBox(pn.WidgetBox):
         self.append(alert)
         return alert
 
-    def update_success(self, msg: str="")->Alert:
+    def update_success(self, msg: str="") -> Alert:
         """ successアラートに更新するメソッドです。
 
         Args:
@@ -182,7 +182,7 @@ class MessageBox(pn.WidgetBox):
         self.append(alert)
         return alert
 
-    def update_warning(self, msg: str="")->Alert:
+    def update_warning(self, msg: str="") -> Alert:
         """ warningアラートに更新するメソッドです。
 
         Args:
@@ -197,7 +197,7 @@ class MessageBox(pn.WidgetBox):
         self.append(alert)
         return alert
 
-    def update_error(self, msg: str="")->Alert:
+    def update_error(self, msg: str="") -> Alert:
         """ errorアラートに更新するメソッドです。
 
         Args:
@@ -212,7 +212,7 @@ class MessageBox(pn.WidgetBox):
         self.append(alert)
         return alert
 
-    def add_info(self, msg: str="")->Alert:
+    def add_info(self, msg: str="") -> Alert:
         """ infoアラートを追加するメソッドです。
 
         Args:
@@ -226,7 +226,7 @@ class MessageBox(pn.WidgetBox):
         self.append(alert)
         return alert
 
-    def add_success(self, msg: str="")->Alert:
+    def add_success(self, msg: str="") -> Alert:
         """ successアラートを追加するメソッドです。
 
         Args:
@@ -240,7 +240,7 @@ class MessageBox(pn.WidgetBox):
         self.append(alert)
         return alert
 
-    def add_warning(self, msg: str="")->Alert:
+    def add_warning(self, msg: str="") -> Alert:
         """ warningアラートを追加するメソッドです。
 
         Args:
@@ -254,7 +254,7 @@ class MessageBox(pn.WidgetBox):
         self.append(alert)
         return alert
 
-    def add_error(self, msg: str="")->Alert:
+    def add_error(self, msg: str="") -> Alert:
         """ errorアラートを追加するメソッドです。
 
         Args:

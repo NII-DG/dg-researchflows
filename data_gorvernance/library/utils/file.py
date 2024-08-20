@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Callable, Set
 
 
-def copy_file(source_path: str, destination_path: str) -> None:
+def copy_file(source_path:str, destination_path:str) -> None:
     """ ファイルをコピーする関数です。
 
     Args:
@@ -25,7 +25,7 @@ def copy_file(source_path: str, destination_path: str) -> None:
     shutil.copyfile(source_path, destination_path)
 
 
-def copy_dir(src: str, dst: str, overwrite: bool=False) -> None:
+def copy_dir(src:str, dst:str, overwrite: bool=False) -> None:
     """ ディレクトリをコピーする関数です。
 
     Args:
@@ -37,7 +37,7 @@ def copy_dir(src: str, dst: str, overwrite: bool=False) -> None:
         指定したディレクトリがなければ作成される。
 
     """
-    def f_exists(base: str, dst: str) -> Callable[[str, list[str]], Set[str]]:
+    def f_exists(base:str, dst:str) -> Callable[[str, list[str]], Set[str]]:
         """ 指定したベースディレクトリと目的のディレクトリの間で存在するファイル名を返す関数です。
 
         Args:
@@ -49,7 +49,7 @@ def copy_dir(src: str, dst: str, overwrite: bool=False) -> None:
 
         """
         base, dst = Path(base), Path(dst)
-        def _ignore(path: str, names: list[str]) -> Set[str]:   # サブディレクトリー毎に呼び出される
+        def _ignore(path:str, names:list[str]) -> Set[str]:   # サブディレクトリー毎に呼び出される
             """ 指定したパスと名前で存在するファイル名のセットを返す関数です。
 
             Args:
@@ -71,7 +71,7 @@ def copy_dir(src: str, dst: str, overwrite: bool=False) -> None:
         shutil.copytree(src, dst, ignore=f_exists(src, dst), dirs_exist_ok=True)
 
 
-def relative_path(target_path: str, start_dir: str) -> str:
+def relative_path(target_path:str, start_dir:str) -> str:
     """ target_pathをstart_dirからの相対パスに変換する関数です。
 
     Args:
@@ -102,7 +102,7 @@ class File:
 
     """
 
-    def __init__(self, file_path: str) -> None:
+    def __init__(self, file_path:str) -> None:
         """ クラスのインスタンスの初期化処理を実行するメソッドです。
 
         Args:
@@ -122,7 +122,7 @@ class File:
             content = file.read()
         return content
 
-    def write(self, content: str) -> None:
+    def write(self, content:str) -> None:
         """ 指定された内容をファイルに書き込むメソッドです。
 
         Args:
@@ -160,7 +160,7 @@ class JsonFile(File):
 
     """
 
-    def __init__(self, file_path: str) -> None:
+    def __init__(self, file_path:str) -> None:
         """ クラスのインスタンスの初期化処理を実行するメソッドです。
 
         Args:

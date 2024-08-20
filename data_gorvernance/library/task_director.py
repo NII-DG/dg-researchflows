@@ -65,7 +65,7 @@ class TaskDirector(TaskSave):
         # 絶対rootディレクトリを取得・設定する
         self._abs_root_path = path_config.get_abs_root_form_working_dg_file_path(
             nb_working_file_path
-            )
+        )
         self._script_file_name = os.path.splitext(notebook_name)[0]
 
         # サブフローステータス管理JSONパス
@@ -78,13 +78,13 @@ class TaskDirector(TaskSave):
             # 研究準備の場合
             self._sub_flow_status_file_path = os.path.join(
                 self._abs_root_path, path_config.get_sub_flow_status_file_path(subflow_type)
-                )
+            )
         else:
             # 研究準備以外の場合
             self._sub_flow_status_file_path = os.path.join(
                 self._abs_root_path,
                 path_config.get_sub_flow_status_file_path(subflow_type, subflow_id)
-                )
+            )
 
     ########################
     #  update task status  #
@@ -96,7 +96,7 @@ class TaskDirector(TaskSave):
         sf_status: SubflowStatus = sf.read()
         sf_status.doing_task_by_task_name(
             self._script_file_name, os.environ["JUPYTERHUB_SERVER_NAME"]
-            )
+        )
         # 更新内容を記録する。
         sf.write(sf_status)
 
@@ -106,13 +106,13 @@ class TaskDirector(TaskSave):
         sf_status: SubflowStatus = sf.read()
         sf_status.completed_task_by_task_name(
             self._script_file_name, os.environ["JUPYTERHUB_SERVER_NAME"]
-            )
+        )
         sf.write(sf_status)
 
     #########################
     #  return subflow menu  #
     #########################
-    def get_subflow_menu_button_object(self)-> pn.pane.HTML:
+    def get_subflow_menu_button_object(self) -> pn.pane.HTML:
         """サブフローメニューへのボタンpanel.HTMLオブジェクトの取得するメソッドです。
 
         Returns:
@@ -121,7 +121,7 @@ class TaskDirector(TaskSave):
         button_width = 500
         sub_flow_menu_relative_url = get_return_sub_flow_menu_relative_url_path(
             self.nb_working_file_path
-            )
+        )
         sub_flow_menu_link_button = pn.pane.HTML()
         sub_flow_menu_link_button.object = create_button(
             url=f'{sub_flow_menu_relative_url}?init_nb=true',

@@ -22,7 +22,7 @@ from library.utils.widgets import MessageBox
 from .subflow import SubFlowManager
 
 
-def access_main_menu(working_file: str):
+def access_main_menu(working_file:str):
     """メインメニューにアクセスするメソッドです。
 
     Args:
@@ -101,7 +101,7 @@ class SubflowMenu(TaskLog):
         )
 
     # イベント
-    def select_flow(self, subflow: SubFlowManager, font_folder: Path) -> Callable:
+    def select_flow(self, subflow:SubFlowManager, font_folder:Path) -> Callable:
         """ボタン押下時にサブフロー図の表示を切り替えるメソッドです。
 
         Args:
@@ -135,7 +135,7 @@ class SubflowMenu(TaskLog):
         self.select_widgetbox.width = d
         self._msg_output = d
 
-    def set_diagram(self, subflow: SubFlowManager, font_folder: Path, display_all=True):
+    def set_diagram(self, subflow:SubFlowManager, font_folder:Path, display_all=True):
         """フロー図の生成と表示設定のメソッドです。
 
         Args:
@@ -168,7 +168,7 @@ class SubflowMenu(TaskLog):
             display_all = False
         return display_all
 
-    def _get_contents(self, svg_file_path: str) -> str:
+    def _get_contents(self, svg_file_path:str) -> str:
         """フロー図を取得するメソッドです。
 
         Args:
@@ -179,7 +179,7 @@ class SubflowMenu(TaskLog):
         """
         return file.File(svg_file_path).read()
 
-    def _get_svg_size(self, svg_file_path: str) -> int:
+    def _get_svg_size(self, svg_file_path:str) -> int:
         """svgの画像の横幅を返すメソッドです。
 
         Args:

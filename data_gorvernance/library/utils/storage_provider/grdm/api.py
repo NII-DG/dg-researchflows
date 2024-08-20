@@ -37,7 +37,7 @@ def build_api_url(base_url: str, endpoint=''):
     return parse.urlunparse((parsed.scheme, netloc, endpoint, '', '', ''))
 
 
-def build_oauth_url(base_url: str, endpoint=''):
+def build_oauth_url(base_url:str, endpoint=''):
     """OAuthのAPI用のURLを作成する
 
     Args:
@@ -53,7 +53,7 @@ def build_oauth_url(base_url: str, endpoint=''):
     return parse.urlunparse((parsed.scheme, netloc, endpoint, '', '', ''))
 
 
-def get_token_profile(base_url: str, token: str):
+def get_token_profile(base_url:str, token:str):
     """https://accounts.rdm.nii.ac.jp/oauth2/profile
 
     Args:
@@ -163,7 +163,7 @@ def get_project_registrations(base_url, token, project_id):
     return response.json()
 
 
-def get_project_collaborators(base_url: str, token: str, project_id: str):
+def get_project_collaborators(base_url:str, token:str, project_id:str):
     """プロジェクトメンバーの情報を取得する
 
     https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/contributors/

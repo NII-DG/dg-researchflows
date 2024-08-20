@@ -40,7 +40,16 @@ def create_button(
         border_value = ' '.join(border)
     if not disable:
         # able button
-        return f'<a style="font-size:{a_font_size};"href="{url}" target="{target}" ><button style="width: {button_width}; height: {button_height}; border-radius: {button_border_radius}; background-color: {button_background_color}; border: {border_value}; color: {a_character_color};">{msg}</button></a>'
+        return(
+            f'<a style="font-size:{a_font_size};"href="{url}" target="{target}" >'
+            f'<button style="width: {button_width}; height: {button_height};'
+            f'border-radius: {button_border_radius}; background-color: {button_background_color};'
+            f'border: {border_value}; color: {a_character_color};">{msg}</button></a>'
+        )
     else:
         # disable button
-        return f'<button style="width: {button_width}; height: {button_height}; border-radius: {button_border_radius}; background-color: {button_background_color}; border: {border_value};" disable>{msg}</button>'
+        return(
+            f'<button style="width: {button_width}; height: {button_height};'
+            f'border-radius: {button_border_radius}; background-color: {button_background_color};'
+            f'border: {border_value};" disable>{msg}</button>'
+        )

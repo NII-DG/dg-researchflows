@@ -13,8 +13,8 @@ from cookiecutter.main import (
     get_user_config,
     determine_repo_dir,
     generate_context
-
 )
+
 from cookiecutter.prompt import (
     render_variable,
     StrictEnvironment

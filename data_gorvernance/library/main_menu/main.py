@@ -164,7 +164,10 @@ class MainMenu(TaskLog):
             # プロジェクト操作コントローラーを無効化
             self._project_menu.disabled = True
             # アラートを表示する。
-            alert = pn.pane.Alert(msg_config.get('main_menu','required_research_preparation'),sizing_mode="stretch_width",alert_type='warning')
+            alert = pn.pane.Alert(
+                msg_config.get('main_menu','required_research_preparation'),
+                sizing_mode="stretch_width",alert_type='warning'
+            )
             self._sub_flow_widget_box.clear()
             self._sub_flow_widget_box.append(alert)
 
@@ -240,7 +243,10 @@ class MainMenu(TaskLog):
     def update_sub_flow_widget_box_for_init(self):
         """サブフロー操作オプションの選択誘導するメソッドです。"""
         self._sub_flow_widget_box.clear()
-        alert = pn.pane.Alert(msg_config.get('main_menu','guide_select_action'),sizing_mode="stretch_width",alert_type='info')
+        alert = pn.pane.Alert(
+            msg_config.get('main_menu','guide_select_action'),
+            sizing_mode="stretch_width",alert_type='info'
+        )
         self._sub_flow_widget_box.append(alert)
 
     def update_sub_flow_widget_box(self):

@@ -103,17 +103,17 @@ class ContainerSetter():
         if user_name is None or len(user_name)<= 0:
             self.change_submit_button_warning(
                 name=msg_config.get('form', 'none_input_value').format(msg_config.get('form', 'user_name'))
-                )
+            )
             return
 
         if not self.validate_format_username(user_name):
             self.change_submit_button_warning(
                 name=msg_config.get('form', 'invali_input_value').format(msg_config.get('form', 'user_name'))
-                )
+            )
             self._msg_output.clear()
             alert = pn.pane.Alert(msg_config.get('form', 'username_pattern_error'),
                 sizing_mode="stretch_width",alert_type='warning'
-                )
+            )
             self._msg_output.append(alert)
             return
 
@@ -121,7 +121,7 @@ class ContainerSetter():
         if password is None or len(password) <= 0:
             self.change_submit_button_warning(
                 name=msg_config.get('form', 'none_input_value').format(msg_config.get('form', 'password'))
-                )
+            )
             return
 
         #認証検証準備（GIN-forkのドメインをparam.jsonに用意する）
@@ -132,7 +132,7 @@ class ContainerSetter():
             self._msg_output.clear()
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',
                 sizing_mode="stretch_width", alert_type='danger'
-                )
+            )
             self._msg_output.append(alert)
             return
 
@@ -142,11 +142,11 @@ class ContainerSetter():
         except UnauthorizedError:
             self.change_submit_button_warning(
                 name=msg_config.get('form', 'invali_input_value').format(msg_config.get('form', 'user_name')+'/'+ msg_config.get('form', 'password'))
-                )
+            )
             self._msg_output.clear()
             alert = pn.pane.Alert(msg_config.get('user_auth','UnauthorizedError'),
                 sizing_mode="stretch_width",alert_type='warning'
-                )
+            )
             self._msg_output.append(alert)
             return
         except Exception:
@@ -154,7 +154,7 @@ class ContainerSetter():
             self._msg_output.clear()
             alert = pn.pane.Alert(f'## [INTERNAL ERROR] : {traceback.format_exc()}',
                 sizing_mode="stretch_width", alert_type='danger'
-                )
+            )
             self._msg_output.append(alert)
             return
         else:

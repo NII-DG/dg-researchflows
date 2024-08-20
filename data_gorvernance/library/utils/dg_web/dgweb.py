@@ -10,9 +10,13 @@ import requests
 from requests.exceptions import RequestException
 
 from ..error import UnauthorizedError, NotFoundContentsError
+from library.utils.config import connect as con_config
+
+DGWEB_BASE_URL = con_config.get('DG_WEB', 'scheme_domain')
 
 class Api():
 
+    @staticmethod
     def get_govsheet_schema(scheme_domain:str)->dict:
         """ ガバナンスシートのスキーマを取得する関数です。
 
@@ -29,7 +33,7 @@ class Api():
         response.raise_for_status()
         return response.json()
 
-
+    @staticmethod
     def get_metadata_schema(scheme_domain:str)->dict:
         """ メタデータのスキーマを取得する関数です。
 
@@ -46,8 +50,8 @@ class Api():
         response.raise_for_status()
         return response.json()
 
-
-    def check_governedrun_token(scheme_domain:str, token:str)->bool:
+    @staticmethod
+    def check_governedrun_token(token:str)->bool:
         """ Governed Runのトークンの有効性を確認する関数です。
 
         Args:
@@ -62,7 +66,7 @@ class Api():
 
         """
         sub_url = '/checkToken'
-        api_url = scheme_domain + sub_url
+        api_url = DGWEB_BASE_URL + sub_url
         data = {
             "grdmToken": None,
             "govRunToken": token
@@ -75,7 +79,7 @@ class Api():
         response.raise_for_status()
         return False
 
-
+    @staticmethod
     def validate(scheme_domain:str, grdm_token:str, project_id:str, govrun_token:str=None, govsheet:dict=None, metadata:dict=None)->dict:
         """ 検証する関数です。
 
@@ -113,7 +117,7 @@ class Api():
             raise
         return response.json()
 
-
+    @staticmethod
     def get_validations(scheme_domain:str, grdm_token: str, project_id: str)->dict:
         """ 検証結果を取得する関数です。
 
@@ -148,7 +152,7 @@ class Api():
             raise
         return response.json()
 
-
+    @staticmethod
     def get_validations_validationId(scheme_domain:str, grdm_token: str, project_id: str, validation_id: str)->dict:
         """ idを指定して検証結果を取得する関数です。
 
@@ -188,6 +192,7 @@ class Api():
         return response.json()
 
 class Data:
+    @staticmethod
     def need_govrun_token(govsheet:dict, metadata:dict)->bool:
         """ Governed Runのトークンが必要かどうかを判定する関数です。
 

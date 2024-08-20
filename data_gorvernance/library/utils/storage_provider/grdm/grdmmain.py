@@ -10,25 +10,25 @@ import json
 import os
 from urllib import parse
 from http import HTTPStatus
-
-from .client import upload, download
+from typing import Union
 from .api import Api
-from .metadata import format_metadata
 from ...error import NotFoundContentsError, UnauthorizedError
 from osfclient.cli import OSF, split_storage
 from osfclient.utils import norm_remote_path, split_storage, is_path_matched
 from osfclient.exceptions import UnauthorizedException
 from requests.exceptions import RequestException
 import requests
+from library.utils.config import connect as con_config
 
 
 NEED_TOKEN_SCOPE = ["osf.full_write"]
 ALLOWED_PERMISSION = ["admin", "write"]
-
+GRDM_BASE_URL = con_config.get('GRDM', 'BASE_URL')
 
 class GrdmMain():
 
-    def get_project_id() -> (str | None):
+    @staticmethod
+    def get_project_id() -> Union[str, None]:
         """プロジェクトIDを取得するメソッドです。
 
         Returns:
@@ -44,8 +44,8 @@ class GrdmMain():
         else:
             return None
 
-
-    def check_authorization(base_url: str, token: str) -> bool:
+    @staticmethod
+    def check_authorization(token: str) -> bool:
         """パーソナルアクセストークンの権限をチェックするメソッドです。
 
         Args:
@@ -56,7 +56,7 @@ class GrdmMain():
             bool: 権限に問題が無ければTrue、問題があればFalseを返す。
         """
         try:
-            profile = Api.get_token_profile(base_url=base_url, token=token)
+            profile = Api.get_token_profile(base_url=GRDM_BASE_URL, token=token)
             scope = profile['scope']
             if all(element in scope for element in NEED_TOKEN_SCOPE):
                 return True
@@ -64,8 +64,8 @@ class GrdmMain():
             return False
         return False
 
-
-    def check_permission(base_url: str, token: str, project_id: str) -> bool:
+    @staticmethod
+    def check_permission(token: str, project_id: str) -> bool:
         """リポジトリへのアクセス権限のチェックを行うメソッドです。
 
         Args:
@@ -81,9 +81,9 @@ class GrdmMain():
         Returns:
             bool:パーミッションに問題なければTrue、問題があればFalseの値を返す。
         """
-        response = Api.get_user_info(base_url, token)
+        response = Api.get_user_info(GRDM_BASE_URL, token)
         user_id = response['data']['id']
-        response = Api.get_project_collaborators(base_url, token, project_id)
+        response = Api.get_project_collaborators(GRDM_BASE_URL, token, project_id)
         data = response['data']
         for user in data:
             if user['embeds']['users']['data']['id'] == user_id:
@@ -91,9 +91,8 @@ class GrdmMain():
                     return True
         return False
 
-
-    #def get_projects_list(scheme: str, domain: str, token: str) -> dict:
-    def get_projects_list(scheme_domain: str, token: str) -> dict:
+    @staticmethod
+    def get_projects_list(token: str) -> dict:
         """プロジェクトの一覧を取得するメソッドです。
 
         Args:
@@ -108,12 +107,12 @@ class GrdmMain():
         Returns:
             dict:プロジェクトの一覧のデータの値を返す。
         """
-        response = Api.get_projects(scheme_domain, token)
+        response = Api.get_projects(GRDM_BASE_URL, token)
         data = response['data']
         return {d['id']: d['attributes']['title'] for d in data}
 
-
-    def sync(token: str, api_url: str, project_id: str, abs_source: str, abs_root:str="/home/jovyan"):
+    @classmethod
+    def sync(cls, token: str, api_url: str, project_id: str, abs_source: str, abs_root:str="/home/jovyan"):
         """GRDMにアップロードするメソッドです。
 
         abs_source は絶対パスでなければならない。
@@ -146,14 +145,14 @@ class GrdmMain():
 
         destination = os.path.relpath(abs_source, abs_root)
 
-        upload(
+        cls.upload(
             token=token, base_url=api_url, project_id=project_id,
             source=abs_source, destination=destination,
             recursive=recursive, force=True
         )
 
-
-    def download_text_file(token: str, api_url: str, project_id: str, remote_path: str, encoding='utf-8'):
+    @classmethod
+    def download_text_file(cls, token: str, api_url: str, project_id: str, remote_path: str, encoding='utf-8'):
         """テキストファイルの中身を取得するメソッドです。
 
         Args:
@@ -168,7 +167,7 @@ class GrdmMain():
             UnauthorizedError: 認証が通らない
             requests.exceptions.RequestException: その他の通信エラー
         """
-        content = download(
+        content = cls.download(
             token=token, project_id=project_id,
             base_url=api_url, remote_path=remote_path
         )
@@ -176,8 +175,8 @@ class GrdmMain():
             raise FileNotFoundError(f'The specified file (path: {remote_path}) does not exist.')
         return content.decode(encoding)
 
-
-    def download_json_file(token: str, api_url: str, project_id: str, remote_path: str):
+    @classmethod
+    def download_json_file(cls, token: str, api_url: str, project_id: str, remote_path: str):
         """jsonファイルの中身を取得するメソッドです。
 
         Args:
@@ -192,11 +191,11 @@ class GrdmMain():
             UnauthorizedError: 認証が通らない
             requests.exceptions.RequestException: その他の通信エラー
         """
-        content = GrdmMain.download_text_file(token, api_url, project_id, remote_path)
+        content = cls.download_text_file(token, api_url, project_id, remote_path)
         return json.loads(content)
 
-
-    def get_project_metadata(base_url: str, token: str, project_id: str):
+    @classmethod
+    def get_project_metadata(cls, base_url: str, token: str, project_id: str):
         """プロジェクトメタデータを取得するメソッドです。
 
         Args:
@@ -213,9 +212,10 @@ class GrdmMain():
         metadata = Api.get_project_registrations(base_url, token, project_id)
         if len(metadata['data']) < 1:
             raise NotFoundContentsError(f"Metadata doesn't exist for the project with the specified ID {project_id}.")
-        return format_metadata(metadata)
+        return cls.format_metadata(metadata)
 
 
+    @staticmethod
     def get_collaborator_list(base_url: str, token: str, project_id: str) -> dict:
         """共同管理者の取得するメソッドです。
 
@@ -239,7 +239,7 @@ class GrdmMain():
             for d in data
         }
 
-
+    @staticmethod
     def build_collaborator_url(base_url: str, project_id: str) -> str:
         """プロジェクトのメンバー一覧のURLを返すメソッドです。
 
@@ -254,7 +254,8 @@ class GrdmMain():
         endpoint = f'{project_id}/contributors/'
         return parse.urlunparse((parsed.scheme, parsed.netloc, endpoint, '', '', ''))
 
-    def upload(token:str, base_url:str, project_id:str, source:str, destination:str, recursive:bool=False, force:bool=False):
+    @classmethod
+    def upload(cls, token:str, base_url:str, project_id:str, source:str, destination:str, recursive:bool=False, force:bool=False):
         """ファイルまたはフォルダをアップロードするメソッドです。
 
         Args:
@@ -315,8 +316,8 @@ class GrdmMain():
             raise UnauthorizedError(str(e)) from e
 
 
-
-    def download(token:str, project_id:str, base_url:str, remote_path:str, base_path=None) -> (bytes | None):
+    @classmethod
+    def download(cls, token:str, project_id:str, base_url:str, remote_path:str, base_path=None) -> Union[bytes, None]:
         """ファイルの内容を取得するメソッドです。
 
         Args:
@@ -371,7 +372,8 @@ class GrdmMain():
                 raise UnauthorizedError(str(e)) from e
             raise
 
-    def format_metadata(metadata:dict) -> dict[str, list]:
+    @classmethod
+    def format_metadata(cls, metadata:dict) -> dict[str, list]:
         """Gakunin RDMから取得したプロジェクトメタデータを整形するメソッドです。
             Args:
                 metadata(dict):メタデータの値
@@ -384,14 +386,14 @@ class GrdmMain():
         first_value = []
         for data in datas:
             url = data["relationships"]["registration_schema"]["links"]["related"]["href"]
-            schema = GrdmMain.get_schema(url)
+            schema = cls.get_schema(url)
 
             # first_value = [second_layer, ...]
             second_layer = {'title': data['attributes']['title']}
             registration = data['attributes']['registration_responses']
             for key, value in registration.items():
                 if key != 'grdm-files':
-                    second_layer[key] = GrdmMain.format_display_name(schema, "page1", key, value)
+                    second_layer[key] = cls.format_display_name(schema, "page1", key, value)
 
             files = json.loads(registration['grdm-files'])
             # grdm-files > value
@@ -405,13 +407,13 @@ class GrdmMain():
                 file_datas['metadata'] = file_metadata
                 file_values.append(file_datas)
 
-            second_layer['grdm-files'] = GrdmMain.format_display_name(schema, "page2", 'grdm-files', file_values)
+            second_layer['grdm-files'] = cls.format_display_name(schema, "page2", 'grdm-files', file_values)
             first_value.append(second_layer)
 
         return {'dmp': first_value}
 
-
-    def get_schema(url:str) -> json:
+    @classmethod
+    def get_schema(cls, url:str) -> json:
         """メタデータのプロトコル名を取得するメソッドです。
 
         リクエストされたURLに接続し、その接続に問題がないかを確認してプロトコル名を取得する。
@@ -426,8 +428,8 @@ class GrdmMain():
         response.raise_for_status()
         return response.json()
 
-
-    def format_display_name(schema: dict, page_id: str, qid: str, value=None) -> dict:
+    @classmethod
+    def format_display_name(cls, schema: dict, page_id: str, qid: str, value=None) -> dict:
         """メタデータをフォーマットして返却するメソッドです。
 
         Args:

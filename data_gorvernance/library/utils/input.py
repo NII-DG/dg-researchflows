@@ -8,10 +8,10 @@ from typing import Callable, Tuple
 
 from . import dg_web
 from .config import message as msg_config
+from .error import UnusableVault, UnauthorizedError, ProjectNotExist, PermissionError
 from .storage_provider import grdm
 from .string import StringManager
 from .vault import Vault
-from .error import UnusableVault, UnauthorizedError, ProjectNotExist, PermissionError
 from library.utils.config import connect as con_config
 
 
@@ -102,7 +102,7 @@ def get_grdm_token(vault_key: str) -> str:
             bool: トークンの有効性を返す。
 
         """
-        return grdm.GrdmMain.check_authorization(con_config.get('GRDM', 'BASE_URL'), token)
+        return grdm.GrdmMain.check_authorization(token)
 
     return get_token(vault_key, check_auth, msg_config.get('form', 'pls_input_grdm_token'))
 
@@ -127,7 +127,7 @@ def get_goveredrun_token() -> str:
         Returns:
             bool: Governed Runのトークンの有効性を返す。
         """
-        return dg_web.Api.check_governedrun_token(con_config.get('DG_WEB', 'scheme_domain'), token)
+        return dg_web.Api.check_governedrun_token(token)
 
     return get_token('govrun_token', check_auth, msg_config.get('form', 'pls_input_govrun_token'))
 
@@ -153,7 +153,7 @@ def get_grdm_connection_parameters() -> Tuple[str, str]:
     while True:
         try:
             token = get_grdm_token(vault_key)
-            if not grdm.GrdmMain.check_permission(con_config.get('GRDM', 'BASE_URL'), token, project_id):
+            if not grdm.GrdmMain.check_permission(token, project_id):
                 raise PermissionError
             break
         except UnauthorizedError:

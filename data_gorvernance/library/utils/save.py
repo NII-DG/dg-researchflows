@@ -87,6 +87,7 @@ class TaskSave(TaskLog):
         token = ""
         project_id = ""
         try:
+            #token, project_id = Input.get_grdm_connection_parameters()
             token, project_id = get_grdm_connection_parameters()
         except UnusableVault as e:
             message = msg_config.get('form', 'no_vault')

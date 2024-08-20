@@ -9,7 +9,8 @@ from ...error import UnauthorizedError, ProjectNotExist
 
 class Api():
 
-    def build_api_url(base_url: str, endpoint=''):
+    @classmethod
+    def build_api_url(cls, base_url: str, endpoint=''):
         """API用のURLを作成する
 
         Args:
@@ -37,8 +38,8 @@ class Api():
                 endpoint = endpoint + '/'
         return parse.urlunparse((parsed.scheme, netloc, endpoint, '', '', ''))
 
-
-    def build_oauth_url(base_url: str, endpoint=''):
+    @classmethod
+    def build_oauth_url(cls, base_url: str, endpoint=''):
         """OAuthのAPI用のURLを作成する
 
         Args:
@@ -53,8 +54,8 @@ class Api():
         endpoint = endpoint.rstrip('/')
         return parse.urlunparse((parsed.scheme, netloc, endpoint, '', '', ''))
 
-
-    def get_token_profile(base_url: str, token: str):
+    @classmethod
+    def get_token_profile(cls, base_url: str, token: str):
         """https://accounts.rdm.nii.ac.jp/oauth2/profile
 
         Args:
@@ -66,7 +67,7 @@ class Api():
             requests.exceptions.RequestException: その他の通信エラー
         """
         endpoint = '/oauth2/profile'
-        api_url = Api.build_oauth_url(base_url, endpoint)
+        api_url = cls.build_oauth_url(base_url, endpoint)
         headers = {
             'Authorization': 'Bearer {}'.format(token)
         }
@@ -79,8 +80,8 @@ class Api():
             raise
         return response.json()
 
-
-    def get_user_info(base_url: str, token: str):
+    @classmethod
+    def get_user_info(cls, base_url: str, token: str):
         """tokenで指定したユーザーの情報を取得する
 
         https://api.rdm.nii.ac.jp/v2/users/me/
@@ -97,7 +98,7 @@ class Api():
             ユーザー情報
         """
         endpoint = '/users/me/'
-        api_url = Api.build_api_url(base_url, endpoint)
+        api_url = cls.build_api_url(base_url, endpoint)
         headers = {
             'Authorization': 'Bearer {}'.format(token)
         }
@@ -110,8 +111,8 @@ class Api():
             raise
         return response.json()
 
-
-    def get_projects(scheme, domain, token):
+    @staticmethod
+    def get_projects(base_url, token):
         """https://api.rdm.nii.ac.jp/v2/nodes/
 
         Raises:
@@ -119,7 +120,7 @@ class Api():
             requests.exceptions.RequestException: その他の通信エラー
         """
         sub_url = 'v2/nodes/'
-        api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
+        api_url = base_url + sub_url
         headers = {
             'Authorization': 'Bearer {}'.format(token)
         }
@@ -132,8 +133,8 @@ class Api():
             raise
         return response.json()
 
-
-    def get_project_registrations(base_url, token, project_id):
+    @classmethod
+    def get_project_registrations(cls, base_url, token, project_id):
         """プロジェクトメタデータを取得する
 
         https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/registrations
@@ -144,7 +145,7 @@ class Api():
             requests.exceptions.RequestException: その他の通信エラー
         """
         endpoint = f'/nodes/{project_id}/registrations/'
-        api_url = Api.build_api_url(base_url, endpoint)
+        api_url = cls.build_api_url(base_url, endpoint)
         headers = {
             'Authorization': 'Bearer {}'.format(token)
         }
@@ -163,8 +164,8 @@ class Api():
             raise
         return response.json()
 
-
-    def get_project_collaborators(base_url: str, token: str, project_id: str):
+    @classmethod
+    def get_project_collaborators(cls, base_url: str, token: str, project_id: str):
         """プロジェクトメンバーの情報を取得する
 
         https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/contributors/
@@ -180,7 +181,7 @@ class Api():
             requests.exceptions.RequestException: その他の通信エラー
         """
         endpoint = f'/nodes/{project_id}/contributors/'
-        api_url = Api.build_api_url(base_url, endpoint)
+        api_url = cls.build_api_url(base_url, endpoint)
         headers = {
             'Authorization': 'Bearer {}'.format(token)
         }

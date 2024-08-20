@@ -1,6 +1,8 @@
 """ dg-webと接続するためのパッケージです。"""
-from .dgform import *
 from .dgweb import *
+from .form import Form
+from .runcrate_form import RunCrateForm
+
 
 SCHEME = 'http'
 DOMAIN = 'dg02.dg.rcos.nii.ac.jp'

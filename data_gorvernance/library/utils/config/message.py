@@ -11,7 +11,7 @@ class ConfigParserBase:
 
     Args:
         class:
-            _instance (Message): シングルトンインスタンスを格納する
+            _instance (ConfigParserBase): シングルトンインスタンスを格納する
 
     """
     _instance = None
@@ -46,7 +46,7 @@ class ConfigParserBase:
             section (str): 設定ファイルのセクションを設定します。
             option (str): 設定ファイルの項目名を設定します。
         Returns:
-            str: 設定値を返す。
+            str: 対応する設定値を返す。
 
         """
         return self._config_file.get(section,option)

@@ -9,7 +9,7 @@ from dg_drawer.research_flow import PhaseStatus
 import panel as pn
 
 from library.utils.config import message as msg_config
-from library.utils.widgets import Alert
+from library.utils.widgets import Alert, MessageBox
 from .base import BaseSubflowForm
 
 class RelinkSubflowForm(BaseSubflowForm):
@@ -26,12 +26,12 @@ class RelinkSubflowForm(BaseSubflowForm):
             submit_button(Button):ボタンの設定
     """
 
-    def __init__(self, abs_root:str, message_box:pn.MessageBox) -> None:
+    def __init__(self, abs_root:str, message_box:MessageBox) -> None:
         """RelinkSubflowForm コンストラクタのメソッドです。
 
         Args:
             abs_root (str): リサーチフローのルートディレクトリ
-            message_box (pn.MessageBox): メッセージを格納する。
+            message_box (MessageBox): メッセージを格納する。
         """
 
         super().__init__(abs_root, message_box)

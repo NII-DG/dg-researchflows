@@ -11,7 +11,7 @@ import panel as pn
 from library.utils.config import path_config, message as msg_config
 from library.utils.error import InputWarning
 from library.utils.string import StringManager
-from library.utils.widgets import Alert
+from library.utils.widgets import Alert, MessageBox
 from .base import BaseSubflowForm
 
 
@@ -30,7 +30,7 @@ class RenameSubflowForm(BaseSubflowForm):
             _err_output(MessageBox):エラーの出力
     """
 
-    def __init__(self, abs_root:str, message_box:pn.MessageBox) -> None:
+    def __init__(self, abs_root:str, message_box:MessageBox) -> None:
         """RenameSubflowForm コンストラクタのメソッドです。
 
         Args:

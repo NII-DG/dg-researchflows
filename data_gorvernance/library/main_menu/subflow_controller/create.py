@@ -6,6 +6,7 @@ import os
 import shutil
 import traceback
 
+
 from dg_drawer.research_flow import PhaseStatus
 import panel as pn
 
@@ -15,6 +16,7 @@ from library.utils.error import InputWarning
 from library.utils.nb_file import NbFile
 from library.utils.string import StringManager
 from .base import BaseSubflowForm
+from library.utils.widgets import MessageBox
 
 
 class CreateSubflowForm(BaseSubflowForm):
@@ -33,7 +35,7 @@ class CreateSubflowForm(BaseSubflowForm):
             _data_dir_name_form(TextInput):データディレクトリ名のフォーム
     """
 
-    def __init__(self, abs_root:str, message_box:pn.MessageBox) -> None:
+    def __init__(self, abs_root:str, message_box:MessageBox) -> None:
         """CreateSubflowForm コンストラクタのメソッドです。
 
         Args:

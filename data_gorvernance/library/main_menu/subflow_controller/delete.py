@@ -8,7 +8,7 @@ from dg_drawer.research_flow import PhaseStatus
 import panel as pn
 
 from library.utils.config import path_config, message as msg_config
-from library.utils.widgets import Alert
+from library.utils.widgets import Alert, MessageBox
 from .base import BaseSubflowForm
 
 
@@ -25,7 +25,7 @@ class DeleteSubflowForm(BaseSubflowForm):
             _err_output(MessageBox):エラーの出力
     """
 
-    def __init__(self, abs_root:str, message_box:pn.MessageBox) -> None:
+    def __init__(self, abs_root:str, message_box:MessageBox) -> None:
         """DeleteSubflowForm コンストラクタのメソッドです。
 
         Args:

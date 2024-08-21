@@ -22,7 +22,8 @@ def get_project_id() -> str:
         str: プロジェクトIDを返す。
 
     """
-    project_id = grdm.GrdmMain.get_project_id()
+    grdmmain = grdm.Main()
+    project_id = grdmmain.get_project_id()
     if project_id:
         return project_id
     while True:
@@ -102,7 +103,8 @@ def get_grdm_token(vault_key: str) -> str:
             bool: トークンの有効性を返す。
 
         """
-        return grdm.GrdmMain.check_authorization(token)
+        grdmmain = grdm.Main()
+        return grdmmain.check_authorization(token)
 
     return get_token(vault_key, check_auth, msg_config.get('form', 'pls_input_grdm_token'))
 
@@ -127,7 +129,8 @@ def get_goveredrun_token() -> str:
         Returns:
             bool: Governed Runのトークンの有効性を返す。
         """
-        return dg_web.Api.check_governedrun_token(token)
+        dgweb_api = dg_web.Api()
+        return dgweb_api.check_governedrun_token(token)
 
     return get_token('govrun_token', check_auth, msg_config.get('form', 'pls_input_govrun_token'))
 
@@ -153,7 +156,8 @@ def get_grdm_connection_parameters() -> Tuple[str, str]:
     while True:
         try:
             token = get_grdm_token(vault_key)
-            if not grdm.GrdmMain.check_permission(token, project_id):
+            grdmmain = grdm.Main()
+            if not grdmmain.check_permission(token, project_id):
                 raise PermissionError
             break
         except UnauthorizedError:

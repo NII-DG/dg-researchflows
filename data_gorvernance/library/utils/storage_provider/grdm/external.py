@@ -1,261 +1,218 @@
-"""データの取得、アップロード、権限やアクセス許可のチェックをするモジュールです。
+"""Gakunin RDMのAPIへの通信、ファイルまたはフォルダをアップロード、メタデータの整形、取得、返却を行うモジュールです。
 
-このモジュールはデータの取得やアップロード、権限やアクセス許可のチェックを行います。
-プロジェクトID、プロジェクトの一覧、テキストファイルの中身やjsonファイルの中身、メタデータを取得したり、
-GRDMにアップロードしたり、"URLの権限やアクセス許可のチェックを行います。
+ファイルの内容を取得し、ファイルまたはフォルダをアップロードします。
 ファイルまたはフォルダをアップロードするメソッドやファイルの内容を取得するメソッドがあります。
+このモジュールはメタデータに必要な値を用意します。
 プロジェクトメタデータを整形したり、メタデータのテンプレートを取得したり、メタデータをフォーマットして返却するメソッドがあります。
 """
-import json
-import os
-from urllib import parse
 from http import HTTPStatus
-from typing import Union
-from .api import Api
-from ...error import NotFoundContentsError, UnauthorizedError
+from urllib import parse
+
+import requests
+from requests.exceptions import RequestException
+
+from ...error import UnauthorizedError, ProjectNotExist
+import os
+from .main import Main
 from osfclient.cli import OSF, split_storage
 from osfclient.utils import norm_remote_path, split_storage, is_path_matched
 from osfclient.exceptions import UnauthorizedException
-from requests.exceptions import RequestException
-import requests
-from library.utils.config import connect as con_config
+from typing import Union
+import json
 
+class External:
 
-NEED_TOKEN_SCOPE = ["osf.full_write"]
-ALLOWED_PERMISSION = ["admin", "write"]
-GRDM_BASE_URL = con_config.get('GRDM', 'BASE_URL')
-
-class GrdmMain():
-
-    @staticmethod
-    def get_project_id() -> Union[str, None]:
-        """プロジェクトIDを取得するメソッドです。
-
-        Returns:
-            str:プロジェクトIDを返す。値が取得できなかった場合はNone。
-        """
-        # url: https://rdm.nii.ac.jp/vz48p/osfstorage
-        url = os.environ.get("BINDER_REPO_URL", "")
-        if not url:
-            return None
-        split_path = parse.urlparse(url).path.split("/")
-        if "osfstorage" in split_path:
-            return split_path[1]
-        else:
-            return None
-
-    @staticmethod
-    def check_authorization(token: str) -> bool:
-        """パーソナルアクセストークンの権限をチェックするメソッドです。
+    @classmethod
+    def build_api_url(cls, base_url: str, endpoint=''):
+        """API用のURLを作成する
 
         Args:
             base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
-            token (str): パーソナルアクセストークン
+            endpoint (str, optional): endpoint for api. Defaults to ''.
 
         Returns:
-            bool: 権限に問題が無ければTrue、問題があればFalseを返す。
-        """
-        try:
-            profile = Api.get_token_profile(base_url=GRDM_BASE_URL, token=token)
-            scope = profile['scope']
-            if all(element in scope for element in NEED_TOKEN_SCOPE):
-                return True
-        except UnauthorizedError:
-            return False
-        return False
+            str: base path
 
-    @staticmethod
-    def check_permission(token: str, project_id: str) -> bool:
-        """リポジトリへのアクセス権限のチェックを行うメソッドです。
-
-        Args:
-            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
-            token (str): パーソナルアクセストークン
-            project_id (str): プロジェクトID
-
-        Raises:
-            UnauthorizedError: 認証が通らない
-            ProjectNotExist: 指定されたプロジェクトIDが存在しない
-            requests.exceptions.RequestException: その他の通信エラー
-
-        Returns:
-            bool:パーミッションに問題なければTrue、問題があればFalseの値を返す。
-        """
-        response = Api.get_user_info(GRDM_BASE_URL, token)
-        user_id = response['data']['id']
-        response = Api.get_project_collaborators(GRDM_BASE_URL, token, project_id)
-        data = response['data']
-        for user in data:
-            if user['embeds']['users']['data']['id'] == user_id:
-                if user['attributes']['permission'] in ALLOWED_PERMISSION:
-                    return True
-        return False
-
-    @staticmethod
-    def get_projects_list(token: str) -> dict:
-        """プロジェクトの一覧を取得するメソッドです。
-
-        Args:
-            scheme(str): プロトコル名(http, https, ssh)
-            domain(str):ドメイン名
-            token(str):パーソナルアクセストークン
-
-        Raises:
-            UnauthorizedError: 認証が通らない
-            requests.exceptions.RequestException: 通信エラー
-
-        Returns:
-            dict:プロジェクトの一覧のデータの値を返す。
-        """
-        response = Api.get_projects(GRDM_BASE_URL, token)
-        data = response['data']
-        return {d['id']: d['attributes']['title'] for d in data}
-
-    @classmethod
-    def sync(cls, token: str, api_url: str, project_id: str, abs_source: str, abs_root:str="/home/jovyan"):
-        """GRDMにアップロードするメソッドです。
-
-        abs_source は絶対パスでなければならない。
-
-        Args:
-            token (str): GRDMのパーソナルアクセストークン
-            api_url (str): API URL (e.g. https://api.osf.io/v2/)
-            project_id (str): プロジェクトID
-            abs_source (str): 同期したいファイルまたはディレクトリ
-            abs_root (str): リサーチフローのルートディレクトリ. Defaults to "/home/jovyan".
-
-        Raises:
-            UnauthorizedError: 認証が通らない
-            RuntimeError: RDMClientから上がってくるエラー全般
-            FileNotFoundError: 指定したファイルが存在しないエラー
-            ValueError:絶対パスではないエラー
-        """
-
-        if os.path.isdir(abs_source):
-            recursive = True
-        elif os.path.isfile(abs_source):
-            recursive = False
-        else:
-            raise FileNotFoundError(f"The file or directory '{abs_source}' does not exist.")
-
-        if not os.path.isabs(abs_source):
-            raise ValueError(f"The path '{abs_source}' is not an absolute path.")
-        if recursive and not abs_source.endswith('/'):
-            abs_source += '/'
-
-        destination = os.path.relpath(abs_source, abs_root)
-
-        cls.upload(
-            token=token, base_url=api_url, project_id=project_id,
-            source=abs_source, destination=destination,
-            recursive=recursive, force=True
-        )
-
-    @classmethod
-    def download_text_file(cls, token: str, api_url: str, project_id: str, remote_path: str, encoding='utf-8'):
-        """テキストファイルの中身を取得するメソッドです。
-
-        Args:
-            token (str): GRDMのパーソナルアクセストークン
-            api_url (str): API URL (e.g. https://api.osf.io/v2/)
-            project_id (str): プロジェクトID
-            remote_path (str): ファイルパス
-            encoding (str): バイトを解析するエンコーディング
-
-        Raises:
-            FileNotFoundError: 指定したファイルが存在しない
-            UnauthorizedError: 認証が通らない
-            requests.exceptions.RequestException: その他の通信エラー
-        """
-        content = cls.download(
-            token=token, project_id=project_id,
-            base_url=api_url, remote_path=remote_path
-        )
-        if content is None:
-            raise FileNotFoundError(f'The specified file (path: {remote_path}) does not exist.')
-        return content.decode(encoding)
-
-    @classmethod
-    def download_json_file(cls, token: str, api_url: str, project_id: str, remote_path: str):
-        """jsonファイルの中身を取得するメソッドです。
-
-        Args:
-            token (str): GRDMのパーソナルアクセストークン
-            api_url (str): API URL (e.g. https://api.osf.io/v2/)
-            project_id (str): プロジェクトID
-            remote_path (str): ファイルパス
-
-        Raises:
-            FileNotFoundError: 指定したファイルが存在しない
-            json.JSONDecodeError: 変換元文字列がjson形式でなかった
-            UnauthorizedError: 認証が通らない
-            requests.exceptions.RequestException: その他の通信エラー
-        """
-        content = cls.download_text_file(token, api_url, project_id, remote_path)
-        return json.loads(content)
-
-    @classmethod
-    def get_project_metadata(cls, base_url: str, token: str, project_id: str):
-        """プロジェクトメタデータを取得するメソッドです。
-
-        Args:
-            base_url (str):Root URL (e.g. https://rdm.nii.ac.jp)
-            token (str): パーソナルアクセストークン
-            project_id (str): プロジェクトID
-
-        Raises:
-            NotFoundContentsError: メタデータが存在しない
-            UnauthorizedError: 認証が通らない
-            ProjectNotExist: 指定されたプロジェクトIDが存在しない
-            requests.exceptions.RequestException: その他の通信エラー
-        """
-        metadata = Api.get_project_registrations(base_url, token, project_id)
-        if len(metadata['data']) < 1:
-            raise NotFoundContentsError(f"Metadata doesn't exist for the project with the specified ID {project_id}.")
-        return cls.format_metadata(metadata)
-
-
-    @staticmethod
-    def get_collaborator_list(base_url: str, token: str, project_id: str) -> dict:
-        """共同管理者の取得するメソッドです。
-
-        Args:
-            base_url (str):Root URL (e.g. https://rdm.nii.ac.jp)
-            token (str): パーソナルアクセストークン
-            project_id (str): プロジェクトID
-
-        Returns:
-            dict: ユーザー名がkey、権限種別がvalue
-
-        Raises:
-            UnauthorizedError: 認証が通らない
-            ProjectNotExist: 指定されたプロジェクトIDが存在しない
-            requests.exceptions.RequestException: その他の通信エラー
-        """
-        response = Api.get_project_collaborators(base_url, token, project_id)
-        data = response['data']
-        return {
-            d['embeds']['users']['data']['attributes']['full_name']: d['attributes']['permission']
-            for d in data
-        }
-
-    @staticmethod
-    def build_collaborator_url(base_url: str, project_id: str) -> str:
-        """プロジェクトのメンバー一覧のURLを返すメソッドです。
-
-        Args:
-            base_url (str):Root URL (e.g. https://rdm.nii.ac.jp)
-            project_id (str): プロジェクトID
-
-        Returns:
-            str: 指定されたproject idのプロジェクトメンバー一覧画面のURL
+        Examples:
+            >>> build_api_base_url('https://rdm.nii.ac.jp')
+            'https://api.rdm.nii.ac.jp/v2/'
+            >>> build_api_base_url('https://rdm.nii.ac.jp', '/users/me/')
+            'https://api.rdm.nii.ac.jp/v2/users/me/'
         """
         parsed = parse.urlparse(base_url)
-        endpoint = f'{project_id}/contributors/'
-        return parse.urlunparse((parsed.scheme, parsed.netloc, endpoint, '', '', ''))
+        netloc = f'api.{parsed.netloc}'
+        base_path = 'v2/'
+        if not endpoint:
+            endpoint = base_path
+        else:
+            endpoint = endpoint.lstrip('/')
+            endpoint = base_path + endpoint
+        if not endpoint.endswith('/'):
+                endpoint = endpoint + '/'
+        return parse.urlunparse((parsed.scheme, netloc, endpoint, '', '', ''))
 
     @classmethod
-    def upload(cls, token:str, base_url:str, project_id:str, source:str, destination:str, recursive:bool=False, force:bool=False):
+    def build_oauth_url(cls, base_url: str, endpoint=''):
+        """OAuthのAPI用のURLを作成する
+
+        Args:
+            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+            endpoint (str, optional): endpoint for api. Defaults to ''.
+
+        Returns:
+            str: base path
+        """
+        parsed = parse.urlparse(base_url)
+        netloc = f'accounts.{parsed.netloc}'
+        endpoint = endpoint.rstrip('/')
+        return parse.urlunparse((parsed.scheme, netloc, endpoint, '', '', ''))
+
+    @classmethod
+    def get_token_profile(cls, base_url: str, token: str):
+        """https://accounts.rdm.nii.ac.jp/oauth2/profile
+
+        Args:
+            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+            token (str): パーソナルアクセストークン
+
+        Raises:
+            UnauthorizedError: 認証が通らない
+            requests.exceptions.RequestException: その他の通信エラー
+        """
+        endpoint = '/oauth2/profile'
+        api_url = cls.build_oauth_url(base_url, endpoint)
+        headers = {
+            'Authorization': 'Bearer {}'.format(token)
+        }
+        response = requests.get(url=api_url, headers=headers)
+        try:
+            response.raise_for_status()
+        except RequestException as e:
+            if response.status_code == HTTPStatus.UNAUTHORIZED:
+                raise UnauthorizedError(str(e)) from e
+            raise
+        return response.json()
+
+    @classmethod
+    def get_user_info(cls, base_url: str, token: str):
+        """tokenで指定したユーザーの情報を取得する
+
+        https://api.rdm.nii.ac.jp/v2/users/me/
+
+        Args:
+            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+            token (str): パーソナルアクセストークン
+
+        Raises:
+            UnauthorizedError: 認証が通らない
+            requests.exceptions.RequestException: その他の通信エラー
+
+        Returns:
+            ユーザー情報
+        """
+        endpoint = '/users/me/'
+        api_url = cls.build_api_url(base_url, endpoint)
+        headers = {
+            'Authorization': 'Bearer {}'.format(token)
+        }
+        response = requests.get(url=api_url, headers=headers)
+        try:
+            response.raise_for_status()
+        except RequestException as e:
+            if response.status_code == HTTPStatus.UNAUTHORIZED:
+                raise UnauthorizedError(str(e)) from e
+            raise
+        return response.json()
+
+    def get_projects(self, base_url, token):
+        """https://api.rdm.nii.ac.jp/v2/nodes/
+
+        Raises:
+            UnauthorizedError: 認証が通らない
+            requests.exceptions.RequestException: その他の通信エラー
+        """
+        sub_url = 'v2/nodes/'
+        api_url = base_url + sub_url
+        headers = {
+            'Authorization': 'Bearer {}'.format(token)
+        }
+        response = requests.get(url=api_url, headers=headers)
+        try:
+            response.raise_for_status()
+        except RequestException as e:
+            if response.status_code == HTTPStatus.UNAUTHORIZED:
+                raise UnauthorizedError(str(e)) from e
+            raise
+        return response.json()
+
+    @classmethod
+    def get_project_registrations(cls, base_url, token, project_id):
+        """プロジェクトメタデータを取得する
+
+        https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/registrations
+
+        Raises:
+            UnauthorizedError: 認証が通らない
+            ProjectNotExist: 指定されたプロジェクトIDが存在しない
+            requests.exceptions.RequestException: その他の通信エラー
+        """
+        endpoint = f'/nodes/{project_id}/registrations/'
+        api_url = cls.build_api_url(base_url, endpoint)
+        headers = {
+            'Authorization': 'Bearer {}'.format(token)
+        }
+        response = requests.get(url=api_url, headers=headers)
+        try:
+            response.raise_for_status()
+        except RequestException as e:
+            if response.status_code == HTTPStatus.UNAUTHORIZED:
+                raise UnauthorizedError(str(e)) from e
+            if response.status_code == HTTPStatus.NOT_FOUND:
+                # 存在しないプロジェクトID
+                raise ProjectNotExist(str(e)) from e
+            if response.status_code == HTTPStatus.GONE:
+                # プロジェクトが消された
+                raise ProjectNotExist(str(e)) from e
+            raise
+        return response.json()
+
+    @classmethod
+    def get_project_collaborators(cls, base_url: str, token: str, project_id: str):
+        """プロジェクトメンバーの情報を取得する
+
+        https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/contributors/
+
+        Args:
+            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+            token (str): パーソナルアクセストークン
+            project_id (str): プロジェクトID
+
+        Raises:
+            UnauthorizedError: 認証が通らない
+            ProjectNotExist: 指定されたプロジェクトIDが存在しない
+            requests.exceptions.RequestException: その他の通信エラー
+        """
+        endpoint = f'/nodes/{project_id}/contributors/'
+        api_url = cls.build_api_url(base_url, endpoint)
+        headers = {
+            'Authorization': 'Bearer {}'.format(token)
+        }
+        response = requests.get(url=api_url, headers=headers)
+        try:
+            response.raise_for_status()
+        except RequestException as e:
+            if response.status_code == HTTPStatus.UNAUTHORIZED:
+                raise UnauthorizedError(str(e)) from e
+            if response.status_code == HTTPStatus.NOT_FOUND:
+                # 存在しないプロジェクトID
+                raise ProjectNotExist(str(e)) from e
+            if response.status_code == HTTPStatus.GONE:
+                # プロジェクトが消された
+                raise ProjectNotExist(str(e)) from e
+            raise
+        return response.json()
+
+    def upload(self, token:str, base_url:str, project_id:str, source:str, destination:str, recursive:bool=False, force:bool=False):
         """ファイルまたはフォルダをアップロードするメソッドです。
 
         Args:
@@ -316,8 +273,7 @@ class GrdmMain():
             raise UnauthorizedError(str(e)) from e
 
 
-    @classmethod
-    def download(cls, token:str, project_id:str, base_url:str, remote_path:str, base_path=None) -> Union[bytes, None]:
+    def download(self, token:str, project_id:str, base_url:str, remote_path:str, base_path=None) -> Union[bytes, None]:
         """ファイルの内容を取得するメソッドです。
 
         Args:

@@ -157,11 +157,12 @@ class TaskSave(TaskLog):
         self.save_form_box.clear()
         msg = msg_config.get('save', 'doing')
         timediff.start()
+        grdmmain = grdm.Main()
 
         try:
             for i, path in enumerate(self._source):
                 self.save_msg_output.update_info(f'{msg} {i+1}/{size}')
-                grdm.GrdmMain.sync(
+                grdmmain.sync(
                     token=self.token,
                     api_url=grdm.API_V2_BASE_URL,
                     project_id=self.project_id,

@@ -2,8 +2,9 @@
 
 プロジェクトメタデータをアップロードしたり、APIに接続してプロジェクトメタデータとプロジェクトメンバーの情報を取得するためです
 """
-from .api import *
-from .grdmmain import GrdmMain
+
+from external import *
+from main import *
 
 BASE_URL = 'https://rdm.nii.ac.jp/'
 

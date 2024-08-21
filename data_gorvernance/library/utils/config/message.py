@@ -1,7 +1,7 @@
 """ 設定ファイルからメッセージを取得するためのモジュールです。"""
 import os
 
-from library.utils.config.config_parser_base import ConfigParserBase
+from .config_parser_base import ConfigParserBase
 
 MESSAGE_CONFIG_PATH = '../../data/message.ini'
 script_dir = os.path.dirname(os.path.abspath(__file__))

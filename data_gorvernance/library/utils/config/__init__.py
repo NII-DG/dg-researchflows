@@ -5,3 +5,4 @@
 """
 from . import message
 from . import path_config
+from . import config_parser_base

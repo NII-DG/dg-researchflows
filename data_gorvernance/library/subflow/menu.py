@@ -55,11 +55,7 @@ class SubflowMenu(TaskLog):
             diagram(pn.pane.HTML):サブフロー図を格納する
             title(pn.pane.Markdown):サブフロー図のタイトル
             diagram_widgetbox(pn.WidgetBox):サブフロー図をHTMLとして埋め込む
-            selector(pn.widgets.RadioBoxGroup):ラジオボタン
-            selector_options(list[str]):ラジオボタンのオプション
             working_file (str): 実行Notebookファイルパス
-            button(pn.widgets.Button):ボタンの設定
-            select_widgetbox(pn.widgets.Button):ボタンの配置
     """
 
     def __init__(self, working_file:str) -> None:
@@ -80,68 +76,20 @@ class SubflowMenu(TaskLog):
         self.title = pn.pane.Markdown()
         self.diagram_widgetbox = pn.WidgetBox(self.title, self.diagram)
 
-        # ラジオボタン
-        self.selector = pn.widgets.RadioBoxGroup()
-        self.selector_options = [
-            message.get('subflow_menu', 'select_abled_task'),
-            message.get('subflow_menu', 'select_all_task')
-        ]
-        self.selector.options = self.selector_options
-        self.selector.value = self.selector_options[0] # type: ignore
-
-        self.button = pn.widgets.Button(
-            name=message.get('subflow_menu', 'select_button_name'),
-            button_type= "primary",
-            align= 'end'
-        )
-        # ボタンの配置
-        self.select_widgetbox = pn.WidgetBox()
-        self.select_widgetbox.append(
-            pn.Row(self.selector, self.button, margin=(10,10,10,25))
-        )
-
-    # イベント
-    def select_flow(self, subflow:SubFlowManager, font_folder:Path) -> Callable:
-        """ボタン押下時にサブフロー図の表示を切り替えるメソッドです。
-
-        Args:
-            subflow (SubFlowManager): サブフロー図
-            font_folder (Path): フォントフォルダのパス
-
-        Returns:
-            Callable:サブフロー図を表示する。
-        """
-        def callback(event):
-            """サブフロー図の生成と表示を行うメソッドです。"""
-            self.diagram_widgetbox.disabled = True
-            self.set_title()
-            self.set_diagram(subflow, font_folder, self.is_display_all())
-            self.diagram_widgetbox.disabled = False
-        return callback
-
     # 各要素の設定
-    def set_title(self):
-        """タイトルを設定するメソッドです。"""
-        if self.is_display_all():
-            self.title.object = f'### {message.get("subflow_menu", "title_all_task")}'
-        else:
-            self.title.object = f'### {message.get("subflow_menu", "title_abled_task")}'
-
     def _set_width(self):
         """フロー図の大きさをもとにwidgetboxの大きさを統一するメソッドです。"""
         d = self.diagram.width + 20
         self.menu_widgetbox.width = d
         self.diagram_widgetbox.width = d
-        self.select_widgetbox.width = d
         self._msg_output = d
-
-    def set_diagram(self, subflow:SubFlowManager, font_folder:Path, display_all=True):
+        
+    def set_diagram(self, subflow: SubFlowManager, font_folder: Path):
         """フロー図の生成と表示設定のメソッドです。
 
         Args:
             subflow(SubFlowManager):サブフロー図
             font_folder(Path):フォントフォルダー
-            display_all(bool):全てのタスクを表示させるかどうか
         """
         with TemporaryDirectory() as workdir:
             tmp_diag = Path(workdir) / 'skeleton.diag'
@@ -149,26 +97,14 @@ class SubflowMenu(TaskLog):
             subflow.generate(
                 svg_path=str(skeleton),
                 tmp_diag=str(tmp_diag),
-                font=str(font_folder / '.fonts/ipag.ttf'),
-                display_all=display_all
+                font=str(font_folder / '.fonts/ipag.ttf')
             )
             self.diagram.object = self._get_contents(str(skeleton))
             self.diagram.width = self._get_svg_size(str(skeleton))
             self._set_width()
 
     # その他
-    def is_display_all(self) -> bool:
-        """フロー図の表示を制御するメソッドです。
-
-        Returns:
-            bool:すべてのタスクをアクティブにするかどうか
-        """
-        display_all = True
-        if self.selector.value == self.selector_options[0]:
-            display_all = False
-        return display_all
-
-    def _get_contents(self, svg_file_path:str) -> str:
+    def _get_contents(self, svg_file_path: str) -> str:
         """フロー図を取得するメソッドです。
 
         Args:
@@ -208,12 +144,11 @@ class SubflowMenu(TaskLog):
         return viewbox_width
 
     @classmethod
-    def render(cls, working_file: str, is_selected=False):
+    def render(cls, working_file: str):
         """サブフローメニューを表示させるメソッドです。
 
         Args:
             working_file (str): 実行Notebookファイルパス
-            is_selected (bool): サブフロー図の切り替えをできるようにするかどうか。デフォルトでは False.
         """
         subflow_menu = cls(working_file)
         pn.extension()
@@ -253,19 +188,7 @@ class SubflowMenu(TaskLog):
                 str(parent), str(status_file), str(diag_file), str(using_task_dir)
             )
             subflow.setup_tasks(str(souce_task_dir))
-
-            # panel activation
-            if is_selected:
-                subflow_menu.set_title()
-                subflow_menu.set_diagram(
-                    subflow, font_folder, subflow_menu.is_display_all()
-                )
-                subflow_menu.button.on_click(
-                    subflow_menu.select_flow(subflow, font_folder)
-                )
-                subflow_menu.menu_widgetbox.append(subflow_menu.select_widgetbox)
-            else:
-                subflow_menu.set_diagram(subflow, font_folder, True)
+            subflow_menu.set_diagram(subflow, font_folder)
             subflow_menu.menu_widgetbox.append(subflow_menu.diagram_widgetbox)
         except Exception:
             message_box = MessageBox().update_error(

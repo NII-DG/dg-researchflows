@@ -18,6 +18,7 @@ from .metadata import format_metadata
 NEED_TOKEN_SCOPE = ["osf.full_write"]
 ALLOWED_PERMISSION = ["admin", "write"]
 
+
 def get_project_id() -> Union[str, None]:
     """プロジェクトIDを取得するメソッドです。
 
@@ -35,7 +36,7 @@ def get_project_id() -> Union[str, None]:
         return None
 
 
-def check_authorization(base_url:str, token:str) -> bool:
+def check_authorization(base_url: str, token: str) -> bool:
     """パーソナルアクセストークンの権限をチェックするメソッドです。
 
     Args:
@@ -55,7 +56,7 @@ def check_authorization(base_url:str, token:str) -> bool:
     return False
 
 
-def check_permission(base_url:str, token:str, project_id:str) -> bool:
+def check_permission(base_url: str, token: str, project_id: str) -> bool:
     """リポジトリへのアクセス権限のチェックを行うメソッドです。
 
     Args:
@@ -82,7 +83,7 @@ def check_permission(base_url:str, token:str, project_id:str) -> bool:
     return False
 
 
-def get_projects_list(scheme:str, domain:str, token:str) -> dict:
+def get_projects_list(scheme: str, domain: str, token: str) -> dict:
     """プロジェクトの一覧を取得するメソッドです。
 
     Args:
@@ -102,7 +103,7 @@ def get_projects_list(scheme:str, domain:str, token:str) -> dict:
     return {d['id']: d['attributes']['title'] for d in data}
 
 
-def sync(token: str, api_url:str, project_id:str, abs_source:str, abs_root:str="/home/jovyan"):
+def sync(token: str, api_url: str, project_id: str, abs_source: str, abs_root: str = "/home/jovyan"):
     """GRDMにアップロードするメソッドです。
 
     abs_source は絶対パスでなければならない。
@@ -126,7 +127,8 @@ def sync(token: str, api_url:str, project_id:str, abs_source:str, abs_root:str="
     elif os.path.isfile(abs_source):
         recursive = False
     else:
-        raise FileNotFoundError(f"The file or directory '{abs_source}' does not exist.")
+        raise FileNotFoundError(
+            f"The file or directory '{abs_source}' does not exist.")
 
     if not os.path.isabs(abs_source):
         raise ValueError(f"The path '{abs_source}' is not an absolute path.")
@@ -142,8 +144,8 @@ def sync(token: str, api_url:str, project_id:str, abs_source:str, abs_root:str="
     )
 
 
-def download_text_file(token:str, api_url:str,
-    project_id:str, remote_path: str, encoding='utf-8'
+def download_text_file(token: str, api_url: str,
+    project_id: str, remote_path: str, encoding='utf-8'
 ):
     """テキストファイルの中身を取得するメソッドです。
 
@@ -164,11 +166,12 @@ def download_text_file(token:str, api_url:str,
         base_url=api_url, remote_path=remote_path
     )
     if content is None:
-        raise FileNotFoundError(f'The specified file (path: {remote_path}) does not exist.')
+        raise FileNotFoundError(
+            f'The specified file (path: {remote_path}) does not exist.')
     return content.decode(encoding)
 
 
-def download_json_file(token:str, api_url:str, project_id:str, remote_path:str):
+def download_json_file(token: str, api_url: str, project_id: str, remote_path: str):
     """jsonファイルの中身を取得するメソッドです。
 
     Args:
@@ -187,7 +190,7 @@ def download_json_file(token:str, api_url:str, project_id:str, remote_path:str):
     return json.loads(content)
 
 
-def get_project_metadata(base_url:str, token:str, project_id:str):
+def get_project_metadata(base_url: str, token: str, project_id: str):
     """プロジェクトメタデータを取得するメソッドです。
 
     Args:
@@ -205,11 +208,11 @@ def get_project_metadata(base_url:str, token:str, project_id:str):
     if len(metadata['data']) < 1:
         raise NotFoundContentsError(
             f"Metadata doesn't exist for the project with the specified ID {project_id}."
-            )
+        )
     return format_metadata(metadata)
 
 
-def get_collaborator_list(base_url:str, token:str, project_id:str) -> dict:
+def get_collaborator_list(base_url: str, token: str, project_id: str) -> dict:
     """共同管理者の取得するメソッドです。
 
     Args:
@@ -233,7 +236,7 @@ def get_collaborator_list(base_url:str, token:str, project_id:str) -> dict:
     }
 
 
-def build_collaborator_url(base_url:str, project_id:str) -> str:
+def build_collaborator_url(base_url: str, project_id: str) -> str:
     """プロジェクトのメンバー一覧のURLを返すメソッドです。
 
     Args:

@@ -22,7 +22,7 @@ from library.utils.widgets import MessageBox
 from .subflow import SubFlowManager
 
 
-def access_main_menu(working_file:str):
+def access_main_menu(working_file: str):
     """メインメニューにアクセスするメソッドです。
 
     Args:
@@ -37,10 +37,10 @@ def access_main_menu(working_file:str):
 
     main_menu_button = pn.pane.HTML()
     main_menu_button.object = create_button(
-            url=f'{link}?init_nb=true',
-            msg=message.get('subflow_menu', 'access_main_menu'),
-            button_width='500px'
-        )
+        url=f'{link}?init_nb=true',
+        msg=message.get('subflow_menu', 'access_main_menu'),
+        button_width='500px'
+    )
     pn.extension()
     display(main_menu_button)
     display(Javascript('IPython.notebook.save_checkpoint();'))
@@ -62,7 +62,7 @@ class SubflowMenu(TaskLog):
             select_widgetbox(pn.widgets.Button):ボタンの配置
     """
 
-    def __init__(self, working_file:str) -> None:
+    def __init__(self, working_file: str) -> None:
         """SubflowMenu コンストラクタのメソッドです。
 
         Args:
@@ -87,21 +87,21 @@ class SubflowMenu(TaskLog):
             message.get('subflow_menu', 'select_all_task')
         ]
         self.selector.options = self.selector_options
-        self.selector.value = self.selector_options[0] # type: ignore
+        self.selector.value = self.selector_options[0]  # type: ignore
 
         self.button = pn.widgets.Button(
             name=message.get('subflow_menu', 'select_button_name'),
-            button_type= "primary",
-            align= 'end'
+            button_type="primary",
+            align='end'
         )
         # ボタンの配置
         self.select_widgetbox = pn.WidgetBox()
         self.select_widgetbox.append(
-            pn.Row(self.selector, self.button, margin=(10,10,10,25))
+            pn.Row(self.selector, self.button, margin=(10, 10, 10, 25))
         )
 
     # イベント
-    def select_flow(self, subflow:SubFlowManager, font_folder:Path) -> Callable:
+    def select_flow(self, subflow: SubFlowManager, font_folder: Path) -> Callable:
         """ボタン押下時にサブフロー図の表示を切り替えるメソッドです。
 
         Args:
@@ -135,7 +135,7 @@ class SubflowMenu(TaskLog):
         self.select_widgetbox.width = d
         self._msg_output = d
 
-    def set_diagram(self, subflow:SubFlowManager, font_folder:Path, display_all=True):
+    def set_diagram(self, subflow: SubFlowManager, font_folder: Path, display_all=True):
         """フロー図の生成と表示設定のメソッドです。
 
         Args:
@@ -168,7 +168,7 @@ class SubflowMenu(TaskLog):
             display_all = False
         return display_all
 
-    def _get_contents(self, svg_file_path:str) -> str:
+    def _get_contents(self, svg_file_path: str) -> str:
         """フロー図を取得するメソッドです。
 
         Args:
@@ -179,7 +179,7 @@ class SubflowMenu(TaskLog):
         """
         return file.File(svg_file_path).read()
 
-    def _get_svg_size(self, svg_file_path:str) -> int:
+    def _get_svg_size(self, svg_file_path: str) -> int:
         """svgの画像の横幅を返すメソッドです。
 
         Args:
@@ -250,7 +250,8 @@ class SubflowMenu(TaskLog):
         try:
             # setup
             subflow = SubFlowManager(
-                str(parent), str(status_file), str(diag_file), str(using_task_dir)
+                str(parent), str(status_file), str(
+                    diag_file), str(using_task_dir)
             )
             subflow.setup_tasks(str(souce_task_dir))
 
@@ -263,14 +264,15 @@ class SubflowMenu(TaskLog):
                 subflow_menu.button.on_click(
                     subflow_menu.select_flow(subflow, font_folder)
                 )
-                subflow_menu.menu_widgetbox.append(subflow_menu.select_widgetbox)
+                subflow_menu.menu_widgetbox.append(
+                    subflow_menu.select_widgetbox)
             else:
                 subflow_menu.set_diagram(subflow, font_folder, True)
             subflow_menu.menu_widgetbox.append(subflow_menu.diagram_widgetbox)
         except Exception:
             message_box = MessageBox().update_error(
                 f'## [INTERNAL ERROR] : {traceback.format_exc()}'
-                )
+            )
             subflow_menu.menu_widgetbox.append(message_box)
         display(subflow_menu.menu_widgetbox)
         display(Javascript('IPython.notebook.save_checkpoint();'))

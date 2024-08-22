@@ -23,7 +23,7 @@ class RunCrateForm:
 
     key = "runCrate"
 
-    def __init__(self)->None:
+    def __init__(self) -> None:
         """ インスタンスの初期化処理を実行するメソッドです。"""
         self.definition = {}
         self.files = {}
@@ -33,7 +33,7 @@ class RunCrateForm:
         self.form_box = pn.WidgetBox()
         self.msg_output = MessageBox()
 
-    def pop_schema(self, schema:dict) -> dict:
+    def pop_schema(self, schema: dict) -> dict:
         """schemaのRunCrate選択部分を取得し、schemaから取り除くメソッドです。
 
         Args:
@@ -47,7 +47,7 @@ class RunCrateForm:
         self.definition = properties.pop(self.key, {})
         return schema
 
-    def create_widget(self, crates:list, data:Optional[dict]=None) -> None:
+    def create_widget(self, crates: list, data: Optional[dict] = None) -> None:
         """RunCrate選択の入力欄を生成するメソッドです。
 
         Args:

@@ -35,7 +35,7 @@ def get_project_id() -> str:
     return project_id
 
 
-def get_token(key:str, func:Callable[[str], bool], message:str) -> str:
+def get_token(key: str, func: Callable[[str], bool], message: str) -> str:
     """ vaultもしくはinputからトークンを取得する関数です。
 
     Args:
@@ -160,7 +160,8 @@ def get_grdm_connection_parameters() -> tuple[str, str]:
             vault.set_value(vault_key, '')
             continue
         except ProjectNotExist as e:
-            msg = msg_config.get('form', 'project_id_not_exist').format(project_id)
+            msg = msg_config.get(
+                'form', 'project_id_not_exist').format(project_id)
             raise ProjectNotExist(msg) from e
 
     return token, project_id

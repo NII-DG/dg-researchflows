@@ -62,7 +62,7 @@ class OCSTemplate:
                 disabled.append(fld[self.__FIELD_NAME])
         return disabled
 
-    def get_id(self, target_name:str) -> str:
+    def get_id(self, target_name: str) -> str:
         """指定したOCSテンプレートのIDを取得するメソッドです。
 
         Args:
@@ -76,7 +76,7 @@ class OCSTemplate:
             if fld[self.__FIELD_NAME] == target_name:
                 return fld[self.__ID]
 
-    def get_template_path(self, target_name:str) -> str:
+    def get_template_path(self, target_name: str) -> str:
         """指定したOCSテンプレートのパスを取得するメソッドです。
 
         Args:

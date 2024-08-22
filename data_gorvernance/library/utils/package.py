@@ -58,7 +58,7 @@ class MakePackage:
             checkout=checkout,
             no_input=True,
         )
-        context_file = os.path.join(self.template_dir,'cookiecutter.json')
+        context_file = os.path.join(self.template_dir, 'cookiecutter.json')
         context = generate_context(context_file=context_file)
         self.template_context = context['cookiecutter']
         return self.get_default_context(context)
@@ -84,7 +84,8 @@ class MakePackage:
         for key, raw in all_prompts:
             if key.startswith('_'):
                 continue
-            cookiecutter_dict[key] = render_variable(env, raw, cookiecutter_dict)
+            cookiecutter_dict[key] = render_variable(
+                env, raw, cookiecutter_dict)
         self.rendered_context = cookiecutter_dict
         return cookiecutter_dict
 
@@ -105,7 +106,7 @@ class MakePackage:
             else var_name
         )
 
-    def create_package(self, context_dict: Union[dict, None] = None, output_dir: str='.'):
+    def create_package(self, context_dict: Union[dict, None] = None, output_dir: str = '.'):
         """ cookiecutterテンプレートを使用してパッケージを作成するメソッドです。
 
         Args:
@@ -115,4 +116,4 @@ class MakePackage:
         """
         cookiecutter(self.template_dir, no_input=True,
             extra_context=context_dict, output_dir=output_dir
-            )
+        )

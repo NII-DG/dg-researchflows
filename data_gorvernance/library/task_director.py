@@ -33,7 +33,8 @@ def get_return_sub_flow_menu_relative_url_path(working_file_path: str) -> str:
         menu_path = path_config.get_sub_flow_menu_path(subflow_type)
         return os.path.join('../../../../..', menu_path)
     else:
-        menu_path = path_config.get_sub_flow_menu_path(subflow_type, subflow_id)
+        menu_path = path_config.get_sub_flow_menu_path(
+            subflow_type, subflow_id)
         return os.path.join('../../../../../..', menu_path)
 
 
@@ -48,7 +49,7 @@ class TaskDirector(TaskSave):
             _sub_flow_status_file_path(str):サブフローステータスファイルのパス
     """
 
-    def __init__(self, nb_working_file_path:str, notebook_name:str) -> None:
+    def __init__(self, nb_working_file_path: str, notebook_name: str) -> None:
         """TaskDirector コンストラクタのメソッドです。
 
         Notebookファイルのオペレーションするための共通クラス
@@ -71,19 +72,22 @@ class TaskDirector(TaskSave):
         # サブフローステータス管理JSONパス
         # 想定値：data_gorvernance\researchflow\plan\status.json
         # 想定値：data_gorvernance\researchflow\サブフロー種別\サブフローID\status.json
-        subflow_type, subflow_id = get_subflow_type_and_id(nb_working_file_path)
+        subflow_type, subflow_id = get_subflow_type_and_id(
+            nb_working_file_path)
         if not subflow_type:
             raise ValueError('don\'t get subflow type.')
         if not subflow_id:
             # 研究準備の場合
             self._sub_flow_status_file_path = os.path.join(
-                self._abs_root_path, path_config.get_sub_flow_status_file_path(subflow_type)
+                self._abs_root_path, path_config.get_sub_flow_status_file_path(
+                    subflow_type)
             )
         else:
             # 研究準備以外の場合
             self._sub_flow_status_file_path = os.path.join(
                 self._abs_root_path,
-                path_config.get_sub_flow_status_file_path(subflow_type, subflow_id)
+                path_config.get_sub_flow_status_file_path(
+                    subflow_type, subflow_id)
             )
 
     ########################
@@ -135,7 +139,7 @@ class TaskDirector(TaskSave):
     def return_subflow_menu(self):
         """サブフローメニューへのボタン表示を行うメソッドです。"""
         pn.extension()
-        sub_flow_menu_link_button  = self.get_subflow_menu_button_object()
+        sub_flow_menu_link_button = self.get_subflow_menu_button_object()
         display(sub_flow_menu_link_button)
         display(Javascript('IPython.notebook.save_checkpoint();'))
 

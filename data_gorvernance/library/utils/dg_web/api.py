@@ -13,7 +13,7 @@ from requests.exceptions import RequestException
 from library.utils.error import UnauthorizedError, NotFoundContentsError
 
 
-def get_govsheet_schema(scheme:str, domain:str) -> dict:
+def get_govsheet_schema(scheme: str, domain: str) -> dict:
     """ ガバナンスシートのスキーマを取得する関数です。
 
     Args:
@@ -31,7 +31,7 @@ def get_govsheet_schema(scheme:str, domain:str) -> dict:
     return response.json()
 
 
-def get_metadata_schema(scheme:str, domain:str) -> dict:
+def get_metadata_schema(scheme: str, domain: str) -> dict:
     """ メタデータのスキーマを取得する関数です。
 
     Args:
@@ -49,7 +49,7 @@ def get_metadata_schema(scheme:str, domain:str) -> dict:
     return response.json()
 
 
-def check_governedrun_token(scheme:str, domain:str, token:str) -> bool:
+def check_governedrun_token(scheme: str, domain: str, token: str) -> bool:
     """ Governed Runのトークンの有効性を確認する関数です。
 
     Args:
@@ -80,9 +80,9 @@ def check_governedrun_token(scheme:str, domain:str, token:str) -> bool:
 
 
 def validate(
-    scheme:str, domain:str, grdm_token:str, project_id:str,
-    govrun_token:Optional[str]=None, govsheet:Optional[dict]=None,
-    metadata:Optional[dict]=None
+    scheme: str, domain: str, grdm_token: str, project_id: str,
+    govrun_token: Optional[str] = None, govsheet: Optional[dict] = None,
+    metadata: Optional[dict] = None
 ) -> dict:
     """ 検証する関数です。
 
@@ -122,7 +122,7 @@ def validate(
     return response.json()
 
 
-def get_validations(scheme:str, domain:str, grdm_token:str, project_id:str) -> dict:
+def get_validations(scheme: str, domain: str, grdm_token: str, project_id: str) -> dict:
     """ 検証結果を取得する関数です。
 
     Args:
@@ -159,7 +159,7 @@ def get_validations(scheme:str, domain:str, grdm_token:str, project_id:str) -> d
 
 
 def get_validations_validationId(
-    scheme:str, domain:str, grdm_token:str, project_id:str, validation_id:str
+    scheme: str, domain: str, grdm_token: str, project_id: str, validation_id: str
 ) -> dict:
     """ idを指定して検証結果を取得する関数です。
 

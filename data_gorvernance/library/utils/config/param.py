@@ -111,7 +111,7 @@ class Siblings():
     __GITHUGIBHTTP = 'git_hugib_http'
     __GITHUBSSH = 'git_hub_ssh'
 
-    def __init__(self, siblings_data:dict) -> None:
+    def __init__(self, siblings_data: dict) -> None:
         """ インスタンスの初期化処理を実行するメソッドです。
 
         Args:
@@ -153,7 +153,7 @@ class Dgcore():
     __SCHEME = 'Scheme'
     __NETLOC = 'Netloc'
 
-    def __init__(self, dg_core_data:dict) -> None:
+    def __init__(self, dg_core_data: dict) -> None:
         """ インスタンスの初期化処理を実行するメソッドです。
 
         Args:
@@ -188,7 +188,7 @@ class Repository():
     """
     __ID = 'id'
 
-    def __init__(self, repo_data:dict) -> None:
+    def __init__(self, repo_data: dict) -> None:
         """ インスタンスの初期化処理を実行するメソッドです。
 
         Args:

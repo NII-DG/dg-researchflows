@@ -16,9 +16,9 @@ from typing import Union
 from library.utils.error import UnauthorizedError
 
 
-def upload(token:str, base_url:str, project_id:str, source:str,
-    destination:str, recursive:bool=False, force:bool=False
-    ):
+def upload(token: str, base_url: str, project_id: str, source: str,
+    destination: str, recursive: bool = False, force: bool = False
+):
     """ファイルまたはフォルダをアップロードするメソッドです。
 
     Args:
@@ -42,7 +42,8 @@ def upload(token:str, base_url:str, project_id:str, source:str,
     osf = OSF(token=token, base_url=base_url)
     if not osf.has_auth:
         raise KeyError('To upload a file you need to provide a username and'
-                    ' password or token.')
+            ' password or token.'
+        )
 
     try:
         project = osf.project(project_id)
@@ -53,7 +54,7 @@ def upload(token:str, base_url:str, project_id:str, source:str,
             if not os.path.isdir(source):
                 raise RuntimeError(
                     f"Expected source ({source}) to be a directory when using recursive mode."
-                    )
+                )
             # local name of the directory that is being uploaded
             _, dir_name = os.path.split(source)
 
@@ -65,19 +66,22 @@ def upload(token:str, base_url:str, project_id:str, source:str,
                         # build the remote path + fname
                         name = os.path.join(remote_path, dir_name, subdir_path,
                                             fname)
-                        store.create_file(name, fp, force=force,
-                                            update=update)
+                        store.create_file(
+                            name, fp, force=force, update=update
+                        )
 
         else:
             with open(source, 'rb') as fp:
-                store.create_file(remote_path, fp, force=force,
-                                    update=update)
+                store.create_file(
+                    remote_path, fp, force=force, update=update
+                )
     except UnauthorizedException as e:
         raise UnauthorizedError(str(e)) from e
 
 
-def download(token:str, project_id:str, base_url:str,
-    remote_path:str, base_path=None) -> Union[bytes, None]:
+def download(token: str, project_id: str, base_url: str,
+    remote_path: str, base_path=None
+) -> Union[bytes, None]:
     """ファイルの内容を取得するメソッドです。
 
     Args:
@@ -104,7 +108,8 @@ def download(token:str, project_id:str, base_url:str,
         base_file_path = base_path[base_path.index('/'):]
         if not base_file_path.endswith('/'):
             base_file_path = base_file_path + '/'
-        path_filter = lambda f: is_path_matched(base_file_path, f)
+
+        def path_filter(f): return is_path_matched(base_file_path, f)
     else:
         path_filter = None
 
@@ -112,7 +117,7 @@ def download(token:str, project_id:str, base_url:str,
         project = osf.project(project_id)
         store = project.storage(storage)
         files = store.files if path_filter is None \
-                else store.matched_files(path_filter)
+            else store.matched_files(path_filter)
         for file_ in files:
             if norm_remote_path(file_.path) == remote_path:
                 try:

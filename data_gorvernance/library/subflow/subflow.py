@@ -28,8 +28,8 @@ class SubFlowManager:
 
     """
 
-    def __init__(self, current_dir:str, status_file:str,
-        diag_file:str, using_task_dir:str
+    def __init__(self, current_dir: str, status_file: str,
+        diag_file: str, using_task_dir: str
     ) -> None:
         """ インスタンスの初期化処理を実行するメソッドです。
 
@@ -45,7 +45,7 @@ class SubFlowManager:
         self.diag_file = diag_file
         self.task_dir = using_task_dir
 
-    def setup_tasks(self, souce_task_dir:str):
+    def setup_tasks(self, souce_task_dir: str):
         """ タスクの原本があるディレクトリからタスクファイルをコピーするメソッドです。
 
         Args:
@@ -54,10 +54,11 @@ class SubFlowManager:
         """
         if os.path.isdir(souce_task_dir):
             for task in self.tasks:
-                self._copy_file_by_name(task.name, souce_task_dir, self.task_dir)
+                self._copy_file_by_name(
+                    task.name, souce_task_dir, self.task_dir)
 
-    def _copy_file_by_name(self, target_file:str, search_directory:str,
-        destination_directory:str
+    def _copy_file_by_name(self, target_file: str, search_directory: str,
+        destination_directory: str
     ) -> None:
         """ 指定した名前のファイルを検索ディレクトリから目的のディレクトリにコピーするメソッドです。
 
@@ -74,7 +75,8 @@ class SubFlowManager:
                 # if filename.startswith(target_file) のとき
                 source_dir = root
                 relative_path = file.relative_path(root, search_directory)
-                destination_dir = os.path.join(destination_directory, relative_path)
+                destination_dir = os.path.join(
+                    destination_directory, relative_path)
                 # タスクノートブックのコピー
                 source_file = os.path.join(source_dir, filename)
                 destination_file = os.path.join(destination_dir, filename)
@@ -85,11 +87,14 @@ class SubFlowManager:
                     path_config.get_abs_root_form_working_dg_file_path(root),
                     path_config.DG_IMAGES_FOLDER
                 )
-                destination_images = os.path.join(destination_dir, path_config.IMAGES)
+                destination_images = os.path.join(
+                    destination_dir, path_config.IMAGES)
                 if not os.path.isdir(destination_images):
-                    os.symlink(source_images, destination_images, target_is_directory=True)
+                    os.symlink(source_images, destination_images,
+                        target_is_directory=True
+                    )
 
-    def generate(self, svg_path:str, tmp_diag:str, font:str, display_all:bool =True) -> None:
+    def generate(self, svg_path: str, tmp_diag: str, font: str, display_all: bool = True) -> None:
         """ ダイアグラムを生成するメソッドです。
 
         Args:
@@ -112,7 +117,7 @@ class SubFlowManager:
         self.diag.generate_svg(tmp_diag, svg_path, font)
         update_svg(svg_path, self.current_dir, self.svg_config)
 
-    def _update(self, display_all:bool=True) -> None:
+    def _update(self, display_all: bool = True) -> None:
         """ タスクの状態に基づいてダイアグラムを更新するメソッドです。
 
         Args:
@@ -123,7 +128,7 @@ class SubFlowManager:
             self._adjust_by_status(task, display_all)
             self._adjust_by_optional(task, display_all)
 
-    def _adjust_by_optional(self, task:SubflowTask, display_all:bool=True) -> None:
+    def _adjust_by_optional(self, task: SubflowTask, display_all: bool = True) -> None:
         """ 非推奨のタスクをグレーアウトし、リンクが押せない状態にするメソッドです。
 
         Args:
@@ -133,7 +138,7 @@ class SubFlowManager:
         """
         if task.disable:
             if display_all:
-                #self.diag.update_node_style(task.id, 'dotted')
+                # self.diag.update_node_style(task.id, 'dotted')
                 pass
             else:
                 # self.diag.delete_node(task.id)
@@ -141,7 +146,7 @@ class SubFlowManager:
                 self.diag.update_node_color(task.id, "#77787B")
                 self.svg_config[task.id]['is_link'] = False
 
-    def _adjust_by_status(self, task:SubflowTask, display_all:bool=True) -> None:
+    def _adjust_by_status(self, task: SubflowTask, display_all: bool = True) -> None:
         """ フロー図の見た目をタスクの状態によって変えるメソッドです。
 
         Args:
@@ -171,7 +176,7 @@ class SubFlowManager:
         elif task.status == task.STATUS_DOING:
             self.diag.update_node_icon(task.id, icon_dir + "/loading.png")
 
-    def parse_headers(self, task:SubflowTask) -> None:
+    def parse_headers(self, task: SubflowTask) -> None:
         """ タスクタイトルとパスを取得するメソッドです。
 
         Args:
@@ -198,13 +203,14 @@ class SubFlowManager:
                 if line0.startswith('# ') or line0.startswith('## ')
             ]
 
-            title = headers[0][0] if not headers[0][0].startswith('About:') else headers[0][0][6:]
+            title = headers[0][0] if not headers[0][0].startswith(
+                'About:') else headers[0][0][6:]
             if task.name in str(nb_path):
                 self.svg_config[task.id]['path'] = str(nb_path)
                 self.svg_config[task.id]['text'] = title
                 break
 
-    def change_id(self, task:SubflowTask) -> None:
+    def change_id(self, task: SubflowTask) -> None:
         """diagファイルのタスクIDをタスクタイトルに置き換えるメソッドです。
 
         Args:

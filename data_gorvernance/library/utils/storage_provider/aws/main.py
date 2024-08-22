@@ -3,7 +3,8 @@ import boto3
 
 from .models import download_dir, download_file
 
-def download(access_key:str, secret_key:str, bucket_name:str, aws_path:str, local_path:str):
+
+def download(access_key: str, secret_key: str, bucket_name: str, aws_path: str, local_path: str):
     """AWS S3バケットからディレクトリまたはファイルをダウンロードするための関数です。
 
     Args:

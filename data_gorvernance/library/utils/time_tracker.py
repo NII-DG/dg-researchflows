@@ -2,6 +2,7 @@
 import time
 from typing import Union
 
+
 class TimeDiff:
     """ 処理時間を計測するためのクラスです。
 

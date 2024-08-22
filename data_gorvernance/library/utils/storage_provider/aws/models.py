@@ -2,7 +2,7 @@
 import os
 
 
-def download_file(s3_client, bucket_name:str, aws_path:str, local_path:str):
+def download_file(s3_client, bucket_name: str, aws_path: str, local_path: str):
     """指定したAWS S3バケットからファイルをダウンロードする関数です。
 
     Args:
@@ -29,7 +29,7 @@ def download_file(s3_client, bucket_name:str, aws_path:str, local_path:str):
     s3_client.download_file(bucket_name, aws_path, local_path)
 
 
-def download_dir(s3_client, bucket_name:str, aws_dir:str, local_dir:str):
+def download_dir(s3_client, bucket_name: str, aws_dir: str, local_dir: str):
     """指定したAWS S3バケットからディレクトリをダウンロードする関数です。
 
     Args:
@@ -47,9 +47,11 @@ def download_dir(s3_client, bucket_name:str, aws_dir:str, local_dir:str):
     next_token = None
     while True:
         if next_token is None:
-            response = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=aws_dir)
+            response = s3_client.list_objects_v2(
+                Bucket=bucket_name, Prefix=aws_dir)
         else:
-            response = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=aws_dir, ContinuationToken=next_token)
+            response = s3_client.list_objects_v2(
+                Bucket=bucket_name, Prefix=aws_dir, ContinuationToken=next_token)
 
         try:
             contents = response['Contents']

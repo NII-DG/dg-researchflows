@@ -21,7 +21,7 @@ class BaseLogger:
 
     """
 
-    def __init__(self, output_dir:str="."):
+    def __init__(self, output_dir: str = "."):
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
         Args:
@@ -34,7 +34,7 @@ class BaseLogger:
         self._update_handler()
         self.logger.propagate = False
 
-    def reset_file(self, fmt:str):
+    def reset_file(self, fmt: str):
         """ファイルのリセットを行うメソッドです。
 
         ログファイルは日付で分割されるため、日付が変わっていた場合のみログハンドラーを更新します。
@@ -64,7 +64,7 @@ class BaseLogger:
         self.handler = FileHandler(log_file)
         self.logger.addHandler(self.handler)
 
-    def set_formatter(self, fmt:str):
+    def set_formatter(self, fmt: str):
         """フォーマッターを設定するためのメソッドです。
 
         Args:
@@ -74,7 +74,7 @@ class BaseLogger:
         formatter = logging.Formatter(fmt)
         self.handler.setFormatter(formatter)
 
-    def set_log_level(self, level:str):
+    def set_log_level(self, level: str):
         """ロガーのログレベルを設定するためのメソッドです。
 
         Args:
@@ -108,7 +108,7 @@ class UserActivityLog(BaseLogger):
 
     """
 
-    def __init__(self, nb_working_file:str, notebook_name:str):
+    def __init__(self, nb_working_file: str, notebook_name: str):
         """ クラスのインスタンスを初期化するメソッドです。コンストラクタ
 
         Args:
@@ -130,8 +130,7 @@ class UserActivityLog(BaseLogger):
         self.subflow_type = subflow_type
         self.cell_id = ""
 
-
-    def _get_log_dir(self, nb_working_file:str) -> str:
+    def _get_log_dir(self, nb_working_file: str) -> str:
         """ログファイルを保存するディレクトリを生成するためのメソッドです。
 
         Args:
@@ -158,7 +157,7 @@ class UserActivityLog(BaseLogger):
         """
         return '%(levelname)s\t%(asctime)s\t%(username)s\t%(subflow_id)s\t%(subflow_type)s\t%(ipynb_name)s\t%(cell_id)s\t%(message)s'
 
-    def info(self, message:str):
+    def info(self, message: str):
         """INFOレベルのログを出力するためのメソッドです。
 
         Args:
@@ -168,7 +167,7 @@ class UserActivityLog(BaseLogger):
         self.reset_file(self._get_format())
         self.logger.info(message, extra=self.record())
 
-    def warning(self, message:str):
+    def warning(self, message: str):
         """WARNINGレベルのログを出力するためのメソッドです。
 
         Args:
@@ -178,7 +177,7 @@ class UserActivityLog(BaseLogger):
         self.reset_file(self._get_format())
         self.logger.warning(message, extra=self.record())
 
-    def error(self, message:str):
+    def error(self, message: str):
         """ERRORレベルのログを出力するためのメソッドです。
 
         Args:
@@ -188,7 +187,7 @@ class UserActivityLog(BaseLogger):
         self.reset_file(self._get_format())
         self.logger.error(message, extra=self.record())
 
-    def start(self, detail:str='', note:str=''):
+    def start(self, detail: str = '', note: str = ''):
         """処理の開始ログを出力するためのメソッドです。
 
         Args:
@@ -198,7 +197,7 @@ class UserActivityLog(BaseLogger):
         """
         self.info("-- " + detail + "処理開始 --" + note)
 
-    def finish(self, detail:str='', note:str=''):
+    def finish(self, detail: str = '', note: str = ''):
         """処理の終了ログを出力するためのメソッドです。
 
         Args:
@@ -218,7 +217,7 @@ class UserActivityLog(BaseLogger):
         return {
             'username': self.username,
             'subflow_id': self.subflow_id,
-            'subflow_type':self.subflow_type,
+            'subflow_type': self.subflow_type,
             'ipynb_name': self.ipynb_file,
             'cell_id': self.cell_id
         }

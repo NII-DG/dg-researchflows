@@ -2,17 +2,17 @@
 
 
 def create_button(
-            url:str='',
-            msg:str='',
-            disable:bool=False,
-            target:str='_self',
-            a_character_color:str='#ffffff',
-            a_font_size:str='15px',
-            button_width:str='300px',
-            button_height:str='30px',
-            button_border_radius:str='5px',
-            border:list[str] = [],
-            button_background_color:str='#0072B5',
+    url: str = '',
+    msg: str = '',
+    disable: bool = False,
+    target: str = '_self',
+    a_character_color: str = '#ffffff',
+    a_font_size: str = '15px',
+    button_width: str = '300px',
+    button_height: str = '30px',
+    button_border_radius: str = '5px',
+    border: list[str] = [],
+    button_background_color: str = '#0072B5',
 ) -> str:
     """ HTMLのボタンを作成する関数です。
 
@@ -40,7 +40,7 @@ def create_button(
         border_value = ' '.join(border)
     if not disable:
         # able button
-        return(
+        return (
             f'<a style="font-size:{a_font_size};"href="{url}" target="{target}" >'
             f'<button style="width: {button_width}; height: {button_height};'
             f'border-radius: {button_border_radius}; background-color: {button_background_color};'
@@ -48,7 +48,7 @@ def create_button(
         )
     else:
         # disable button
-        return(
+        return (
             f'<button style="width: {button_width}; height: {button_height};'
             f'border-radius: {button_border_radius}; background-color: {button_background_color};'
             f'border: {border_value};" disable>{msg}</button>'

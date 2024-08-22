@@ -19,7 +19,7 @@ class Button(pn.widgets.Button):
 
     """
 
-    def set_looks_init(self, name: str="") -> None:
+    def set_looks_init(self, name: str = "") -> None:
         """ ボタンの見た目を設定するメソッドです。
 
         Args:
@@ -33,7 +33,7 @@ class Button(pn.widgets.Button):
         self.button_type = 'primary'
         self.button_style = 'solid'
 
-    def set_looks_processing(self, name: str="") -> None:
+    def set_looks_processing(self, name: str = "") -> None:
         """ ボタンの見た目を設定するメソッドです。
 
         Args:
@@ -85,7 +85,7 @@ class Alert(pn.pane.Alert):
     """ pn.pane.Alertを拡張して特定のアラートを簡単に作成できるようにしたクラスです。"""
 
     @classmethod
-    def info(cls, msg: str="") -> 'Alert':
+    def info(cls, msg: str = "") -> 'Alert':
         """ infoタイプのアラートを作成するメソッドです。
 
         Args:
@@ -98,7 +98,7 @@ class Alert(pn.pane.Alert):
         return cls(msg, sizing_mode="stretch_width", alert_type='info')
 
     @classmethod
-    def success(cls, msg: str="") -> 'Alert':
+    def success(cls, msg: str = "") -> 'Alert':
         """ successタイプのアラートを作成するメソッドです。
 
         Args:
@@ -111,7 +111,7 @@ class Alert(pn.pane.Alert):
         return cls(msg, sizing_mode="stretch_width", alert_type='success')
 
     @classmethod
-    def warning(cls, msg: str="") -> 'Alert':
+    def warning(cls, msg: str = "") -> 'Alert':
         """ warningタイプのアラートを作成するメソッドです。
 
         Args:
@@ -124,7 +124,7 @@ class Alert(pn.pane.Alert):
         return cls(msg, sizing_mode="stretch_width", alert_type='warning')
 
     @classmethod
-    def error(cls, msg: str="") -> 'Alert':
+    def error(cls, msg: str = "") -> 'Alert':
         """ dangerタイプのアラートを作成するメソッドです。
 
         Args:
@@ -140,7 +140,7 @@ class Alert(pn.pane.Alert):
 class MessageBox(pn.WidgetBox):
     """ メッセージを表示するためのwidgetBoxのクラスです。"""
 
-    def has_message(self)->bool:
+    def has_message(self) -> bool:
         """ MessageBoxにメッセージが存在するかを判定するメソッドです。
 
         Returns:
@@ -152,7 +152,7 @@ class MessageBox(pn.WidgetBox):
         else:
             return False
 
-    def update_info(self, msg: str="") -> Alert:
+    def update_info(self, msg: str = "") -> Alert:
         """ infoアラートに更新するメソッドです。
 
         Args:
@@ -167,7 +167,7 @@ class MessageBox(pn.WidgetBox):
         self.append(alert)
         return alert
 
-    def update_success(self, msg: str="") -> Alert:
+    def update_success(self, msg: str = "") -> Alert:
         """ successアラートに更新するメソッドです。
 
         Args:
@@ -182,7 +182,7 @@ class MessageBox(pn.WidgetBox):
         self.append(alert)
         return alert
 
-    def update_warning(self, msg: str="") -> Alert:
+    def update_warning(self, msg: str = "") -> Alert:
         """ warningアラートに更新するメソッドです。
 
         Args:
@@ -197,7 +197,7 @@ class MessageBox(pn.WidgetBox):
         self.append(alert)
         return alert
 
-    def update_error(self, msg: str="") -> Alert:
+    def update_error(self, msg: str = "") -> Alert:
         """ errorアラートに更新するメソッドです。
 
         Args:
@@ -212,7 +212,7 @@ class MessageBox(pn.WidgetBox):
         self.append(alert)
         return alert
 
-    def add_info(self, msg: str="") -> Alert:
+    def add_info(self, msg: str = "") -> Alert:
         """ infoアラートを追加するメソッドです。
 
         Args:
@@ -226,7 +226,7 @@ class MessageBox(pn.WidgetBox):
         self.append(alert)
         return alert
 
-    def add_success(self, msg: str="") -> Alert:
+    def add_success(self, msg: str = "") -> Alert:
         """ successアラートを追加するメソッドです。
 
         Args:
@@ -240,7 +240,7 @@ class MessageBox(pn.WidgetBox):
         self.append(alert)
         return alert
 
-    def add_warning(self, msg: str="") -> Alert:
+    def add_warning(self, msg: str = "") -> Alert:
         """ warningアラートを追加するメソッドです。
 
         Args:
@@ -254,7 +254,7 @@ class MessageBox(pn.WidgetBox):
         self.append(alert)
         return alert
 
-    def add_error(self, msg: str="") -> Alert:
+    def add_error(self, msg: str = "") -> Alert:
         """ errorアラートを追加するメソッドです。
 
         Args:

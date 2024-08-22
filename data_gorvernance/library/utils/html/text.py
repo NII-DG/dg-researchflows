@@ -5,7 +5,9 @@ from IPython.core.display import HTML
 from IPython.display import display
 
 
-def create_html_msg(msg:str='', fore:Optional[str]=None, back:Optional[str]=None, tag:str='p') -> str:
+def create_html_msg(
+    msg: str = '', fore: Optional[str] = None, back: Optional[str] = None, tag: str = 'p'
+) -> str:
     """ HTMLを生成する関数です。
 
     Args:
@@ -33,7 +35,7 @@ def create_html_msg(msg:str='', fore:Optional[str]=None, back:Optional[str]=None
         return "<" + tag + " style='" + style + "'>" + msg + "</" + tag + ">"
 
 
-def create_html_msg_info(msg:str='', tag:str='p') -> str:
+def create_html_msg_info(msg: str = '', tag: str = 'p') -> str:
     """ infoメッセージを生成する関数です。
 
     Args:
@@ -47,7 +49,7 @@ def create_html_msg_info(msg:str='', tag:str='p') -> str:
     return create_html_msg(msg=msg, back='#9eff9e', tag=tag)
 
 
-def create_html_msg_warm(msg:str='', tag:str='p') -> str:
+def create_html_msg_warm(msg: str = '', tag: str = 'p') -> str:
     """ warnメッセージを生成する関数です。
 
     Args:
@@ -61,7 +63,7 @@ def create_html_msg_warm(msg:str='', tag:str='p') -> str:
     return create_html_msg(msg=msg, back='#ffff93', tag=tag)
 
 
-def create_html_msg_err(msg:str='', tag:str='p') -> str:
+def create_html_msg_err(msg: str = '', tag: str = 'p') -> str:
     """ errメッセージを生成する関数です。
 
     Args:
@@ -75,7 +77,7 @@ def create_html_msg_err(msg:str='', tag:str='p') -> str:
     return create_html_msg(msg=msg, back='#ffa8a8', tag=tag)
 
 
-def create_html_msg_log(msg:str='', tag:str='p') -> str:
+def create_html_msg_log(msg: str = '', tag: str = 'p') -> str:
     """ 標準メッセージを生成する関数です。
 
     Args:
@@ -89,7 +91,7 @@ def create_html_msg_log(msg:str='', tag:str='p') -> str:
     return create_html_msg(msg=msg, tag=tag)
 
 
-def display_msg_info(msg:str='', tag:str='p') -> None:
+def display_msg_info(msg: str = '', tag: str = 'p') -> None:
     """Infoメッセージを表示する関数です。
 
     Args:
@@ -100,7 +102,7 @@ def display_msg_info(msg:str='', tag:str='p') -> None:
     display(HTML(create_html_msg_info(msg, tag)))
 
 
-def display_msg_warm(msg:str='', tag:str='p') -> None:
+def display_msg_warm(msg: str = '', tag: str = 'p') -> None:
     """Warningメッセージを表示する関数です。
 
     Args:
@@ -111,7 +113,7 @@ def display_msg_warm(msg:str='', tag:str='p') -> None:
     display(HTML(create_html_msg_warm(msg, tag)))
 
 
-def display_msg_err(msg:str='', tag:str='p') -> None:
+def display_msg_err(msg: str = '', tag: str = 'p') -> None:
     """Errorsメッセージを表示する関数です。
 
     Args:
@@ -122,7 +124,7 @@ def display_msg_err(msg:str='', tag:str='p') -> None:
     display(HTML(create_html_msg_err(msg, tag)))
 
 
-def display_msg_log(msg:str='', tag:str='p') -> None:
+def display_msg_log(msg: str = '', tag: str = 'p') -> None:
     """標準メッセージを表示する関数です。
 
     Args:

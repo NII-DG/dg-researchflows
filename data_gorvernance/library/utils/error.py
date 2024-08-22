@@ -1,5 +1,6 @@
 """ エラーのモジュールです。"""
 
+
 class NotFoundSubflowDataError(Exception):
     """サブフローのデータが取得できなかったエラーのクラスです。"""
 

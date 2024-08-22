@@ -57,7 +57,7 @@ class Vault():
         self.__create_dg_engine()
         self.__create_dg_policy()
 
-    def set_value(self, key:str, value:str):
+    def set_value(self, key: str, value: str):
         """値の設定をするメソッドです。
 
         Args:
@@ -71,7 +71,7 @@ class Vault():
             mount_point=DG_ENGINE_NAME,
         )
 
-    def has_value(self, key:str) -> bool:
+    def has_value(self, key: str) -> bool:
         """値の存在チェックをするメソッドです。
 
         Args:
@@ -91,7 +91,7 @@ class Vault():
             return False
         return key in secrets['data']['keys']
 
-    def get_value(self, key:str) -> Union[str, None]:
+    def get_value(self, key: str) -> Union[str, None]:
         """値の取得をするメソッドです。
 
         Args:
@@ -175,7 +175,7 @@ class Vault():
                 policy=DG_POLICY,
             )
 
-    def __write_token(self, token:str):
+    def __write_token(self, token: str):
         """ルートトークン保存のメソッドです。
 
         Args:

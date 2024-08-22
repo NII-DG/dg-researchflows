@@ -95,7 +95,7 @@ class Checkbox(pn.widgets.Checkbox):
 
     """
 
-    def __init__(self, **params:Any) -> None:
+    def __init__(self, **params: Any) -> None:
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
@@ -118,7 +118,7 @@ class Title(pn.pane.Markdown):
 
     """
 
-    def __init__(self, obj:Optional[str]=None, **params:Any) -> None:
+    def __init__(self, obj: Optional[str] = None, **params: Any) -> None:
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
@@ -134,7 +134,7 @@ class Title(pn.pane.Markdown):
             obj = "### " + obj
         super().__init__(object=obj, **params)
 
-    def set_text(self, text:str) -> None:
+    def set_text(self, text: str) -> None:
         """ タイトルを設定するメソッドです。
 
         Args:
@@ -153,7 +153,7 @@ class Description(pn.pane.Markdown):
 
     """
 
-    def __init__(self, obj:Optional[str]=None, **params:Any) -> None:
+    def __init__(self, obj: Optional[str] = None, **params: Any) -> None:
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
@@ -177,7 +177,7 @@ class Column(pn.Column):
 
     """
 
-    def __init__(self, **params:Any) -> None:
+    def __init__(self, **params: Any) -> None:
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
@@ -200,7 +200,7 @@ class ArrayBox(pn.WidgetBox):
 
     """
 
-    def __init__(self, **params:Any) -> None:
+    def __init__(self, **params: Any) -> None:
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
@@ -223,7 +223,7 @@ class ObjectBox(pn.WidgetBox):
 
     """
 
-    def __init__(self, **params:Any) -> None:
+    def __init__(self, **params: Any) -> None:
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
@@ -258,7 +258,7 @@ class Form:
 
         self.schema = {}
 
-    def create_widgets(self, schema:dict, data:Optional[dict]=None) -> None:
+    def create_widgets(self, schema: dict, data: Optional[dict] = None) -> None:
         """jsonchemaの形式に沿った入力欄をpanelで作成するメソッドです。
 
         Args:
@@ -276,7 +276,7 @@ class Form:
             self.form_box.append(self._generate_widget(properties, key, value))
 
     def _generate_widget(
-        self, definition:dict, key:str, value:Optional[dict]=None
+        self, definition: dict, key: str, value: Optional[dict] = None
     ) -> Union[ArrayBox, ObjectBox, Column]:
         """jsonschemaの設定値からpanelのwidgetを作成するメソッドです。
 
@@ -303,12 +303,12 @@ class Form:
                 widget = Select(schema_key=key, options=options)
         elif definition.get("type") == "array":
             return self._generate_array_widget(
-                    definition=definition, title=title, key=key, values=value
-                )
+                definition=definition, title=title, key=key, values=value
+            )
         elif definition.get("type") == "object":
             return self._generate_object_widget(
-                    definition=definition, title=title, key=key, values=value
-                )
+                definition=definition, title=title, key=key, values=value
+            )
         elif definition.get("type") == "number":
             if isinstance(value, int):
                 widget = IntInput(schema_key=key, value=value)
@@ -326,11 +326,13 @@ class Form:
             return form
         elif "string" in definition.get("type", ""):
             if isinstance(value, str):
-                widget = TextInput(schema_key=key, value=value, value_input=value)
+                widget = TextInput(
+                    schema_key=key, value=value, value_input=value)
             else:
                 widget = TextInput(schema_key=key)
         else:
-            self.msg_output.add_warning(f'name: {title}\ntype: {definition.get("type")}')
+            self.msg_output.add_warning(
+                f'name: {title}\ntype: {definition.get("type")}')
 
         title = Title(title, schema_key=key)
         form.append(title)
@@ -342,7 +344,7 @@ class Form:
         return form
 
     def _generate_object_widget(
-        self, definition:dict, title:str, key:str, values:dict
+        self, definition: dict, title: str, key: str, values: dict
     ) -> ObjectBox:
         """type: objectをwidgetbox化するメソッドです。
 
@@ -372,7 +374,7 @@ class Form:
         return obj_box
 
     def _generate_array_widget(
-        self, definition:dict, title:str, key:str, values:Any
+        self, definition: dict, title: str, key: str, values: Any
     ) -> ArrayBox:
         """type: arrayをwidgetbox化するメソッドです。
 
@@ -393,7 +395,7 @@ class Form:
             box.append(Description(description, schema_key=key))
         column = pn.Column()
 
-        def create_items(value: Optional[dict]=None) -> pn.Row:
+        def create_items(value: Optional[dict] = None) -> pn.Row:
             """arrayのひとつの要素を作成するメソッドです。
 
             Args:
@@ -414,7 +416,7 @@ class Form:
                 return pn.Row(widget, create_remove_button(widget, align='end'))
 
         def create_remove_button(
-            widget:Union[ArrayBox, ObjectBox, Column], align:str='start'
+            widget: Union[ArrayBox, ObjectBox, Column], align: str = 'start'
         ) -> Button:
             """ arrayの選択した要素を削除するボタンを生成するメソッドです。
 
@@ -426,8 +428,10 @@ class Form:
                 Button: 生成した削除ボタンを返す。
 
             """
-            remove_button = Button(name='Remove', button_type='danger', button_style='outline', align=align)
-            def remove_item(event:Any)->None:
+            remove_button = Button(
+                name='Remove', button_type='danger', button_style='outline', align=align)
+
+            def remove_item(event: Any) -> None:
                 """ ウィジェットを削除するメソッドです。
 
                 Args:
@@ -464,7 +468,7 @@ class Form:
             remove_button.on_click(remove_item)
             return remove_button
 
-        def add_item(event:Any)->None:
+        def add_item(event: Any) -> None:
             """ Columnに要素を追加するメソッドです。
 
             Args:
@@ -482,13 +486,14 @@ class Form:
 
         box.append(column)
 
-        add_button = Button(name='Add', button_type='primary', button_style='outline')
+        add_button = Button(
+            name='Add', button_type='primary', button_style='outline')
         add_button.on_click(add_item)
         box.append(add_button)
 
         return box
 
-    def is_not_input_widget(self, widget:Any) -> bool:
+    def is_not_input_widget(self, widget: Any) -> bool:
         """ 値を取得するwidgetでないかどうかを判定するメソッドです。
 
         Args:
@@ -523,7 +528,7 @@ class Form:
             data.update(self._get_property(widget, schema))
         return data
 
-    def _get_property(self, widget:Any, schema:dict) -> dict:
+    def _get_property(self, widget: Any, schema: dict) -> dict:
         """ 各widgetからデータを取得するメソッドです。
 
         Args:
@@ -539,7 +544,7 @@ class Form:
         """
         key = widget.schema_key
         value = ""
-        definition:dict = schema[key]
+        definition: dict = schema[key]
 
         try:
             key = widget.schema_key
@@ -563,7 +568,7 @@ class Form:
         else:
             return {}
 
-    def _get_value(self, widget:pn.Column) -> Any:
+    def _get_value(self, widget: pn.Column) -> Any:
         """Column内のwidgetの値を取得するメソッドです。
 
         Args:
@@ -585,7 +590,7 @@ class Form:
             break
         return value
 
-    def _get_object_value(self, widget:ObjectBox, schema:dict):
+    def _get_object_value(self, widget: ObjectBox, schema: dict):
         """ObjectBox内のwidgetの値を取得するメソッドです。
 
         Args:
@@ -606,7 +611,7 @@ class Form:
             value.update(self._get_property(w, properties))
         return value
 
-    def _get_array_value(self, widget:ArrayBox, schema:dict) -> list:
+    def _get_array_value(self, widget: ArrayBox, schema: dict) -> list:
         """ArrayBox内のwidgetの値を取得するメソッドです。
 
         Args:
@@ -634,7 +639,7 @@ class Form:
             break
         return value
 
-    def sort_order(self, schema:dict, json_path:str) -> dict:
+    def sort_order(self, schema: dict, json_path: str) -> dict:
         """jsonファイルを読み込みスキーマを並び替える処理を呼ぶメソッドです。
 
         Args:
@@ -648,10 +653,10 @@ class Form:
         with open(json_path, 'r') as f:
             order = json.load(f)
         order_schema = self.sort_schema(schema['properties'], order)
-        update_schema.update({'properties':order_schema})
+        update_schema.update({'properties': order_schema})
         return update_schema
 
-    def sort_schema(self, properties:dict, order:dict) -> dict:
+    def sort_schema(self, properties: dict, order: dict) -> dict:
         """jsonファイルのkeyに合わせてスキーマを並び替えるメソッドです。
 
         Args:
@@ -666,13 +671,15 @@ class Form:
         for order_key in order['ui:order']:
             if properties.get(order_key):
                 if order.get(order_key) and properties[order_key].get("type") == "object":
-                    schema_value = self.sort_schema(properties[order_key]['properties'], order[order_key])
-                    new_schema.update({order_key:properties[order_key]})
+                    schema_value = self.sort_schema(
+                        properties[order_key]['properties'], order[order_key])
+                    new_schema.update({order_key: properties[order_key]})
                     new_schema[order_key]['properties'] = schema_value
                 elif order.get(order_key) and properties[order_key].get("type") == "array":
                     if properties[order_key]['items'].get("type") == "object":
-                        schema_value = self.sort_schema(properties[order_key]['items']['properties'], order[order_key]['items'])
-                        new_schema.update({order_key:properties[order_key]})
+                        schema_value = self.sort_schema(
+                            properties[order_key]['items']['properties'], order[order_key]['items'])
+                        new_schema.update({order_key: properties[order_key]})
                         new_schema[order_key]['items']['properties'] = schema_value
                     else:
                         new_schema[order_key] = schema_value

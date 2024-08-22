@@ -7,7 +7,7 @@ import json
 import requests
 
 
-def format_metadata(metadata:dict) -> dict[str, list]:
+def format_metadata(metadata: dict) -> dict[str, list]:
     """Gakunin RDMから取得したプロジェクトメタデータを整形するメソッドです。
 
     Args:
@@ -29,7 +29,8 @@ def format_metadata(metadata:dict) -> dict[str, list]:
         registration = data['attributes']['registration_responses']
         for key, value in registration.items():
             if key != 'grdm-files':
-                second_layer[key] = format_display_name(schema, "page1", key, value)
+                second_layer[key] = format_display_name(
+                    schema, "page1", key, value)
 
         files = json.loads(registration['grdm-files'])
         # grdm-files > value
@@ -43,13 +44,14 @@ def format_metadata(metadata:dict) -> dict[str, list]:
             file_datas['metadata'] = file_metadata
             file_values.append(file_datas)
 
-        second_layer['grdm-files'] = format_display_name(schema, "page2", 'grdm-files', file_values)
+        second_layer['grdm-files'] = format_display_name(
+            schema, "page2", 'grdm-files', file_values)
         first_value.append(second_layer)
 
     return {'dmp': first_value}
 
 
-def get_schema(url:str) -> dict:
+def get_schema(url: str) -> dict:
     """メタデータのテンプレートを取得するメソッドです。
 
     リクエストされたURLに接続し、その接続に問題がないかを確認してテンプレート名を取得する。

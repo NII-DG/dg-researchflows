@@ -12,7 +12,7 @@ from .html import create_button
 from .setting import get_data_dir
 
 
-def open_main_menu(working_file:str) -> None:
+def open_main_menu(working_file: str) -> None:
     """ 別タブでメインメニューを開くボタンを表示する関数です。
 
     Args:
@@ -37,7 +37,7 @@ def open_main_menu(working_file:str) -> None:
     display(Javascript('IPython.notebook.save_checkpoint();'))
 
 
-def open_data_folder(working_file:str) -> None:
+def open_data_folder(working_file: str) -> None:
     """ 別タブでデータフォルダを開くボタンを表示する関数です。
 
     Args:

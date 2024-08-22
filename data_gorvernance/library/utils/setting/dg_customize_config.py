@@ -13,7 +13,8 @@ from library.utils.file import JsonFile
 script_dir_path = os.path.dirname(__file__)
 p = Path(script_dir_path)
 # DGカスタマイズJSON定義書絶対パス(data_gorvernance\library\data\data_governance_customize.json)
-data_governance_customize_file = p.joinpath('../../', 'data/data_governance_customize.json').resolve()
+data_governance_customize_file = p.joinpath(
+    '../../', 'data/data_governance_customize.json').resolve()
 
 
 class AlphaProperty:
@@ -31,7 +32,7 @@ class AlphaProperty:
     __ID = 'id'
     __CUSTOMIZE = 'customize'
 
-    def __init__(self, data:dict[str, dict]) -> None:
+    def __init__(self, data: dict[str, dict]) -> None:
         """クラスのインスタンスを初期化するメソッドです。コンストラクタ
 
         Args:
@@ -39,10 +40,11 @@ class AlphaProperty:
 
         """
         self._id = data[self.__ID]
-        self._customize:list[SubFlowRule] = []
+        self._customize: list[SubFlowRule] = []
 
         for subflow_type_name, subflow_rule_data in data[self.__CUSTOMIZE].items():
-            self._customize.append(SubFlowRule(subflow_type_name, subflow_rule_data))
+            self._customize.append(SubFlowRule(
+                subflow_type_name, subflow_rule_data))
 
 
 class SubFlowRule:
@@ -61,7 +63,7 @@ class SubFlowRule:
     __TASK_IDS = 'task_ids'
     __VERIFICATION_IDS = 'verification_ids'
 
-    def __init__(self, subflow_type_name:str, data:dict[str, Any]) -> None:
+    def __init__(self, subflow_type_name: str, data: dict[str, Any]) -> None:
         """クラスのインスタンスを初期化するメソッドです。コンストラクタ
 
         Args:
@@ -83,7 +85,7 @@ def get_dg_customize_config() -> list[AlphaProperty]:
     """
     jf = JsonFile(str(data_governance_customize_file))
     dg_customize_data = jf.read()
-    dg_customize:list[AlphaProperty] = []
+    dg_customize: list[AlphaProperty] = []
     for alpha_property_data in dg_customize_data['dg_customize']:
         dg_customize.append(AlphaProperty(alpha_property_data))
     return dg_customize

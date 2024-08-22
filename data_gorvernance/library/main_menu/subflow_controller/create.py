@@ -35,7 +35,7 @@ class CreateSubflowForm(BaseSubflowForm):
             _data_dir_name_form(TextInput):データディレクトリ名のフォーム
     """
 
-    def __init__(self, abs_root:str, message_box:MessageBox) -> None:
+    def __init__(self, abs_root: str, message_box: MessageBox) -> None:
         """CreateSubflowForm コンストラクタのメソッドです。
 
         Args:
@@ -44,9 +44,10 @@ class CreateSubflowForm(BaseSubflowForm):
         """
         super().__init__(abs_root, message_box)
         # 処理開始ボタン
-        self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
+        self.change_submit_button_init(
+            msg_config.get('main_menu', 'create_sub_flow'))
 
-    def generate_sub_flow_type_options(self, research_flow_status:list[PhaseStatus]) -> dict[str, int]:
+    def generate_sub_flow_type_options(self, research_flow_status: list[PhaseStatus]) -> dict[str, int]:
         """サブフロー種別(フェーズ)を表示するメソッドです。
 
         Args:
@@ -63,10 +64,11 @@ class CreateSubflowForm(BaseSubflowForm):
                 continue
             else:
                 # plan以外の全てのフェーズ
-                pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
+                pahse_options[msg_config.get(
+                    'research_flow_phase_display_name', phase_status._name)] = phase_status._seq_number
         return pahse_options
 
-    def change_submit_button_init(self, name:str):
+    def change_submit_button_init(self, name: str):
         """ボタンの状態を初期化するメソッドです。
 
         Args:
@@ -89,18 +91,20 @@ class CreateSubflowForm(BaseSubflowForm):
             # 親サブフロー種別(フェーズ)（必須)：シングルセレクトの更新
             parent_sub_flow_type_options = self.generate_parent_sub_flow_type_options(
                 selected_value, research_flow_status
-                )
+            )
             self._parent_sub_flow_type_selector.options = parent_sub_flow_type_options
             # 新規作成ボタンのボタンの有効化チェック
             self.change_disable_submit_button()
         except Exception:
-            self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
+            self._err_output.update_error(
+                f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     # overwrite
     def change_disable_submit_button(self):
         """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化するメソッドです。"""
         # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
-        self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
+        self.change_submit_button_init(
+            msg_config.get('main_menu', 'create_sub_flow'))
 
         value = self._sub_flow_type_selector.value
         if value is None:
@@ -158,7 +162,7 @@ class CreateSubflowForm(BaseSubflowForm):
             self._parent_sub_flow_type_selector,
             self._parent_sub_flow_selector,
             self.submit_button
-            )
+        )
 
     def main(self):
         """サブフロー新規作成処理のメソッドです。
@@ -171,7 +175,8 @@ class CreateSubflowForm(BaseSubflowForm):
         """
 
         # 新規作成ボタンを処理中ステータスに更新する
-        self.change_submit_button_processing(msg_config.get('main_menu', 'creating_sub_flow'))
+        self.change_submit_button_processing(
+            msg_config.get('main_menu', 'creating_sub_flow'))
 
         # 入力情報を取得する。
         phase_seq_number = self._sub_flow_type_selector.value
@@ -196,9 +201,10 @@ class CreateSubflowForm(BaseSubflowForm):
         try:
             phase_name, new_sub_flow_id = self.reserch_flow_status_operater.create_sub_flow(
                 phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids
-                )
+            )
         except Exception:
-            self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
+            self.change_submit_button_error(
+                msg_config.get('main_menu', 'error_create_sub_flow'))
             raise
 
         # /data/<phase_name>/<data_dir_name>の作成
@@ -208,22 +214,26 @@ class CreateSubflowForm(BaseSubflowForm):
         except Exception as e:
             # ディレクトリ名が存在した場合
             # リサーチフローステータス管理JSONをロールバック
-            self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
+            self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(
+                new_sub_flow_id)
             # ユーザーに再入力を促す
-            message = msg_config.get('main_menu','data_directory_exist')
+            message = msg_config.get('main_menu', 'data_directory_exist')
             self.change_submit_button_warning(message)
             raise InputWarning(message) from e
 
         # 新規サブフローデータの用意
         try:
-            self.prepare_new_subflow_data(phase_name, new_sub_flow_id, sub_flow_name)
+            self.prepare_new_subflow_data(
+                phase_name, new_sub_flow_id, sub_flow_name)
         except Exception:
             # 失敗した場合に/data/<phase_name>/<data_dir_name>の削除
             os.remove(data_dir_path)
             # 失敗した場合は、リサーチフローステータス管理JSONをロールバック
-            self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
+            self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(
+                new_sub_flow_id)
             # 新規作成ボタンを作成失敗ステータスに更新する
-            self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
+            self.change_submit_button_error(
+                msg_config.get('main_menu', 'error_create_sub_flow'))
             raise
 
         # フォームの初期化
@@ -232,9 +242,10 @@ class CreateSubflowForm(BaseSubflowForm):
         self._sub_flow_name_form.value_input = ''
         self._data_dir_name_form.value = ''
         self._data_dir_name_form.value_input = ''
-        self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
+        self.change_submit_button_init(
+            msg_config.get('main_menu', 'create_sub_flow'))
 
-    def create_data_dir(self, phase_name:str, data_dir_name:str) -> str:
+    def create_data_dir(self, phase_name: str, data_dir_name: str) -> str:
         """データディレクトリを作成するメソッドです。
 
         Args:
@@ -247,13 +258,14 @@ class CreateSubflowForm(BaseSubflowForm):
         Returns:
             str: データディレクトリを作成するパスの値を返す。
         """
-        path = path_config.get_task_data_dir(self.abs_root, phase_name, data_dir_name)
+        path = path_config.get_task_data_dir(
+            self.abs_root, phase_name, data_dir_name)
         if os.path.exists(path):
             raise Exception(f'{path} is already exist.')
         os.makedirs(path)
         return path
 
-    def prepare_new_subflow_data(self, phase_name:str, new_sub_flow_id:str, sub_flow_name:str):
+    def prepare_new_subflow_data(self, phase_name: str, new_sub_flow_id: str, sub_flow_name: str):
         """新しいサブフローのデータを用意するメソッドです。
 
         Args:
@@ -264,15 +276,18 @@ class CreateSubflowForm(BaseSubflowForm):
 
         # 新規サブフローデータの用意
         # data_gorvernance\researchflowを取得
-        dg_researchflow_path = os.path.join(self.abs_root, path_config.DG_RESEARCHFLOW_FOLDER)
+        dg_researchflow_path = os.path.join(
+            self.abs_root, path_config.DG_RESEARCHFLOW_FOLDER)
         # data_gorvernance\base\subflowを取得する
-        dg_base_subflow_path = os.path.join(self.abs_root, path_config.DG_SUB_FLOW_BASE_DATA_FOLDER)
+        dg_base_subflow_path = os.path.join(
+            self.abs_root, path_config.DG_SUB_FLOW_BASE_DATA_FOLDER)
 
         # コピー先フォルダパス
-        dect_dir_path = os.path.join(dg_researchflow_path, phase_name, new_sub_flow_id)
+        dect_dir_path = os.path.join(
+            dg_researchflow_path, phase_name, new_sub_flow_id)
 
         # コピー先フォルダの作成
-        os.makedirs(dect_dir_path) # 既に存在している場合はエラーになる
+        os.makedirs(dect_dir_path)  # 既に存在している場合はエラーになる
 
         # 対象コピーファイルorディレクトリリスト
         copy_files = path_config.get_prepare_file_name_list_for_subflow()
@@ -280,8 +295,10 @@ class CreateSubflowForm(BaseSubflowForm):
         try:
             for copy_file_name in copy_files:
                 # コピー元ファイルパス
-                src_path = os.path.join(dg_base_subflow_path, phase_name, copy_file_name)
-                dect_path = os.path.join(dg_researchflow_path, phase_name, new_sub_flow_id, copy_file_name)
+                src_path = os.path.join(
+                    dg_base_subflow_path, phase_name, copy_file_name)
+                dect_path = os.path.join(
+                    dg_researchflow_path, phase_name, new_sub_flow_id, copy_file_name)
                 # コピーする。
                 if os.path.isfile(src_path):
                     shutil.copyfile(src_path, dect_path)

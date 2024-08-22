@@ -10,6 +10,7 @@ script_dir_path = os.path.dirname(__file__)
 p = Path(script_dir_path)
 field_json_file = p.joinpath('../../data/field.json').resolve()
 
+
 class Field:
     """field.jsonファイルのデータ操作を行うメソッドを記載したクラスです。
 
@@ -61,7 +62,7 @@ class Field:
                 disabled.append(fld[self.__FIELD_NAME])
         return disabled
 
-    def get_template_path(self, target_name:str) -> str:
+    def get_template_path(self, target_name: str) -> str:
         """指定したフィールド名の実験パッケージを取得するメソッドです。
 
         Args:

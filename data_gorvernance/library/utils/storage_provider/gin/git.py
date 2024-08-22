@@ -9,11 +9,12 @@ def get_remote_url() -> str:
         str:gitリポジトリのリモートurl
 
     """
-    stdout, stderr, rt = Cmd.decode_exec_subprocess('git config --get remote.origin.url')
+    stdout, stderr, rt = Cmd.decode_exec_subprocess(
+        'git config --get remote.origin.url')
     return stdout.replace('\n', '')
 
 
-def git_annex_untrust(cwd:str) -> str:
+def git_annex_untrust(cwd: str) -> str:
     """ルートディレクトリを信頼できない設定にするメソッドです。
 
     Args:
@@ -23,23 +24,25 @@ def git_annex_untrust(cwd:str) -> str:
         str:コマンドの実行結果
 
     """
-    stdout, stderr, rt = Cmd.exec_subprocess(cmd='git annex untrust here', cwd=cwd)
+    stdout, stderr, rt = Cmd.exec_subprocess(
+        cmd='git annex untrust here', cwd=cwd)
     result = stdout.decode('utf-8')
     return result
 
 
-def git_annex_trust(cwd:str):
+def git_annex_trust(cwd: str):
     """ルートディレクトリを信頼する設定にするメソッドです。
 
     Args:
         cwd (str):ルートディレクトリの絶対パス
 
     """
-    stdout, stderr, rt = Cmd.exec_subprocess(cmd='git annex --force trust web', cwd=cwd)
+    stdout, stderr, rt = Cmd.exec_subprocess(
+        cmd='git annex --force trust web', cwd=cwd)
     result = stdout.decode('utf-8')
 
 
-def git_annex_lock(path:str) -> str:
+def git_annex_lock(path: str) -> str:
     """ファイルを編集不可能にするメソッドです。
 
     Args:
@@ -49,12 +52,13 @@ def git_annex_lock(path:str) -> str:
         str:コマンドの実行結果
 
     """
-    stdout, stderr, rt = Cmd.exec_subprocess(f'git annex lock {path}', raise_error=False)
+    stdout, stderr, rt = Cmd.exec_subprocess(
+        f'git annex lock {path}', raise_error=False)
     result = stdout.decode('utf-8')
     return result
 
 
-def git_annex_unlock(path:str) -> str:
+def git_annex_unlock(path: str) -> str:
     """ファイルを編集可能にするメソッドです。
 
     Args:
@@ -64,13 +68,14 @@ def git_annex_unlock(path:str) -> str:
         str:コマンドの実行結果
 
     """
-    stdout, stderr, rt = Cmd.exec_subprocess(f'git annex unlock {path}',raise_error=False)
+    stdout, stderr, rt = Cmd.exec_subprocess(
+        f'git annex unlock {path}', raise_error=False)
     result = stdout.decode('utf-8')
     return result
 
 
 def git_annex_metadata_add_minetype_sha256_contentsize(
-    file_path:str, mime_type:str, sha256:str, content_size:int, exec_path:str
+    file_path: str, mime_type: str, sha256: str, content_size: int, exec_path: str
 ):
     """指定したファイルにGit Annexのメタデータ(mime_type, sha256, content_size) を追加するメソッドです。
 
@@ -85,11 +90,11 @@ def git_annex_metadata_add_minetype_sha256_contentsize(
     Cmd.exec_subprocess(
         f'git annex metadata "{file_path}" -s mime_type={mime_type} -s sha256={sha256} -s content_size={content_size}',
         cwd=exec_path
-        )
+    )
 
 
 def git_annex_metadata_add_sd_date_published(
-    file_path:str,sd_date_published:str, exec_path:str
+    file_path: str, sd_date_published: str, exec_path: str
 ):
     """指定したファイルにGit Annexのメタデータ(sd_date_published)を追加するメソッドです。
 
@@ -102,9 +107,10 @@ def git_annex_metadata_add_sd_date_published(
     Cmd.exec_subprocess(
         f'git annex metadata "{file_path}" -s sd_date_published={sd_date_published}',
         cwd=exec_path
-        )
+    )
 
-def git_commmit(msg:str, cwd:str) -> str:
+
+def git_commmit(msg: str, cwd: str) -> str:
     """コミットを作成するためのメソッドです。
 
     Args:
@@ -115,12 +121,13 @@ def git_commmit(msg:str, cwd:str) -> str:
         str:コマンドの実行結果
 
     """
-    stdout, stderr, rt = Cmd.exec_subprocess('git commit -m "{}"'.format(msg), cwd=cwd,raise_error=False)
+    stdout, stderr, rt = Cmd.exec_subprocess(
+        'git commit -m "{}"'.format(msg), cwd=cwd, raise_error=False)
     result = stdout.decode('utf-8')
     return result
 
 
-def git_pull(cwd:str) -> str:
+def git_pull(cwd: str) -> str:
     """指定したディレクトリでプルを行うメソッドです。
 
     Args:
@@ -130,12 +137,13 @@ def git_pull(cwd:str) -> str:
         str:コマンドの実行結果
 
     """
-    stdout, stderr, rt = Cmd.exec_subprocess('git pull', cwd=cwd, raise_error=False)
+    stdout, stderr, rt = Cmd.exec_subprocess(
+        'git pull', cwd=cwd, raise_error=False)
     result = stdout.decode('utf-8')
     return result
 
 
-def git_branch(cwd:str, option:str='') -> str:
+def git_branch(cwd: str, option: str = '') -> str:
     """指定したディレクトリでブランチを操作するメソッドです。
 
     Args:
@@ -147,14 +155,16 @@ def git_branch(cwd:str, option:str='') -> str:
 
     """
     if len(option) > 0:
-        stdout, stderr, rt = Cmd.exec_subprocess(f'git branch {option}', cwd=cwd,raise_error=False)
+        stdout, stderr, rt = Cmd.exec_subprocess(
+            f'git branch {option}', cwd=cwd, raise_error=False)
     else:
-        stdout, stderr, rt = Cmd.exec_subprocess(f'git branch', cwd=cwd,raise_error=False)
+        stdout, stderr, rt = Cmd.exec_subprocess(
+            f'git branch', cwd=cwd, raise_error=False)
     result = stdout.decode('utf-8')
     return result
 
 
-def git_branch_for_remote(cwd:str) -> str:
+def git_branch_for_remote(cwd: str) -> str:
     """指定したディレクトリ内のGitリポジトリでリモートブランチの一覧を取得するためのメソッドです。
 
     Args:
@@ -167,7 +177,7 @@ def git_branch_for_remote(cwd:str) -> str:
     return git_branch(cwd, '-r')
 
 
-def is_annex_branch_in_repote(cwd:str) -> bool:
+def is_annex_branch_in_repote(cwd: str) -> bool:
     """origin/git-annexのリモートブランチが存在するか確認するメソッドです。
 
     Args:
@@ -184,7 +194,7 @@ def is_annex_branch_in_repote(cwd:str) -> bool:
         return False
 
 
-def exec_git_status(cwd:str) -> str:
+def exec_git_status(cwd: str) -> str:
     """現在のgitリポジトリの状態を表示するメソッドです。
 
     Args:
@@ -199,7 +209,7 @@ def exec_git_status(cwd:str) -> str:
     return result
 
 
-def is_conflict(cwd:str) -> bool:
+def is_conflict(cwd: str) -> bool:
     """現在のgitリポジトリに衝突しているものがあるかを確かめるメソッドです。
 
     Args:

@@ -7,7 +7,7 @@ import requests
 from requests import Response
 
 
-def get_server_info(scheme:str, domain:str) -> Response:
+def get_server_info(scheme: str, domain: str) -> Response:
     """サーバー情報を取得するための関数です。
 
     Args:
@@ -30,7 +30,7 @@ def get_server_info(scheme:str, domain:str) -> Response:
         raise Exception(f'Fail Request to GIN fork url:{api_url}') from e
 
 
-def get_token_for_auth(scheme:str, domain:str, user_name:str, password:str) -> Response:
+def get_token_for_auth(scheme: str, domain: str, user_name: str, password: str) -> Response:
     """指定したユーザー名とパスワードから認証トークンを取得するメソッドです。
 
     Args:
@@ -49,7 +49,7 @@ def get_token_for_auth(scheme:str, domain:str, user_name:str, password:str) -> R
     return requests.get(url=api_url, auth=auth)
 
 
-def create_token_for_auth(scheme:str, domain:str, user_name:str, password:str) -> Response:
+def create_token_for_auth(scheme: str, domain: str, user_name: str, password: str) -> Response:
     """指定したユーザー名とパスワードから認証トークンを作成するメソッドです。
 
     Args:
@@ -65,11 +65,11 @@ def create_token_for_auth(scheme:str, domain:str, user_name:str, password:str) -
     sub_url = os.path.join('api/v1/users', user_name, 'tokens')
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     auth = (user_name, password)
-    data={"name": "system-generated"}
+    data = {"name": "system-generated"}
     return requests.post(url=api_url, auth=auth, data=data)
 
 
-def get_user_info(scheme:str, domain:str, token:str) -> Response:
+def get_user_info(scheme: str, domain: str, token: str) -> Response:
     """指定したユーザーの情報を取得するためのメソッドです。
 
     Args:
@@ -83,11 +83,11 @@ def get_user_info(scheme:str, domain:str, token:str) -> Response:
     """
     sub_url = "api/v1/user"
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
-    params = {'token' : token}
+    params = {'token': token}
     return requests.get(url=api_url, params=params)
 
 
-def delete_access_token(scheme:str, domain:str, token:str) -> Response:
+def delete_access_token(scheme: str, domain: str, token: str) -> Response:
     """指定したアクセストークンを削除するメソッドです。
 
     Args:
@@ -101,11 +101,11 @@ def delete_access_token(scheme:str, domain:str, token:str) -> Response:
     """
     sub_url = "api/v1/user/token/delete"
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
-    params = {'token' : token}
+    params = {'token': token}
     return requests.delete(url=api_url, params=params)
 
 
-def upload_key(scheme:str, domain:str, token:str, pubkey:str) -> Response:
+def upload_key(scheme: str, domain: str, token: str, pubkey: str) -> Response:
     """指定した公開鍵をアップロードするメソッドです。
 
     Args:
@@ -120,15 +120,15 @@ def upload_key(scheme:str, domain:str, token:str, pubkey:str) -> Response:
     """
     sub_url = "api/v1/user/keys"
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
-    params = {'token' : token}
-    data={
+    params = {'token': token}
+    data = {
         "title": "system-generated-"+str(time.time()),
         "key": pubkey
     }
     return requests.post(url=api_url, params=params, data=data)
 
 
-def search_repo(scheme:str, domain:str, repo_id:str, user_id:str, token:str) -> Response:
+def search_repo(scheme: str, domain: str, repo_id: str, user_id: str, token: str) -> Response:
     """指定したリポジトリの検索を行うメソッドです。
 
     Args:
@@ -145,14 +145,16 @@ def search_repo(scheme:str, domain:str, repo_id:str, user_id:str, token:str) -> 
     sub_url = "/api/v1/repos/search/user"
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     params = {
-        'id' : repo_id,
-        'uid' : user_id,
-        'token' : token
+        'id': repo_id,
+        'uid': user_id,
+        'token': token
     }
     return requests.get(url=api_url, params=params)
 
 
-def patch_container(scheme:str, domain:str, token:str, server_name:str, user_id:str) -> Response:
+def patch_container(
+    scheme: str, domain: str, token: str, server_name: str, user_id: str
+) -> Response:
     """指定したコンテナの更新を行うメソッドです。
 
     Args:
@@ -169,14 +171,14 @@ def patch_container(scheme:str, domain:str, token:str, server_name:str, user_id:
     sub_url = "/api/v1/container"
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     params = {
-        'token' : token,
-        'server_name' : server_name,
-        'user_id' : user_id
+        'token': token,
+        'server_name': server_name,
+        'user_id': user_id
     }
     return requests.patch(url=api_url, params=params)
 
 
-def search_public_repo(scheme:str, domain:str, repo_id:str,) -> Response:
+def search_public_repo(scheme: str, domain: str, repo_id: str,) -> Response:
     """指定した公開リポジトリの検索を行うメソッドです。
 
     Args:
@@ -191,6 +193,6 @@ def search_public_repo(scheme:str, domain:str, repo_id:str,) -> Response:
     sub_url = "/api/v1/repos/search"
     api_url = parse.urlunparse((scheme, domain, sub_url, "", "", ""))
     params = {
-        'id' : repo_id,
+        'id': repo_id,
     }
     return requests.get(url=api_url, params=params)

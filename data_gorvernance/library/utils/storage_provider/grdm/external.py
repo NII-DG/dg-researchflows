@@ -21,6 +21,7 @@ from typing import Union
 import json
 
 class External:
+    """GRDMのAPI通信への通信、動作確認、データの取得などを行うクラスです。"""
 
     @classmethod
     def build_api_url(cls, base_url: str, endpoint=''):

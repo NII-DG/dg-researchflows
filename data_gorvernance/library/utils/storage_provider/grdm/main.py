@@ -27,8 +27,14 @@ NEED_TOKEN_SCOPE = ["osf.full_write"]
 ALLOWED_PERMISSION = ["admin", "write"]
 
 class Main():
+    """GRDMのデータ取得、アップロード、許可のチェックを行うクラスです。
+    Attributes:
+        instance:
+            _grdm_base_url(str):WebサーバーのURL
+    """
 
     def __init__(self) -> None:
+        """Main コンストラクタのメソッドです。"""
         self._grdm_base_url = con_config.get('GRDM', 'BASE_URL')
 
     def get_project_id(self) -> Union[str, None]:

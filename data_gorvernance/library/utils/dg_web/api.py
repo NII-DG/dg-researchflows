@@ -1,7 +1,6 @@
 """dg-webと接続するモジュールです。
 
 dg-webからガバナンスシートやメタデータのスキーマの取得する関数や検証を行う関数が記載されています。
-
 """
 from http import HTTPStatus
 from urllib import parse
@@ -13,8 +12,18 @@ from ..error import UnauthorizedError, NotFoundContentsError
 from library.utils.config import connect as con_config
 
 class Api():
+    """dg-webに接続するクラスです。
+    Attributes:
+        instance:
+            scheme_domain(str):WebサーバーのURL
+    """
 
     def __init__(self, scheme_domain) -> None:
+        """Api コンストラクタのメソッドです。
+
+        Args:
+            scheme_domain (str):WebサーバーのURL
+        """
         self.scheme_domain = scheme_domain
 
     def get_govsheet_schema(self)->dict:

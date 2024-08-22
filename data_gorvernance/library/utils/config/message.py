@@ -19,7 +19,6 @@ def get(section: str, option: str) -> str:
         option (str): message.iniのキーを設定します。
     Returns:
         str: メッセージを返す。
-
     """
     config = Message(message_ini_path)
     return config.get(section, option)

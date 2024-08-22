@@ -1,7 +1,6 @@
 """ 設定ファイルから情報を読み取るためのモジュールです。
 
-設定ファイルをシングルトンに読み込む基底クラスが記載されています。
-
+設定ファイルを読み込むための基底クラスが記載されています。
 """
 from __future__ import annotations
 import configparser
@@ -14,7 +13,6 @@ class ConfigParserBase:
             _instance (ConfigParserBase): シングルトンインスタンスを格納する
         instance:
             _config_file (ConfigParser): 設定ファイルの情報を保持するインスタンス
-
     """
     _instance = None
 
@@ -23,14 +21,13 @@ class ConfigParserBase:
 
         Returns:
             ConfigParserBase: このクラスのシングルトンインスタンスを返す。
-
         """
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance.initialize(*args, **kwargs)
         return cls._instance
 
-    def initialize(self, config_path: str, encoding: str='utf-8'):
+    def initialize(self, config_path: str, encoding: str = 'utf-8'):
         """  設定ファイルを読み込むメソッドです。
 
         Args:
@@ -48,6 +45,5 @@ class ConfigParserBase:
             option (str): 設定ファイルの項目名を設定します。
         Returns:
             str: 対応する設定値を返す。
-
         """
         return self._config_file[section][option]

@@ -55,11 +55,7 @@ class SubflowMenu(TaskLog):
             diagram(pn.pane.HTML):サブフロー図を格納する
             title(pn.pane.Markdown):サブフロー図のタイトル
             diagram_widgetbox(pn.WidgetBox):サブフロー図をHTMLとして埋め込む
-            selector(pn.widgets.RadioBoxGroup):ラジオボタン
-            selector_options(list[str]):ラジオボタンのオプション
             working_file (str): 実行Notebookファイルパス
-            button(pn.widgets.Button):ボタンの設定
-            select_widgetbox(pn.widgets.Button):ボタンの配置
     """
 
     def __init__(self, working_file: str) -> None:
@@ -80,6 +76,7 @@ class SubflowMenu(TaskLog):
         self.title = pn.pane.Markdown()
         self.diagram_widgetbox = pn.WidgetBox(self.title, self.diagram)
 
+<<<<<<< HEAD
         # ラジオボタン
         self.selector = pn.widgets.RadioBoxGroup()
         self.selector_options = [
@@ -119,29 +116,27 @@ class SubflowMenu(TaskLog):
             self.diagram_widgetbox.disabled = False
         return callback
 
+=======
+>>>>>>> 02fbe48a00ce6da0d0f0fcbb92f3b4698ead1844
     # 各要素の設定
-    def set_title(self):
-        """タイトルを設定するメソッドです。"""
-        if self.is_display_all():
-            self.title.object = f'### {message.get("subflow_menu", "title_all_task")}'
-        else:
-            self.title.object = f'### {message.get("subflow_menu", "title_abled_task")}'
-
     def _set_width(self):
         """フロー図の大きさをもとにwidgetboxの大きさを統一するメソッドです。"""
         d = self.diagram.width + 20
         self.menu_widgetbox.width = d
         self.diagram_widgetbox.width = d
-        self.select_widgetbox.width = d
         self._msg_output = d
+<<<<<<< HEAD
 
     def set_diagram(self, subflow: SubFlowManager, font_folder: Path, display_all=True):
+=======
+        
+    def set_diagram(self, subflow: SubFlowManager, font_folder: Path):
+>>>>>>> 02fbe48a00ce6da0d0f0fcbb92f3b4698ead1844
         """フロー図の生成と表示設定のメソッドです。
 
         Args:
             subflow(SubFlowManager):サブフロー図
             font_folder(Path):フォントフォルダー
-            display_all(bool):全てのタスクを表示させるかどうか
         """
         with TemporaryDirectory() as workdir:
             tmp_diag = Path(workdir) / 'skeleton.diag'
@@ -149,14 +144,14 @@ class SubflowMenu(TaskLog):
             subflow.generate(
                 svg_path=str(skeleton),
                 tmp_diag=str(tmp_diag),
-                font=str(font_folder / '.fonts/ipag.ttf'),
-                display_all=display_all
+                font=str(font_folder / '.fonts/ipag.ttf')
             )
             self.diagram.object = self._get_contents(str(skeleton))
             self.diagram.width = self._get_svg_size(str(skeleton))
             self._set_width()
 
     # その他
+<<<<<<< HEAD
     def is_display_all(self) -> bool:
         """フロー図の表示を制御するメソッドです。
 
@@ -168,6 +163,8 @@ class SubflowMenu(TaskLog):
             display_all = False
         return display_all
 
+=======
+>>>>>>> 02fbe48a00ce6da0d0f0fcbb92f3b4698ead1844
     def _get_contents(self, svg_file_path: str) -> str:
         """フロー図を取得するメソッドです。
 
@@ -208,12 +205,11 @@ class SubflowMenu(TaskLog):
         return viewbox_width
 
     @classmethod
-    def render(cls, working_file: str, is_selected=False):
+    def render(cls, working_file: str):
         """サブフローメニューを表示させるメソッドです。
 
         Args:
             working_file (str): 実行Notebookファイルパス
-            is_selected (bool): サブフロー図の切り替えをできるようにするかどうか。デフォルトでは False.
         """
         subflow_menu = cls(working_file)
         pn.extension()
@@ -254,6 +250,7 @@ class SubflowMenu(TaskLog):
                     diag_file), str(using_task_dir)
             )
             subflow.setup_tasks(str(souce_task_dir))
+<<<<<<< HEAD
 
             # panel activation
             if is_selected:
@@ -268,6 +265,9 @@ class SubflowMenu(TaskLog):
                     subflow_menu.select_widgetbox)
             else:
                 subflow_menu.set_diagram(subflow, font_folder, True)
+=======
+            subflow_menu.set_diagram(subflow, font_folder)
+>>>>>>> 02fbe48a00ce6da0d0f0fcbb92f3b4698ead1844
             subflow_menu.menu_widgetbox.append(subflow_menu.diagram_widgetbox)
         except Exception:
             message_box = MessageBox().update_error(

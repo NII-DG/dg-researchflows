@@ -8,7 +8,7 @@ blockdiag {
     default_group_color = "#FFC800";
 
     group {
-        RF002001;
+        RF009006;
         RF002003;
     }
 
@@ -23,10 +23,9 @@ blockdiag {
             RF009004;
         }
         RF009002;
-        RF009006;
         RF009007;
         RF009001;
         RF009005;
     }
-    RF002001 -> RF002003;
+    RF009006 -> RF002003;
 }

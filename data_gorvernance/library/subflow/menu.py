@@ -76,48 +76,6 @@ class SubflowMenu(TaskLog):
         self.title = pn.pane.Markdown()
         self.diagram_widgetbox = pn.WidgetBox(self.title, self.diagram)
 
-<<<<<<< HEAD
-        # ラジオボタン
-        self.selector = pn.widgets.RadioBoxGroup()
-        self.selector_options = [
-            message.get('subflow_menu', 'select_abled_task'),
-            message.get('subflow_menu', 'select_all_task')
-        ]
-        self.selector.options = self.selector_options
-        self.selector.value = self.selector_options[0]  # type: ignore
-
-        self.button = pn.widgets.Button(
-            name=message.get('subflow_menu', 'select_button_name'),
-            button_type="primary",
-            align='end'
-        )
-        # ボタンの配置
-        self.select_widgetbox = pn.WidgetBox()
-        self.select_widgetbox.append(
-            pn.Row(self.selector, self.button, margin=(10, 10, 10, 25))
-        )
-
-    # イベント
-    def select_flow(self, subflow: SubFlowManager, font_folder: Path) -> Callable:
-        """ボタン押下時にサブフロー図の表示を切り替えるメソッドです。
-
-        Args:
-            subflow (SubFlowManager): サブフロー図
-            font_folder (Path): フォントフォルダのパス
-
-        Returns:
-            Callable:サブフロー図を表示する。
-        """
-        def callback(event):
-            """サブフロー図の生成と表示を行うメソッドです。"""
-            self.diagram_widgetbox.disabled = True
-            self.set_title()
-            self.set_diagram(subflow, font_folder, self.is_display_all())
-            self.diagram_widgetbox.disabled = False
-        return callback
-
-=======
->>>>>>> 02fbe48a00ce6da0d0f0fcbb92f3b4698ead1844
     # 各要素の設定
     def _set_width(self):
         """フロー図の大きさをもとにwidgetboxの大きさを統一するメソッドです。"""
@@ -125,13 +83,8 @@ class SubflowMenu(TaskLog):
         self.menu_widgetbox.width = d
         self.diagram_widgetbox.width = d
         self._msg_output = d
-<<<<<<< HEAD
 
-    def set_diagram(self, subflow: SubFlowManager, font_folder: Path, display_all=True):
-=======
-        
     def set_diagram(self, subflow: SubFlowManager, font_folder: Path):
->>>>>>> 02fbe48a00ce6da0d0f0fcbb92f3b4698ead1844
         """フロー図の生成と表示設定のメソッドです。
 
         Args:
@@ -151,20 +104,6 @@ class SubflowMenu(TaskLog):
             self._set_width()
 
     # その他
-<<<<<<< HEAD
-    def is_display_all(self) -> bool:
-        """フロー図の表示を制御するメソッドです。
-
-        Returns:
-            bool:すべてのタスクをアクティブにするかどうか
-        """
-        display_all = True
-        if self.selector.value == self.selector_options[0]:
-            display_all = False
-        return display_all
-
-=======
->>>>>>> 02fbe48a00ce6da0d0f0fcbb92f3b4698ead1844
     def _get_contents(self, svg_file_path: str) -> str:
         """フロー図を取得するメソッドです。
 
@@ -250,24 +189,7 @@ class SubflowMenu(TaskLog):
                     diag_file), str(using_task_dir)
             )
             subflow.setup_tasks(str(souce_task_dir))
-<<<<<<< HEAD
-
-            # panel activation
-            if is_selected:
-                subflow_menu.set_title()
-                subflow_menu.set_diagram(
-                    subflow, font_folder, subflow_menu.is_display_all()
-                )
-                subflow_menu.button.on_click(
-                    subflow_menu.select_flow(subflow, font_folder)
-                )
-                subflow_menu.menu_widgetbox.append(
-                    subflow_menu.select_widgetbox)
-            else:
-                subflow_menu.set_diagram(subflow, font_folder, True)
-=======
             subflow_menu.set_diagram(subflow, font_folder)
->>>>>>> 02fbe48a00ce6da0d0f0fcbb92f3b4698ead1844
             subflow_menu.menu_widgetbox.append(subflow_menu.diagram_widgetbox)
         except Exception:
             message_box = MessageBox().update_error(

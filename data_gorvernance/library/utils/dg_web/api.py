@@ -14,10 +14,10 @@ from library.utils.config import connect as con_config
 
 class Api():
 
-    def __init__(self) -> None:
-        self._dgweb_base_url = con_config.get('DG_WEB', 'scheme_domain')
+    def __init__(self, scheme_domain) -> None:
+        self.scheme_domain = scheme_domain
 
-    def get_govsheet_schema(self, scheme_domain:str)->dict:
+    def get_govsheet_schema(self)->dict:
         """ ガバナンスシートのスキーマを取得する関数です。
 
         Args:
@@ -28,12 +28,12 @@ class Api():
 
         """
         sub_url = '/schemas/govSheet'
-        api_url = scheme_domain + sub_url
+        api_url = self.scheme_domain + sub_url
         response = requests.get(url=api_url)
         response.raise_for_status()
         return response.json()
 
-    def get_metadata_schema(self, scheme_domain:str)->dict:
+    def get_metadata_schema(self)->dict:
         """ メタデータのスキーマを取得する関数です。
 
         Args:
@@ -44,7 +44,7 @@ class Api():
 
         """
         sub_url = '/schemas/metadata'
-        api_url = scheme_domain + sub_url
+        api_url = self.scheme_domain + sub_url
         response = requests.get(url=api_url)
         response.raise_for_status()
         return response.json()
@@ -64,7 +64,7 @@ class Api():
 
         """
         sub_url = '/checkToken'
-        api_url = self._dgweb_base_url + sub_url
+        api_url = self.scheme_domain + sub_url
         data = {
             "grdmToken": None,
             "govRunToken": token
@@ -77,7 +77,7 @@ class Api():
         response.raise_for_status()
         return False
 
-    def validate(self, scheme_domain:str, grdm_token:str, project_id:str, govrun_token:str=None, govsheet:dict=None, metadata:dict=None)->dict:
+    def validate(self, grdm_token:str, project_id:str, govrun_token:str=None, govsheet:dict=None, metadata:dict=None)->dict:
         """ 検証する関数です。
 
         Args:
@@ -97,7 +97,7 @@ class Api():
 
         """
         sub_url = '/validations/submit'
-        api_url = scheme_domain + sub_url
+        api_url = self.scheme_domain + sub_url
         data = {
             "grdmToken": grdm_token,
             "govRunToken": govrun_token,
@@ -114,7 +114,7 @@ class Api():
             raise
         return response.json()
 
-    def get_validations(self, scheme_domain:str, grdm_token: str, project_id: str)->dict:
+    def get_validations(self, grdm_token: str, project_id: str)->dict:
         """ 検証結果を取得する関数です。
 
         Args:
@@ -132,7 +132,7 @@ class Api():
 
         """
         sub_url = '/validations'
-        api_url = scheme_domain + sub_url
+        api_url = self.scheme_domain + sub_url
         data = {
             "grdmToken": grdm_token,
             "grdmProjectId": project_id,
@@ -148,7 +148,7 @@ class Api():
             raise
         return response.json()
 
-    def get_validations_validationId(self, scheme_domain:str, grdm_token: str, project_id: str, validation_id: str)->dict:
+    def get_validations_validationId(self, grdm_token: str, project_id: str, validation_id: str)->dict:
         """ idを指定して検証結果を取得する関数です。
 
         Args:
@@ -167,7 +167,7 @@ class Api():
 
         """
         sub_url = f'/validations/{validation_id}'
-        api_url = scheme_domain + sub_url
+        api_url = self.scheme_domain + sub_url
         data = {
             "grdmToken": grdm_token,
             "grdmProjectId": project_id,

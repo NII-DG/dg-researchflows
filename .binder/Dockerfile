@@ -11,7 +11,6 @@ RUN apt-get install -y iputils-ping net-tools
 RUN apt-get install -y expect
 RUN apt-get install -y curl
 RUN apt-get install -y git
-RUN apt-get install -y git-annex
 RUN apt-get install fontconfig
 RUN apt-get install -y fonts-ipafont
 
@@ -38,12 +37,10 @@ USER ${NB_USER}
 # install the notebook package etc.
 RUN pip install --no-cache --upgrade pip
 RUN pip install --no-cache notebook
-RUN pip install --no-cache datalad==0.17.6
 RUN pip install --no-cache lxml==4.7.1
 RUN pip install --no-cache blockdiag==3.0.0
 RUN pip install --no-cache -U nbformat==5.2.0
 RUN pip install --no-cache black==21.12b0
-RUN pip install --no-cache snakemake
 RUN pip install --no-cache boto3
 RUN pip install --no-cache chardet==4.0.0
 RUN pip install --no-cache panel==1.3.0
@@ -102,9 +99,7 @@ ARG NB_UID=1000
 
 RUN rm -rf ${HOME}/work
 
-# prepare datalad procedure dir
-RUN mkdir -p ${HOME}/.config/datalad/procedures
-
+# library path
 ENV PYTHONPATH "${PYTHONPATH}:${HOME}/data_gorvernance"
 
 WORKDIR ${HOME}

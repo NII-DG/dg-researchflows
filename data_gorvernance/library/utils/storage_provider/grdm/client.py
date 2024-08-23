@@ -16,7 +16,8 @@ from typing import Union
 from library.utils.error import UnauthorizedError
 
 
-def upload(token: str, base_url: str, project_id: str, source: str,
+def upload(
+    token: str, base_url: str, project_id: str, source: str,
     destination: str, recursive: bool = False, force: bool = False
 ):
     """ファイルまたはフォルダをアップロードするメソッドです。
@@ -41,9 +42,7 @@ def upload(token: str, base_url: str, project_id: str, source: str,
 
     osf = OSF(token=token, base_url=base_url)
     if not osf.has_auth:
-        raise KeyError('To upload a file you need to provide a username and'
-            ' password or token.'
-        )
+        raise KeyError('To upload a file you need to provide a username and password or token.')
 
     try:
         project = osf.project(project_id)
@@ -52,9 +51,7 @@ def upload(token: str, base_url: str, project_id: str, source: str,
         store = project.storage(storage)
         if recursive:
             if not os.path.isdir(source):
-                raise RuntimeError(
-                    f"Expected source ({source}) to be a directory when using recursive mode."
-                )
+                raise RuntimeError(f"Expected source ({source}) to be a directory when using recursive mode.")
             # local name of the directory that is being uploaded
             _, dir_name = os.path.split(source)
 
@@ -64,22 +61,18 @@ def upload(token: str, base_url: str, project_id: str, source: str,
                     local_path = os.path.join(root, fname)
                     with open(local_path, 'rb') as fp:
                         # build the remote path + fname
-                        name = os.path.join(remote_path, dir_name, subdir_path,
-                                            fname)
-                        store.create_file(
-                            name, fp, force=force, update=update
-                        )
+                        name = os.path.join(remote_path, dir_name, subdir_path, fname)
+                        store.create_file(name, fp, force=force, update=update)
 
         else:
             with open(source, 'rb') as fp:
-                store.create_file(
-                    remote_path, fp, force=force, update=update
-                )
+                store.create_file(remote_path, fp, force=force, update=update)
     except UnauthorizedException as e:
         raise UnauthorizedError(str(e)) from e
 
 
-def download(token: str, project_id: str, base_url: str,
+def download(
+    token: str, project_id: str, base_url: str,
     remote_path: str, base_path=None
 ) -> Union[bytes, None]:
     """ファイルの内容を取得するメソッドです。

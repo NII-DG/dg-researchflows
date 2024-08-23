@@ -1,6 +1,6 @@
 """ RunCrateの入力フォームのモジュールです。"""
-from typing import Optional
 import panel as pn
+from typing import Optional
 
 from library.utils.widgets import MessageBox
 from .form import Checkbox, Title, Description

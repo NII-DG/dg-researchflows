@@ -47,11 +47,9 @@ def download_dir(s3_client, bucket_name: str, aws_dir: str, local_dir: str):
     next_token = None
     while True:
         if next_token is None:
-            response = s3_client.list_objects_v2(
-                Bucket=bucket_name, Prefix=aws_dir)
+            response = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=aws_dir)
         else:
-            response = s3_client.list_objects_v2(
-                Bucket=bucket_name, Prefix=aws_dir, ContinuationToken=next_token)
+            response = s3_client.list_objects_v2(Bucket=bucket_name, Prefix=aws_dir, ContinuationToken=next_token)
 
         try:
             contents = response['Contents']

@@ -122,9 +122,7 @@ class UserActivityLog(BaseLogger):
         self.set_log_level('info')
         # set items
         self.username = os.environ['JUPYTERHUB_USER']
-        self.ipynb_file = os.path.join(
-            os.path.dirname(nb_working_file), notebook_name
-        )
+        self.ipynb_file = os.path.join(os.path.dirname(nb_working_file), notebook_name)
         subflow_type, subflow_id = get_subflow_type_and_id(nb_working_file)
         self.subflow_id = subflow_id
         self.subflow_type = subflow_type
@@ -140,9 +138,7 @@ class UserActivityLog(BaseLogger):
             str:ログファイルを保存するディレクトリへのパス
 
         """
-        root_folder = Path(
-            path_config.get_abs_root_form_working_dg_file_path(nb_working_file)
-        )
+        root_folder = Path(path_config.get_abs_root_form_working_dg_file_path(nb_working_file))
         log_dir = os.environ['JUPYTERHUB_SERVER_NAME']
         log_dir = (root_folder / path_config.DG_LOG_FOLDER / log_dir)
         os.makedirs(log_dir, exist_ok=True)

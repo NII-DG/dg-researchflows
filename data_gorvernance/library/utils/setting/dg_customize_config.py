@@ -13,8 +13,7 @@ from library.utils.file import JsonFile
 script_dir_path = os.path.dirname(__file__)
 p = Path(script_dir_path)
 # DGカスタマイズJSON定義書絶対パス(data_gorvernance\library\data\data_governance_customize.json)
-data_governance_customize_file = p.joinpath(
-    '../../', 'data/data_governance_customize.json').resolve()
+data_governance_customize_file = p.joinpath('../../', 'data/data_governance_customize.json').resolve()
 
 
 class AlphaProperty:
@@ -43,8 +42,7 @@ class AlphaProperty:
         self._customize: list[SubFlowRule] = []
 
         for subflow_type_name, subflow_rule_data in data[self.__CUSTOMIZE].items():
-            self._customize.append(SubFlowRule(
-                subflow_type_name, subflow_rule_data))
+            self._customize.append(SubFlowRule(subflow_type_name, subflow_rule_data))
 
 
 class SubFlowRule:

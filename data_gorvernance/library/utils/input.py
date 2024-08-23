@@ -160,8 +160,7 @@ def get_grdm_connection_parameters() -> tuple[str, str]:
             vault.set_value(vault_key, '')
             continue
         except ProjectNotExist as e:
-            msg = msg_config.get(
-                'form', 'project_id_not_exist').format(project_id)
+            msg = msg_config.get('form', 'project_id_not_exist').format(project_id)
             raise ProjectNotExist(msg) from e
 
     return token, project_id

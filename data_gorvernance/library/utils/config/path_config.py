@@ -83,14 +83,12 @@ DOT_GITIGNORE = '.gitignore'
 # File Path
 # main menu
 MAIN_MENU_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, MAIN_NOTEBOOK)
-SETUP_COMPLETED_TEXT_PATH = os.path.join(
-    DG_WORKING_FOLDER, 'setup_completed.txt')
+SETUP_COMPLETED_TEXT_PATH = os.path.join(DG_WORKING_FOLDER, 'setup_completed.txt')
 # config file
 TOKEN_JSON_PAHT = os.path.join(DG_WORKING_FOLDER, TOKEN)
 USER_INFO_PATH = os.path.join(DG_WORKING_FOLDER, USER_INFO)
 # data_gorvernance/researchflow/plan/status.json
-PLAN_TASK_STATUS_FILE_PATH = os.path.join(
-    DG_RESEARCHFLOW_FOLDER, PLAN, STATUS_JSON)
+PLAN_TASK_STATUS_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, STATUS_JSON)
 PLAN_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, PLAN_JSON)
 
 

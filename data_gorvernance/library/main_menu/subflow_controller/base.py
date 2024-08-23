@@ -43,49 +43,45 @@ class BaseSubflowForm():
         """
         self.abs_root = abs_root
 
-        research_flow_status_file_path = path_config.get_research_flow_status_file_path(
-            abs_root)
+        research_flow_status_file_path = path_config.get_research_flow_status_file_path(abs_root)
         self.reserch_flow_status_operater = ResearchFlowStatusOperater(
-            research_flow_status_file_path)
+            research_flow_status_file_path
+        )
 
         # リサーチフローステータス管理情報の取得
         research_flow_status = self.reserch_flow_status_operater.load_research_flow_status()
         self._err_output = message_box
 
         # サブフロー種別(フェーズ)オプション
-        sub_flow_type_options = self.generate_sub_flow_type_options(
-            research_flow_status)
+        sub_flow_type_options = self.generate_sub_flow_type_options(research_flow_status)
         # サブフロー種別(フェーズ):シングルセレクト
         self._sub_flow_type_selector = pn.widgets.Select(
             name=msg_config.get('main_menu', 'sub_flow_type'),
             options=sub_flow_type_options,
-            value=sub_flow_type_options[msg_config.get(
-                'form', 'selector_default')]
+            value=sub_flow_type_options[msg_config.get('form', 'selector_default')]
         )
         # サブフロー種別(フェーズ)のイベントリスナー
         self._sub_flow_type_selector.param.watch(
-            self.callback_sub_flow_type_selector, 'value')
+            self.callback_sub_flow_type_selector, 'value'
+        )
 
         # サブフロー名称オプション
         sub_flow_name_options = self.generate_sub_flow_name_options(
-            sub_flow_type_options[msg_config.get(
-                'form', 'selector_default')], research_flow_status
+            sub_flow_type_options[msg_config.get('form', 'selector_default')],
+            research_flow_status
         )
         # サブフロー名称：シングルセレクト
         self._sub_flow_name_selector = pn.widgets.Select(
             name=msg_config.get('main_menu', 'sub_flow_name_select'),
             options=sub_flow_name_options,
-            value=sub_flow_name_options[msg_config.get(
-                'form', 'selector_default')]
+            value=sub_flow_name_options[msg_config.get('form', 'selector_default')]
         )
         # サブフロー名称のイベントリスナー
-        self._sub_flow_name_selector.param.watch(
-            self.callback_sub_flow_name_selector, 'value')
+        self._sub_flow_name_selector.param.watch(self.callback_sub_flow_name_selector, 'value')
 
         # サブフロー名称：テキストフォーム
         self._sub_flow_name_form = pn.widgets.TextInput(
-            name=msg_config.get('main_menu', 'sub_flow_name_input'),
-            max_length=15
+            name=msg_config.get('main_menu', 'sub_flow_name_input'),max_length=15
         )
         # サブフロー名称：テキストフォームのイベントリスナー
         self._sub_flow_name_form.param.watch(self.callback_menu_form, 'value')
@@ -99,15 +95,14 @@ class BaseSubflowForm():
 
         # 親サブフロー種別(フェーズ)オプション
         parent_sub_flow_type_options = self.generate_parent_sub_flow_type_options(
-            sub_flow_type_options[msg_config.get(
-                'form', 'selector_default')], research_flow_status
+            sub_flow_type_options[msg_config.get('form', 'selector_default')],
+            research_flow_status
         )
         # 親サブフロー種別(フェーズ)（必須)：シングルセレクト
         self._parent_sub_flow_type_selector = pn.widgets.Select(
             name=msg_config.get('main_menu', 'parent_sub_flow_type'),
             options=parent_sub_flow_type_options,
-            value=parent_sub_flow_type_options[msg_config.get(
-                'form', 'selector_default')],
+            value=parent_sub_flow_type_options[msg_config.get('form', 'selector_default')],
         )
         # 親サブフロー種別(フェーズ)のイベントリスナー
         self._parent_sub_flow_type_selector.param.watch(
@@ -116,8 +111,7 @@ class BaseSubflowForm():
 
         # 親サブフロー選択オプション
         parent_sub_flow_options = self.generate_parent_sub_flow_options(
-            parent_sub_flow_type_options[msg_config.get(
-                'form', 'selector_default')],
+            parent_sub_flow_type_options[msg_config.get('form', 'selector_default')],
             research_flow_status
         )
         # 親サブフロー選択 : マルチセレクト
@@ -126,8 +120,7 @@ class BaseSubflowForm():
             options=parent_sub_flow_options
         )
         # 親サブフロー選択のイベントリスナー
-        self._parent_sub_flow_selector.param.watch(
-            self.callback_menu_form, 'value')
+        self._parent_sub_flow_selector.param.watch(self.callback_menu_form, 'value')
 
         # 処理開始ボタン
         self.submit_button = Button(disabled=True)
@@ -141,9 +134,7 @@ class BaseSubflowForm():
         """
         self.submit_button.on_click(callback_function)
 
-    def generate_sub_flow_type_options(
-        self, research_flow_status: list[PhaseStatus]
-    ) -> dict[str, int]:
+    def generate_sub_flow_type_options(self, research_flow_status: list[PhaseStatus]) -> dict[str, int]:
         """サブフロー種別(フェーズ)を表示するメソッドです。
 
         Args:
@@ -161,11 +152,12 @@ class BaseSubflowForm():
                 continue
             # サブフローのあるフェーズのみ
             if len(phase_status._sub_flow_data) > 0:
-                pahse_options[msg_config.get(
-                    'research_flow_phase_display_name', phase_status._name)] = phase_status._seq_number
+                pahse_options[msg_config.get('research_flow_phase_display_name', phase_status._name)] = phase_status._seq_number
         return pahse_options
 
-    def generate_sub_flow_name_options(self, phase_seq_number: int, research_flow_status: list[PhaseStatus]) -> dict[str, int]:
+    def generate_sub_flow_name_options(
+        self, phase_seq_number: int, research_flow_status: list[PhaseStatus]
+    ) -> dict[str, int]:
         """サブフロー名を表示するメソッドです。
 
         Args:
@@ -189,7 +181,8 @@ class BaseSubflowForm():
         return name_options
 
     def generate_parent_sub_flow_type_options(
-            self, pahase_seq_number: int, research_flow_status: list[PhaseStatus]) -> dict[str, int]:
+        self, pahase_seq_number: int, research_flow_status: list[PhaseStatus]
+    ) -> dict[str, int]:
         """親サブフロー種別を表示するメソッドです。
 
         Args:
@@ -207,12 +200,12 @@ class BaseSubflowForm():
         else:
             for phase_status in research_flow_status:
                 if phase_status._seq_number < pahase_seq_number:
-                    pahse_options[msg_config.get(
-                        'research_flow_phase_display_name', phase_status._name)] = phase_status._seq_number
+                    pahse_options[msg_config.get('research_flow_phase_display_name', phase_status._name)] = phase_status._seq_number
         return pahse_options
 
     def generate_parent_sub_flow_options(
-            self, pahase_seq_number: int, research_flow_status: list[PhaseStatus]) -> dict[str, str]:
+        self, pahase_seq_number: int, research_flow_status: list[PhaseStatus]
+    ) -> dict[str, str]:
         """親サブフロー選択オプションで選択した値を表示するメソッドです。
 
         Args:
@@ -285,8 +278,7 @@ class BaseSubflowForm():
             # 新規作成ボタンのボタンの有効化チェック
             self.change_disable_submit_button()
         except Exception:
-            self._err_output.update_error(
-                f'## [INTERNAL ERROR] : {traceback.format_exc()}')
+            self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_sub_flow_type_selector(self, event):
         """サブフロー種別(フェーズ)のボタンが操作できるように有効化するメソッドです。"""
@@ -299,14 +291,12 @@ class BaseSubflowForm():
             if selected_value is None:
                 raise Exception('Sub Flow Type Selector has None')
             # サブフロー名称：シングルセレクトの更新
-            sub_flow_name_options = self.generate_sub_flow_name_options(
-                selected_value, research_flow_status)
+            sub_flow_name_options = self.generate_sub_flow_name_options(selected_value, research_flow_status)
             self._sub_flow_name_selector.options = sub_flow_name_options
             # 新規作成ボタンのボタンの有効化チェック
             self.change_disable_submit_button()
         except Exception:
-            self._err_output.update_error(
-                f'## [INTERNAL ERROR] : {traceback.format_exc()}')
+            self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_sub_flow_name_selector(self, event):
         """サブフロー名称のボタンが操作できるように有効化するメソッドです。"""
@@ -316,8 +306,7 @@ class BaseSubflowForm():
             # 新規作成ボタンのボタンの有効化チェック
             self.change_disable_submit_button()
         except Exception:
-            self._err_output.update_error(
-                f'## [INTERNAL ERROR] : {traceback.format_exc()}')
+            self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_parent_sub_flow_type_selector(self, event):
         """親サブフロー種別(フェーズ)のボタンが操作できるように有効化するメソッドです。"""
@@ -337,8 +326,7 @@ class BaseSubflowForm():
             # 新規作成ボタンのボタンの有効化チェック
             self.change_disable_submit_button()
         except Exception:
-            self._err_output.update_error(
-                f'## [INTERNAL ERROR] : {traceback.format_exc()}')
+            self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     ############
     # validate #

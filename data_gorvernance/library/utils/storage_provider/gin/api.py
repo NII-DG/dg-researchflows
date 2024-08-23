@@ -152,9 +152,7 @@ def search_repo(scheme: str, domain: str, repo_id: str, user_id: str, token: str
     return requests.get(url=api_url, params=params)
 
 
-def patch_container(
-    scheme: str, domain: str, token: str, server_name: str, user_id: str
-) -> Response:
+def patch_container(scheme: str, domain: str, token: str, server_name: str, user_id: str) -> Response:
     """指定したコンテナの更新を行うメソッドです。
 
     Args:

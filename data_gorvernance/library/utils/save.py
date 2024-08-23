@@ -35,10 +35,7 @@ def all_sync_path(abs_root: str) -> list:
     dg_dir = os.path.join(abs_root, path_config.DATA_GOVERNANCE)
     contents = os.listdir(dg_dir)
     contents.remove(path_config.WORKING)
-    paths.extend([
-        os.path.join(dg_dir, con)
-        for con in contents
-    ])
+    paths.extend([os.path.join(dg_dir, con) for con in contents])
 
     return paths
 
@@ -64,8 +61,7 @@ class TaskSave(TaskLog):
 
         """
         super().__init__(nb_working_file_path, notebook_name)
-        self._abs_root_path = path_config.get_abs_root_form_working_dg_file_path(
-            nb_working_file_path)
+        self._abs_root_path = path_config.get_abs_root_form_working_dg_file_path(nb_working_file_path)
 
         # メッセージ出力
         self.save_msg_output = MessageBox()
@@ -134,8 +130,7 @@ class TaskSave(TaskLog):
 
         # define form
         if not self.save_msg_output.has_message():
-            self._save_submit_button.set_looks_init(
-                msg_config.get('save', 'submit'))
+            self._save_submit_button.set_looks_init(msg_config.get('save', 'submit'))
             self._save_submit_button.on_click(self._save_submit_callback)
             self.save_form_box.append(self._save_submit_button)
 
@@ -177,27 +172,21 @@ class TaskSave(TaskLog):
         except RequestException as e:
             timediff.end()
             minutes, seconds = timediff.get_diff_minute()
-            error_summary = traceback.format_exception_only(type(e), e)[
-                0].rstrip('\\n')
-            error_msg = msg_config.get(
-                'save', 'connection_error') + "\n" + error_summary
+            error_summary = traceback.format_exception_only(type(e), e)[0].rstrip('\\n')
+            error_msg = msg_config.get('save', 'connection_error') + "\n" + error_summary
             self.log.error(f'{error_msg}\n{traceback.format_exc()}')
-            self.save_msg_output.add_error(
-                f'経過時間: {minutes}m {seconds}s\n {error_msg}')
+            self.save_msg_output.add_error(f'経過時間: {minutes}m {seconds}s\n {error_msg}')
             return
         except Exception as e:
             timediff.end()
             minutes, seconds = timediff.get_diff_minute()
-            error_summary = traceback.format_exception_only(type(e), e)[
-                0].rstrip('\\n')
+            error_summary = traceback.format_exception_only(type(e), e)[0].rstrip('\\n')
             error_msg = f'## [INTERNAL ERROR] : {error_summary}\n{traceback.format_exc()}'
-            self.save_msg_output.add_error(
-                f'経過時間: {minutes}m {seconds}s\n {error_msg}')
+            self.save_msg_output.add_error(f'経過時間: {minutes}m {seconds}s\n {error_msg}')
             self.log.error(f'{error_msg}\n{traceback.format_exc()}')
             return
         # end
         timediff.end()
         minutes, seconds = timediff.get_diff_minute()
         message = msg_config.get('save', 'success')
-        self.save_msg_output.update_success(
-            f'{message}（{minutes}m {seconds}s）')
+        self.save_msg_output.update_success(f'{message}（{minutes}m {seconds}s）')

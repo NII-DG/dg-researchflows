@@ -28,9 +28,7 @@ class SubFlowManager:
 
     """
 
-    def __init__(self, current_dir: str, status_file: str,
-        diag_file: str, using_task_dir: str
-    ) -> None:
+    def __init__(self, current_dir: str, status_file: str,diag_file: str, using_task_dir: str) -> None:
         """ インスタンスの初期化処理を実行するメソッドです。
 
         Args:
@@ -54,12 +52,9 @@ class SubFlowManager:
         """
         if os.path.isdir(souce_task_dir):
             for task in self.tasks:
-                self._copy_file_by_name(
-                    task.name, souce_task_dir, self.task_dir)
+                self._copy_file_by_name(task.name, souce_task_dir, self.task_dir)
 
-    def _copy_file_by_name(self, target_file: str, search_directory: str,
-        destination_directory: str
-    ) -> None:
+    def _copy_file_by_name(self, target_file: str, search_directory: str,destination_directory: str) -> None:
         """ 指定した名前のファイルを検索ディレクトリから目的のディレクトリにコピーするメソッドです。
 
         Args:
@@ -75,8 +70,7 @@ class SubFlowManager:
                 # if filename.startswith(target_file) のとき
                 source_dir = root
                 relative_path = file.relative_path(root, search_directory)
-                destination_dir = os.path.join(
-                    destination_directory, relative_path)
+                destination_dir = os.path.join(destination_directory, relative_path)
                 # タスクノートブックのコピー
                 source_file = os.path.join(source_dir, filename)
                 destination_file = os.path.join(destination_dir, filename)
@@ -87,12 +81,9 @@ class SubFlowManager:
                     path_config.get_abs_root_form_working_dg_file_path(root),
                     path_config.DG_IMAGES_FOLDER
                 )
-                destination_images = os.path.join(
-                    destination_dir, path_config.IMAGES)
+                destination_images = os.path.join(destination_dir, path_config.IMAGES)
                 if not os.path.isdir(destination_images):
-                    os.symlink(source_images, destination_images,
-                        target_is_directory=True
-                    )
+                    os.symlink(source_images, destination_images,target_is_directory=True)
 
     def generate(self, svg_path: str, tmp_diag: str, font: str) -> None:
         """ ダイアグラムを生成するメソッドです。
@@ -120,7 +111,7 @@ class SubFlowManager:
         """ タスクの状態に基づいてダイアグラムを更新するメソッドです。"""
         for task in self.tasks:
             self._adjust_by_status(task)
-            
+
     def _adjust_by_status(self, task: SubflowTask) -> None:
         """ フロー図の見た目をタスクの状態によって変えるメソッドです。
 

@@ -127,8 +127,7 @@ def sync(token: str, api_url: str, project_id: str, abs_source: str, abs_root: s
     elif os.path.isfile(abs_source):
         recursive = False
     else:
-        raise FileNotFoundError(
-            f"The file or directory '{abs_source}' does not exist.")
+        raise FileNotFoundError(f"The file or directory '{abs_source}' does not exist.")
 
     if not os.path.isabs(abs_source):
         raise ValueError(f"The path '{abs_source}' is not an absolute path.")
@@ -144,7 +143,8 @@ def sync(token: str, api_url: str, project_id: str, abs_source: str, abs_root: s
     )
 
 
-def download_text_file(token: str, api_url: str,
+def download_text_file(
+    token: str, api_url: str,
     project_id: str, remote_path: str, encoding='utf-8'
 ):
     """テキストファイルの中身を取得するメソッドです。
@@ -166,8 +166,7 @@ def download_text_file(token: str, api_url: str,
         base_url=api_url, remote_path=remote_path
     )
     if content is None:
-        raise FileNotFoundError(
-            f'The specified file (path: {remote_path}) does not exist.')
+        raise FileNotFoundError(f'The specified file (path: {remote_path}) does not exist.')
     return content.decode(encoding)
 
 
@@ -206,9 +205,7 @@ def get_project_metadata(base_url: str, token: str, project_id: str):
     """
     metadata = get_project_registrations(base_url, token, project_id)
     if len(metadata['data']) < 1:
-        raise NotFoundContentsError(
-            f"Metadata doesn't exist for the project with the specified ID {project_id}."
-        )
+        raise NotFoundContentsError(f"Metadata doesn't exist for the project with the specified ID {project_id}.")
     return format_metadata(metadata)
 
 

@@ -56,7 +56,8 @@ class SubflowTask:
     allowed_statuses = [STATUS_UNFEASIBLE,
                         STATUS_UNEXECUTED, STATUS_DOING, STATUS_DONE]
 
-    def __init__(self, id: str, name: str, is_multiple: bool, is_required: bool, completed_count: int,
+    def __init__(
+        self, id: str, name: str, is_multiple: bool, is_required: bool, completed_count: int,
         dependent_task_ids: list[str], status: str, execution_environments: list[str], disabled: bool
     ) -> None:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ

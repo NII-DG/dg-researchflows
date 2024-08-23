@@ -5,9 +5,7 @@ from IPython.core.display import HTML
 from IPython.display import display
 
 
-def create_html_msg(
-    msg: str = '', fore: Optional[str] = None, back: Optional[str] = None, tag: str = 'p'
-) -> str:
+def create_html_msg(msg: str = '', fore: Optional[str] = None, back: Optional[str] = None, tag: str = 'p') -> str:
     """ HTMLを生成する関数です。
 
     Args:

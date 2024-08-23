@@ -6,8 +6,7 @@ from library.utils.file import JsonFile
 
 
 # analysis_environment.jsonのファイルパス
-json_path = Path(os.path.dirname(__file__)).joinpath(
-    '../../data/analysis_environment.json').resolve()
+json_path = Path(os.path.dirname(__file__)).joinpath('../../data/analysis_environment.json').resolve()
 
 
 class AnalysisEnvironment:

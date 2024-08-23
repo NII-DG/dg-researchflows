@@ -33,11 +33,8 @@ def get_subflow_type_and_id(working_file_path: str) -> tuple[str, str]:
     except:
         raise
 
-    abs_root = path_config.get_abs_root_form_working_dg_file_path(
-        working_file_path)
-    rf_status = ResearchFlowStatusOperater(
-        path_config.get_research_flow_status_file_path(abs_root)
-    )
+    abs_root = path_config.get_abs_root_form_working_dg_file_path(working_file_path)
+    rf_status = ResearchFlowStatusOperater(path_config.get_research_flow_status_file_path(abs_root))
 
     phase_index = index + 1
     if phase_index < len(parts):
@@ -71,22 +68,18 @@ def get_data_dir(working_file_path: str) -> str:
 
     """
     working_file_path = os.path.normpath(working_file_path)
-    abs_root = path_config.get_abs_root_form_working_dg_file_path(
-        working_file_path)
+    abs_root = path_config.get_abs_root_form_working_dg_file_path(working_file_path)
 
     subflow_type, subflow_id = get_subflow_type_and_id(working_file_path)
     if not subflow_type or not subflow_id:
-        raise Exception(
-            f'## [INTERNAL ERROR] : don\'t get subflow type or id.')
+        raise Exception(f'## [INTERNAL ERROR] : don\'t get subflow type or id.')
     try:
-        rf_status_file = path_config.get_research_flow_status_file_path(
-            abs_root)
+        rf_status_file = path_config.get_research_flow_status_file_path(abs_root)
         rf_status = ResearchFlowStatusOperater(rf_status_file)
         data_dir_name = rf_status.get_data_dir(subflow_type, subflow_id)
 
     except Exception as e:
-        raise Exception(
-            f'## [INTERNAL ERROR] : don\'t get directory name of data') from e
+        raise Exception(f'## [INTERNAL ERROR] : don\'t get directory name of data') from e
     return path_config.get_task_data_dir(abs_root, subflow_type, data_dir_name)
 
 
@@ -106,8 +99,7 @@ class ResearchFlowStatusFile(JsonFile):
         if os.path.isfile(file_path):
             super().__init__(file_path)
         else:
-            raise FileNotFoundError(
-                f'[ERROR] : Not Found File. File Path : {file_path}')
+            raise FileNotFoundError(f'[ERROR] : Not Found File. File Path : {file_path}')
 
     def load_research_flow_status(self) -> list[PhaseStatus]:
         """リサーチフローステータス管理JSONからリサーチフローステータスのインスタンスを取得するメソッドです。
@@ -218,8 +210,7 @@ class ResearchFlowStatusFile(JsonFile):
                 continue
 
         if not exist_phase:
-            raise Exception(
-                f'Not Found phase. target phase seq_number : {phase_seq_number}')
+            raise Exception(f'Not Found phase. target phase seq_number : {phase_seq_number}')
 
         return True
 
@@ -249,8 +240,7 @@ class ResearchFlowStatusFile(JsonFile):
                 continue
 
         if not exist_phase:
-            raise Exception(
-                f'Not Found phase. target phase seq_number : {phase_seq_number}')
+            raise Exception(f'Not Found phase. target phase seq_number : {phase_seq_number}')
 
         return True
 
@@ -284,8 +274,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         """
         update_research_flow_status = []
         for phase in research_flow_status:
-            phase.update_name(name=msg_config.get(
-                'research_flow_phase_display_name', phase._name))
+            phase.update_name(name=msg_config.get('research_flow_phase_display_name', phase._name))
             for sb in phase._sub_flow_data:
                 sb._name = escape_html_text(sb._name)
             update_research_flow_status.append(phase)
@@ -303,8 +292,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
                     # 現在の日時を取得
                     current_datetime = datetime.now()
                     # 現在時刻を埋める
-                    phase_status._sub_flow_data[0]._create_datetime = int(
-                        current_datetime.timestamp())
+                    phase_status._sub_flow_data[0]._create_datetime = int(current_datetime.timestamp())
             else:
                 continue
 
@@ -354,8 +342,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
                 continue
 
         if phase_name is None:
-            raise Exception(
-                f'Not Found phase. target phase seq_number : {creating_phase_seq_number}')
+            raise Exception(f'Not Found phase. target phase seq_number : {creating_phase_seq_number}')
         if new_sub_flow_id is None:
             raise Exception(f'Cannot Issue New Sub Flow ID')
         # リサーチフローステータス管理JSONの上書き
@@ -386,8 +373,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
                 phase_status._sub_flow_data.remove(remove_subflow)
                 break
         else:
-            raise NotFoundSubflowDataError(
-                f'There Is No Subflow Data to Delete. sub_flow_id : {sub_flow_id}')
+            raise NotFoundSubflowDataError(f'There Is No Subflow Data to Delete. sub_flow_id : {sub_flow_id}')
         # リサーチフローステータス管理JSONの上書き
         self.update_file(research_flow_status)
 
@@ -412,13 +398,13 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
                     sf._parent_ids = parent_sub_flow_ids
                     break
             else:
-                raise NotFoundSubflowDataError(
-                    f'There Is No Subflow Data to Relink. sub_flow_id : {sub_flow_id}')
+                raise NotFoundSubflowDataError(f'There Is No Subflow Data to Relink. sub_flow_id : {sub_flow_id}')
             break
         self.update_file(research_flow_status)
 
     def rename_sub_flow(
-        self, phase_seq_number: int, sub_flow_id: str, sub_flow_name: str, data_dir_name: str
+        self, phase_seq_number: int, sub_flow_id: str,
+        sub_flow_name: str, data_dir_name: str
     ):
         """サブフロー名とディレクトリ名を変更するメソッドです。
 
@@ -442,8 +428,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
                     sf._data_dir = data_dir_name
                     break
             else:
-                raise NotFoundSubflowDataError(
-                    f'There Is No Subflow Data to Rename. sub_flow_id : {sub_flow_id}')
+                raise NotFoundSubflowDataError(f'There Is No Subflow Data to Rename. sub_flow_id : {sub_flow_id}')
             break
         self.update_file(research_flow_status)
 
@@ -470,8 +455,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
                 if sb._id == id:
                     return sb._name, sb._data_dir
         else:
-            raise NotFoundSubflowDataError(
-                f'There Is No Data Directory Name. sub_flow_id : {id}')
+            raise NotFoundSubflowDataError(f'There Is No Data Directory Name. sub_flow_id : {id}')
 
     def get_data_dir(self, phase_name: str, id: str) -> str:
         """指定したサブフローデータのディレクトリ名を取得するメソッドです。
@@ -495,8 +479,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
                 if sb._id == id:
                     return sb._data_dir
         else:
-            raise NotFoundSubflowDataError(
-                f'There Is No Data Directory Name. sub_flow_id : {id}')
+            raise NotFoundSubflowDataError(f'There Is No Data Directory Name. sub_flow_id : {id}')
 
     def get_subflow_phase(self, phase_seq_number: int) -> str:
         """指定したフェーズの名前を取得するメソッドです。
@@ -516,8 +499,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
             if phase_status._seq_number == phase_seq_number:
                 return phase_status._name
         else:
-            raise Exception(
-                f'There is no phase. phase_seq_number : {phase_seq_number}')
+            raise Exception(f'There is no phase. phase_seq_number : {phase_seq_number}')
 
     def get_subflow_phases(self) -> list[str]:
         """リーサーチフローステータスに存在する全てのフェーズ名を取得するメソッドです。

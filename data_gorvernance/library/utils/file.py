@@ -70,8 +70,7 @@ def copy_dir(src: str, dst: str, overwrite: bool = False) -> None:
     if overwrite:
         shutil.copytree(src, dst, dirs_exist_ok=True)
     else:
-        shutil.copytree(src, dst, ignore=f_exists(
-            src, dst), dirs_exist_ok=True)
+        shutil.copytree(src, dst, ignore=f_exists(src, dst), dirs_exist_ok=True)
 
 
 def relative_path(target_path: str, start_dir: str) -> str:

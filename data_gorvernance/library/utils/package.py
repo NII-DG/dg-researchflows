@@ -84,8 +84,7 @@ class MakePackage:
         for key, raw in all_prompts:
             if key.startswith('_'):
                 continue
-            cookiecutter_dict[key] = render_variable(
-                env, raw, cookiecutter_dict)
+            cookiecutter_dict[key] = render_variable(env, raw, cookiecutter_dict)
         self.rendered_context = cookiecutter_dict
         return cookiecutter_dict
 
@@ -114,6 +113,4 @@ class MakePackage:
             output_dir (str): パッケージを作成するディレクトリを設定します。
 
         """
-        cookiecutter(self.template_dir, no_input=True,
-            extra_context=context_dict, output_dir=output_dir
-        )
+        cookiecutter(self.template_dir, no_input=True,extra_context=context_dict, output_dir=output_dir)

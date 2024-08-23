@@ -122,7 +122,7 @@ class Title(pn.pane.Markdown):
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
-            object(str|None): Markdownを含む文字列を設定します。
+            obj(str|None): Markdownを含む文字列を設定します。
             **params(dict): pn.pane.Markdownのその他のパラメータを設定します。
 
         """
@@ -343,9 +343,7 @@ class Form:
 
         return form
 
-    def _generate_object_widget(
-        self, definition: dict, title: str, key: str, values: dict
-    ) -> ObjectBox:
+    def _generate_object_widget(self, definition: dict, title: str, key: str, values: dict) -> ObjectBox:
         """type: objectをwidgetbox化するメソッドです。
 
         Args:
@@ -373,9 +371,7 @@ class Form:
             obj_box.append(self._generate_widget(properties, i_key, value))
         return obj_box
 
-    def _generate_array_widget(
-        self, definition: dict, title: str, key: str, values: Any
-    ) -> ArrayBox:
+    def _generate_array_widget(self, definition: dict, title: str, key: str, values: Any) -> ArrayBox:
         """type: arrayをwidgetbox化するメソッドです。
 
         Args:
@@ -415,9 +411,7 @@ class Form:
             else:
                 return pn.Row(widget, create_remove_button(widget, align='end'))
 
-        def create_remove_button(
-            widget: Union[ArrayBox, ObjectBox, Column], align: str = 'start'
-        ) -> Button:
+        def create_remove_button(widget: Union[ArrayBox, ObjectBox, Column], align: str = 'start') -> Button:
             """ arrayの選択した要素を削除するボタンを生成するメソッドです。
 
             Args:
@@ -428,8 +422,7 @@ class Form:
                 Button: 生成した削除ボタンを返す。
 
             """
-            remove_button = Button(
-                name='Remove', button_type='danger', button_style='outline', align=align)
+            remove_button = Button(name='Remove', button_type='danger', button_style='outline', align=align)
 
             def remove_item(event: Any) -> None:
                 """ ウィジェットを削除するメソッドです。
@@ -486,8 +479,7 @@ class Form:
 
         box.append(column)
 
-        add_button = Button(
-            name='Add', button_type='primary', button_style='outline')
+        add_button = Button(name='Add', button_type='primary', button_style='outline')
         add_button.on_click(add_item)
         box.append(add_button)
 

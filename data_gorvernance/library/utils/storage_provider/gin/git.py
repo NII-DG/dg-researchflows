@@ -37,8 +37,7 @@ def git_annex_trust(cwd: str):
         cwd (str):ルートディレクトリの絶対パス
 
     """
-    stdout, stderr, rt = Cmd.exec_subprocess(
-        cmd='git annex --force trust web', cwd=cwd)
+    stdout, stderr, rt = Cmd.exec_subprocess(cmd='git annex --force trust web', cwd=cwd)
     result = stdout.decode('utf-8')
 
 
@@ -52,8 +51,7 @@ def git_annex_lock(path: str) -> str:
         str:コマンドの実行結果
 
     """
-    stdout, stderr, rt = Cmd.exec_subprocess(
-        f'git annex lock {path}', raise_error=False)
+    stdout, stderr, rt = Cmd.exec_subprocess(f'git annex lock {path}', raise_error=False)
     result = stdout.decode('utf-8')
     return result
 
@@ -68,8 +66,7 @@ def git_annex_unlock(path: str) -> str:
         str:コマンドの実行結果
 
     """
-    stdout, stderr, rt = Cmd.exec_subprocess(
-        f'git annex unlock {path}', raise_error=False)
+    stdout, stderr, rt = Cmd.exec_subprocess(f'git annex unlock {path}', raise_error=False)
     result = stdout.decode('utf-8')
     return result
 
@@ -93,9 +90,7 @@ def git_annex_metadata_add_minetype_sha256_contentsize(
     )
 
 
-def git_annex_metadata_add_sd_date_published(
-    file_path: str, sd_date_published: str, exec_path: str
-):
+def git_annex_metadata_add_sd_date_published(file_path: str, sd_date_published: str, exec_path: str):
     """指定したファイルにGit Annexのメタデータ(sd_date_published)を追加するメソッドです。
 
     Args:
@@ -121,8 +116,7 @@ def git_commmit(msg: str, cwd: str) -> str:
         str:コマンドの実行結果
 
     """
-    stdout, stderr, rt = Cmd.exec_subprocess(
-        'git commit -m "{}"'.format(msg), cwd=cwd, raise_error=False)
+    stdout, stderr, rt = Cmd.exec_subprocess('git commit -m "{}"'.format(msg), cwd=cwd, raise_error=False)
     result = stdout.decode('utf-8')
     return result
 
@@ -137,8 +131,7 @@ def git_pull(cwd: str) -> str:
         str:コマンドの実行結果
 
     """
-    stdout, stderr, rt = Cmd.exec_subprocess(
-        'git pull', cwd=cwd, raise_error=False)
+    stdout, stderr, rt = Cmd.exec_subprocess('git pull', cwd=cwd, raise_error=False)
     result = stdout.decode('utf-8')
     return result
 
@@ -155,11 +148,9 @@ def git_branch(cwd: str, option: str = '') -> str:
 
     """
     if len(option) > 0:
-        stdout, stderr, rt = Cmd.exec_subprocess(
-            f'git branch {option}', cwd=cwd, raise_error=False)
+        stdout, stderr, rt = Cmd.exec_subprocess(f'git branch {option}', cwd=cwd, raise_error=False)
     else:
-        stdout, stderr, rt = Cmd.exec_subprocess(
-            f'git branch', cwd=cwd, raise_error=False)
+        stdout, stderr, rt = Cmd.exec_subprocess(f'git branch', cwd=cwd, raise_error=False)
     result = stdout.decode('utf-8')
     return result
 

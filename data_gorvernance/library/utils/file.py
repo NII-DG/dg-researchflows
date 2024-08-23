@@ -3,11 +3,11 @@
 JSONファイルを操作するためのクラスやファイルをコピーする関数が記載されています。
 
 """
+import json
 import os
 import shutil
-import json
 from pathlib import Path
-from typing import List, Set, Callable
+from typing import Callable, List, Set
 
 
 def copy_file(source_path: str, destination_path: str) -> None:

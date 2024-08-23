@@ -3,17 +3,17 @@ import os
 import traceback
 from typing import Any, Tuple, List
 
-import panel as pn
 from IPython.display import clear_output
+import panel as pn
 from requests.exceptions import RequestException
 
 from .config import path_config, message as msg_config
-from .widgets import Button, MessageBox
+from .error import UnusableVault, ProjectNotExist, UnauthorizedError, PermissionError
+from .input import get_grdm_connection_parameters
+from .log import TaskLog
 from .storage_provider import grdm
 from .time import TimeDiff
-from .log import TaskLog
-from .input import get_grdm_connection_parameters
-from .error import UnusableVault, ProjectNotExist, UnauthorizedError, PermissionError
+from .widgets import Button, MessageBox
 
 
 def all_sync_path(abs_root: str) -> list:

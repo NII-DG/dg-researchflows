@@ -3,12 +3,13 @@
 dg-webからガバナンスシートやメタデータのスキーマの取得する関数や検証を行う関数が記載されています。
 """
 from http import HTTPStatus
+from typing import Optional
 from urllib import parse
 
 import requests
 from requests.exceptions import RequestException
 
-from ..error import UnauthorizedError, NotFoundContentsError
+from library.utils.error import UnauthorizedError, NotFoundContentsError
 from library.utils.config import connect as con_config
 
 class Api():

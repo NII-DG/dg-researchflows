@@ -6,17 +6,8 @@ GRDMにアップロードしたり、"URLの権限やアクセス許可のチェ
 """
 import json
 import os
+from typing import Union
 from urllib import parse
-
-#from .client import upload, download
-#from .api import (
-#    get_token_profile,
-#    get_user_info,
-#    get_projects,
-#    get_project_registrations,
-#    get_project_collaborators
-#)
-#from .metadata import format_metadata
 from ...error import NotFoundContentsError, UnauthorizedError
 from typing import Union
 from library.utils.config import connect as con_config

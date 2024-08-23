@@ -3,12 +3,14 @@
 入力フォーム生成や操作のためのクラスが記載されています。
 
 """
+import json
 import traceback
-from typing import Any, Dict
+from typing import Any, Optional
 
 import panel as pn
 
 from library.utils.widgets import MessageBox, Button
+
 
 # (vertical, horizontal)
 # (top, right, bottom, and left)
@@ -116,11 +118,11 @@ class Title(pn.pane.Markdown):
 
     """
 
-    def __init__(self, object: str=None, **params: dict)->None:
+    def __init__(self, object: Optional[str]=None, **params: Any)->None:
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
-            object(str): Markdownを含む文字列を設定します。
+            object(str|None): Markdownを含む文字列を設定します。
             **params(dict): pn.pane.Markdownのその他のパラメータを設定します。
 
         """
@@ -141,6 +143,7 @@ class Title(pn.pane.Markdown):
         """
         self.object = f"### {text}"
 
+
 class Description(pn.pane.Markdown):
     """ マークダウン形式の説明のクラスです。
 
@@ -150,7 +153,7 @@ class Description(pn.pane.Markdown):
 
     """
 
-    def __init__(self, object: str=None, **params: dict)->None:
+    def __init__(self, object: Optional[str]=None, **params: Any)->None:
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
@@ -163,6 +166,7 @@ class Description(pn.pane.Markdown):
         if "margin" not in params:
             params["margin"] = (0, 10, 0, 20)
         super().__init__(object=object, **params)
+
 
 class Column(pn.Column):
     """ タイトルや入力欄をまとめるクラスです。
@@ -186,6 +190,7 @@ class Column(pn.Column):
             params["margin"] = (5, 10, 5, 10)
         super().__init__(**params)
 
+
 class ArrayBox(pn.WidgetBox):
     """ 入力欄が増減する項目をまとめたクラスです。
 
@@ -207,6 +212,7 @@ class ArrayBox(pn.WidgetBox):
         if "margin" not in params:
             params["margin"] = 15
         super().__init__(**params)
+
 
 class ObjectBox(pn.WidgetBox):
     """ 入力欄を大項目でまとめるクラスです。
@@ -230,6 +236,7 @@ class ObjectBox(pn.WidgetBox):
             params["margin"] = 10
         super().__init__(**params)
 
+
 class Form:
     """入力フォームの操作のクラスです。
 
@@ -251,7 +258,7 @@ class Form:
 
         self.schema = {}
 
-    def create_widgets(self, schema: dict, data: dict=None) -> None:
+    def create_widgets(self, schema: dict, data: Optional[dict]=None) -> None:
         """jsonchemaの形式に沿った入力欄をpanelで作成するメソッドです。
 
         Args:
@@ -268,7 +275,7 @@ class Form:
                 value = data.get(key, {})
             self.form_box.append(self._generate_widget(properties, key, value))
 
-    def _generate_widget(self, definition:dict, key:str, value:dict=None)->ArrayBox | ObjectBox | Column:
+    def _generate_widget(self, definition:dict, key:str, value:Optional[dict]=None)->ArrayBox | ObjectBox | Column:
         """jsonschemaの設定値からpanelのwidgetを作成するメソッドです。
 
         Args:
@@ -380,7 +387,7 @@ class Form:
             box.append(Description(description, schema_key=key))
         column = pn.Column()
 
-        def create_items(value: dict=None)->pn.Row:
+        def create_items(value: Optional[dict]=None)->pn.Row:
             """arrayのひとつの要素を作成するメソッドです。
 
             Args:
@@ -618,3 +625,49 @@ class Form:
             # Columnの値が取得できたら終わる
             break
         return value
+
+    def sort_order(self, schema: dict, json_path: str) -> dict:
+        """jsonファイルを読み込みスキーマを並び替える処理を呼ぶメソッドです。
+
+        Args:
+            schema (dict): 元のスキーマ
+            json_path (str): jsonファイルのパス
+
+        Returns:
+            dict: 並び替えたスキーマを返す。
+        """
+        update_schema = {}
+        with open(json_path, 'r') as f:
+            order = json.load(f)
+        order_schema = self.sort_schema(schema['properties'], order)
+        update_schema.update({'properties':order_schema})
+        return update_schema
+
+    def sort_schema(self, properties:dict, order:dict) -> dict:
+        """jsonファイルのkeyに合わせてスキーマを並び替えるメソッドです。
+
+        Args:
+            properties (dict): スキーマのproperties要素を設定する。
+            order (dict): jsonファイルの要素を設定する。
+
+        Returns:
+            dict: 並び替えたスキーマを返す。
+
+        """
+        new_schema = {}
+        for order_key in order['ui:order']:
+            if properties.get(order_key):
+                if order.get(order_key) and properties[order_key].get("type") == "object":
+                    schema_value = self.sort_schema(properties[order_key]['properties'], order[order_key])
+                    new_schema.update({order_key:properties[order_key]})
+                    new_schema[order_key]['properties'] = schema_value
+                elif order.get(order_key) and properties[order_key].get("type") == "array":
+                    if properties[order_key]['items'].get("type") == "object":
+                        schema_value = self.sort_schema(properties[order_key]['items']['properties'], order[order_key]['items'])
+                        new_schema.update({order_key:properties[order_key]})
+                        new_schema[order_key]['items']['properties'] = schema_value
+                    else:
+                        new_schema[order_key] = schema_value
+                else:
+                    new_schema[order_key] = properties[order_key]
+        return new_schema

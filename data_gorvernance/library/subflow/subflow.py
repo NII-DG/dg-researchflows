@@ -1,16 +1,18 @@
 """ サブフローを管理するモジュールです。"""
-import os
 from itertools import chain, zip_longest
+import os
 from pathlib import Path
 
 from nbformat import NO_CONVERT, read
 
-from ..utils import file
-from ..utils.config import path_config
-from ..utils.diagram import DiagManager, init_config, update_svg
-from ..utils.setting import SubflowStatusFile, SubflowTask
+from library.utils import file
+from library.utils.config import path_config
+from library.utils.diagram import DiagManager, init_config, update_svg
+from library.utils.setting import SubflowStatusFile, SubflowTask
+
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
+
 
 class SubFlowManager:
     """ サブフローを管理するクラスです。
@@ -83,15 +85,13 @@ class SubFlowManager:
                 if not os.path.isdir(destination_images):
                     os.symlink(source_images, destination_images, target_is_directory=True)
 
-
-    def generate(self, svg_path: str, tmp_diag: str, font: str, display_all:bool = True) -> None:
+    def generate(self, svg_path: str, tmp_diag: str, font: str) -> None:
         """ ダイアグラムを生成するメソッドです。
 
         Args:
             svg_path (str): SVGファイルの出力パスを設定します。
             tmp_diag (str): 一時的なダイアグラムファイルへのパスを設定します。
             font (str): ダイアグラムに使用するフォントを設定します。
-            display_all (bool): 非推奨のタスクを推奨タスクと同じように表示するかどうかを設定します。
 
         """
         # 毎回元ファイルを読み込む
@@ -101,52 +101,24 @@ class SubFlowManager:
         for task in self.tasks:
             self.svg_config.update(init_config(task.id, task.name))
             self.parse_headers(task)
-        self._update(display_all)
+        self._update()
         for task in self.tasks:
             self.change_id(task)
         self.diag.generate_svg(tmp_diag, svg_path, font)
         update_svg(svg_path, self.current_dir, self.svg_config)
 
-    def _update(self, display_all: bool = True) -> None:
-        """ タスクの状態に基づいてダイアグラムを更新するメソッドです。
-
-        Args:
-            display_all (bool): 非推奨のタスクを推奨タスクと同じように表示するかどうかを設定します。
-
-        """
+    def _update(self) -> None:
+        """ タスクの状態に基づいてダイアグラムを更新するメソッドです。"""
         for task in self.tasks:
-            self._adjust_by_status(task, display_all)
-            self._adjust_by_optional(task, display_all)
+            self._adjust_by_status(task)
 
-    def _adjust_by_optional(self, task: SubflowTask, display_all: bool = True) -> None:
-        """ 非推奨のタスクをグレーアウトし、リンクが押せない状態にするメソッドです。
-
-        Args:
-            task (SubflowTask): 調整するタスクを設定します。
-            display_all (bool): 非推奨のタスクを通常通りに表示するかどうかを設定します。
-
-        """
-        if task.disable:
-            if display_all:
-                #self.diag.update_node_style(task.id, 'dotted')
-                pass
-            else:
-                # self.diag.delete_node(task.id)
-                # 以下暫定処理
-                self.diag.update_node_color(task.id, "#77787B")
-                self.svg_config[task.id]['is_link'] = False
-
-    def _adjust_by_status(self, task: SubflowTask, display_all: bool = True) -> None:
+    def _adjust_by_status(self, task: SubflowTask) -> None:
         """ フロー図の見た目をタスクの状態によって変えるメソッドです。
 
         Args:
             task (SubflowTask): 調整するタスクを設定します。
-            display_all (bool): 非推奨のタスクを推奨タスクと同じように調整するかどうかを設定します。
 
         """
-        if task.disable and not display_all:
-            return
-
         if task.is_multiple:
             self.diag.update_node_stacked(task.id)
 

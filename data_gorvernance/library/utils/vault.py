@@ -2,15 +2,17 @@
 
 このモジュールはVaultサーバーに接続するために必要な値の設定とチェックを行い、キーやポリシーを作成してサーバーを起動させ、接続確認を行うメソッドがあります。
 """
-import hvac
 import os
 import requests
 import subprocess
 import threading
 import time
 
+import hvac
+
 from .error import UnusableVault
 from typing import Union
+
 
 VAULT_ADDR = 'http://127.0.0.1:8200'
 TOKEN_PATH = '/home/jovyan/.vault/token'

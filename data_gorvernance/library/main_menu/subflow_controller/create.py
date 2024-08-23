@@ -2,20 +2,20 @@
 
 このモジュールはサブフロー新規作成クラスを始め、新しいサブフローのデータを用意したり、データの検証を行うメソッドなどがあります。
 """
-import shutil
 import os
+import shutil
 import traceback
-from typing import Dict, List
+from typing import List
 
-import panel as pn
 from dg_drawer.research_flow import PhaseStatus
+import panel as pn
 
-from ...utils.nb_file import NbFile
-from ...utils import file
-from ...utils.config import path_config, message as msg_config
+from library.utils import file
+from library.utils.config import path_config, message as msg_config
+from library.utils.error import InputWarning
+from library.utils.nb_file import NbFile
+from library.utils.string import StringManager
 from .base import BaseSubflowForm
-from ...utils.string import StringManager
-from ...utils.error import InputWarning
 
 
 class CreateSubflowForm(BaseSubflowForm):
@@ -45,7 +45,7 @@ class CreateSubflowForm(BaseSubflowForm):
         # 処理開始ボタン
         self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
 
-    def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus]) -> dict:
+    def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus]) -> dict[str, int]:
         """サブフロー種別(フェーズ)を表示するメソッドです。
 
         Args:

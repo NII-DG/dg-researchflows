@@ -2,24 +2,13 @@
     "is_completed": false,
     "tasks": [
         {
-            "id": "RF002001",
-            "name": "make_research_data_management_plan",
-            "is_multiple": false,
-            "is_required": true,
-            "completed_count": 0,
-            "dependent_task_ids": [],
-            "status": "unexecuted",
-            "execution_environments": [],
-            "disabled": false
-        },
-        {
             "id": "RF002003",
             "name": "build_experiment_environment",
             "is_multiple": false,
             "is_required": false,
             "completed_count": 0,
             "dependent_task_ids": [
-                "RF002001"
+                "RF009006"
             ],
             "status": "unfeasible",
             "execution_environments": [],
@@ -73,7 +62,7 @@
             "id": "RF009006",
             "name": "governance_sheet",
             "is_multiple": true,
-            "is_required": false,
+            "is_required": true,
             "completed_count": 0,
             "dependent_task_ids": [],
             "status": "unexecuted",

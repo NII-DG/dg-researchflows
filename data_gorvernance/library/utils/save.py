@@ -88,11 +88,11 @@ class TaskSave(TaskLog):
         except UnusableVault:
             message = msg_config.get('form', 'no_vault')
             self.save_msg_output.update_error(message)
-            self.log.error(traceback.format_exc())
+            self.log.error(f'{message}\n{traceback.format_exc()}')
         except RepoPermissionError:
             message = msg_config.get('form', 'insufficient_permission')
             self.save_msg_output.update_error(message)
-            self.log.error(traceback.format_exc())
+            self.log.error(f'{message}\n{traceback.format_exc()}')
         except ProjectNotExist as e:
             self.save_msg_output.update_error(str(e))
             self.log.error(traceback.format_exc())
@@ -167,7 +167,7 @@ class TaskSave(TaskLog):
         except UnauthorizedError:
             message = msg_config.get('form', 'token_unauthorized')
             self.save_msg_output.update_warning(message)
-            self.log.warning(traceback.format_exc())
+            self.log.warning(f'{message}\n{traceback.format_exc()}')
             return
         except RequestException as e:
             timediff.end()

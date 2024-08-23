@@ -6,7 +6,7 @@ GRDMにアップロードしたり、"URLの権限やアクセス許可のチェ
 """
 import json
 import os
-from typing import Union
+from typing import Optional
 from urllib import parse
 
 from library.utils.error import NotFoundContentsError, UnauthorizedError
@@ -19,11 +19,11 @@ NEED_TOKEN_SCOPE = ["osf.full_write"]
 ALLOWED_PERMISSION = ["admin", "write"]
 
 
-def get_project_id() -> Union[str, None]:
+def get_project_id() -> Optional[str]:
     """プロジェクトIDを取得するメソッドです。
 
     Returns:
-        Union[str, None]:プロジェクトIDを返す。値が取得できなかった場合はNone。
+        Optional[str]:プロジェクトIDを返す。値が取得できなかった場合はNone。
     """
     # url: https://rdm.nii.ac.jp/vz48p/osfstorage
     url = os.environ.get("BINDER_REPO_URL", "")

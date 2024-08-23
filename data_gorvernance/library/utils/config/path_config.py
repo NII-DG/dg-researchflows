@@ -5,16 +5,16 @@ import os
 DATA_GOVERNANCE = 'data_gorvernance'
 DATA = 'data'
 OCS_TEMPLATES = 'ocs-templates'
-# data_gorvernance直下
+## data_gorvernance直下
 BASE = 'base'
 LOG = 'log'
 IMAGES = 'images'
 RESEARCHFLOW = 'researchflow'
-WORKING = 'working'  # 同期非対称フォルダ
-# base直下
+WORKING = 'working'  ## 同期非対称フォルダ
+## base直下
 SUB_FLOW = 'subflow'
 TASK = 'task'
-# researchflow直下
+## researchflow直下
 PLAN = 'plan'
 
 

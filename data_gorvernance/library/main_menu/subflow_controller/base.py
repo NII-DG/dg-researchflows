@@ -81,7 +81,7 @@ class BaseSubflowForm():
 
         # サブフロー名称：テキストフォーム
         self._sub_flow_name_form = pn.widgets.TextInput(
-            name=msg_config.get('main_menu', 'sub_flow_name_input'),max_length=15
+            name=msg_config.get('main_menu', 'sub_flow_name_input'), max_length=15
         )
         # サブフロー名称：テキストフォームのイベントリスナー
         self._sub_flow_name_form.param.watch(self.callback_menu_form, 'value')

@@ -4,8 +4,8 @@ cookiecutterテンプレートを使用してパッケージを作成するク�
 
 """
 from collections import OrderedDict
-from typing import Union
 import os
+from typing import Optional
 
 from cookiecutter.exceptions import OutputDirExistsException, RepositoryNotFound
 from cookiecutter.main import (
@@ -39,12 +39,12 @@ class MakePackage:
         self.rendered_context = OrderedDict([])
         self.prompts = {}
 
-    def get_template(self, template: str, checkout: Union[str, None] = None) -> dict:
+    def get_template(self, template: str, checkout: Optional[str] = None) -> dict:
         """ cookiecutterのテンプレートの設定値を取得するメソッドです。
 
         Args:
             template (str): クローンするリポジトリのURLまたはパスを設定します。
-            checkout Union[str, None]: クローン後にチェックアウトするブランチ、タグ、コミット IDを設定します。
+            checkout Optional[str, None]: クローン後にチェックアウトするブランチ、タグ、コミット IDを設定します。
 
         Returns:
             dict: cookiecutterのテンプレートの設定値を返す。
@@ -105,11 +105,11 @@ class MakePackage:
             else var_name
         )
 
-    def create_package(self, context_dict: Union[dict, None] = None, output_dir: str = '.'):
+    def create_package(self, context_dict: Optional[dict] = None, output_dir: str = '.'):
         """ cookiecutterテンプレートを使用してパッケージを作成するメソッドです。
 
         Args:
-            context_dict: Union[dict, None]: デフォルトおよびユーザー設定を上書きするコンテキストの辞書を設定します。
+            context_dict: Optional[dict]: デフォルトおよびユーザー設定を上書きするコンテキストの辞書を設定します。
             output_dir (str): パッケージを作成するディレクトリを設定します。
 
         """

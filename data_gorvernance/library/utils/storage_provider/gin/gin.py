@@ -22,7 +22,7 @@ from library.utils.config import message as msg_config
 from library.utils.config import path_config
 from library.utils.config.param import ParamConfig
 from library.utils.error import (NoValueInDgFileError, RepositoryNotExist,
-                                 UnauthorizedError, UrlUpdateError)
+                                UnauthorizedError, UrlUpdateError)
 from . import api as gin_api
 from . import git
 

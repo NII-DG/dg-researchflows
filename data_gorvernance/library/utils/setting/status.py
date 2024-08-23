@@ -53,8 +53,7 @@ class SubflowTask:
     STATUS_UNEXECUTED = "unexecuted"
     STATUS_DOING = "doing"
     STATUS_DONE = "done"
-    allowed_statuses = [STATUS_UNFEASIBLE,
-                        STATUS_UNEXECUTED, STATUS_DOING, STATUS_DONE]
+    allowed_statuses = [STATUS_UNFEASIBLE, STATUS_UNEXECUTED, STATUS_DOING, STATUS_DONE]
 
     def __init__(
         self, id: str, name: str, is_multiple: bool, is_required: bool, completed_count: int,

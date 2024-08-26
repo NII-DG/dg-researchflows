@@ -6,23 +6,24 @@ GRDMにアップロードしたり、"URLの権限やアクセス許可のチェ
 """
 import json
 import os
-from typing import Union
+from typing import Optional
 from urllib import parse
 
 from library.utils.error import NotFoundContentsError, UnauthorizedError
 from .api import (get_project_collaborators, get_project_registrations,
-                  get_projects, get_token_profile, get_user_info)
+                    get_projects, get_token_profile, get_user_info)
 from .client import download, upload
 from .metadata import format_metadata
 
 NEED_TOKEN_SCOPE = ["osf.full_write"]
 ALLOWED_PERMISSION = ["admin", "write"]
 
-def get_project_id() -> Union[str, None]:
+
+def get_project_id() -> Optional[str]:
     """プロジェクトIDを取得するメソッドです。
 
     Returns:
-        Union[str, None]:プロジェクトIDを返す。値が取得できなかった場合はNone。
+        Optional[str]:プロジェクトIDを返す。値が取得できなかった場合はNone。
     """
     # url: https://rdm.nii.ac.jp/vz48p/osfstorage
     url = os.environ.get("BINDER_REPO_URL", "")
@@ -102,7 +103,7 @@ def get_projects_list(scheme: str, domain: str, token: str) -> dict:
     return {d['id']: d['attributes']['title'] for d in data}
 
 
-def sync(token: str, api_url: str, project_id: str, abs_source: str, abs_root:str="/home/jovyan"):
+def sync(token: str, api_url: str, project_id: str, abs_source: str, abs_root: str = "/home/jovyan"):
     """GRDMにアップロードするメソッドです。
 
     abs_source は絶対パスでなければならない。
@@ -142,7 +143,10 @@ def sync(token: str, api_url: str, project_id: str, abs_source: str, abs_root:st
     )
 
 
-def download_text_file(token: str, api_url: str, project_id: str, remote_path: str, encoding='utf-8'):
+def download_text_file(
+    token: str, api_url: str,
+    project_id: str, remote_path: str, encoding='utf-8'
+):
     """テキストファイルの中身を取得するメソッドです。
 
     Args:

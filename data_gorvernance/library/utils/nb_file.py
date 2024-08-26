@@ -1,6 +1,5 @@
 """ Notebookファイル操作のモジュールです。"""
 import os
-from typing import Any
 
 import nbformat
 
@@ -37,7 +36,6 @@ class NbFile(File):
             if cell.cell_type == 'markdown' and ':subflow_name' in cell.source:
                 cell.source = cell.source.replace(':subflow_name', security.escape_html_text(subflow_name))
         self.write(notebook)
-
 
     def read(self) -> nbformat.NotebookNode:
         """ ファイルからNotebookを読み込むメソッドです。

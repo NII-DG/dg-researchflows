@@ -3,14 +3,15 @@
 このモジュールはサブフロー間接続編集クラスを始め、既存のサブフロー間の接続を編集したりするメソッドなどがあります。
 """
 import traceback
-from typing import List, Union
+from typing import Union
 
 from dg_drawer.research_flow import PhaseStatus
 import panel as pn
 
 from library.utils.config import message as msg_config
-from library.utils.widgets import Alert
+from library.utils.widgets import Alert, MessageBox
 from .base import BaseSubflowForm
+
 
 class RelinkSubflowForm(BaseSubflowForm):
     """サブフロー間接続編集クラスです。
@@ -26,12 +27,12 @@ class RelinkSubflowForm(BaseSubflowForm):
             submit_button(Button):ボタンの設定
     """
 
-    def __init__(self, abs_root:str, message_box:pn.widgets.MessageBox) -> None:
+    def __init__(self, abs_root: str, message_box: MessageBox) -> None:
         """RelinkSubflowForm コンストラクタのメソッドです。
 
         Args:
             abs_root (str): リサーチフローのルートディレクトリ
-            message_box (pn.widgets.MessageBox): メッセージを格納する。
+            message_box (MessageBox): メッセージを格納する。
         """
 
         super().__init__(abs_root, message_box)
@@ -39,11 +40,11 @@ class RelinkSubflowForm(BaseSubflowForm):
         self.change_submit_button_init(msg_config.get('main_menu', 'relink_sub_flow'))
 
     # overwrite
-    def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus]) -> dict[str, int]:
+    def generate_sub_flow_type_options(self, research_flow_status: list[PhaseStatus]) -> dict[str, int]:
         """サブフロー種別(フェーズ)を表示するメソッドです。
 
         Args:
-            research_flow_status (List[PhaseStatus]): リサーチフローステータス管理情報
+            research_flow_status (list[PhaseStatus]): リサーチフローステータス管理情報
 
         Returns:
             dict: フェーズ表示名を返す。
@@ -60,16 +61,20 @@ class RelinkSubflowForm(BaseSubflowForm):
                 continue
             # サブフローのあるフェーズのみ
             if len(phase_status._sub_flow_data) > 0:
-                pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
+                pahse_options[msg_config.get(
+                    'research_flow_phase_display_name', phase_status._name)] = phase_status._seq_number
         return pahse_options
 
-    def get_parent_type_and_ids(self, phase_seq_number:str, sub_flow_id:str, research_flow_status:List[PhaseStatus]) -> tuple[int, list]:
+    def get_parent_type_and_ids(
+        self, phase_seq_number: str, sub_flow_id: str,
+        research_flow_status: list[PhaseStatus]
+    ) -> tuple[int, list]:
         """親サブフロー種別(フェーズ)と親サブフローIDを取得するメソッドです。
 
         Args:
             phase_seq_number (int): フェーズ番号
             sub_flow_id (str): サブフローID
-            research_flow_status (List[PhaseStatus]): リサーチフローステータス管理情報
+            research_flow_status (list[PhaseStatus]): リサーチフローステータス管理情報
 
         Returns:
             int: 親サブフロー種別(フェーズ)
@@ -110,11 +115,13 @@ class RelinkSubflowForm(BaseSubflowForm):
             if selected_sub_flow_id is None:
                 raise Exception('Sub Flow Name Selector has None')
             # 親サブフロー種別の更新
-            parent_sub_flow_type_options = self.generate_parent_sub_flow_type_options(selected_sub_flow_type, research_flow_status)
+            parent_sub_flow_type_options = self.generate_parent_sub_flow_type_options(
+                selected_sub_flow_type, research_flow_status
+            )
             self._parent_sub_flow_type_selector.options = parent_sub_flow_type_options
             # 新規作成ボタンのボタンの有効化チェック
             self.change_disable_submit_button()
-        except Exception as e:
+        except Exception:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     # overwrite
@@ -136,7 +143,9 @@ class RelinkSubflowForm(BaseSubflowForm):
                 raise Exception('Parent Sub Flow Type Selector has None')
 
             # 親サブフロー選択の更新
-            parent_sub_flow_options = self.generate_parent_sub_flow_options(selected_parent_type, research_flow_status)
+            parent_sub_flow_options = self.generate_parent_sub_flow_options(
+                selected_parent_type, research_flow_status
+            )
             self._parent_sub_flow_selector.options = parent_sub_flow_options
             # 親サブフロー選択の値の更新
             parent_sub_flow_type, parent_ids = self.get_parent_type_and_ids(
@@ -147,7 +156,7 @@ class RelinkSubflowForm(BaseSubflowForm):
                 self._parent_sub_flow_selector.value = parent_ids
             # 新規作成ボタンのボタンの有効化チェック
             self.change_disable_submit_button()
-        except Exception as e:
+        except Exception:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     # overwrite
@@ -199,7 +208,7 @@ class RelinkSubflowForm(BaseSubflowForm):
         sub_flow_type_list = self._sub_flow_type_selector.options
         if len(sub_flow_type_list) < 2:
             # defaultがあるため2未満にする
-            return Alert.warning(msg_config.get('main_menu','nothing_editable_subflow'))
+            return Alert.warning(msg_config.get('main_menu', 'nothing_editable_subflow'))
 
         return pn.Column(
             f'### {msg_config.get("main_menu", "update_sub_flow_link_title")}',
@@ -208,7 +217,7 @@ class RelinkSubflowForm(BaseSubflowForm):
             self._parent_sub_flow_type_selector,
             self._parent_sub_flow_selector,
             self.submit_button
-            )
+        )
 
     def main(self):
         """サブフロー間接続編集処理のメソッドです。"""
@@ -222,7 +231,9 @@ class RelinkSubflowForm(BaseSubflowForm):
         parent_sub_flow_ids = self._parent_sub_flow_selector.value
 
         try:
-            self.reserch_flow_status_operater.relink_sub_flow(phase_seq_number, sub_flow_id, parent_sub_flow_ids)
+            self.reserch_flow_status_operater.relink_sub_flow(
+                phase_seq_number, sub_flow_id, parent_sub_flow_ids
+            )
         except Exception:
             self.change_submit_button_error(msg_config.get('main_menu', 'error_relink_sub_flow'))
             raise

@@ -7,7 +7,7 @@ import json
 import os
 import shutil
 from pathlib import Path
-from typing import Callable, List, Set
+from typing import Callable, Set
 
 
 def copy_file(source_path: str, destination_path: str) -> None:
@@ -25,7 +25,7 @@ def copy_file(source_path: str, destination_path: str) -> None:
     shutil.copyfile(source_path, destination_path)
 
 
-def copy_dir(src: str, dst: str, overwrite: bool=False) -> None:
+def copy_dir(src: str, dst: str, overwrite: bool = False) -> None:
     """ ディレクトリをコピーする関数です。
 
     Args:
@@ -37,7 +37,7 @@ def copy_dir(src: str, dst: str, overwrite: bool=False) -> None:
         指定したディレクトリがなければ作成される。
 
     """
-    def f_exists(base: str, dst: str) -> Callable[[str, List[str]], Set[str]]:
+    def f_exists(base: str, dst: str) -> Callable[[str, list[str]], Set[str]]:
         """ 指定したベースディレクトリと目的のディレクトリの間で存在するファイル名を返す関数です。
 
         Args:
@@ -45,16 +45,18 @@ def copy_dir(src: str, dst: str, overwrite: bool=False) -> None:
             dst(str): 比較対象のディレクトリのパスを設定します。
 
         Returns:
-            Callable[[str, List[str]], Set[str]]: 相対的なディレクトリ名およびファイル名のセットを返す関数を返す。
+            Callable[[str, list[str]], Set[str]]: 相対的なディレクトリ名およびファイル名のセットを返す関数を返す。
 
         """
         base, dst = Path(base), Path(dst)
-        def _ignore(path: str, names: List[str]) -> Set[str]:   # サブディレクトリー毎に呼び出される
+
+        # サブディレクトリー毎に呼び出される
+        def _ignore(path: str, names: list[str]) -> Set[str]:
             """ 指定したパスと名前で存在するファイル名のセットを返す関数です。
 
             Args:
                 path(str): サブディレクトリのパスを設定します。
-                names(List[str]): サブディレクトリ内のファイル名のリストを設定します。
+                names(list[str]): サブディレクトリ内のファイル名のリストを設定します。
 
             Returns:
                 set[str]: ベースディレクトリと目的ディレクトリの間で存在するファイル名のセットを返す。
@@ -62,7 +64,7 @@ def copy_dir(src: str, dst: str, overwrite: bool=False) -> None:
             """
             names = set(names)
             rel = Path(path).relative_to(base)
-            return {f.name for f in (dst/ rel).glob('*') if f.name in names}
+            return {f.name for f in (dst / rel).glob('*') if f.name in names}
         return _ignore
 
     if overwrite:
@@ -84,9 +86,9 @@ def relative_path(target_path: str, start_dir: str) -> str:
     """
     if target_path and start_dir:
         return os.path.relpath(
-                    path=os.path.normpath(target_path),
-                    start=os.path.normpath(start_dir)
-                )
+            path=os.path.normpath(target_path),
+            start=os.path.normpath(start_dir)
+        )
     else:
         return ""
 
@@ -179,12 +181,12 @@ class JsonFile(File):
         content = super().read()
         return json.loads(content)
 
-    def write(self, data:dict) -> None:
+    def write(self, content: dict) -> None:
         """ 与えられた内容をjsonとしてファイルに書き込むメソッドです。
 
         Args:
-            data(dict): 書き込む内容を設定します。
+            content(dict): 書き込む内容を設定します。
 
         """
-        json_data = json.dumps(data, ensure_ascii=False, indent=4)
+        json_data = json.dumps(content, ensure_ascii=False, indent=4)
         super().write(json_data)

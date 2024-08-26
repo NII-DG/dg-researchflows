@@ -20,9 +20,7 @@ def open_main_menu(working_file: str) -> None:
 
     """
     button_width = 500
-    root_folder = Path(
-        path_config.get_abs_root_form_working_dg_file_path(working_file)
-    )
+    root_folder = Path(path_config.get_abs_root_form_working_dg_file_path(working_file))
     main_menu = str(root_folder / path_config.MAIN_MENU_PATH)
 
     link = file.relative_path(main_menu, os.path.dirname(working_file))

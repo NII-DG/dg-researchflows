@@ -11,12 +11,15 @@ from osfclient.cli import OSF, split_storage
 from osfclient.exceptions import UnauthorizedException
 from osfclient.utils import norm_remote_path, split_storage, is_path_matched
 from requests.exceptions import RequestException
-from typing import Union
+from typing import Optional
 
 from library.utils.error import UnauthorizedError
 
 
-def upload(token:str, base_url:str, project_id:str, source:str, destination:str, recursive:bool=False, force:bool=False):
+def upload(
+    token: str, base_url: str, project_id: str, source: str,
+    destination: str, recursive: bool = False, force: bool = False
+):
     """ファイルまたはフォルダをアップロードするメソッドです。
 
     Args:
@@ -39,8 +42,7 @@ def upload(token:str, base_url:str, project_id:str, source:str, destination:str,
 
     osf = OSF(token=token, base_url=base_url)
     if not osf.has_auth:
-        raise KeyError('To upload a file you need to provide a username and'
-                    ' password or token.')
+        raise KeyError('To upload a file you need to provide a username and password or token.')
 
     try:
         project = osf.project(project_id)
@@ -49,9 +51,7 @@ def upload(token:str, base_url:str, project_id:str, source:str, destination:str,
         store = project.storage(storage)
         if recursive:
             if not os.path.isdir(source):
-                raise RuntimeError("Expected source ({}) to be a directory when "
-                                    "using recursive mode.".format(source))
-
+                raise RuntimeError(f"Expected source ({source}) to be a directory when using recursive mode.")
             # local name of the directory that is being uploaded
             _, dir_name = os.path.split(source)
 
@@ -61,20 +61,20 @@ def upload(token:str, base_url:str, project_id:str, source:str, destination:str,
                     local_path = os.path.join(root, fname)
                     with open(local_path, 'rb') as fp:
                         # build the remote path + fname
-                        name = os.path.join(remote_path, dir_name, subdir_path,
-                                            fname)
-                        store.create_file(name, fp, force=force,
-                                            update=update)
+                        name = os.path.join(remote_path, dir_name, subdir_path, fname)
+                        store.create_file(name, fp, force=force, update=update)
 
         else:
             with open(source, 'rb') as fp:
-                store.create_file(remote_path, fp, force=force,
-                                    update=update)
+                store.create_file(remote_path, fp, force=force, update=update)
     except UnauthorizedException as e:
         raise UnauthorizedError(str(e)) from e
 
 
-def download(token:str, project_id:str, base_url:str, remote_path:str, base_path=None) -> Union[bytes, None]:
+def download(
+    token: str, project_id: str, base_url: str,
+    remote_path: str, base_path=None
+) -> Optional[bytes]:
     """ファイルの内容を取得するメソッドです。
 
     Args:
@@ -85,7 +85,7 @@ def download(token:str, project_id:str, base_url:str, remote_path:str, base_path
         base_path (str): ファイルを探すディレクトリのパス
 
     Returns:
-        Union[bytes, None]: 指定したファイルの内容
+        Optional[bytes]: 指定したファイルの内容
 
     Raises:
         UnauthorizedError: 認証が通らない
@@ -101,7 +101,8 @@ def download(token:str, project_id:str, base_url:str, remote_path:str, base_path
         base_file_path = base_path[base_path.index('/'):]
         if not base_file_path.endswith('/'):
             base_file_path = base_file_path + '/'
-        path_filter = lambda f: is_path_matched(base_file_path, f)
+
+        def path_filter(f): return is_path_matched(base_file_path, f)
     else:
         path_filter = None
 
@@ -109,7 +110,7 @@ def download(token:str, project_id:str, base_url:str, remote_path:str, base_path
         project = osf.project(project_id)
         store = project.storage(storage)
         files = store.files if path_filter is None \
-                else store.matched_files(path_filter)
+            else store.matched_files(path_filter)
         for file_ in files:
             if norm_remote_path(file_.path) == remote_path:
                 try:

@@ -19,4 +19,3 @@ class TestMessageConfig(TestCase):
         """
         research_preparation = message.get('research_flow_phase_display_name', 'plan')
         self.assertEqual('研究準備', research_preparation)
-

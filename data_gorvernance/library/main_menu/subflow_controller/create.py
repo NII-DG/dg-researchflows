@@ -5,7 +5,7 @@
 import os
 import shutil
 import traceback
-from typing import List
+
 
 from dg_drawer.research_flow import PhaseStatus
 import panel as pn
@@ -15,7 +15,9 @@ from library.utils.config import path_config, message as msg_config
 from library.utils.error import InputWarning
 from library.utils.nb_file import NbFile
 from library.utils.string import StringManager
+from library.utils.widgets import MessageBox
 from .base import BaseSubflowForm
+
 
 
 class CreateSubflowForm(BaseSubflowForm):
@@ -34,7 +36,7 @@ class CreateSubflowForm(BaseSubflowForm):
             _data_dir_name_form(TextInput):データディレクトリ名のフォーム
     """
 
-    def __init__(self, abs_root:str, message_box:pn.widgets.MessageBox) -> None:
+    def __init__(self, abs_root: str, message_box: MessageBox) -> None:
         """CreateSubflowForm コンストラクタのメソッドです。
 
         Args:
@@ -45,11 +47,11 @@ class CreateSubflowForm(BaseSubflowForm):
         # 処理開始ボタン
         self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
 
-    def generate_sub_flow_type_options(self, research_flow_status:List[PhaseStatus]) -> dict[str, int]:
+    def generate_sub_flow_type_options(self, research_flow_status: list[PhaseStatus]) -> dict[str, int]:
         """サブフロー種別(フェーズ)を表示するメソッドです。
 
         Args:
-            research_flow_status (List[PhaseStatus]): リサーチフローステータス管理情報
+            research_flow_status (list[PhaseStatus]): リサーチフローステータス管理情報
 
         Returns:
             dict: フェーズ表示名を返す。
@@ -62,10 +64,10 @@ class CreateSubflowForm(BaseSubflowForm):
                 continue
             else:
                 # plan以外の全てのフェーズ
-                pahse_options[msg_config.get('research_flow_phase_display_name',phase_status._name)] = phase_status._seq_number
+                pahse_options[msg_config.get('research_flow_phase_display_name', phase_status._name)] = phase_status._seq_number
         return pahse_options
 
-    def change_submit_button_init(self, name:str):
+    def change_submit_button_init(self, name: str):
         """ボタンの状態を初期化するメソッドです。
 
         Args:
@@ -90,7 +92,7 @@ class CreateSubflowForm(BaseSubflowForm):
             self._parent_sub_flow_type_selector.options = parent_sub_flow_type_options
             # 新規作成ボタンのボタンの有効化チェック
             self.change_disable_submit_button()
-        except Exception as e:
+        except Exception:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     # overwrite
@@ -155,7 +157,7 @@ class CreateSubflowForm(BaseSubflowForm):
             self._parent_sub_flow_type_selector,
             self._parent_sub_flow_selector,
             self.submit_button
-            )
+        )
 
     def main(self):
         """サブフロー新規作成処理のメソッドです。
@@ -191,7 +193,9 @@ class CreateSubflowForm(BaseSubflowForm):
 
         # リサーチフローステータス管理JSONの更新
         try:
-            phase_name, new_sub_flow_id = self.reserch_flow_status_operater.create_sub_flow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
+            phase_name, new_sub_flow_id = self.reserch_flow_status_operater.create_sub_flow(
+                phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids
+            )
         except Exception:
             self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             raise
@@ -200,14 +204,14 @@ class CreateSubflowForm(BaseSubflowForm):
         data_dir_path = ""
         try:
             data_dir_path = self.create_data_dir(phase_name, data_dir_name)
-        except Exception:
+        except Exception as e:
             # ディレクトリ名が存在した場合
             # リサーチフローステータス管理JSONをロールバック
             self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
             # ユーザーに再入力を促す
-            message = msg_config.get('main_menu','data_directory_exist')
+            message = msg_config.get('main_menu', 'data_directory_exist')
             self.change_submit_button_warning(message)
-            raise InputWarning(message)
+            raise InputWarning(message) from e
 
         # 新規サブフローデータの用意
         try:
@@ -229,7 +233,7 @@ class CreateSubflowForm(BaseSubflowForm):
         self._data_dir_name_form.value_input = ''
         self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
 
-    def create_data_dir(self, phase_name:str, data_dir_name:str) -> str:
+    def create_data_dir(self, phase_name: str, data_dir_name: str) -> str:
         """データディレクトリを作成するメソッドです。
 
         Args:
@@ -248,7 +252,7 @@ class CreateSubflowForm(BaseSubflowForm):
         os.makedirs(path)
         return path
 
-    def prepare_new_subflow_data(self, phase_name:str, new_sub_flow_id:str, sub_flow_name:str):
+    def prepare_new_subflow_data(self, phase_name: str, new_sub_flow_id: str, sub_flow_name: str):
         """新しいサブフローのデータを用意するメソッドです。
 
         Args:
@@ -267,7 +271,7 @@ class CreateSubflowForm(BaseSubflowForm):
         dect_dir_path = os.path.join(dg_researchflow_path, phase_name, new_sub_flow_id)
 
         # コピー先フォルダの作成
-        os.makedirs(dect_dir_path) # 既に存在している場合はエラーになる
+        os.makedirs(dect_dir_path)  # 既に存在している場合はエラーになる
 
         # 対象コピーファイルorディレクトリリスト
         copy_files = path_config.get_prepare_file_name_list_for_subflow()
@@ -286,7 +290,7 @@ class CreateSubflowForm(BaseSubflowForm):
                 if copy_file_name == path_config.MENU_NOTEBOOK:
                     nb_file = NbFile(dect_path)
                     nb_file.embed_subflow_name_on_header(sub_flow_name)
-        except Exception as e:
+        except Exception:
             # 失敗した場合は、コピー先フォルダごと削除する（ロールバック）
             shutil.rmtree(dect_dir_path)
             raise

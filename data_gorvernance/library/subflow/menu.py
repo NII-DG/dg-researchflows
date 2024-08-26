@@ -28,19 +28,17 @@ def access_main_menu(working_file: str):
     Args:
         working_file (str): 実行Notebookファイルパス
     """
-    root_folder = Path(
-        path_config.get_abs_root_form_working_dg_file_path(working_file)
-    )
+    root_folder = Path(path_config.get_abs_root_form_working_dg_file_path(working_file))
     main_menu = str(root_folder / path_config.MAIN_MENU_PATH)
 
     link = file.relative_path(main_menu, os.path.dirname(working_file))
 
     main_menu_button = pn.pane.HTML()
     main_menu_button.object = create_button(
-            url=f'{link}?init_nb=true',
-            msg=message.get('subflow_menu', 'access_main_menu'),
-            button_width='500px'
-        )
+        url=f'{link}?init_nb=true',
+        msg=message.get('subflow_menu', 'access_main_menu'),
+        button_width='500px'
+    )
     pn.extension()
     display(main_menu_button)
     display(Javascript('IPython.notebook.save_checkpoint();'))
@@ -58,7 +56,7 @@ class SubflowMenu(TaskLog):
             working_file (str): 実行Notebookファイルパス
     """
 
-    def __init__(self, working_file:str) -> None:
+    def __init__(self, working_file: str) -> None:
         """SubflowMenu コンストラクタのメソッドです。
 
         Args:
@@ -157,9 +155,7 @@ class SubflowMenu(TaskLog):
 
         # base path
         parent = Path(os.path.dirname(working_file))
-        root_folder = Path(
-            path_config.get_abs_root_form_working_dg_file_path(working_file)
-        )
+        root_folder = Path(path_config.get_abs_root_form_working_dg_file_path(working_file))
 
         # get subflow type and id from path
         subflow_type, subflow_id = get_subflow_type_and_id(working_file)
@@ -184,9 +180,7 @@ class SubflowMenu(TaskLog):
 
         try:
             # setup
-            subflow = SubFlowManager(
-                str(parent), str(status_file), str(diag_file), str(using_task_dir)
-            )
+            subflow = SubFlowManager(str(parent), str(status_file), str(diag_file), str(using_task_dir))
             subflow.setup_tasks(str(souce_task_dir))
             subflow_menu.set_diagram(subflow, font_folder)
             subflow_menu.menu_widgetbox.append(subflow_menu.diagram_widgetbox)

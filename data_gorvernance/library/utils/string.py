@@ -44,7 +44,7 @@ class StringManager:
         return bool(re.match(r'^[\x20-\x7E]*$', text))
 
     @staticmethod
-    def strip(text:str, remove_empty: bool=True) -> str:
+    def strip(text: str, remove_empty: bool = True) -> str:
         """ 文字列の両端の空白文字を削除するメソッドです。
 
         remove_empty=Falseのとき、空白文字のみで構成された文字列が渡された場合にもとの文字列をそのまま返す。

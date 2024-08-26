@@ -1,7 +1,6 @@
 """ocs_template.jsonのファイルのデータを扱うモジュールです。"""
 import os
 from pathlib import Path
-from typing import List
 
 from library.utils.file import JsonFile
 
@@ -23,7 +22,7 @@ class OCSTemplate:
             __OCS_TEMPLATE_PATH(str):OCSテンプレートパスのキー名
             __IS_ACTIVE(str):アクティブ状態かの判定に用いるフラグのキー名
         instance:
-           ocs_template(list(object)):OCSテンプレートデータのリスト
+            ocs_template(list(object)):OCSテンプレートデータのリスト
 
     """
     __FIELD = "ocs_template"
@@ -41,7 +40,7 @@ class OCSTemplate:
         contents = JsonFile(str(ocs_template_json_file)).read()
         self.ocs_template = contents[self.__FIELD]
 
-    def get_name(self)->list[str]:
+    def get_name(self) -> list[str]:
         """OCSテンプレート名のリストを作成するメソッドです。
 
         Returns:
@@ -50,7 +49,7 @@ class OCSTemplate:
         """
         return [fld[self.__FIELD_NAME] for fld in self.ocs_template]
 
-    def get_disabled_ids(self)->List[str]:
+    def get_disabled_ids(self) -> list[str]:
         """アクティブ状態でないデータのリストを作成するメソッドです。
 
         Returns:
@@ -63,7 +62,7 @@ class OCSTemplate:
                 disabled.append(fld[self.__FIELD_NAME])
         return disabled
 
-    def get_id(self, target_name:str)->str:
+    def get_id(self, target_name: str) -> str:
         """指定したOCSテンプレートのIDを取得するメソッドです。
 
         Args:
@@ -77,7 +76,7 @@ class OCSTemplate:
             if fld[self.__FIELD_NAME] == target_name:
                 return fld[self.__ID]
 
-    def get_template_path(self, target_name:str)->str:
+    def get_template_path(self, target_name: str) -> str:
         """指定したOCSテンプレートのパスを取得するメソッドです。
 
         Args:

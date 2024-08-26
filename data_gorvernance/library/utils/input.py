@@ -1,4 +1,4 @@
-""" トークン取得のモジュールです。
+"""トークン取得のモジュールです。
 
 各種トークンやプロジェクトIDを取得する関数が記載されています。
 
@@ -12,7 +12,6 @@ from .error import UnusableVault, UnauthorizedError, ProjectNotExist, RepoPermis
 from .storage_provider import grdm
 from .string import StringManager
 from .vault import Vault
-from library.utils.config import connect as con_config
 
 
 def get_project_id() -> str:
@@ -22,8 +21,7 @@ def get_project_id() -> str:
         str: プロジェクトIDを返す。
 
     """
-    grdmmain = grdm.Grdm()
-    project_id = grdmmain.get_project_id()
+    project_id = grdm.get_project_id()
     if project_id:
         return project_id
     while True:
@@ -103,8 +101,7 @@ def get_grdm_token(vault_key: str) -> str:
             bool: トークンの有効性を返す。
 
         """
-        grdmmain = grdm.Grdm()
-        return grdmmain.check_authorization(token)
+        return grdm.check_authorization(grdm.BASE_URL, token)
 
     return get_token(vault_key, check_auth, msg_config.get('form', 'pls_input_grdm_token'))
 
@@ -129,14 +126,13 @@ def get_goveredrun_token() -> str:
         Returns:
             bool: Governed Runのトークンの有効性を返す。
         """
-        dgweb_api = dg_web.Api()
-        return dgweb_api.check_governedrun_token(token)
+        return dg_web.check_governedrun_token(dg_web.SCHEME, dg_web.DOMAIN, token)
 
     return get_token('govrun_token', check_auth, msg_config.get('form', 'pls_input_govrun_token'))
 
 
 def get_grdm_connection_parameters() -> tuple[str, str]:
-    """ GRDMのトークンとプロジェクトIDを取得する関数です。
+    """GRDMのトークンとプロジェクトIDを取得する関数です。
 
     Returns:
         str: GRDMのトークンを返す。
@@ -156,9 +152,8 @@ def get_grdm_connection_parameters() -> tuple[str, str]:
     while True:
         try:
             token = get_grdm_token(vault_key)
-            grdmmain = grdm.Grdm()
-            if not grdmmain.check_permission(token, project_id):
-                raise PermissionError
+            if not grdm.check_permission(grdm.BASE_URL, token, project_id):
+                raise RepoPermissionError
             break
         except UnauthorizedError:
             vault = Vault()

@@ -14,8 +14,6 @@ from .log import TaskLog
 from .storage_provider import grdm
 from .time_tracker import TimeDiff
 from .widgets import Button, MessageBox
-from library.utils.config import connect as con_config
-from typing import Union
 
 
 def all_sync_path(abs_root: str) -> list:
@@ -74,7 +72,6 @@ class TaskSave(TaskLog):
         self.save_form_box.width = 900
         # 確定ボタン
         self._save_submit_button = Button(width=500)
-        self.API_V2_BASE_URL = con_config.get('GRDM', 'API_V2_BASE_URL')
 
     def get_grdm_params(self) -> tuple[str, str]:
         """ GRDMのトークンとプロジェクトIDを取得するメソッドです。
@@ -156,14 +153,13 @@ class TaskSave(TaskLog):
         self.save_form_box.clear()
         msg = msg_config.get('save', 'doing')
         timediff.start()
-        grdmmain = grdm.Grdm()
 
         try:
             for i, path in enumerate(self._source):
                 self.save_msg_output.update_info(f'{msg} {i+1}/{size}')
-                grdmmain.sync(
+                grdm.sync(
                     token=self.token,
-                    api_url= self.API_V2_BASE_URL,
+                    api_url=grdm.API_V2_BASE_URL,
                     project_id=self.project_id,
                     abs_source=path,
                     abs_root=self._abs_root_path

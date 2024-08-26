@@ -1,4 +1,4 @@
-""" Vaultサーバーへの接続のモジュールです。
+"""Vaultサーバーへの接続のモジュールです。
 
 このモジュールはVaultサーバーに接続するために必要な値の設定とチェックを行い、キーやポリシーを作成してサーバーを起動させ、接続確認を行うメソッドがあります。
 """
@@ -28,9 +28,8 @@ MAX_RETRY_COUNT = 5
 
 
 def start_server():
-    """ サーバーを起動するメソッドです。"""
-    config_path = os.path.join(
-        os.environ['HOME'], 'data_gorvernance/library/data/vault-config.hcl')
+    """サーバーを起動するメソッドです。"""
+    config_path = os.path.join(os.environ['HOME'], 'data_gorvernance/library/data/vault-config.hcl')
     dir_path = os.path.join(os.environ['HOME'], '.vault/log')
     os.makedirs(dir_path, exist_ok=True)
     with open(os.path.join(dir_path, 'vault.log'), 'w') as file:
@@ -42,10 +41,10 @@ def start_server():
 
 
 class Vault():
-    """ Vault Server操作クラスです。"""
+    """Vault Server操作クラスです。"""
 
     def initialize(self):
-        """ Vault初期化を行うメソッドです。"""
+        """Vault初期化を行うメソッドです。"""
         try:
             self.__read_token()
             return
@@ -58,7 +57,7 @@ class Vault():
         self.__create_dg_policy()
 
     def set_value(self, key: str, value: str):
-        """ 値の設定をするメソッドです。
+        """値の設定をするメソッドです。
 
         Args:
             key(str):トークンをvaultで保存するときのキー
@@ -72,7 +71,7 @@ class Vault():
         )
 
     def has_value(self, key: str) -> bool:
-        """ 値の存在チェックをするメソッドです。
+        """値の存在チェックをするメソッドです。
 
         Args:
             key(str):トークンをvaultで保存するときのキー
@@ -92,7 +91,7 @@ class Vault():
         return key in secrets['data']['keys']
 
     def get_value(self, key: str) -> Optional[str]:
-        """ 値の取得をするメソッドです。
+        """値の取得をするメソッドです。
 
         Args:
             key(str):トークンをvaultで保存するときのキー
@@ -111,7 +110,7 @@ class Vault():
         return read_res['data']['secret']
 
     def __start_server(self):
-        """ Vaultサーバー起動するメソッドです。
+        """Vaultサーバー起動するメソッドです。
 
         Raises:
             UnusableVault:vaultが利用できない場合のエラー
@@ -151,7 +150,7 @@ class Vault():
         self.__write_token(root_token)
 
     def __create_dg_engine(self):
-        """ シークレットエンジン(kv)作成をするメソッドです。"""
+        """シークレットエンジン(kv)作成をするメソッドです。"""
         token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=token)
 
@@ -164,7 +163,7 @@ class Vault():
             )
 
     def __create_dg_policy(self):
-        """ ポリシー作成をするメソッドです。"""
+        """ポリシー作成をするメソッドです。"""
         token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=token)
 
@@ -176,7 +175,7 @@ class Vault():
             )
 
     def __write_token(self, token: str):
-        """ ルートトークン保存のメソッドです。
+        """ルートトークン保存のメソッドです。
 
         Args:
             token(str):ルートトークン
@@ -185,7 +184,7 @@ class Vault():
             f.write(token)
 
     def __read_token(self) -> str:
-        """ ルートトークン取得のメソッドです。
+        """ルートトークン取得のメソッドです。
 
         Raises:
             UnusableVault:vaultが利用できないエラー
@@ -201,7 +200,7 @@ class Vault():
         return root_token
 
     def __get_client(self) -> hvac.Client:
-        """ vaultに接続するためのクライアントを取得するメソッドです。
+        """vaultに接続するためのクライアントを取得するメソッドです。
 
         Returns:
             hvac.Client:vaultサーバーのクライアント

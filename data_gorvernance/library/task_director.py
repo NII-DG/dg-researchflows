@@ -1,4 +1,4 @@
-""" サブフローステータス更新を行うモジュールです。
+"""サブフローステータス更新を行うモジュールです。
 
 ここは全てのタスクに共通の処理をまとめます。
 """
@@ -16,7 +16,7 @@ from library.utils.setting import get_subflow_type_and_id, SubflowStatusFile, Su
 
 
 def get_return_sub_flow_menu_relative_url_path(working_file_path: str) -> str:
-    """ サブフローメニューNotebookへのパス、ファイルパスを取得するメソッドです。
+    """サブフローメニューNotebookへのパス、ファイルパスを取得するメソッドです。
 
     Args:
         working_file_path(str):作業ファイルのパス
@@ -38,7 +38,7 @@ def get_return_sub_flow_menu_relative_url_path(working_file_path: str) -> str:
 
 
 class TaskDirector(TaskSave):
-    """ タスクの基底クラスです。
+    """タスクの基底クラスです。
 
     Attributes:
         instance:
@@ -49,7 +49,7 @@ class TaskDirector(TaskSave):
     """
 
     def __init__(self, nb_working_file_path: str, notebook_name: str) -> None:
-        """ TaskDirector コンストラクタのメソッドです。
+        """TaskDirector コンストラクタのメソッドです。
 
         Notebookファイルのオペレーションするための共通クラス
 
@@ -88,7 +88,7 @@ class TaskDirector(TaskSave):
     #  update task status  #
     ########################
     def doing_task(self):
-        """ タスク開始によるサブフローステータス管理JSONの更新をするメソッドです。"""
+        """タスク開始によるサブフローステータス管理JSONの更新をするメソッドです。"""
         # タスク開始によるサブフローステータス管理JSONの更新
         sf = SubflowStatusFile(self._sub_flow_status_file_path)
         sf_status: SubflowStatus = sf.read()
@@ -97,7 +97,7 @@ class TaskDirector(TaskSave):
         sf.write(sf_status)
 
     def done_task(self):
-        """ タスク完了によるサブフローステータス管理JSONの更新をするメソッドです。"""
+        """タスク完了によるサブフローステータス管理JSONの更新をするメソッドです。"""
         sf = SubflowStatusFile(self._sub_flow_status_file_path)
         sf_status: SubflowStatus = sf.read()
         sf_status.completed_task_by_task_name(self._script_file_name, os.environ["JUPYTERHUB_SERVER_NAME"])
@@ -107,7 +107,7 @@ class TaskDirector(TaskSave):
     #  return subflow menu  #
     #########################
     def get_subflow_menu_button_object(self) -> pn.pane.HTML:
-        """ サブフローメニューへのボタンpanel.HTMLオブジェクトの取得するメソッドです。
+        """サブフローメニューへのボタンpanel.HTMLオブジェクトの取得するメソッドです。
 
         Returns:
             panel.pane.HTML: HTMLオブジェクト
@@ -125,7 +125,7 @@ class TaskDirector(TaskSave):
 
     # ここではログを吐かない
     def return_subflow_menu(self):
-        """ サブフローメニューへのボタン表示を行うメソッドです。"""
+        """サブフローメニューへのボタン表示を行うメソッドです。"""
         pn.extension()
         sub_flow_menu_link_button = self.get_subflow_menu_button_object()
         display(sub_flow_menu_link_button)
@@ -137,7 +137,7 @@ class TaskDirector(TaskSave):
 
     # override
     def _save(self):
-        """ ファイルをストレージへ保存するメソッドです。"""
+        """ファイルをストレージへ保存するメソッドです。"""
         # uploadしたときにタスク完了とするため
         super()._save()
         self.done_task()

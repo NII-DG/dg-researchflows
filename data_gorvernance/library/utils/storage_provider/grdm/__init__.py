@@ -1,8 +1,15 @@
-""" Gakunin RDMとやり取りをするパッケージです。
+"""Gakunin RDMとやり取りをするパッケージです。
 
 プロジェクトメタデータをアップロードしたり、APIに接続してプロジェクトメタデータとプロジェクトメンバーの情報を取得するためです
 """
+from .main import *
+from .api import *
 
-from .external import External
-from library.utils.storage_provider.grdm.grdm import Grdm
-from .metadata import Metadata
+BASE_URL = 'https://rdm.nii.ac.jp/'
+
+# TODO: BASE_URLに統一したい
+SCHEME = 'https'
+DOMAIN = 'rdm.nii.ac.jp'
+
+API_V2_BASE_URL = 'https://api.rdm.nii.ac.jp/v2/'
+API_DOMAIN = 'api.rdm.nii.ac.jp'

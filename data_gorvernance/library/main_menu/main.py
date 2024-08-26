@@ -1,4 +1,4 @@
-""" メインメニュー画面での操作のモジュールです。
+"""メインメニュー画面での操作のモジュールです。
 
 このモジュールはメインメニューの画面やボタンを表示するメソッドやサブフローメニューの画面の表示、操作を行えるメソッドなどがあります。
 """
@@ -29,7 +29,7 @@ from .subflow_controller import (
 
 
 class MainMenu(TaskLog):
-    """ メインメニューのクラスです。
+    """メインメニューのクラスです。
 
     Attributes:
 
@@ -53,7 +53,7 @@ class MainMenu(TaskLog):
     """
 
     def __init__(self, working_file: str) -> None:
-        """ MainMenu コンストラクタのメソッドです。
+        """MainMenu コンストラクタのメソッドです。
 
         Args:
             working_file(str):実行Notebookファイルパス
@@ -159,7 +159,7 @@ class MainMenu(TaskLog):
         self.check_status_research_preparation_flow()
 
     def check_status_research_preparation_flow(self):
-        """ 研究準備の実行ステータス確認をするメソッドです。"""
+        """研究準備の実行ステータス確認をするメソッドです。"""
         sf = SubflowStatusFile(os.path.join(self.abs_root, path_config.PLAN_TASK_STATUS_FILE_PATH))
         plan_sub_flow_status = sf.read()
         # 研究準備サブフローの進行状況をチェックする。
@@ -185,7 +185,7 @@ class MainMenu(TaskLog):
     ######################################
 
     def callback_menu_tabs(self, event):
-        """ サブフロー操作で選択ができるようにするメソッドです。
+        """サブフロー操作で選択ができるようにするメソッドです。
 
         Args:
             event: 機能コントローラーのイベントリスナー
@@ -207,7 +207,7 @@ class MainMenu(TaskLog):
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_project_menu(self, event):
-        """ プロジェクト操作コントローラーの更新をするための遷移ボタンのメソッドです。"""
+        """プロジェクト操作コントローラーの更新をするための遷移ボタンのメソッドです。"""
         # 開発中のためアラートを表示する。
         try:
             self._err_output.clear()
@@ -221,7 +221,7 @@ class MainMenu(TaskLog):
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_sub_flow_menu(self, event):
-        """ サブフロー操作コントローラーオプションによるサブフロー操作フォームを表示するメソッドです。"""
+        """サブフロー操作コントローラーオプションによるサブフロー操作フォームを表示するメソッドです。"""
         try:
             self._err_output.clear()
             selected_value = self._sub_flow_menu.value
@@ -249,7 +249,7 @@ class MainMenu(TaskLog):
     #########################
 
     def update_sub_flow_widget_box_for_init(self):
-        """ サブフロー操作オプションの選択誘導するメソッドです。"""
+        """サブフロー操作オプションの選択誘導するメソッドです。"""
         self._sub_flow_widget_box.clear()
         alert = pn.pane.Alert(
             msg_config.get('main_menu', 'guide_select_action'),
@@ -258,7 +258,7 @@ class MainMenu(TaskLog):
         self._sub_flow_widget_box.append(alert)
 
     def update_sub_flow_widget_box(self):
-        """ サブフロー操作フォームの表示するメソッドです。"""
+        """サブフロー操作フォームの表示するメソッドです。"""
         # ボタンのイベントリスナー
         self.subflow_form.set_submit_button_on_click(self.callback_submit_button)
 
@@ -269,7 +269,7 @@ class MainMenu(TaskLog):
         self.subflow_form.submit_button.disabled = True
 
     def callback_submit_button(self, event):
-        """ サブフローのボタンを呼び戻すメソッドです。"""
+        """サブフローのボタンを呼び戻すメソッドです。"""
         try:
             # start
             self.log.start(detail=self.callback_type)
@@ -293,7 +293,7 @@ class MainMenu(TaskLog):
 
     @classmethod
     def generate(cls, working_path: str):
-        """ メインメニューを生成するメソッドです。
+        """メインメニューを生成するメソッドです。
 
         Args:
             working_path(str) : Notebookのファイルのパス

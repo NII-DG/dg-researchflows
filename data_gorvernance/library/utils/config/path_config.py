@@ -10,7 +10,7 @@ BASE = 'base'
 LOG = 'log'
 IMAGES = 'images'
 RESEARCHFLOW = 'researchflow'
-WORKING = 'working'  ## 同期非対称フォルダ
+WORKING = 'working' ## 同期非対称フォルダ
 ## base直下
 SUB_FLOW = 'subflow'
 TASK = 'task'

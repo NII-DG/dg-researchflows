@@ -22,7 +22,7 @@ def get_project_id() -> str:
         str: プロジェクトIDを返す。
 
     """
-    grdmmain = grdm.Main()
+    grdmmain = grdm.Grdm()
     project_id = grdmmain.get_project_id()
     if project_id:
         return project_id
@@ -103,7 +103,7 @@ def get_grdm_token(vault_key: str) -> str:
             bool: トークンの有効性を返す。
 
         """
-        grdmmain = grdm.Main()
+        grdmmain = grdm.Grdm()
         return grdmmain.check_authorization(token)
 
     return get_token(vault_key, check_auth, msg_config.get('form', 'pls_input_grdm_token'))
@@ -156,7 +156,7 @@ def get_grdm_connection_parameters() -> Tuple[str, str]:
     while True:
         try:
             token = get_grdm_token(vault_key)
-            grdmmain = grdm.Main()
+            grdmmain = grdm.Grdm()
             if not grdmmain.check_permission(token, project_id):
                 raise PermissionError
             break

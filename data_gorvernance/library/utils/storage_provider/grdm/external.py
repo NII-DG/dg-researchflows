@@ -2,8 +2,6 @@
 
 ファイルの内容を取得し、ファイルまたはフォルダをアップロードします。
 ファイルまたはフォルダをアップロードするメソッドやファイルの内容を取得するメソッドがあります。
-このモジュールはメタデータに必要な値を用意します。
-プロジェクトメタデータを整形したり、メタデータのテンプレートを取得したり、メタデータをフォーマットして返却するメソッドがあります。
 """
 from http import HTTPStatus
 from urllib import parse
@@ -13,7 +11,6 @@ from requests.exceptions import RequestException
 
 from ...error import UnauthorizedError, ProjectNotExist
 import os
-from .main import Main
 from osfclient.cli import OSF, split_storage
 from osfclient.utils import norm_remote_path, split_storage, is_path_matched
 from osfclient.exceptions import UnauthorizedException
@@ -23,8 +20,15 @@ import json
 class External:
     """GRDMのAPI通信への通信、動作確認、データの取得などを行うクラスです。"""
 
-    @classmethod
-    def build_api_url(cls, base_url: str, endpoint=''):
+    def __init__(self, base_url:str) -> None:
+        """External コンストラクタのメソッドです。
+
+        Args:
+            base_url (str):WebサーバーのURL
+        """
+        self.base_url = base_url
+
+    def build_api_url(base_url: str, endpoint=''):
         """API用のURLを作成する
 
         Args:
@@ -52,8 +56,8 @@ class External:
                 endpoint = endpoint + '/'
         return parse.urlunparse((parsed.scheme, netloc, endpoint, '', '', ''))
 
-    @classmethod
-    def build_oauth_url(cls, base_url: str, endpoint=''):
+
+    def build_oauth_url(base_url: str, endpoint=''):
         """OAuthのAPI用のURLを作成する
 
         Args:
@@ -68,8 +72,7 @@ class External:
         endpoint = endpoint.rstrip('/')
         return parse.urlunparse((parsed.scheme, netloc, endpoint, '', '', ''))
 
-    @classmethod
-    def get_token_profile(cls, base_url: str, token: str):
+    def get_token_profile(self, token: str):
         """https://accounts.rdm.nii.ac.jp/oauth2/profile
 
         Args:
@@ -81,7 +84,7 @@ class External:
             requests.exceptions.RequestException: その他の通信エラー
         """
         endpoint = '/oauth2/profile'
-        api_url = cls.build_oauth_url(base_url, endpoint)
+        api_url = External.build_oauth_url(self.base_url, endpoint)
         headers = {
             'Authorization': 'Bearer {}'.format(token)
         }
@@ -94,8 +97,7 @@ class External:
             raise
         return response.json()
 
-    @classmethod
-    def get_user_info(cls, base_url: str, token: str):
+    def get_user_info(self, token: str):
         """tokenで指定したユーザーの情報を取得する
 
         https://api.rdm.nii.ac.jp/v2/users/me/
@@ -112,7 +114,7 @@ class External:
             ユーザー情報
         """
         endpoint = '/users/me/'
-        api_url = cls.build_api_url(base_url, endpoint)
+        api_url = External.build_api_url(self.base_url, endpoint)
         headers = {
             'Authorization': 'Bearer {}'.format(token)
         }
@@ -146,8 +148,7 @@ class External:
             raise
         return response.json()
 
-    @classmethod
-    def get_project_registrations(cls, base_url, token, project_id):
+    def get_project_registrations(self, token, project_id):
         """プロジェクトメタデータを取得する
 
         https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/registrations
@@ -158,7 +159,7 @@ class External:
             requests.exceptions.RequestException: その他の通信エラー
         """
         endpoint = f'/nodes/{project_id}/registrations/'
-        api_url = cls.build_api_url(base_url, endpoint)
+        api_url = External.build_api_url(self.base_url, endpoint)
         headers = {
             'Authorization': 'Bearer {}'.format(token)
         }
@@ -177,8 +178,7 @@ class External:
             raise
         return response.json()
 
-    @classmethod
-    def get_project_collaborators(cls, base_url: str, token: str, project_id: str):
+    def get_project_collaborators(self, token: str, project_id: str):
         """プロジェクトメンバーの情報を取得する
 
         https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/contributors/
@@ -194,7 +194,7 @@ class External:
             requests.exceptions.RequestException: その他の通信エラー
         """
         endpoint = f'/nodes/{project_id}/contributors/'
-        api_url = cls.build_api_url(base_url, endpoint)
+        api_url = External.build_api_url(self.base_url, endpoint)
         headers = {
             'Authorization': 'Bearer {}'.format(token)
         }
@@ -328,99 +328,3 @@ class External:
             if response.status_code == HTTPStatus.UNAUTHORIZED:
                 raise UnauthorizedError(str(e)) from e
             raise
-
-    @classmethod
-    def format_metadata(cls, metadata:dict) -> dict[str, list]:
-        """Gakunin RDMから取得したプロジェクトメタデータを整形するメソッドです。
-            Args:
-                metadata(dict):メタデータの値
-            Returns:
-                list:Dmpの値を返す。
-        """
-
-        datas = metadata['data']
-        # {'dmp': first_value}
-        first_value = []
-        for data in datas:
-            url = data["relationships"]["registration_schema"]["links"]["related"]["href"]
-            schema = cls.get_schema(url)
-
-            # first_value = [second_layer, ...]
-            second_layer = {'title': data['attributes']['title']}
-            registration = data['attributes']['registration_responses']
-            for key, value in registration.items():
-                if key != 'grdm-files':
-                    second_layer[key] = cls.format_display_name(schema, "page1", key, value)
-
-            files = json.loads(registration['grdm-files'])
-            # grdm-files > value
-            file_values = []
-            for file in files:
-                file_datas = {}
-                file_datas['path'] = file['path']
-                file_metadata = {}
-                for key, item in file['metadata'].items():
-                    file_metadata[key] = item['value']
-                file_datas['metadata'] = file_metadata
-                file_values.append(file_datas)
-
-            second_layer['grdm-files'] = cls.format_display_name(schema, "page2", 'grdm-files', file_values)
-            first_value.append(second_layer)
-
-        return {'dmp': first_value}
-
-    @classmethod
-    def get_schema(cls, url:str) -> json:
-        """メタデータのプロトコル名を取得するメソッドです。
-
-        リクエストされたURLに接続し、その接続に問題がないかを確認してプロトコル名を取得する。
-
-        Args:
-            url(str):メタデータのURL
-
-        Returns:
-            Response.json:メタデータのプロトコル名の値を返す。
-        """
-        response = requests.get(url=url)
-        response.raise_for_status()
-        return response.json()
-
-    @classmethod
-    def format_display_name(cls, schema: dict, page_id: str, qid: str, value=None) -> dict:
-        """メタデータをフォーマットして返却するメソッドです。
-
-        Args:
-            schema (dict): メタデータのプロトコル名
-            page_id (str): プロジェクトメタデータ("page1")、ファイルメタデータ("page2")
-            qid (str): メタデータのqid
-            value (str): メタデータに設定された値. Defaults to None.
-
-        Returns:
-            dict: フォーマットされたメタデータの値
-        """
-        pages = schema["data"]["attributes"]["schema"]["pages"]
-        items = {}
-        for page in pages:
-            if page.get("id") != page_id:
-                continue
-
-            questions = page["questions"]
-            for question in questions:
-                if question.get("qid") != qid:
-                    continue
-
-                items['label_jp'] = question.get("nav")
-                if value is None:
-                    break
-                items['value'] = value
-
-                options = question.get("options", [])
-                for option in options:
-                    if option.get("text") != value:
-                        continue
-                    items['field_name_jp'] = option.get("tooltip")
-                    break
-                break
-            break
-
-        return items

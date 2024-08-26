@@ -30,9 +30,6 @@ class Api():
     def get_govsheet_schema(self)->dict:
         """ ガバナンスシートのスキーマを取得する関数です。
 
-        Args:
-            scheme_domain (str): スキーマを設定します。
-
         Returns:
             dict: ガバナンスシートのスキーマを返す。
 
@@ -45,9 +42,6 @@ class Api():
 
     def get_metadata_schema(self)->dict:
         """ メタデータのスキーマを取得する関数です。
-
-        Args:
-            scheme_domain (str): スキーマを設定します。
 
         Returns:
             dict: メタデータのスキーマを返す。
@@ -63,7 +57,6 @@ class Api():
         """ Governed Runのトークンの有効性を確認する関数です。
 
         Args:
-            scheme_domain (str): スキーマを設定します。
             token (str): Governed Runのトークンを設定します。
 
         Returns:
@@ -91,7 +84,6 @@ class Api():
         """ 検証する関数です。
 
         Args:
-            scheme_domain (str): スキーマを設定します。
             grdm_token(str): GRDMのトークンを設定します。
             project_id(str): プロジェクトidを設定します。
             govrun_token(str|None): Governed Runのトークンを設定します。
@@ -128,7 +120,6 @@ class Api():
         """ 検証結果を取得する関数です。
 
         Args:
-            scheme_domain (str): スキーマを設定します。
             grdm_token (str): GRDMのトークンを設定します。
             project_id (str): プロジェクトidを設定します。
 
@@ -162,7 +153,6 @@ class Api():
         """ idを指定して検証結果を取得する関数です。
 
         Args:
-            scheme_domain (str): スキーマを設定します。
             grdm_token (str): GRDMのトークンを設定します。
             project_id (str): プロジェクトidを設定します。
             validation_id (str): 検証のidを設定します。

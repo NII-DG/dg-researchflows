@@ -1,12 +1,17 @@
-import configparser
+""" 設定ファイルからメッセージを取得するためのモジュールです。"""
 import os
 
-MESSAGE_CONFIG_PATH = '../../data/connect.ini'
+from .config_parser_base import ConfigParserBase
+
+CONNECT_CONFIG_PATH = '../../data/connect.ini'
 script_dir = os.path.dirname(os.path.abspath(__file__))
-message_ini_path = os.path.abspath(os.path.join(script_dir, MESSAGE_CONFIG_PATH))
+connect_ini_path = os.path.abspath(os.path.join(script_dir, CONNECT_CONFIG_PATH))
+
+class Connect(ConfigParserBase):
+    """ connect.iniを読み込むためのクラスです。"""
 
 
-def get(section:str, option:str) -> str:
+def get(section: str, option: str) -> str:
     """ メッセージを取得する関数です。
 
     Args:
@@ -15,7 +20,5 @@ def get(section:str, option:str) -> str:
     Returns:
         str: メッセージを返す。
     """
-    config = configparser.ConfigParser()
-    config.read(message_ini_path, encoding='utf-8')
-
-    return config[section][option]
+    config = Connect(connect_ini_path)
+    return config.get(section, option)

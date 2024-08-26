@@ -12,12 +12,13 @@ from ...error import NotFoundContentsError, UnauthorizedError
 from typing import Union
 from library.utils.config import connect as con_config
 from .external import External
+from .metadata import Metadata
 
 
 NEED_TOKEN_SCOPE = ["osf.full_write"]
 ALLOWED_PERMISSION = ["admin", "write"]
 
-class Main():
+class Grdm():
     """GRDMのデータ取得、アップロード、許可のチェックを行うクラスです。
     Attributes:
         instance:
@@ -27,6 +28,7 @@ class Main():
     def __init__(self) -> None:
         """Main コンストラクタのメソッドです。"""
         self._grdm_base_url = con_config.get('GRDM', 'BASE_URL')
+        self.api_instance = External(self._grdm_base_url)
 
     def get_project_id(self) -> Union[str, None]:
         """プロジェクトIDを取得するメソッドです。
@@ -55,7 +57,8 @@ class Main():
             bool: 権限に問題が無ければTrue、問題があればFalseを返す。
         """
         try:
-            profile = External.get_token_profile(base_url=self._grdm_base_url, token=token)
+            profile = self.api_instance.get_token_profile(token=token)
+
             scope = profile['scope']
             if all(element in scope for element in NEED_TOKEN_SCOPE):
                 return True
@@ -79,9 +82,9 @@ class Main():
         Returns:
             bool:パーミッションに問題なければTrue、問題があればFalseの値を返す。
         """
-        response = External.get_user_info(self._grdm_base_url, token)
+        response = self.api_instance.get_user_info(token)
         user_id = response['data']['id']
-        response = External.get_project_collaborators(self._grdm_base_url, token, project_id)
+        response = self.api_instance.get_project_collaborators(token, project_id)
         data = response['data']
         for user in data:
             if user['embeds']['users']['data']['id'] == user_id:
@@ -104,8 +107,7 @@ class Main():
         Returns:
             dict:プロジェクトの一覧のデータの値を返す。
         """
-        external = External()
-        response = external.get_projects(self._grdm_base_url, token)
+        response = self.api_instance.get_projects(token)
         data = response['data']
         return {d['id']: d['attributes']['title'] for d in data}
 
@@ -149,8 +151,7 @@ class Main():
             recursive=recursive, force=True
         )
 
-    @classmethod
-    def download_text_file(cls, token: str, api_url: str, project_id: str, remote_path: str, encoding='utf-8'):
+    def download_text_file(self, token: str, api_url: str, project_id: str, remote_path: str, encoding='utf-8'):
         """テキストファイルの中身を取得するメソッドです。
 
         Args:
@@ -174,8 +175,7 @@ class Main():
             raise FileNotFoundError(f'The specified file (path: {remote_path}) does not exist.')
         return content.decode(encoding)
 
-    @classmethod
-    def download_json_file(cls, token: str, api_url: str, project_id: str, remote_path: str):
+    def download_json_file(self, token: str, api_url: str, project_id: str, remote_path: str):
         """jsonファイルの中身を取得するメソッドです。
 
         Args:
@@ -190,10 +190,10 @@ class Main():
             UnauthorizedError: 認証が通らない
             requests.exceptions.RequestException: その他の通信エラー
         """
-        content = cls.download_text_file(token, api_url, project_id, remote_path)
+        content = Grdm.download_text_file(token, api_url, project_id, remote_path)
         return json.loads(content)
 
-    def get_project_metadata(self, base_url: str, token: str, project_id: str):
+    def get_project_metadata(self, token: str, project_id: str):
         """プロジェクトメタデータを取得するメソッドです。
 
         Args:
@@ -207,13 +207,12 @@ class Main():
             ProjectNotExist: 指定されたプロジェクトIDが存在しない
             requests.exceptions.RequestException: その他の通信エラー
         """
-        metadata = External.get_project_registrations(base_url, token, project_id)
+        metadata = self.api_instance.get_project_registrations(token, project_id)
         if len(metadata['data']) < 1:
             raise NotFoundContentsError(f"Metadata doesn't exist for the project with the specified ID {project_id}.")
-        return External.format_metadata(metadata)
+        return Metadata.format_metadata(metadata)
 
-
-    def get_collaborator_list(self, base_url: str, token: str, project_id: str) -> dict:
+    def get_collaborator_list(self, token: str, project_id: str) -> dict:
         """共同管理者の取得するメソッドです。
 
         Args:
@@ -229,7 +228,7 @@ class Main():
             ProjectNotExist: 指定されたプロジェクトIDが存在しない
             requests.exceptions.RequestException: その他の通信エラー
         """
-        response = External.get_project_collaborators(base_url, token, project_id)
+        response = self.api_instance.get_project_collaborators(token, project_id)
         data = response['data']
         return {
             d['embeds']['users']['data']['attributes']['full_name']: d['attributes']['permission']

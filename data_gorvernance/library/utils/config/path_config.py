@@ -68,26 +68,26 @@ def get_task_data_dir(abs_root: str, phase: str, data_dir_name: str) -> str:
 
 # File
 MAIN_NOTEBOOK = 'main.ipynb'
-# subflow
+## subflow
 MENU_NOTEBOOK = 'menu.ipynb'
 STATUS_JSON = 'status.json'
 PROPERTY_JSON = 'property.json'
 PLAN_JSON = 'plan.json'
 FLOW_DIAG = 'flow.diag'
-# config file
+## config file
 TOKEN = 'token.json'
 USER_INFO = 'user_info.json'
 DOT_GITIGNORE = '.gitignore'
 
 
 # File Path
-# main menu
+## main menu
 MAIN_MENU_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, MAIN_NOTEBOOK)
 SETUP_COMPLETED_TEXT_PATH = os.path.join(DG_WORKING_FOLDER, 'setup_completed.txt')
-# config file
+## config file
 TOKEN_JSON_PAHT = os.path.join(DG_WORKING_FOLDER, TOKEN)
 USER_INFO_PATH = os.path.join(DG_WORKING_FOLDER, USER_INFO)
-# data_gorvernance/researchflow/plan/status.json
+## data_gorvernance/researchflow/plan/status.json
 PLAN_TASK_STATUS_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, STATUS_JSON)
 PLAN_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, PLAN_JSON)
 

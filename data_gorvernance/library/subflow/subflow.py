@@ -54,7 +54,7 @@ class SubFlowManager:
             for task in self.tasks:
                 self._copy_file_by_name(task.name, souce_task_dir, self.task_dir)
 
-    def _copy_file_by_name(self, target_file: str, search_directory: str,destination_directory: str) -> None:
+    def _copy_file_by_name(self, target_file: str, search_directory: str, destination_directory: str) -> None:
         """ 指定した名前のファイルを検索ディレクトリから目的のディレクトリにコピーするメソッドです。
 
         Args:
@@ -83,7 +83,7 @@ class SubFlowManager:
                 )
                 destination_images = os.path.join(destination_dir, path_config.IMAGES)
                 if not os.path.isdir(destination_images):
-                    os.symlink(source_images, destination_images,target_is_directory=True)
+                    os.symlink(source_images, destination_images, target_is_directory=True)
 
     def generate(self, svg_path: str, tmp_diag: str, font: str) -> None:
         """ ダイアグラムを生成するメソッドです。

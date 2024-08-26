@@ -1,5 +1,5 @@
 """ メッセージ取得のモジュールです。"""
-import configparser
+from mailbox import Message
 import os
 
 MESSAGE_CONFIG_PATH = '../../data/message.ini'
@@ -17,7 +17,5 @@ def get(section: str, option: str) -> str:
         str: メッセージを返す。
 
     """
-    config = configparser.ConfigParser()
-    config.read(message_ini_path, encoding='utf-8')
-
+    config = Message(message_ini_path)
     return config[section][option]

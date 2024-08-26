@@ -1,4 +1,4 @@
-"""サブフローの削除を行うモジュールです。
+""" サブフローの削除を行うモジュールです。
 
 このモジュールはサブフロー削除クラスを始め、新しいサブフローのデータを削除したりするメソッドなどがあります。
 """
@@ -13,7 +13,7 @@ from .base import BaseSubflowForm
 
 
 class DeleteSubflowForm(BaseSubflowForm):
-    """サブフロー削除クラスです。
+    """ サブフロー削除クラスです。
 
     Attributes:
         instance:
@@ -26,7 +26,7 @@ class DeleteSubflowForm(BaseSubflowForm):
     """
 
     def __init__(self, abs_root: str, message_box: MessageBox) -> None:
-        """DeleteSubflowForm コンストラクタのメソッドです。
+        """ DeleteSubflowForm コンストラクタのメソッドです。
 
         Args:
             abs_root (str): リサーチフローのルートディレクトリ
@@ -40,7 +40,7 @@ class DeleteSubflowForm(BaseSubflowForm):
     # overwrite
     def generate_sub_flow_name_options(
             self, phase_seq_number: int, research_flow_status: list[PhaseStatus]) -> dict[str, int]:
-        """サブフロー種別(フェーズ)を表示するメソッドです。
+        """ サブフロー種別(フェーズ)を表示するメソッドです。
 
         Args:
             research_flow_status (list[PhaseStatus]): リサーチフローステータス管理情報
@@ -77,7 +77,7 @@ class DeleteSubflowForm(BaseSubflowForm):
 
     # overwrite
     def change_disable_submit_button(self):
-        """サブフロー削除フォームの必須項目が選択・入力が満たしている場合、削除ボタンを有効化するメソッドです。"""
+        """ サブフロー削除フォームの必須項目が選択・入力が満たしている場合、削除ボタンを有効化するメソッドです。"""
         # サブフロー削除フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
         self.change_submit_button_init(msg_config.get('main_menu', 'delete_sub_flow'))
 
@@ -100,7 +100,7 @@ class DeleteSubflowForm(BaseSubflowForm):
         self.submit_button.disabled = False
 
     def define_input_form(self) -> Union[Alert, pn.Column]:
-        """サブフロー削除フォームを定義するメソッドです。
+        """ サブフロー削除フォームを定義するメソッドです。
 
         Retunes:
             Union[Alert, pn.Column]: フォームに表示する内容
@@ -117,7 +117,7 @@ class DeleteSubflowForm(BaseSubflowForm):
         )
 
     def main(self):
-        """サブフロー削除処理のメソッドです。
+        """ サブフロー削除処理のメソッドです。
 
         入力情報やパスを取得し、 削除したいデータを取得する。
         """

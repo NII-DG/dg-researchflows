@@ -7,7 +7,7 @@ from .form import Checkbox, Title, Description
 
 
 class RunCrateForm:
-    """RunCrateの入力フォームの操作のクラスです。
+    """ RunCrateの入力フォームの操作のクラスです。
 
     Attributes:
         class:
@@ -34,7 +34,7 @@ class RunCrateForm:
         self.msg_output = MessageBox()
 
     def pop_schema(self, schema: dict) -> dict:
-        """schemaのRunCrate選択部分を取得し、schemaから取り除くメソッドです。
+        """ schemaのRunCrate選択部分を取得し、schemaから取り除くメソッドです。
 
         Args:
             schema (dict): スキーマを設定します。
@@ -48,7 +48,7 @@ class RunCrateForm:
         return schema
 
     def create_widget(self, crates: list, data: Optional[dict] = None) -> None:
-        """RunCrate選択の入力欄を生成するメソッドです。
+        """ RunCrate選択の入力欄を生成するメソッドです。
 
         Args:
             crates (list): index.jsonの内容を設定します。

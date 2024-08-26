@@ -1,4 +1,4 @@
-"""サブフローメニューの表示をするモジュールです。
+""" サブフローメニューの表示をするモジュールです。
 
 サブフローメニュークラスを始め、サブフロー図などの画像を表示させたり、メインメニューにアクセスするメソッドがあります。
 """
@@ -23,7 +23,7 @@ from .subflow import SubFlowManager
 
 
 def access_main_menu(working_file: str):
-    """メインメニューにアクセスするメソッドです。
+    """ メインメニューにアクセスするメソッドです。
 
     Args:
         working_file (str): 実行Notebookファイルパス
@@ -45,7 +45,7 @@ def access_main_menu(working_file: str):
 
 
 class SubflowMenu(TaskLog):
-    """サブフローメニューのクラスです。
+    """ サブフローメニューのクラスです。
 
     Attributes:
         instance:
@@ -57,7 +57,7 @@ class SubflowMenu(TaskLog):
     """
 
     def __init__(self, working_file: str) -> None:
-        """SubflowMenu コンストラクタのメソッドです。
+        """ SubflowMenu コンストラクタのメソッドです。
 
         Args:
             working_file (str): 実行Notebookファイルパス
@@ -76,14 +76,14 @@ class SubflowMenu(TaskLog):
 
     # 各要素の設定
     def _set_width(self):
-        """フロー図の大きさをもとにwidgetboxの大きさを統一するメソッドです。"""
+        """ フロー図の大きさをもとにwidgetboxの大きさを統一するメソッドです。"""
         d = self.diagram.width + 20
         self.menu_widgetbox.width = d
         self.diagram_widgetbox.width = d
         self._msg_output = d
 
     def set_diagram(self, subflow: SubFlowManager, font_folder: Path):
-        """フロー図の生成と表示設定のメソッドです。
+        """ フロー図の生成と表示設定のメソッドです。
 
         Args:
             subflow(SubFlowManager):サブフロー図
@@ -103,7 +103,7 @@ class SubflowMenu(TaskLog):
 
     # その他
     def _get_contents(self, svg_file_path: str) -> str:
-        """フロー図を取得するメソッドです。
+        """ フロー図を取得するメソッドです。
 
         Args:
             svg_file_path (str): svgファイルのパス
@@ -114,7 +114,7 @@ class SubflowMenu(TaskLog):
         return file.File(svg_file_path).read()
 
     def _get_svg_size(self, svg_file_path: str) -> int:
-        """svgの画像の横幅を返すメソッドです。
+        """ svgの画像の横幅を返すメソッドです。
 
         Args:
             svg_file_path (str): svgファイルのパス
@@ -143,7 +143,7 @@ class SubflowMenu(TaskLog):
 
     @classmethod
     def render(cls, working_file: str):
-        """サブフローメニューを表示させるメソッドです。
+        """ サブフローメニューを表示させるメソッドです。
 
         Args:
             working_file (str): 実行Notebookファイルパス

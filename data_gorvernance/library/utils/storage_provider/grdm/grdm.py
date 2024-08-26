@@ -1,4 +1,4 @@
-"""データの取得、アップロード、権限やアクセス許可のチェックをするモジュールです。
+""" データの取得、アップロード、権限やアクセス許可のチェックをするモジュールです。
 
 このモジュールはデータの取得やアップロード、権限やアクセス許可のチェックを行います。
 プロジェクトID、プロジェクトの一覧、テキストファイルの中身やjsonファイルの中身、メタデータを取得したり、
@@ -19,19 +19,19 @@ NEED_TOKEN_SCOPE = ["osf.full_write"]
 ALLOWED_PERMISSION = ["admin", "write"]
 
 class Grdm():
-    """GRDMのデータ取得、アップロード、許可のチェックを行うクラスです。
+    """ GRDMのデータ取得、アップロード、許可のチェックを行うクラスです。
     Attributes:
         instance:
             _grdm_base_url(str):WebサーバーのURL
     """
 
     def __init__(self) -> None:
-        """Main コンストラクタのメソッドです。"""
+        """ Main コンストラクタのメソッドです。"""
         self._grdm_base_url = con_config.get('GRDM', 'BASE_URL')
         self.api_instance = External(self._grdm_base_url)
 
     def get_project_id(self) -> Union[str, None]:
-        """プロジェクトIDを取得するメソッドです。
+        """ プロジェクトIDを取得するメソッドです。
 
         Returns:
             str:プロジェクトIDを返す。値が取得できなかった場合はNone。
@@ -47,7 +47,7 @@ class Grdm():
             return None
 
     def check_authorization(self, token: str) -> bool:
-        """パーソナルアクセストークンの権限をチェックするメソッドです。
+        """ パーソナルアクセストークンの権限をチェックするメソッドです。
 
         Args:
             base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
@@ -67,7 +67,7 @@ class Grdm():
         return False
 
     def check_permission(self, token: str, project_id: str) -> bool:
-        """リポジトリへのアクセス権限のチェックを行うメソッドです。
+        """ リポジトリへのアクセス権限のチェックを行うメソッドです。
 
         Args:
             base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
@@ -93,7 +93,7 @@ class Grdm():
         return False
 
     def get_projects_list(self, token: str) -> dict:
-        """プロジェクトの一覧を取得するメソッドです。
+        """ プロジェクトの一覧を取得するメソッドです。
 
         Args:
             scheme(str): プロトコル名(http, https, ssh)
@@ -112,7 +112,7 @@ class Grdm():
         return {d['id']: d['attributes']['title'] for d in data}
 
     def sync(self, token: str, api_url: str, project_id: str, abs_source: str, abs_root:str="/home/jovyan"):
-        """GRDMにアップロードするメソッドです。
+        """ GRDMにアップロードするメソッドです。
 
         abs_source は絶対パスでなければならない。
 
@@ -152,7 +152,7 @@ class Grdm():
         )
 
     def download_text_file(self, token: str, api_url: str, project_id: str, remote_path: str, encoding='utf-8'):
-        """テキストファイルの中身を取得するメソッドです。
+        """ テキストファイルの中身を取得するメソッドです。
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
@@ -176,7 +176,7 @@ class Grdm():
         return content.decode(encoding)
 
     def download_json_file(self, token: str, api_url: str, project_id: str, remote_path: str):
-        """jsonファイルの中身を取得するメソッドです。
+        """ jsonファイルの中身を取得するメソッドです。
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
@@ -194,7 +194,7 @@ class Grdm():
         return json.loads(content)
 
     def get_project_metadata(self, token: str, project_id: str):
-        """プロジェクトメタデータを取得するメソッドです。
+        """ プロジェクトメタデータを取得するメソッドです。
 
         Args:
             base_url (str):Root URL (e.g. https://rdm.nii.ac.jp)
@@ -210,10 +210,11 @@ class Grdm():
         metadata = self.api_instance.get_project_registrations(token, project_id)
         if len(metadata['data']) < 1:
             raise NotFoundContentsError(f"Metadata doesn't exist for the project with the specified ID {project_id}.")
-        return Metadata.format_metadata(metadata)
+        instance_metadata = Metadata()
+        return instance_metadata.format_metadata(metadata)
 
     def get_collaborator_list(self, token: str, project_id: str) -> dict:
-        """共同管理者の取得するメソッドです。
+        """ 共同管理者の取得するメソッドです。
 
         Args:
             base_url (str):Root URL (e.g. https://rdm.nii.ac.jp)
@@ -236,7 +237,7 @@ class Grdm():
         }
 
     def build_collaborator_url(self, base_url: str, project_id: str) -> str:
-        """プロジェクトのメンバー一覧のURLを返すメソッドです。
+        """ プロジェクトのメンバー一覧のURLを返すメソッドです。
 
         Args:
             base_url (str):Root URL (e.g. https://rdm.nii.ac.jp)

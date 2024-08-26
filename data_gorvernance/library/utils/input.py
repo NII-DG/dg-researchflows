@@ -1,4 +1,4 @@
-"""トークン取得のモジュールです。
+""" トークン取得のモジュールです。
 
 各種トークンやプロジェクトIDを取得する関数が記載されています。
 
@@ -136,7 +136,7 @@ def get_goveredrun_token() -> str:
 
 
 def get_grdm_connection_parameters() -> Tuple[str, str]:
-    """GRDMのトークンとプロジェクトIDを取得する関数です。
+    """ GRDMのトークンとプロジェクトIDを取得する関数です。
 
     Returns:
         str: GRDMのトークンを返す。

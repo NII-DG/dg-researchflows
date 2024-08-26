@@ -1,4 +1,4 @@
-"""Gakunin RDMのAPIへの通信、ファイルまたはフォルダをアップロード、メタデータの整形、取得、返却を行うモジュールです。
+""" Gakunin RDMのAPIへの通信、ファイルまたはフォルダをアップロード、メタデータの整形、取得、返却を行うモジュールです。
 
 ファイルの内容を取得し、ファイルまたはフォルダをアップロードします。
 ファイルまたはフォルダをアップロードするメソッドやファイルの内容を取得するメソッドがあります。
@@ -18,10 +18,10 @@ from typing import Union
 import json
 
 class External:
-    """GRDMのAPI通信への通信、動作確認、データの取得などを行うクラスです。"""
+    """ GRDMのAPI通信への通信、動作確認、データの取得などを行うクラスです。"""
 
     def __init__(self, base_url:str) -> None:
-        """External コンストラクタのメソッドです。
+        """ External コンストラクタのメソッドです。
 
         Args:
             base_url (str):WebサーバーのURL
@@ -29,7 +29,7 @@ class External:
         self.base_url = base_url
 
     def build_api_url(base_url: str, endpoint=''):
-        """API用のURLを作成する
+        """ API用のURLを作成する
 
         Args:
             base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
@@ -58,7 +58,7 @@ class External:
 
 
     def build_oauth_url(base_url: str, endpoint=''):
-        """OAuthのAPI用のURLを作成する
+        """ OAuthのAPI用のURLを作成する
 
         Args:
             base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
@@ -73,7 +73,7 @@ class External:
         return parse.urlunparse((parsed.scheme, netloc, endpoint, '', '', ''))
 
     def get_token_profile(self, token: str):
-        """https://accounts.rdm.nii.ac.jp/oauth2/profile
+        """ https://accounts.rdm.nii.ac.jp/oauth2/profile
 
         Args:
             base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
@@ -98,7 +98,7 @@ class External:
         return response.json()
 
     def get_user_info(self, token: str):
-        """tokenで指定したユーザーの情報を取得する
+        """ tokenで指定したユーザーの情報を取得する
 
         https://api.rdm.nii.ac.jp/v2/users/me/
 
@@ -128,7 +128,7 @@ class External:
         return response.json()
 
     def get_projects(self, base_url, token):
-        """https://api.rdm.nii.ac.jp/v2/nodes/
+        """ https://api.rdm.nii.ac.jp/v2/nodes/
 
         Raises:
             UnauthorizedError: 認証が通らない
@@ -149,7 +149,7 @@ class External:
         return response.json()
 
     def get_project_registrations(self, token, project_id):
-        """プロジェクトメタデータを取得する
+        """ プロジェクトメタデータを取得する
 
         https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/registrations
 
@@ -179,7 +179,7 @@ class External:
         return response.json()
 
     def get_project_collaborators(self, token: str, project_id: str):
-        """プロジェクトメンバーの情報を取得する
+        """ プロジェクトメンバーの情報を取得する
 
         https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/contributors/
 
@@ -214,7 +214,7 @@ class External:
         return response.json()
 
     def upload(self, token:str, base_url:str, project_id:str, source:str, destination:str, recursive:bool=False, force:bool=False):
-        """ファイルまたはフォルダをアップロードするメソッドです。
+        """ ファイルまたはフォルダをアップロードするメソッドです。
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
@@ -275,7 +275,7 @@ class External:
 
 
     def download(self, token:str, project_id:str, base_url:str, remote_path:str, base_path=None) -> Union[bytes, None]:
-        """ファイルの内容を取得するメソッドです。
+        """ ファイルの内容を取得するメソッドです。
 
         Args:
             token (str): GRDMのパーソナルアクセストークン

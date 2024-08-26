@@ -10,6 +10,7 @@ from typing import Any, Optional
 import panel as pn
 
 from library.utils.widgets import MessageBox, Button
+from typing import Union
 
 
 # (vertical, horizontal)
@@ -238,7 +239,7 @@ class ObjectBox(pn.WidgetBox):
 
 
 class Form:
-    """入力フォームの操作のクラスです。
+    """ 入力フォームの操作のクラスです。
 
     jsonschemaから入力欄を生成し、そこからデータを取得する。
 
@@ -259,7 +260,7 @@ class Form:
         self.schema = {}
 
     def create_widgets(self, schema: dict, data: Optional[dict]=None) -> None:
-        """jsonchemaの形式に沿った入力欄をpanelで作成するメソッドです。
+        """ jsonchemaの形式に沿った入力欄をpanelで作成するメソッドです。
 
         Args:
             schema (dict): フォームの元となるjsonschemaを設定します。
@@ -275,8 +276,8 @@ class Form:
                 value = data.get(key, {})
             self.form_box.append(self._generate_widget(properties, key, value))
 
-    def _generate_widget(self, definition:dict, key:str, value:Optional[dict]=None)->ArrayBox | ObjectBox | Column:
-        """jsonschemaの設定値からpanelのwidgetを作成するメソッドです。
+    def _generate_widget(self, definition:dict, key:str, value:Optional[dict]=None)->Union[ArrayBox, ObjectBox, Column]:
+        """ jsonschemaの設定値からpanelのwidgetを作成するメソッドです。
 
         Args:
             definition (dict): jsonschemaのkeyに対する定義部分. property value.
@@ -340,7 +341,7 @@ class Form:
         return form
 
     def _generate_object_widget(self, definition:dict, title:str, key:str, values:dict)->ObjectBox:
-        """type: objectをwidgetbox化するメソッドです。
+        """ type: objectをwidgetbox化するメソッドです。
 
         Args:
             definition (dict): jsonschemaのkeyに対する定義部分を設定します。 property value.
@@ -368,7 +369,7 @@ class Form:
         return obj_box
 
     def _genetate_array_widget(self, definition:dict, title:str, key:str, values:Any)->ArrayBox:
-        """type: arrayをwidgetbox化するメソッドです。
+        """ type: arrayをwidgetbox化するメソッドです。
 
         Args:
             definition (dict): jsonschemaのkeyに対する定義部分. property value.
@@ -388,7 +389,7 @@ class Form:
         column = pn.Column()
 
         def create_items(value: Optional[dict]=None)->pn.Row:
-            """arrayのひとつの要素を作成するメソッドです。
+            """ arrayのひとつの要素を作成するメソッドです。
 
             Args:
                 value (dict|None): 項目の初期値を設定します。
@@ -407,7 +408,7 @@ class Form:
             else:
                 return pn.Row(widget, create_remove_button(widget, align='end'))
 
-        def create_remove_button(widget: ArrayBox | ObjectBox | Column, align: str='start')->Button:
+        def create_remove_button(widget: Union[ArrayBox, ObjectBox, Column], align: str='start')->Button:
             """ arrayの選択した要素を削除するボタンを生成するメソッドです。
 
             Args:
@@ -556,7 +557,7 @@ class Form:
             return {}
 
     def _get_value(self, widget: pn.Column)->Any:
-        """Column内のwidgetの値を取得するメソッドです。
+        """ Column内のwidgetの値を取得するメソッドです。
 
         Args:
             widget (pn.Column): データを取得したいColumnを設定します。
@@ -578,7 +579,7 @@ class Form:
         return value
 
     def _get_object_value(self, widget: ObjectBox, schema: dict):
-        """ObjectBox内のwidgetの値を取得するメソッドです。
+        """ ObjectBox内のwidgetの値を取得するメソッドです。
 
         Args:
             widget (ObjectBox): データを取得したいObjectBoxを設定します。
@@ -599,7 +600,7 @@ class Form:
         return value
 
     def _get_array_value(self, widget: ArrayBox, schema: dict)->list:
-        """ArrayBox内のwidgetの値を取得するメソッドです。
+        """ ArrayBox内のwidgetの値を取得するメソッドです。
 
         Args:
             widget (ArrayBox): データを取得したいArrayBoxを設定します。
@@ -627,7 +628,7 @@ class Form:
         return value
 
     def sort_order(self, schema: dict, json_path: str) -> dict:
-        """jsonファイルを読み込みスキーマを並び替える処理を呼ぶメソッドです。
+        """ jsonファイルを読み込みスキーマを並び替える処理を呼ぶメソッドです。
 
         Args:
             schema (dict): 元のスキーマ
@@ -644,7 +645,7 @@ class Form:
         return update_schema
 
     def sort_schema(self, properties:dict, order:dict) -> dict:
-        """jsonファイルのkeyに合わせてスキーマを並び替えるメソッドです。
+        """ jsonファイルのkeyに合わせてスキーマを並び替えるメソッドです。
 
         Args:
             properties (dict): スキーマのproperties要素を設定する。

@@ -1,4 +1,4 @@
-"""メタデータの整形、取得、返却を行うモジュールです。
+""" メタデータの整形、取得、返却を行うモジュールです。
 
 このモジュールはメタデータに必要な値を用意します。
 プロジェクトメタデータを整形したり、メタデータのテンプレートを取得したり、メタデータをフォーマットして返却するメソッドがあります。
@@ -7,11 +7,10 @@ import json
 import requests
 
 class Metadata():
-    """取得したメタデータを表示するためのクラスです。"""
+    """ 取得したメタデータを表示するためのクラスです。"""
 
-    @classmethod
-    def format_metadata(cls, metadata:dict) -> dict[str, list]:
-        """Gakunin RDMから取得したプロジェクトメタデータを整形するメソッドです。
+    def format_metadata(self, metadata:dict) -> dict[str, list]:
+        """ Gakunin RDMから取得したプロジェクトメタデータを整形するメソッドです。
             Args:
                 metadata(dict):メタデータの値
             Returns:
@@ -23,14 +22,14 @@ class Metadata():
         first_value = []
         for data in datas:
             url = data["relationships"]["registration_schema"]["links"]["related"]["href"]
-            schema = cls.get_schema(url)
+            schema = Metadata.get_schema(url)
 
             # first_value = [second_layer, ...]
             second_layer = {'title': data['attributes']['title']}
             registration = data['attributes']['registration_responses']
             for key, value in registration.items():
                 if key != 'grdm-files':
-                    second_layer[key] = cls.format_display_name(schema, "page1", key, value)
+                    second_layer[key] = Metadata.format_display_name(schema, "page1", key, value)
 
             files = json.loads(registration['grdm-files'])
             # grdm-files > value
@@ -44,14 +43,13 @@ class Metadata():
                 file_datas['metadata'] = file_metadata
                 file_values.append(file_datas)
 
-            second_layer['grdm-files'] = cls.format_display_name(schema, "page2", 'grdm-files', file_values)
+            second_layer['grdm-files'] = Metadata.format_display_name(schema, "page2", 'grdm-files', file_values)
             first_value.append(second_layer)
 
         return {'dmp': first_value}
 
-    @classmethod
-    def get_schema(cls, url:str) -> json:
-        """メタデータのプロトコル名を取得するメソッドです。
+    def get_schema(self, url:str) -> json:
+        """ メタデータのプロトコル名を取得するメソッドです。
 
         リクエストされたURLに接続し、その接続に問題がないかを確認してプロトコル名を取得する。
 
@@ -65,9 +63,8 @@ class Metadata():
         response.raise_for_status()
         return response.json()
 
-    @classmethod
-    def format_display_name(cls, schema: dict, page_id: str, qid: str, value=None) -> dict:
-        """メタデータをフォーマットして返却するメソッドです。
+    def format_display_name(self, schema: dict, page_id: str, qid: str, value=None) -> dict:
+        """ メタデータをフォーマットして返却するメソッドです。
 
         Args:
             schema (dict): メタデータのプロトコル名

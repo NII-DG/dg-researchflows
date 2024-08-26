@@ -19,7 +19,7 @@ class Api():
             scheme_domain(str):WebサーバーのURL
     """
 
-    def __init__(self, scheme_domain) -> None:
+    def __init__(self, scheme_domain: str) -> None:
         """ Api コンストラクタのメソッドです。
 
         Args:

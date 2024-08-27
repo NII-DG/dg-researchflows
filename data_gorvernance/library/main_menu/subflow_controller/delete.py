@@ -2,13 +2,13 @@
 
 このモジュールはサブフロー削除クラスを始め、新しいサブフローのデータを削除したりするメソッドなどがあります。
 """
-from typing import List, Union
+from typing import Union
 
 from dg_drawer.research_flow import PhaseStatus
 import panel as pn
 
 from library.utils.config import path_config, message as msg_config
-from library.utils.widgets import Alert
+from library.utils.widgets import Alert, MessageBox
 from .base import BaseSubflowForm
 
 
@@ -25,7 +25,7 @@ class DeleteSubflowForm(BaseSubflowForm):
             _err_output(MessageBox):エラーの出力
     """
 
-    def __init__(self, abs_root:str, message_box:pn.widgets.MessageBox) -> None:
+    def __init__(self, abs_root: str, message_box: MessageBox) -> None:
         """ DeleteSubflowForm コンストラクタのメソッドです。
 
         Args:
@@ -34,17 +34,19 @@ class DeleteSubflowForm(BaseSubflowForm):
         """
         super().__init__(abs_root, message_box)
         # 処理開始ボタン
-        self.change_submit_button_init(msg_config.get('main_menu', 'delete_sub_flow'))
+        self.change_submit_button_init(
+            msg_config.get('main_menu', 'delete_sub_flow'))
 
     # overwrite
-    def generate_sub_flow_name_options(self, phase_seq_number:int, research_flow_status:List[PhaseStatus]) -> dict[str, int]:
+    def generate_sub_flow_name_options(
+            self, phase_seq_number: int, research_flow_status: list[PhaseStatus]) -> dict[str, int]:
         """ サブフロー種別(フェーズ)を表示するメソッドです。
 
         Args:
-            research_flow_status (List[PhaseStatus]): リサーチフローステータス管理情報
+            research_flow_status (list[PhaseStatus]): リサーチフローステータス管理情報
 
         Returns:
-            Dict[str, int]: フェーズ表示名を返す。
+            dict[str, int]: フェーズ表示名を返す。
         """
         # サブフロー名(表示名をkey, サブフローIDをVauleとする)
         name_options = {}
@@ -106,13 +108,13 @@ class DeleteSubflowForm(BaseSubflowForm):
         sub_flow_type_list = self._sub_flow_type_selector.options
         if len(sub_flow_type_list) < 2:
             # defaultがあるため2未満にする
-            return Alert.warning(msg_config.get('main_menu','nothing_editable_subflow'))
+            return Alert.warning(msg_config.get('main_menu', 'nothing_editable_subflow'))
         return pn.Column(
             f'### {msg_config.get("main_menu", "delete_sub_flow_title")}',
             self._sub_flow_type_selector,
             self._sub_flow_name_selector,
             self.submit_button
-            )
+        )
 
     def main(self):
         """ サブフロー削除処理のメソッドです。

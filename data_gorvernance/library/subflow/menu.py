@@ -1,4 +1,4 @@
-""" サブフローメニューの表示をするモジュールです。
+"""サブフローメニューの表示をするモジュールです。
 
 サブフローメニュークラスを始め、サブフロー図などの画像を表示させたり、メインメニューにアクセスするメソッドがあります。
 """
@@ -23,31 +23,29 @@ from .subflow import SubFlowManager
 
 
 def access_main_menu(working_file: str):
-    """ メインメニューにアクセスするメソッドです。
+    """メインメニューにアクセスするメソッドです。
 
     Args:
         working_file (str): 実行Notebookファイルパス
     """
-    root_folder = Path(
-        path_config.get_abs_root_form_working_dg_file_path(working_file)
-    )
+    root_folder = Path(path_config.get_abs_root_form_working_dg_file_path(working_file))
     main_menu = str(root_folder / path_config.MAIN_MENU_PATH)
 
     link = file.relative_path(main_menu, os.path.dirname(working_file))
 
     main_menu_button = pn.pane.HTML()
     main_menu_button.object = create_button(
-            url=f'{link}?init_nb=true',
-            msg=message.get('subflow_menu', 'access_main_menu'),
-            button_width='500px'
-        )
+        url=f'{link}?init_nb=true',
+        msg=message.get('subflow_menu', 'access_main_menu'),
+        button_width='500px'
+    )
     pn.extension()
     display(main_menu_button)
     display(Javascript('IPython.notebook.save_checkpoint();'))
 
 
 class SubflowMenu(TaskLog):
-    """ サブフローメニューのクラスです。
+    """サブフローメニューのクラスです。
 
     Attributes:
         instance:
@@ -58,8 +56,8 @@ class SubflowMenu(TaskLog):
             working_file (str): 実行Notebookファイルパス
     """
 
-    def __init__(self, working_file:str) -> None:
-        """ SubflowMenu コンストラクタのメソッドです。
+    def __init__(self, working_file: str) -> None:
+        """SubflowMenu コンストラクタのメソッドです。
 
         Args:
             working_file (str): 実行Notebookファイルパス
@@ -78,14 +76,14 @@ class SubflowMenu(TaskLog):
 
     # 各要素の設定
     def _set_width(self):
-        """ フロー図の大きさをもとにwidgetboxの大きさを統一するメソッドです。"""
+        """フロー図の大きさをもとにwidgetboxの大きさを統一するメソッドです。"""
         d = self.diagram.width + 20
         self.menu_widgetbox.width = d
         self.diagram_widgetbox.width = d
         self._msg_output = d
 
     def set_diagram(self, subflow: SubFlowManager, font_folder: Path):
-        """ フロー図の生成と表示設定のメソッドです。
+        """フロー図の生成と表示設定のメソッドです。
 
         Args:
             subflow(SubFlowManager):サブフロー図
@@ -105,7 +103,7 @@ class SubflowMenu(TaskLog):
 
     # その他
     def _get_contents(self, svg_file_path: str) -> str:
-        """ フロー図を取得するメソッドです。
+        """フロー図を取得するメソッドです。
 
         Args:
             svg_file_path (str): svgファイルのパス
@@ -116,7 +114,7 @@ class SubflowMenu(TaskLog):
         return file.File(svg_file_path).read()
 
     def _get_svg_size(self, svg_file_path: str) -> int:
-        """ svgの画像の横幅を返すメソッドです。
+        """svgの画像の横幅を返すメソッドです。
 
         Args:
             svg_file_path (str): svgファイルのパス
@@ -145,7 +143,7 @@ class SubflowMenu(TaskLog):
 
     @classmethod
     def render(cls, working_file: str):
-        """ サブフローメニューを表示させるメソッドです。
+        """サブフローメニューを表示させるメソッドです。
 
         Args:
             working_file (str): 実行Notebookファイルパス
@@ -157,9 +155,7 @@ class SubflowMenu(TaskLog):
 
         # base path
         parent = Path(os.path.dirname(working_file))
-        root_folder = Path(
-            path_config.get_abs_root_form_working_dg_file_path(working_file)
-        )
+        root_folder = Path(path_config.get_abs_root_form_working_dg_file_path(working_file))
 
         # get subflow type and id from path
         subflow_type, subflow_id = get_subflow_type_and_id(working_file)
@@ -184,9 +180,7 @@ class SubflowMenu(TaskLog):
 
         try:
             # setup
-            subflow = SubFlowManager(
-                str(parent), str(status_file), str(diag_file), str(using_task_dir)
-            )
+            subflow = SubFlowManager(str(parent), str(status_file), str(diag_file), str(using_task_dir))
             subflow.setup_tasks(str(souce_task_dir))
             subflow_menu.set_diagram(subflow, font_folder)
             subflow_menu.menu_widgetbox.append(subflow_menu.diagram_widgetbox)

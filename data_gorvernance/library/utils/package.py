@@ -5,6 +5,7 @@ cookiecutterテンプレートを使用してパッケージを作成するク�
 """
 from collections import OrderedDict
 import os
+from typing import Optional
 
 from cookiecutter.exceptions import OutputDirExistsException, RepositoryNotFound
 from cookiecutter.main import (
@@ -12,8 +13,8 @@ from cookiecutter.main import (
     get_user_config,
     determine_repo_dir,
     generate_context
-
 )
+
 from cookiecutter.prompt import (
     render_variable,
     StrictEnvironment
@@ -38,12 +39,12 @@ class MakePackage:
         self.rendered_context = OrderedDict([])
         self.prompts = {}
 
-    def get_template(self, template: str, checkout: str | None = None) -> dict:
+    def get_template(self, template: str, checkout: Optional[str] = None) -> dict:
         """ cookiecutterのテンプレートの設定値を取得するメソッドです。
 
         Args:
             template (str): クローンするリポジトリのURLまたはパスを設定します。
-            checkout (str | None): クローン後にチェックアウトするブランチ、タグ、コミット IDを設定します。
+            checkout Optional[str, None]: クローン後にチェックアウトするブランチ、タグ、コミット IDを設定します。
 
         Returns:
             dict: cookiecutterのテンプレートの設定値を返す。
@@ -57,7 +58,7 @@ class MakePackage:
             checkout=checkout,
             no_input=True,
         )
-        context_file = os.path.join(self.template_dir,'cookiecutter.json')
+        context_file = os.path.join(self.template_dir, 'cookiecutter.json')
         context = generate_context(context_file=context_file)
         self.template_context = context['cookiecutter']
         return self.get_default_context(context)
@@ -104,12 +105,12 @@ class MakePackage:
             else var_name
         )
 
-    def create_package(self, context_dict: dict | None = None, output_dir: str='.'):
+    def create_package(self, context_dict: Optional[dict] = None, output_dir: str = '.'):
         """ cookiecutterテンプレートを使用してパッケージを作成するメソッドです。
 
         Args:
-            context_dict (dict | None): デフォルトおよびユーザー設定を上書きするコンテキストの辞書を設定します。
+            context_dict: Optional[dict]: デフォルトおよびユーザー設定を上書きするコンテキストの辞書を設定します。
             output_dir (str): パッケージを作成するディレクトリを設定します。
 
         """
-        cookiecutter(self.template_dir, no_input=True, extra_context=context_dict, output_dir=output_dir)
+        cookiecutter(self.template_dir, no_input=True,extra_context=context_dict, output_dir=output_dir)

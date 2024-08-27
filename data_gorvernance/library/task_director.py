@@ -28,7 +28,7 @@ def get_return_sub_flow_menu_relative_url_path(working_file_path: str) -> str:
 
     subflow_type, subflow_id = get_subflow_type_and_id(working_file_path)
     if not subflow_type:
-            raise ValueError('don\'t get subflow type.')
+        raise ValueError('don\'t get subflow type.')
     if not subflow_id:
         menu_path = path_config.get_sub_flow_menu_path(subflow_type)
         return os.path.join('../../../../..', menu_path)
@@ -48,7 +48,7 @@ class TaskDirector(TaskSave):
             _sub_flow_status_file_path(str):サブフローステータスファイルのパス
     """
 
-    def __init__(self, nb_working_file_path:str, notebook_name:str) -> None:
+    def __init__(self, nb_working_file_path: str, notebook_name: str) -> None:
         """ TaskDirector コンストラクタのメソッドです。
 
         Notebookファイルのオペレーションするための共通クラス
@@ -74,10 +74,15 @@ class TaskDirector(TaskSave):
             raise ValueError('don\'t get subflow type.')
         if not subflow_id:
             # 研究準備の場合
-            self._sub_flow_status_file_path = os.path.join(self._abs_root_path, path_config.get_sub_flow_status_file_path(subflow_type))
+            self._sub_flow_status_file_path = os.path.join(
+                self._abs_root_path, path_config.get_sub_flow_status_file_path(subflow_type)
+            )
         else:
             # 研究準備以外の場合
-            self._sub_flow_status_file_path = os.path.join(self._abs_root_path, path_config.get_sub_flow_status_file_path(subflow_type, subflow_id))
+            self._sub_flow_status_file_path = os.path.join(
+                self._abs_root_path,
+                path_config.get_sub_flow_status_file_path(subflow_type, subflow_id)
+            )
 
     ########################
     #  update task status  #
@@ -101,7 +106,7 @@ class TaskDirector(TaskSave):
     #########################
     #  return subflow menu  #
     #########################
-    def get_subflow_menu_button_object(self)-> pn.pane.HTML:
+    def get_subflow_menu_button_object(self) -> pn.pane.HTML:
         """ サブフローメニューへのボタンpanel.HTMLオブジェクトの取得するメソッドです。
 
         Returns:
@@ -122,7 +127,7 @@ class TaskDirector(TaskSave):
     def return_subflow_menu(self):
         """ サブフローメニューへのボタン表示を行うメソッドです。"""
         pn.extension()
-        sub_flow_menu_link_button  = self.get_subflow_menu_button_object()
+        sub_flow_menu_link_button = self.get_subflow_menu_button_object()
         display(sub_flow_menu_link_button)
         display(Javascript('IPython.notebook.save_checkpoint();'))
 

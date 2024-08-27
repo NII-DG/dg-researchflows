@@ -4,11 +4,11 @@
 
 """
 import getpass
-from typing import Callable, Tuple
+from typing import Callable
 
 from . import dg_web
 from .config import message as msg_config
-from .error import UnusableVault, UnauthorizedError, ProjectNotExist, PermissionError
+from .error import UnusableVault, UnauthorizedError, ProjectNotExist, RepoPermissionError
 from .storage_provider import grdm
 from .string import StringManager
 from .vault import Vault
@@ -37,7 +37,7 @@ def get_project_id() -> str:
     return project_id
 
 
-def get_token(key:str, func:Callable[[str], bool], message:str) -> str:
+def get_token(key: str, func: Callable[[str], bool], message: str) -> str:
     """ vaultもしくはinputからトークンを取得する関数です。
 
     Args:
@@ -135,7 +135,7 @@ def get_goveredrun_token() -> str:
     return get_token('govrun_token', check_auth, msg_config.get('form', 'pls_input_govrun_token'))
 
 
-def get_grdm_connection_parameters() -> Tuple[str, str]:
+def get_grdm_connection_parameters() -> tuple[str, str]:
     """ GRDMのトークンとプロジェクトIDを取得する関数です。
 
     Returns:
@@ -143,7 +143,7 @@ def get_grdm_connection_parameters() -> Tuple[str, str]:
         str: プロジェクトIDを返す。
 
     Raises:
-        PermissionError: プロジェクトの権限が足りない
+        RepoPermissionError: プロジェクトの権限が足りない
         ProjectNotExist: プロジェクトIDが存在しない
         UnusableVault: vaultが利用できない
         requests.exceptions.RequestException: 通信不良
@@ -158,7 +158,7 @@ def get_grdm_connection_parameters() -> Tuple[str, str]:
             token = get_grdm_token(vault_key)
             grdmmain = grdm.Grdm()
             if not grdmmain.check_permission(token, project_id):
-                raise PermissionError
+                raise RepoPermissionError
             break
         except UnauthorizedError:
             vault = Vault()

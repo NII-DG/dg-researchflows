@@ -1,5 +1,6 @@
 """ エラーのモジュールです。"""
 
+
 class NotFoundSubflowDataError(Exception):
     """サブフローのデータが取得できなかったエラーのクラスです。"""
 
@@ -22,7 +23,7 @@ class ProjectNotExist(Exception):
     """指定したプロジェクトが存在しないエラーのクラスです。"""
 
 
-class PermissionError(Exception):
+class RepoPermissionError(Exception):
     """リポジトリのアクセス権限が足りないエラーのクラスです。"""
 
 

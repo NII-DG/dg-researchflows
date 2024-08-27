@@ -1,7 +1,6 @@
 """field.jsonファイルのデータを操作するクラスを記載したモジュールです。"""
 import os
 from pathlib import Path
-from typing import List
 
 from library.utils.file import JsonFile
 
@@ -10,6 +9,7 @@ from library.utils.file import JsonFile
 script_dir_path = os.path.dirname(__file__)
 p = Path(script_dir_path)
 field_json_file = p.joinpath('../../data/field.json').resolve()
+
 
 class Field:
     """field.jsonファイルのデータ操作を行うメソッドを記載したクラスです。
@@ -40,7 +40,7 @@ class Field:
         contents = JsonFile(str(field_json_file)).read()
         self.field = contents[self.__FIELD]
 
-    def get_name(self)->list[str]:
+    def get_name(self) -> list[str]:
         """フィールド名のリストを作成するメソッドです。
 
         Returns:
@@ -49,7 +49,7 @@ class Field:
         """
         return [fld[self.__FIELD_NAME] for fld in self.field]
 
-    def get_disabled_ids(self)->List[str]:
+    def get_disabled_ids(self) -> list[str]:
         """アクティブ状態でないフィールドのリストを作成するメソッドです。
 
         Returns:
@@ -62,7 +62,7 @@ class Field:
                 disabled.append(fld[self.__FIELD_NAME])
         return disabled
 
-    def get_template_path(self, target_name:str)->str:
+    def get_template_path(self, target_name: str) -> str:
         """指定したフィールド名の実験パッケージを取得するメソッドです。
 
         Args:

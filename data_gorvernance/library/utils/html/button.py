@@ -1,19 +1,18 @@
 """ HTMLボタン生成のモジュールです。"""
-from typing import List
 
 
 def create_button(
-            url:str='',
-            msg:str='',
-            disable:bool=False,
-            target:str='_self',
-            a_character_color:str='#ffffff',
-            a_font_size:str='15px',
-            button_width:str='300px',
-            button_height:str='30px',
-            button_border_radius:str='5px',
-            border:List[str] = [],
-            button_background_color:str='#0072B5',
+    url: str = '',
+    msg: str = '',
+    disable: bool = False,
+    target: str = '_self',
+    a_character_color: str = '#ffffff',
+    a_font_size: str = '15px',
+    button_width: str = '300px',
+    button_height: str = '30px',
+    button_border_radius: str = '5px',
+    border: list[str] = [],
+    button_background_color: str = '#0072B5',
 ) -> str:
     """ HTMLのボタンを作成する関数です。
 
@@ -27,7 +26,7 @@ def create_button(
         button_width (str: ボタンの幅を指定します。
         button_height (str): ボタンの高さを指定します。
         button_border_radius (str): ボタンの角の丸みを指定します。
-        border (List[str]): ボタンの枠線のスタイルを指定します。
+        border (list[str]): ボタンの枠線のスタイルを指定します。
         button_background_color (str): ボタンの背景色を指定します。
 
     Returns:
@@ -41,7 +40,16 @@ def create_button(
         border_value = ' '.join(border)
     if not disable:
         # able button
-        return f'<a style="font-size:{a_font_size};"href="{url}" target="{target}" ><button style="width: {button_width}; height: {button_height}; border-radius: {button_border_radius}; background-color: {button_background_color}; border: {border_value}; color: {a_character_color};">{msg}</button></a>'
+        return (
+            f'<a style="font-size:{a_font_size};"href="{url}" target="{target}" >'
+            f'<button style="width: {button_width}; height: {button_height};'
+            f'border-radius: {button_border_radius}; background-color: {button_background_color};'
+            f'border: {border_value}; color: {a_character_color};">{msg}</button></a>'
+        )
     else:
         # disable button
-        return f'<button style="width: {button_width}; height: {button_height}; border-radius: {button_border_radius}; background-color: {button_background_color}; border: {border_value};" disable>{msg}</button>'
+        return (
+            f'<button style="width: {button_width}; height: {button_height};'
+            f'border-radius: {button_border_radius}; background-color: {button_background_color};'
+            f'border: {border_value};" disable>{msg}</button>'
+        )

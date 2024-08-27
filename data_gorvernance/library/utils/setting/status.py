@@ -55,7 +55,10 @@ class SubflowTask:
     STATUS_DONE = "done"
     allowed_statuses = [STATUS_UNFEASIBLE, STATUS_UNEXECUTED, STATUS_DOING, STATUS_DONE]
 
-    def __init__(self, id: str, name: str, is_multiple: bool, is_required: bool, completed_count: int, dependent_task_ids: list[str], status: str, execution_environments: list[str], disabled: bool) -> None:
+    def __init__(
+        self, id: str, name: str, is_multiple: bool, is_required: bool, completed_count: int,
+        dependent_task_ids: list[str], status: str, execution_environments: list[str], disabled: bool
+    ) -> None:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
         Args:
@@ -95,7 +98,7 @@ class SubflowTask:
         else:
             raise ValueError
 
-    def add_execution_environments(self, id:str):
+    def add_execution_environments(self, id: str):
         """実行環境のリストへの追加を行うメソッドです。
 
         Args:
@@ -106,7 +109,7 @@ class SubflowTask:
             self._execution_environments.append(id)
 
     @property
-    def id(self)->str:
+    def id(self) -> str:
         """タスクの機能IDを取得するためのゲッターです。
 
         Returns:
@@ -116,7 +119,7 @@ class SubflowTask:
         return self._id
 
     @property
-    def name(self)->str:
+    def name(self) -> str:
         """タスクのファイル名を取得するためのゲッターです。
 
         Returns:
@@ -126,7 +129,7 @@ class SubflowTask:
         return self._name
 
     @property
-    def is_multiple(self)->bool:
+    def is_multiple(self) -> bool:
         """タスクが複数回実行可能かの判定に用いるフラグを取得するためのゲッターです。
 
         Returns:
@@ -136,7 +139,7 @@ class SubflowTask:
         return self._is_multiple
 
     @property
-    def is_required(self)->bool:
+    def is_required(self) -> bool:
         """必須タスクかの判定に用いるフラグを取得するためのゲッターです。
 
         Returns:
@@ -146,7 +149,7 @@ class SubflowTask:
         return self._is_required
 
     @property
-    def completed_count(self)->int:
+    def completed_count(self) -> int:
         """タスクの完了回数を取得するためのゲッターです。
 
         Returns:
@@ -160,7 +163,7 @@ class SubflowTask:
         self._completed_count += 1
 
     @property
-    def dependent_task_ids(self)->list[str]:
+    def dependent_task_ids(self) -> list[str]:
         """依存するタスクの機能IDを取得するためのゲッターです。
 
         Returns:
@@ -170,7 +173,7 @@ class SubflowTask:
         return self._dependent_task_ids
 
     @property
-    def status(self)->str:
+    def status(self) -> str:
         """実行状況を取得するためのゲッターです。
 
         Returns:
@@ -190,7 +193,7 @@ class SubflowTask:
         self._set_status(status)
 
     @property
-    def disable(self)->bool:
+    def disable(self) -> bool:
         """使用不可の状態とするためのフラグを取得するためのゲッターです。
 
         Returns:
@@ -199,7 +202,7 @@ class SubflowTask:
         return self._disable
 
     @disable.setter
-    def disable(self, is_disable:bool):
+    def disable(self, is_disable: bool):
         """使用不可の状態とするためのフラグを設定するためのセッターです。
 
         Args:
@@ -209,7 +212,7 @@ class SubflowTask:
         self._disable = is_disable
 
     @property
-    def execution_environments(self)->list[str]:
+    def execution_environments(self) -> list[str]:
         """実行中の実行環境IDのリストを取得するためのゲッターです。
 
         Returns:
@@ -218,7 +221,7 @@ class SubflowTask:
         """
         return self._execution_environments
 
-    def to_dict(self)->dict[str, any]:
+    def to_dict(self) -> dict[str, any]:
         """インスタンスが保持しているデータを辞書型のデータに変換するメソッドです。
 
         Returns:
@@ -260,7 +263,7 @@ class SubflowStatus:
         self._tasks = [SubflowTask(**task) for task in tasks]
 
     @property
-    def is_completed(self)->bool:
+    def is_completed(self) -> bool:
         """サブフローが完了しているかの判定に用いるフラグを取得するためのゲッターです。
 
         Returns:
@@ -270,11 +273,11 @@ class SubflowStatus:
         return self._is_completed
 
     @property
-    def tasks(self)->list[SubflowTask]:
+    def tasks(self) -> list[SubflowTask]:
         """:サブフローの各タスクのステータスのリストを取得するためのゲッターです。
 
         Returns:
-           list[SubflowTask]:サブフローの各タスクのステータスのリスト
+            list[SubflowTask]:サブフローの各タスクのステータスのリスト
 
         """
         return self._tasks
@@ -289,7 +292,7 @@ class SubflowStatus:
         """
         self._is_completed = is_completed
 
-    def to_dict(self)->dict[str, any]:
+    def to_dict(self) -> dict[str, any]:
         """"インスタンスが保持しているデータを辞書型のデータに変換するメソッドです。
 
         Returns:
@@ -297,13 +300,13 @@ class SubflowStatus:
 
         """
         return {
-            _IS_COMPLETED : self.is_completed,
+            _IS_COMPLETED: self.is_completed,
             _TASKS: [
                 con.to_dict() for con in self.tasks
             ]
         }
 
-    def get_task_by_task_id(self, id:str)->SubflowTask:
+    def get_task_by_task_id(self, id: str) -> SubflowTask:
         """指定したサブフロータスクを取得するメソッドです。
 
         Args:
@@ -321,7 +324,7 @@ class SubflowStatus:
                 return task
         raise Exception(f'Not Found task status by {id}')
 
-    def doing_task_by_task_name(self, task_name:str, environment_id:str):
+    def doing_task_by_task_name(self, task_name: str, environment_id: str):
         """指定したタスクのステータスを実行中に更新するメソッドです。
 
         Args:
@@ -331,11 +334,11 @@ class SubflowStatus:
         """
         for task in self._tasks:
             if task.name == task_name:
-                ## status を実行中ステータスへ更新
+                # status を実行中ステータスへ更新
                 task.status = SubflowTask.STATUS_DOING
                 task.add_execution_environments(environment_id)
 
-    def completed_task_by_task_name(self, task_name:str, environment_id:str):
+    def completed_task_by_task_name(self, task_name: str, environment_id: str):
         """指定したタスクのステータスを完了に更新するメソッドです。
 
         Args:
@@ -347,14 +350,14 @@ class SubflowStatus:
         # 対象タスクのステータスを完了に更新する。
         for task in self._tasks:
             if task.name == task_name:
-                ## completed_countに１プラス
+                # completed_countに１プラス
                 task.increme_completed_count()
-                ## ステータスへ更新
+                # ステータスへ更新
                 if len(task.execution_environments) == 1:
                     task.status = SubflowTask.STATUS_DONE
                 else:
                     continue
-                ## 実行環境IDをリストから削除する。
+                # 実行環境IDをリストから削除する。
                 task._execution_environments.remove(environment_id)
 
         # 上記の更新を受け、下流の実行可能状態を更新する。
@@ -369,7 +372,7 @@ class SubflowStatus:
                         is_executable_state = False
                         break
                 if is_executable_state:
-                    #実行可能の場合、ステータスを実行不可から未実行に変更
+                    # 実行可能の場合、ステータスを実行不可から未実行に変更
                     task.status = SubflowTask.STATUS_UNEXECUTED
             else:
                 continue
@@ -396,7 +399,7 @@ class SubflowStatusFile(JsonFile):
         """
         super().__init__(file_path)
 
-    def read(self)->SubflowStatus:
+    def read(self) -> SubflowStatus:
         """ジェイソンファイルの読み込みを行うメソッドです。
 
         Returns:

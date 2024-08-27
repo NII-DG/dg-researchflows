@@ -5,7 +5,7 @@
 """
 import os
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 from library.utils.file import JsonFile
 
@@ -21,25 +21,25 @@ class AlphaProperty:
 
     Attributes:
         class:
-           __ID(str):サブフローidのキー名
-           __CUSTOMIZE(str):カスタマイズデータのキー名
+            __ID(str):サブフローidのキー名
+            __CUSTOMIZE(str):カスタマイズデータのキー名
         instance:
             _id(dict):サブフローid
-            _customize(List[SubFlowRule]):取り出したデータで初期化したリスト
+            _customize(list[SubFlowRule]):取り出したデータで初期化したリスト
 
     """
     __ID = 'id'
     __CUSTOMIZE = 'customize'
 
-    def __init__(self, data:Dict[str, Dict]) -> None:
+    def __init__(self, data: dict[str, dict]) -> None:
         """クラスのインスタンスを初期化するメソッドです。コンストラクタ
 
         Args:
-            data (Dict[str, Dict]): subFlowの情報が格納されたデータ
+            data (dict[str, dict]): subFlowの情報が格納されたデータ
 
         """
         self._id = data[self.__ID]
-        self._customize:List[SubFlowRule] = []
+        self._customize: list[SubFlowRule] = []
 
         for subflow_type_name, subflow_rule_data in data[self.__CUSTOMIZE].items():
             self._customize.append(SubFlowRule(subflow_type_name, subflow_rule_data))
@@ -61,12 +61,12 @@ class SubFlowRule:
     __TASK_IDS = 'task_ids'
     __VERIFICATION_IDS = 'verification_ids'
 
-    def __init__(self, subflow_type_name:str, data:Dict[str, Any]) -> None:
+    def __init__(self, subflow_type_name: str, data: dict[str, Any]) -> None:
         """クラスのインスタンスを初期化するメソッドです。コンストラクタ
 
         Args:
             subflow_type_name (str): サブフローの型名
-            data (Dict[str, Any]): subFlowの情報が格納されたデータ
+            data (dict[str, Any]): subFlowの情報が格納されたデータ
 
         """
         self._subflow_type_name = subflow_type_name
@@ -74,7 +74,7 @@ class SubFlowRule:
         self._verification_ids = data[self.__VERIFICATION_IDS]
 
 
-def get_dg_customize_config()->list[AlphaProperty]:
+def get_dg_customize_config() -> list[AlphaProperty]:
     """DGカスタマイズJSON定義書のインスタンスを取得するメソッドです。
 
     Returns:
@@ -83,7 +83,7 @@ def get_dg_customize_config()->list[AlphaProperty]:
     """
     jf = JsonFile(str(data_governance_customize_file))
     dg_customize_data = jf.read()
-    dg_customize:List[AlphaProperty] = []
+    dg_customize: list[AlphaProperty] = []
     for alpha_property_data in dg_customize_data['dg_customize']:
         dg_customize.append(AlphaProperty(alpha_property_data))
     return dg_customize

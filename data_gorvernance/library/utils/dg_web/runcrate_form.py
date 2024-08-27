@@ -1,12 +1,13 @@
 """ RunCrateの入力フォームのモジュールです。"""
 import panel as pn
+from typing import Optional
 
 from library.utils.widgets import MessageBox
 from .form import Checkbox, Title, Description
 
 
 class RunCrateForm:
-    """ RunCrateの入力フォームの操作のクラスです。
+    """RunCrateの入力フォームの操作のクラスです。
 
     Attributes:
         class:
@@ -22,7 +23,7 @@ class RunCrateForm:
 
     key = "runCrate"
 
-    def __init__(self)->None:
+    def __init__(self) -> None:
         """ インスタンスの初期化処理を実行するメソッドです。"""
         self.definition = {}
         self.files = {}
@@ -32,8 +33,8 @@ class RunCrateForm:
         self.form_box = pn.WidgetBox()
         self.msg_output = MessageBox()
 
-    def pop_schema(self, schema:dict)->dict:
-        """ schemaのRunCrate選択部分を取得し、schemaから取り除くメソッドです。
+    def pop_schema(self, schema: dict) -> dict:
+        """schemaのRunCrate選択部分を取得し、schemaから取り除くメソッドです。
 
         Args:
             schema (dict): スキーマを設定します。
@@ -46,8 +47,8 @@ class RunCrateForm:
         self.definition = properties.pop(self.key, {})
         return schema
 
-    def create_widget(self, crates: list, data: dict=None)->None:
-        """ RunCrate選択の入力欄を生成するメソッドです。
+    def create_widget(self, crates: list, data: Optional[dict] = None) -> None:
+        """RunCrate選択の入力欄を生成するメソッドです。
 
         Args:
             crates (list): index.jsonの内容を設定します。
@@ -86,7 +87,7 @@ class RunCrateForm:
         self.form_box.append(column)
         self.widgets[self.key] = column
 
-    def get_data(self)->dict:
+    def get_data(self) -> dict:
         """ RunCrate選択の入力値からデータを生成するメソッドです。
 
         Returns:

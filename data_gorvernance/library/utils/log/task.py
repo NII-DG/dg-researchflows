@@ -28,7 +28,7 @@ class TaskLog:
     # 継承したクラスで呼ぶ為のデコレータ #
     ###################################
     @staticmethod
-    def task_cell(cell_id: str, start_message:str="", finish_message:str="") -> Callable:
+    def task_cell(cell_id: str, start_message: str = "", finish_message: str = "") -> Callable:
         """タスクセルに必須の処理を行うメソッドです。
 
         タスクセルの実行状況をトレースするため、実行の前後でログの出力を行います。
@@ -54,7 +54,7 @@ class TaskLog:
         return wrapper
 
     @staticmethod
-    def callback_form(event_name:str) -> Callable:
+    def callback_form(event_name: str) -> Callable:
         """フォームの処理に必須の処理を行うメソッドです。
 
         フォームの処理の実行状況をトレースするため、実行の前後でログの出力を行います。

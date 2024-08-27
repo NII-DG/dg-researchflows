@@ -1,4 +1,4 @@
-""" メインメニュー画面での操作のモジュールです。
+"""メインメニュー画面での操作のモジュールです。
 
 このモジュールはメインメニューの画面やボタンを表示するメソッドやサブフローメニューの画面の表示、操作を行えるメソッドなどがあります。
 """
@@ -27,8 +27,9 @@ from .subflow_controller import (
 # mv ./demo/* ./
 # rm -rf ./demo
 
+
 class MainMenu(TaskLog):
-    """ メインメニューのクラスです。
+    """メインメニューのクラスです。
 
     Attributes:
 
@@ -51,8 +52,8 @@ class MainMenu(TaskLog):
     Called from data_gorvernance/researchflow/main.ipynb
     """
 
-    def __init__(self, working_file:str) -> None:
-        """ MainMenu コンストラクタのメソッドです。
+    def __init__(self, working_file: str) -> None:
+        """MainMenu コンストラクタのメソッドです。
 
         Args:
             working_file(str):実行Notebookファイルパス
@@ -60,20 +61,21 @@ class MainMenu(TaskLog):
         """
         super().__init__(working_file, 'main.ipynb')
 
-
         ##############################
         # リサーチフロー図オブジェクト #
         ##############################
         self.abs_root = path_config.get_abs_root_form_working_dg_file_path(working_file)
         # リサーチフロー図の生成
-        ## data_gorvernance\researchflow\research_flow_status.json
+        # data_gorvernance\researchflow\research_flow_status.json
         self._research_flow_status_file_path = path_config.get_research_flow_status_file_path(self.abs_root)
 
         self.reserch_flow_status_operater = ResearchFlowStatusOperater(self._research_flow_status_file_path)
         # プロジェクトで初回のリサーチフロー図アクセス時の初期化
         self.reserch_flow_status_operater.init_research_preparation()
-        ## リサーチフロー図オブジェクトの定義
-        self._research_flow_image = pn.pane.HTML(self.reserch_flow_status_operater.get_svg_of_research_flow_status())
+        # リサーチフロー図オブジェクトの定義
+        self._research_flow_image = pn.pane.HTML(
+            self.reserch_flow_status_operater.get_svg_of_research_flow_status()
+        )
         self._research_flow_image.width = 1000
 
         ######################################
@@ -90,12 +92,14 @@ class MainMenu(TaskLog):
         # 機能コントローラーの定義
         self._menu_tabs = pn.Tabs()
 
-        ## プロジェクト操作コントローラーの定義
-        ### 遷移ボタン for プロジェクト操作コントローラー
+        # プロジェクト操作コントローラーの定義
+        # 遷移ボタン for プロジェクト操作コントローラー
         self.button_for_project_menu = pn.pane.HTML()
-        self.button_for_project_menu.object = html_button.create_button(msg=msg_config.get('main_menu', 'disable_jump_button'), disable=True, border=['dashed', '1px'],button_background_color='#ffffff')
-
-        ### プロジェクト操作アクションセレクタ―
+        self.button_for_project_menu.object = html_button.create_button(
+            msg=msg_config.get('main_menu', 'disable_jump_button'),
+            disable=True, border=['dashed', '1px'], button_background_color='#ffffff'
+        )
+        # プロジェクト操作アクションセレクタ―
         project_menu_title = msg_config.get('main_menu', 'project_menu_title')
         project_menu_options = dict()
         project_menu_options[msg_config.get('form', 'selector_default')] = 0
@@ -106,35 +110,42 @@ class MainMenu(TaskLog):
         project_menu_options[msg_config.get('main_menu', 'finish_research_title')] = 5
         self._project_menu = pn.widgets.Select(options=project_menu_options, value=0)
 
-        ## プロジェクト操作アクションセレクタ―のイベントリスナー
-        self._project_menu.param.watch(self.callback_project_menu,'value')
+        # プロジェクト操作アクションセレクタ―のイベントリスナー
+        self._project_menu.param.watch(self.callback_project_menu, 'value')
 
-        ## サブフロー操作コントローラーウェジットボックス（後からなんでもいれる事ができます）
+        # サブフロー操作コントローラーウェジットボックス（後からなんでもいれる事ができます）
         self._project_widget_box = pn.WidgetBox()
         self._project_widget_box.width = 900
 
-        ## サブフロー操作コントローラーの定義
-        ### サブフロー操作コントローラーオプション
-        sub_flow_menu_title = msg_config.get('main_menu', 'sub_flow_menu_title')
+        # サブフロー操作コントローラーの定義
+        # サブフロー操作コントローラーオプション
+        sub_flow_menu_title = msg_config.get(
+            'main_menu', 'sub_flow_menu_title')
         sub_flow_menu_options = dict()
-        sub_flow_menu_options[msg_config.get('form','selector_default')] = 0
-        sub_flow_menu_options[msg_config.get('main_menu','create_sub_flow_title')] = 1
-        sub_flow_menu_options[msg_config.get('main_menu','update_sub_flow_link_title')] = 2
-        sub_flow_menu_options[msg_config.get('main_menu','update_sub_flow_name_title')] = 3
-        sub_flow_menu_options[msg_config.get('main_menu','delete_sub_flow_title')] = 4
-        ## サブフロー操作コントローラー
+        sub_flow_menu_options[msg_config.get('form', 'selector_default')] = 0
+        sub_flow_menu_options[msg_config.get('main_menu', 'create_sub_flow_title')] = 1
+        sub_flow_menu_options[msg_config.get('main_menu', 'update_sub_flow_link_title')] = 2
+        sub_flow_menu_options[msg_config.get('main_menu', 'update_sub_flow_name_title')] = 3
+        sub_flow_menu_options[msg_config.get('main_menu', 'delete_sub_flow_title')] = 4
+        # サブフロー操作コントローラー
         self._sub_flow_menu = pn.widgets.Select(options=sub_flow_menu_options, value=0)
-        ## サブフロー操作コントローラーのイベントリスナー
-        self._sub_flow_menu.param.watch(self.callback_sub_flow_menu,'value')
-        ## サブフロー操作コントローラーウェジットボックス（後からなんでもいれる事ができます）
+        # サブフロー操作コントローラーのイベントリスナー
+        self._sub_flow_menu.param.watch(self.callback_sub_flow_menu, 'value')
+        # サブフロー操作コントローラーウェジットボックス（後からなんでもいれる事ができます）
         self._sub_flow_widget_box = pn.WidgetBox()
         self._sub_flow_widget_box.width = 900
         self.update_sub_flow_widget_box_for_init()
 
-        sub_flow_menu_layout = pn.Column(self._sub_flow_menu, self._sub_flow_widget_box)
-        project_menu_layout = pn.Column(pn.Row(self._project_menu, self.button_for_project_menu), self._project_widget_box)
+        sub_flow_menu_layout = pn.Column(
+            self._sub_flow_menu,
+            self._sub_flow_widget_box
+        )
+        project_menu_layout = pn.Column(
+            pn.Row(self._project_menu, self.button_for_project_menu),
+            self._project_widget_box
+        )
 
-        self._menu_tabs.append((sub_flow_menu_title, sub_flow_menu_layout)) # tab_index = 0
+        self._menu_tabs.append((sub_flow_menu_title, sub_flow_menu_layout))  # tab_index = 0
         # 未開発のためコメントアウト
         # self._menu_tabs.append((project_menu_title, project_menu_layout)) # tab_index = 1
         # 機能コントローラーのイベントリスナー
@@ -148,7 +159,7 @@ class MainMenu(TaskLog):
         self.check_status_research_preparation_flow()
 
     def check_status_research_preparation_flow(self):
-        """ 研究準備の実行ステータス確認をするメソッドです。"""
+        """研究準備の実行ステータス確認をするメソッドです。"""
         sf = SubflowStatusFile(os.path.join(self.abs_root, path_config.PLAN_TASK_STATUS_FILE_PATH))
         plan_sub_flow_status = sf.read()
         # 研究準備サブフローの進行状況をチェックする。
@@ -162,17 +173,19 @@ class MainMenu(TaskLog):
             # プロジェクト操作コントローラーを無効化
             self._project_menu.disabled = True
             # アラートを表示する。
-            alert = pn.pane.Alert(msg_config.get('main_menu','required_research_preparation'),sizing_mode="stretch_width",alert_type='warning')
+            alert = pn.pane.Alert(
+                msg_config.get('main_menu', 'required_research_preparation'),
+                sizing_mode="stretch_width", alert_type='warning'
+            )
             self._sub_flow_widget_box.clear()
             self._sub_flow_widget_box.append(alert)
-
 
     ######################################
     # イベントリスナーコールバックメソッド #
     ######################################
 
     def callback_menu_tabs(self, event):
-        """ サブフロー操作で選択ができるようにするメソッドです。
+        """サブフロー操作で選択ができるようにするメソッドです。
 
         Args:
             event: 機能コントローラーのイベントリスナー
@@ -182,7 +195,7 @@ class MainMenu(TaskLog):
             tab_index = event.new
             if tab_index == 0:
                 # サブフロー操作が選択
-                ## サブフロー操作コントローラーオプションを初期化
+                # サブフロー操作コントローラーオプションを初期化
                 self._sub_flow_menu.value = 0
                 self._project_widget_box.clear()
                 self.check_status_research_preparation_flow()
@@ -190,57 +203,62 @@ class MainMenu(TaskLog):
                 # プロジェクト操作が選択
                 self._project_menu.value = 0
                 self._sub_flow_widget_box.clear()
-        except Exception as e:
+        except Exception:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_project_menu(self, event):
-        """ プロジェクト操作コントローラーの更新をするための遷移ボタンのメソッドです。"""
+        """プロジェクト操作コントローラーの更新をするための遷移ボタンのメソッドです。"""
         # 開発中のためアラートを表示する。
         try:
             self._err_output.clear()
             self._project_widget_box.clear()
-            alert = pn.pane.Alert(msg_config.get('DEFAULT','developing'),sizing_mode="stretch_width",alert_type='warning')
+            alert = pn.pane.Alert(
+                msg_config.get('DEFAULT', 'developing'),
+                sizing_mode="stretch_width", alert_type='warning'
+            )
             self._project_widget_box.append(alert)
-        except Exception as e:
+        except Exception:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
     def callback_sub_flow_menu(self, event):
-        """ サブフロー操作コントローラーオプションによるサブフロー操作フォームを表示するメソッドです。"""
+        """サブフロー操作コントローラーオプションによるサブフロー操作フォームを表示するメソッドです。"""
         try:
             self._err_output.clear()
             selected_value = self._sub_flow_menu.value
-            if selected_value == 0: ## 選択なし
+            if selected_value == 0:  # 選択なし
                 self.update_sub_flow_widget_box_for_init()
                 return
-            elif selected_value == 1: ## サブフロー新規作成
+            elif selected_value == 1:  # サブフロー新規作成
                 self.callback_type = "create"
                 self.subflow_form = CreateSubflowForm(self.abs_root, self._err_output)
-            elif selected_value == 2: ## サブフロー間接続編集
+            elif selected_value == 2:  # サブフロー間接続編集
                 self.callback_type = "relink"
                 self.subflow_form = RelinkSubflowForm(self.abs_root, self._err_output)
-            elif selected_value == 3: ## サブフロー名称変更
+            elif selected_value == 3:  # サブフロー名称変更
                 self.callback_type = "rename"
                 self.subflow_form = RenameSubflowForm(self.abs_root, self._err_output)
-            elif selected_value == 4: ## サブフロー削除
+            elif selected_value == 4:  # サブフロー削除
                 self.callback_type = "delete"
                 self.subflow_form = DeleteSubflowForm(self.abs_root, self._err_output)
             self.update_sub_flow_widget_box()
         except Exception as e:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
 
-
     #########################
     # サブフロー操作フォーム #
     #########################
 
     def update_sub_flow_widget_box_for_init(self):
-        """ サブフロー操作オプションの選択誘導するメソッドです。"""
+        """サブフロー操作オプションの選択誘導するメソッドです。"""
         self._sub_flow_widget_box.clear()
-        alert = pn.pane.Alert(msg_config.get('main_menu','guide_select_action'),sizing_mode="stretch_width",alert_type='info')
+        alert = pn.pane.Alert(
+            msg_config.get('main_menu', 'guide_select_action'),
+            sizing_mode="stretch_width", alert_type='info'
+        )
         self._sub_flow_widget_box.append(alert)
 
     def update_sub_flow_widget_box(self):
-        """ サブフロー操作フォームの表示するメソッドです。"""
+        """サブフロー操作フォームの表示するメソッドです。"""
         # ボタンのイベントリスナー
         self.subflow_form.set_submit_button_on_click(self.callback_submit_button)
 
@@ -248,10 +266,10 @@ class MainMenu(TaskLog):
         self._sub_flow_widget_box.clear()
         self._sub_flow_widget_box.append(sub_flow_form_layout)
         # ボタンの無効化をする（最初の設定が反映されないため）
-        self.subflow_form.submit_button.disabled=True
+        self.subflow_form.submit_button.disabled = True
 
     def callback_submit_button(self, event):
-        """ サブフローのボタンを呼び戻すメソッドです。"""
+        """サブフローのボタンを呼び戻すメソッドです。"""
         try:
             # start
             self.log.start(detail=self.callback_type)
@@ -262,9 +280,9 @@ class MainMenu(TaskLog):
             display(Javascript('IPython.notebook.save_checkpoint();'))
             # end
             self.log.finish(detail=self.callback_type)
-        except InputWarning as e:
-            self.log.warning(str(e))
-        except  Exception:
+        except InputWarning:
+            self.log.warning(traceback.format_exc())
+        except Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
             self.log.error(message)
             self._err_output.update_error(message)
@@ -274,8 +292,8 @@ class MainMenu(TaskLog):
     #################
 
     @classmethod
-    def generate(cls, working_path:str):
-        """ メインメニューを生成するメソッドです。
+    def generate(cls, working_path: str):
+        """メインメニューを生成するメソッドです。
 
         Args:
             working_path(str) : Notebookのファイルのパス
@@ -283,16 +301,16 @@ class MainMenu(TaskLog):
         # panel activation
         pn.extension()
         # Get initial setup complete status
-        ## ~/.data-governance/setup_completed.txt, if present, complete, if not, not complete
-        ## TODO:再調整要
+        # ~/.data-governance/setup_completed.txt, if present, complete, if not, not complete
+        # TODO:再調整要
         # https://github.com/NII-DG/dg-researchflowsのデータが配置されているディレクトリ
         # Jupyter環境では/home/jovyan
-        #abs_root = path_config.get_abs_root_form_working_dg_file_path(working_path)
+        # abs_root = path_config.get_abs_root_form_working_dg_file_path(working_path)
         # 初期セットアップ完了フラグファイルパス
-        #abs_setup_completed_file_path = os.path.join(abs_root, path_config.SETUP_COMPLETED_TEXT_PATH)
+        # abs_setup_completed_file_path = os.path.join(abs_root, path_config.SETUP_COMPLETED_TEXT_PATH)
 
         # Hidden Setup
-        #if os.path.isfile(abs_setup_completed_file_path):
+        # if os.path.isfile(abs_setup_completed_file_path):
 
         # Initial setup is complete.
         # Display the main menu
@@ -303,23 +321,28 @@ class MainMenu(TaskLog):
         vault = Vault()
         vault.initialize()
 
-        ## 機能コントローラーを配置
+        # 機能コントローラーを配置
         main_menu_title = 'メインメニュー'
-        main_menu_box = pn.WidgetBox(f'## {main_menu_title}', main_menu._menu_tabs, main_menu._err_output)
+        main_menu_box = pn.WidgetBox(
+            f'## {main_menu_title}',
+            main_menu._menu_tabs, main_menu._err_output
+        )
         display(main_menu_box)
-        ## リサーチフロー図を配置
-        research_flow_image_title = pn.pane.Markdown(f'### {msg_config.get("main_menu", "subflow_relationship_diagram")}')
+        # リサーチフロー図を配置
+        research_flow_image_title = pn.pane.Markdown(
+            f'### {msg_config.get("main_menu", "subflow_relationship_diagram")}'
+        )
         display(research_flow_image_title)
         display(main_menu._research_flow_image)
 
         # Hidden Setup
-        #else:
-            # Initial setup is incomplete.
-            # Leads you to the initial setup
+        # else:
+        # Initial setup is incomplete.
+        # Leads you to the initial setup
 
-            # display message
+        # display message
         #    alert = pn.pane.Alert(msg_config.get('main_menu', 'required_initial_setup'),sizing_mode="stretch_width",alert_type='warning')
-            # display initial setup link button
+        # display initial setup link button
         #    initial_setup_link_button = pn.pane.HTML()
         #    initial_setup_link_button.object = html_button.create_button(
         #        url = './setup.ipynb?init_nb=true',

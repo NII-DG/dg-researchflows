@@ -26,14 +26,14 @@ def init_config(id: str, name: str) -> dict:
 
     """
     return {
-        id : {
+        id: {
             'name': name,
             'is_link': True
         }
     }
 
 
-def update_svg(output: str, current_dir:str, config: dict) -> None:
+def update_svg(output: str, current_dir: str, config: dict) -> None:
     """ svgファイルを更新する関数です。
 
     Args:
@@ -66,7 +66,7 @@ def _embed_detail_information(current_dir: str, skeleton: Path, config: dict) ->
         f.write(etree.tostring(tree, method='xml', pretty_print=True))
 
 
-def _embed_info_in_one_rect(elem: etree.Element, current_dir: str, config: dict)->None:
+def _embed_info_in_one_rect(elem: etree.Element, current_dir: str, config: dict) -> None:
     """ 一つの矩形に情報を埋め込む関数です。
 
     Args:
@@ -92,7 +92,8 @@ def _embed_info_in_one_rect(elem: etree.Element, current_dir: str, config: dict)
         if value['is_link']:
             text_elem.attrib['fill'] = title_font_color
             link = value['path']
-            link = file.relative_path(link, current_dir).replace("../", "./../")
+            link = file.relative_path(
+                link, current_dir).replace("../", "./../")
             inseet_elem = create_anchor([text_elem], link)
         else:
             text_elem.attrib['fill'] = text_font_color

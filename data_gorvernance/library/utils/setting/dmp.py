@@ -6,6 +6,7 @@ class DMPManager(JsonFile):
     """DMPデータの操作を行うクラスです。
 
     """
+
     def __init__(self, file_path: str):
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
@@ -16,7 +17,7 @@ class DMPManager(JsonFile):
         super().__init__(file_path)
 
     @staticmethod
-    def create_dmp_options(contents:dict)->dict:
+    def create_dmp_options(contents: dict) -> dict:
         """dmpのタイトルを抽出し、オプションの一覧を作成するメソッドです。
 
         Args:
@@ -34,7 +35,7 @@ class DMPManager(JsonFile):
         return options
 
     @staticmethod
-    def get_dmp(contents:dict, index:int)->dict[str, list]:
+    def get_dmp(contents: dict, index: int) -> dict[str, list]:
         """指定したdmpを取得するためのメソッドです。
 
         Args:
@@ -48,7 +49,7 @@ class DMPManager(JsonFile):
         return {"dmp": [contents['dmp'][index]]}
 
     @staticmethod
-    def display_format(content:dict)->str:
+    def display_format(content: dict) -> str:
         """dmpデータの表示フォーマットを作成するメソッドです。
 
         Args:

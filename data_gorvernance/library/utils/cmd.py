@@ -1,6 +1,5 @@
 """ コマンドを実行するモジュールです。"""
 import subprocess
-from typing import Tuple
 
 from .error import ExecCmdError
 
@@ -9,7 +8,9 @@ class Cmd():
     """ シェルコマンド実行のクラスです。"""
 
     @classmethod
-    def decode_exec_subprocess(cls, cmd: str, cwd: str='', raise_error: bool=True)->Tuple[str, str, int]:
+    def decode_exec_subprocess(
+        cls, cmd: str, cwd: str = '', raise_error: bool = True
+    ) -> tuple[str, str, int]:
         """ コマンドの実行結果をデコードするメソッドです。
 
         Args:
@@ -29,7 +30,9 @@ class Cmd():
         return stdout, stderr, rt
 
     @classmethod
-    def exec_subprocess(cls, cmd: str, cwd: str='', raise_error: bool=True)->Tuple[bytes, bytes, int]:
+    def exec_subprocess(
+        cls, cmd: str, cwd: str = '', raise_error: bool = True
+    ) -> tuple[bytes, bytes, int]:
         """ 指定されたコマンドを新しいプロセスで実行するメソッドです。
 
         Args:
@@ -47,11 +50,9 @@ class Cmd():
 
         """
         if cwd == '':
-            child = subprocess.Popen(cmd, shell=True,
-                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            child = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         else:
-            child = subprocess.Popen(cmd, shell=True,
-                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd)
+            child = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd)
         stdout, stderr = child.communicate()
         rt = child.returncode
         if rt != 0 and raise_error:

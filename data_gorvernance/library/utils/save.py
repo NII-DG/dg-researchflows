@@ -1,22 +1,20 @@
 """ タスクを保存するモジュールです。"""
 import os
 import traceback
-from typing import Any, Tuple, List
+from typing import Any, Union
 
 from IPython.display import clear_output
 import panel as pn
 from requests.exceptions import RequestException
 
 from .config import path_config, message as msg_config
-from .error import UnusableVault, ProjectNotExist, UnauthorizedError, PermissionError
+from .error import UnusableVault, ProjectNotExist, UnauthorizedError, RepoPermissionError
 from .input import get_grdm_connection_parameters
 from .log import TaskLog
 from .storage_provider import grdm
-from .time import TimeDiff
+from .time_tracker import TimeDiff
 from .widgets import Button, MessageBox
 from library.utils.config import connect as con_config
-from typing import Union
-
 
 def all_sync_path(abs_root: str) -> list:
     """ 指定されたホームディレクトリから特定のディレクトリのパスを返す関数です。
@@ -37,10 +35,7 @@ def all_sync_path(abs_root: str) -> list:
     dg_dir = os.path.join(abs_root, path_config.DATA_GOVERNANCE)
     contents = os.listdir(dg_dir)
     contents.remove(path_config.WORKING)
-    paths.extend([
-        os.path.join(dg_dir, con)
-        for con in contents
-    ])
+    paths.extend([os.path.join(dg_dir, con) for con in contents])
 
     return paths
 
@@ -79,7 +74,7 @@ class TaskSave(TaskLog):
         self._save_submit_button = Button(width=500)
         self.API_V2_BASE_URL = con_config.get('GRDM', 'API_V2_BASE_URL')
 
-    def get_grdm_params(self) -> Tuple[str, str]:
+    def get_grdm_params(self) -> tuple[str, str]:
         """ GRDMのトークンとプロジェクトIDを取得するメソッドです。
 
         Returns:
@@ -91,14 +86,14 @@ class TaskSave(TaskLog):
         project_id = ""
         try:
             token, project_id = get_grdm_connection_parameters()
-        except UnusableVault as e:
+        except UnusableVault:
             message = msg_config.get('form', 'no_vault')
             self.save_msg_output.update_error(message)
-            self.log.error(str(e))
-        except PermissionError:
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+        except RepoPermissionError:
             message = msg_config.get('form', 'insufficient_permission')
             self.save_msg_output.update_error(message)
-            self.log.error(traceback.format_exc())
+            self.log.error(f'{message}\n{traceback.format_exc()}')
         except ProjectNotExist as e:
             self.save_msg_output.update_error(str(e))
             self.log.error(traceback.format_exc())
@@ -112,11 +107,11 @@ class TaskSave(TaskLog):
             self.log.error(message)
         return token, project_id
 
-    def define_save_form(self, source: Union[str, List[str]]) -> None:
+    def define_save_form(self, source: Union[str, list[str]]) -> None:
         """ GRDMに保存するフォームを作成するメソッドです。
 
         Args:
-            source (str | List[str]): 保存するファイルを設定します。
+            source (Union[str, list[str]]): 保存するファイルを設定します。
 
         Raises:
             TypeError: sourceがstrまたはlistでない
@@ -141,7 +136,7 @@ class TaskSave(TaskLog):
             self.save_form_box.append(self._save_submit_button)
 
     @TaskLog.callback_form("input_token")
-    def _save_submit_callback(self, event:Any) -> None:
+    def _save_submit_callback(self, event: Any) -> None:
         """ ボタン押下時に保存するメソッドです。
 
         Args:
@@ -174,14 +169,14 @@ class TaskSave(TaskLog):
         except UnauthorizedError:
             message = msg_config.get('form', 'token_unauthorized')
             self.save_msg_output.update_warning(message)
-            self.log.warning(traceback.format_exc())
+            self.log.warning(f'{message}\n{traceback.format_exc()}')
             return
         except RequestException as e:
             timediff.end()
             minutes, seconds = timediff.get_diff_minute()
             error_summary = traceback.format_exception_only(type(e), e)[0].rstrip('\\n')
             error_msg = msg_config.get('save', 'connection_error') + "\n" + error_summary
-            self.log.error(error_msg)
+            self.log.error(f'{error_msg}\n{traceback.format_exc()}')
             self.save_msg_output.add_error(f'経過時間: {minutes}m {seconds}s\n {error_msg}')
             return
         except Exception as e:
@@ -190,7 +185,7 @@ class TaskSave(TaskLog):
             error_summary = traceback.format_exception_only(type(e), e)[0].rstrip('\\n')
             error_msg = f'## [INTERNAL ERROR] : {error_summary}\n{traceback.format_exc()}'
             self.save_msg_output.add_error(f'経過時間: {minutes}m {seconds}s\n {error_msg}')
-            self.log.error(error_msg)
+            self.log.error(f'{error_msg}\n{traceback.format_exc()}')
             return
         # end
         timediff.end()

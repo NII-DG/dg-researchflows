@@ -11,7 +11,7 @@ import time
 import hvac
 
 from .error import UnusableVault
-from typing import Union
+from typing import Optional
 
 
 VAULT_ADDR = 'http://127.0.0.1:8200'
@@ -20,7 +20,7 @@ DG_ENGINE_NAME = 'dg-kv'
 DG_POLICY_NAME = 'dg-policy'
 DG_POLICY = '''\
 path "dg-kv/*" {
-  capabilities = [ "create", "read", "update", "delete", "list" ]
+    capabilities = [ "create", "read", "update", "delete", "list" ]
 }
 '''
 TOKEN_TTL = '1m'
@@ -29,8 +29,7 @@ MAX_RETRY_COUNT = 5
 
 def start_server():
     """ サーバーを起動するメソッドです。"""
-    config_path = os.path.join(
-        os.environ['HOME'], 'data_gorvernance/library/data/vault-config.hcl')
+    config_path = os.path.join(os.environ['HOME'], 'data_gorvernance/library/data/vault-config.hcl')
     dir_path = os.path.join(os.environ['HOME'], '.vault/log')
     os.makedirs(dir_path, exist_ok=True)
     with open(os.path.join(dir_path, 'vault.log'), 'w') as file:
@@ -57,7 +56,7 @@ class Vault():
         self.__create_dg_engine()
         self.__create_dg_policy()
 
-    def set_value(self, key:str, value:str):
+    def set_value(self, key: str, value: str):
         """ 値の設定をするメソッドです。
 
         Args:
@@ -71,7 +70,7 @@ class Vault():
             mount_point=DG_ENGINE_NAME,
         )
 
-    def has_value(self, key:str) -> bool:
+    def has_value(self, key: str) -> bool:
         """ 値の存在チェックをするメソッドです。
 
         Args:
@@ -91,14 +90,14 @@ class Vault():
             return False
         return key in secrets['data']['keys']
 
-    def get_value(self, key:str) -> Union[str, None]:
+    def get_value(self, key: str) -> Optional[str]:
         """ 値の取得をするメソッドです。
 
         Args:
             key(str):トークンをvaultで保存するときのキー
 
         Returns:
-            Union[str, None]: 取得した値を返す。値がない場合はNoneを返す。
+            Optional[str]: 取得した値を返す。値がない場合はNoneを返す。
         """
         if not self.has_value(key):
             return None
@@ -175,7 +174,7 @@ class Vault():
                 policy=DG_POLICY,
             )
 
-    def __write_token(self, token:str):
+    def __write_token(self, token: str):
         """ ルートトークン保存のメソッドです。
 
         Args:

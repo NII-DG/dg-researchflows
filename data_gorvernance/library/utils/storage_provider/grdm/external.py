@@ -20,14 +20,6 @@ from typing import Union
 class External:
     """ GRDMのAPI通信への通信、動作確認、データの取得などを行うクラスです。"""
 
-#    def __init__(self, base_url:str) -> None:
-#        """ External コンストラクタのメソッドです。
-
-#        Args:
-#            base_url (str):WebサーバーのURL
-#        """
-#        self.base_url = base_url
-
     def build_api_url(self, base_url: str, endpoint=''):
         """ API用のURLを作成する
 
@@ -178,7 +170,6 @@ class External:
             raise
         return response.json()
 
-    #def get_project_collaborators(self, token: str, project_id: str):
     def get_project_collaborators(self, base_url: str, token: str, project_id: str):
         """ プロジェクトメンバーの情報を取得する
 

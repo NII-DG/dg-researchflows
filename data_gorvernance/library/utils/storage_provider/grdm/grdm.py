@@ -26,11 +26,6 @@ class Grdm():
             _grdm_base_url(str):WebサーバーのURL
     """
 
-#    def __init__(self) -> None:
-#        """ Main コンストラクタのメソッドです。"""
-#        self._grdm_base_url = con_config.get('GRDM', 'BASE_URL')
-#        self.api_instance = External(self._grdm_base_url)
-
     def get_project_id(self) -> Union[str, None]:
         """ プロジェクトIDを取得するメソッドです。
 
@@ -58,7 +53,6 @@ class Grdm():
             bool: 権限に問題が無ければTrue、問題があればFalseを返す。
         """
         try:
-            #profile = self.api_instance.get_token_profile(token=token)
             external = External()
             profile = external.get_token_profile(base_url=base_url, token=token)
 
@@ -86,11 +80,9 @@ class Grdm():
             bool:パーミッションに問題なければTrue、問題があればFalseの値を返す。
         """
 
-        #response = self.api_instance.get_user_info(token)
         external = External()
         response = external.get_user_info(base_url, token)
         user_id = response['data']['id']
-        #response = self.api_instance.get_project_collaborators(token, project_id)
         response = external.get_project_collaborators(base_url, token, project_id)
         data = response['data']
         for user in data:
@@ -115,7 +107,6 @@ class Grdm():
             dict:プロジェクトの一覧のデータの値を返す。
         """
         external = External()
-        #response = self.api_instance.get_projects(token)
         response = external.get_projects(base_url, token)
         data = response['data']
         return {d['id']: d['attributes']['title'] for d in data}
@@ -217,7 +208,6 @@ class Grdm():
             requests.exceptions.RequestException: その他の通信エラー
         """
         external = External()
-        #metadata = self.api_instance.get_project_registrations(token, project_id)
         metadata = external.get_project_registrations(base_url, token, project_id)
         if len(metadata['data']) < 1:
             raise NotFoundContentsError(f"Metadata doesn't exist for the project with the specified ID {project_id}.")

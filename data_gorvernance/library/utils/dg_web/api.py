@@ -1,4 +1,4 @@
-""" dg-webと接続するモジュールです。
+"""dg-webと接続するモジュールです。
 
 dg-webからガバナンスシートやメタデータのスキーマの取得する関数や検証を行う関数が記載されています。
 """
@@ -13,48 +13,48 @@ from library.utils.error import UnauthorizedError, NotFoundContentsError
 from library.utils.config import connect as con_config
 
 class Api():
-    """ dg-webに接続するクラスです。
+    """dg-webに接続するクラスです。
     Attributes:
         instance:
             scheme_domain(str):WebサーバーのURL
     """
 
     def __init__(self, scheme_domain: str) -> None:
-        """ Api コンストラクタのメソッドです。
+        """Api コンストラクタのメソッドです。
 
         Args:
             scheme_domain (str):WebサーバーのURL
         """
         self.scheme_domain = scheme_domain
 
-    def get_govsheet_schema(self)->dict:
-        """ ガバナンスシートのスキーマを取得する関数です。
+    def get_govsheet_schema(self, scheme_domain: str)->dict:
+        """ガバナンスシートのスキーマを取得する関数です。
 
         Returns:
             dict: ガバナンスシートのスキーマを返す。
 
         """
         sub_url = '/schemas/govSheet'
-        api_url = self.scheme_domain + sub_url
+        api_url = scheme_domain + sub_url
         response = requests.get(url=api_url)
         response.raise_for_status()
         return response.json()
 
-    def get_metadata_schema(self)->dict:
-        """ メタデータのスキーマを取得する関数です。
+    def get_metadata_schema(self, scheme_domain: str)->dict:
+        """メタデータのスキーマを取得する関数です。
 
         Returns:
             dict: メタデータのスキーマを返す。
 
         """
         sub_url = '/schemas/metadata'
-        api_url = self.scheme_domain + sub_url
+        api_url = scheme_domain + sub_url
         response = requests.get(url=api_url)
         response.raise_for_status()
         return response.json()
 
-    def check_governedrun_token(self, token:str)->bool:
-        """ Governed Runのトークンの有効性を確認する関数です。
+    def check_governedrun_token(self, scheme_domain: str, token:str)->bool:
+        """Governed Runのトークンの有効性を確認する関数です。
 
         Args:
             token (str): Governed Runのトークンを設定します。
@@ -67,7 +67,7 @@ class Api():
 
         """
         sub_url = '/checkToken'
-        api_url = self.scheme_domain + sub_url
+        api_url = scheme_domain + sub_url
         data = {
             "grdmToken": None,
             "govRunToken": token
@@ -81,7 +81,7 @@ class Api():
         return False
 
     def validate(self, grdm_token:str, project_id:str, govrun_token:str=None, govsheet:dict=None, metadata:dict=None)->dict:
-        """ 検証する関数です。
+        """検証する関数です。
 
         Args:
             grdm_token(str): GRDMのトークンを設定します。
@@ -117,7 +117,7 @@ class Api():
         return response.json()
 
     def get_validations(self, grdm_token: str, project_id: str)->dict:
-        """ 検証結果を取得する関数です。
+        """検証結果を取得する関数です。
 
         Args:
             grdm_token (str): GRDMのトークンを設定します。
@@ -150,7 +150,7 @@ class Api():
         return response.json()
 
     def get_validations_validationId(self, grdm_token: str, project_id: str, validation_id: str)->dict:
-        """ idを指定して検証結果を取得する関数です。
+        """idを指定して検証結果を取得する関数です。
 
         Args:
             grdm_token (str): GRDMのトークンを設定します。

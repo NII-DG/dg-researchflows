@@ -3,32 +3,32 @@
 ファイルの内容を取得し、ファイルまたはフォルダをアップロードします。
 ファイルまたはフォルダをアップロードするメソッドやファイルの内容を取得するメソッドがあります。
 """
+import os
+import json
+import requests
+
 from http import HTTPStatus
 from urllib import parse
-
-import requests
 from requests.exceptions import RequestException
-
 from ...error import UnauthorizedError, ProjectNotExist
-import os
 from osfclient.cli import OSF, split_storage
 from osfclient.utils import norm_remote_path, split_storage, is_path_matched
 from osfclient.exceptions import UnauthorizedException
 from typing import Union
-import json
+
 
 class External:
     """ GRDMのAPI通信への通信、動作確認、データの取得などを行うクラスです。"""
 
-    def __init__(self, base_url:str) -> None:
-        """ External コンストラクタのメソッドです。
+#    def __init__(self, base_url:str) -> None:
+#        """ External コンストラクタのメソッドです。
 
-        Args:
-            base_url (str):WebサーバーのURL
-        """
-        self.base_url = base_url
+#        Args:
+#            base_url (str):WebサーバーのURL
+#        """
+#        self.base_url = base_url
 
-    def build_api_url(base_url: str, endpoint=''):
+    def build_api_url(self, base_url: str, endpoint=''):
         """ API用のURLを作成する
 
         Args:
@@ -57,7 +57,7 @@ class External:
         return parse.urlunparse((parsed.scheme, netloc, endpoint, '', '', ''))
 
 
-    def build_oauth_url(base_url: str, endpoint=''):
+    def build_oauth_url(self, base_url: str, endpoint=''):
         """ OAuthのAPI用のURLを作成する
 
         Args:
@@ -72,7 +72,7 @@ class External:
         endpoint = endpoint.rstrip('/')
         return parse.urlunparse((parsed.scheme, netloc, endpoint, '', '', ''))
 
-    def get_token_profile(self, token: str):
+    def get_token_profile(self, base_url: str, token: str):
         """ https://accounts.rdm.nii.ac.jp/oauth2/profile
 
         Args:
@@ -84,7 +84,7 @@ class External:
             requests.exceptions.RequestException: その他の通信エラー
         """
         endpoint = '/oauth2/profile'
-        api_url = External.build_oauth_url(self.base_url, endpoint)
+        api_url = External.build_oauth_url(base_url, endpoint)
         headers = {
             'Authorization': 'Bearer {}'.format(token)
         }
@@ -97,7 +97,7 @@ class External:
             raise
         return response.json()
 
-    def get_user_info(self, token: str):
+    def get_user_info(self, base_url: str, token: str):
         """ tokenで指定したユーザーの情報を取得する
 
         https://api.rdm.nii.ac.jp/v2/users/me/
@@ -114,7 +114,7 @@ class External:
             ユーザー情報
         """
         endpoint = '/users/me/'
-        api_url = External.build_api_url(self.base_url, endpoint)
+        api_url = External.build_api_url(base_url, endpoint)
         headers = {
             'Authorization': 'Bearer {}'.format(token)
         }
@@ -148,7 +148,7 @@ class External:
             raise
         return response.json()
 
-    def get_project_registrations(self, token, project_id):
+    def get_project_registrations(self, base_url: str, token: str, project_id: str):
         """ プロジェクトメタデータを取得する
 
         https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/registrations
@@ -159,7 +159,7 @@ class External:
             requests.exceptions.RequestException: その他の通信エラー
         """
         endpoint = f'/nodes/{project_id}/registrations/'
-        api_url = External.build_api_url(self.base_url, endpoint)
+        api_url = External.build_api_url(base_url, endpoint)
         headers = {
             'Authorization': 'Bearer {}'.format(token)
         }
@@ -178,7 +178,8 @@ class External:
             raise
         return response.json()
 
-    def get_project_collaborators(self, token: str, project_id: str):
+    #def get_project_collaborators(self, token: str, project_id: str):
+    def get_project_collaborators(self, base_url: str, token: str, project_id: str):
         """ プロジェクトメンバーの情報を取得する
 
         https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/contributors/
@@ -194,7 +195,7 @@ class External:
             requests.exceptions.RequestException: その他の通信エラー
         """
         endpoint = f'/nodes/{project_id}/contributors/'
-        api_url = External.build_api_url(self.base_url, endpoint)
+        api_url = External.build_api_url(base_url, endpoint)
         headers = {
             'Authorization': 'Bearer {}'.format(token)
         }

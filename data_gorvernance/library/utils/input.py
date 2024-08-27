@@ -104,7 +104,7 @@ def get_grdm_token(vault_key: str) -> str:
 
         """
         grdmmain = grdm.Grdm()
-        return grdmmain.check_authorization(token)
+        return grdmmain.check_authorization(con_config.get('GRDM', 'BASE_URL'), token)
 
     return get_token(vault_key, check_auth, msg_config.get('form', 'pls_input_grdm_token'))
 
@@ -130,7 +130,7 @@ def get_goveredrun_token() -> str:
             bool: Governed Runのトークンの有効性を返す。
         """
         dgweb_api = dg_web.Api()
-        return dgweb_api.check_governedrun_token(token)
+        return dgweb_api.check_governedrun_token(con_config.get('DG_WEB', 'BASE_URL'), token)
 
     return get_token('govrun_token', check_auth, msg_config.get('form', 'pls_input_govrun_token'))
 

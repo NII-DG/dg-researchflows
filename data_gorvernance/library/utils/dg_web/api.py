@@ -27,7 +27,7 @@ class Api():
         """
         self.scheme_domain = scheme_domain
 
-    def get_govsheet_schema(self, scheme_domain: str)->dict:
+    def get_govsheet_schema(self, scheme_domain: str) -> dict:
         """ガバナンスシートのスキーマを取得する関数です。
 
         Returns:
@@ -40,7 +40,7 @@ class Api():
         response.raise_for_status()
         return response.json()
 
-    def get_metadata_schema(self, scheme_domain: str)->dict:
+    def get_metadata_schema(self, scheme_domain: str) -> dict:
         """メタデータのスキーマを取得する関数です。
 
         Returns:
@@ -53,7 +53,7 @@ class Api():
         response.raise_for_status()
         return response.json()
 
-    def check_governedrun_token(self, scheme_domain: str, token:str)->bool:
+    def check_governedrun_token(self, scheme_domain: str, token: str) -> bool:
         """Governed Runのトークンの有効性を確認する関数です。
 
         Args:
@@ -80,7 +80,7 @@ class Api():
         response.raise_for_status()
         return False
 
-    def validate(self, grdm_token:str, project_id:str, govrun_token:str=None, govsheet:dict=None, metadata:dict=None)->dict:
+    def validate(self, grdm_token: str, project_id: str, govrun_token: str=None, govsheet: dict=None, metadata: dict=None) -> dict:
         """検証する関数です。
 
         Args:

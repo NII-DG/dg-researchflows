@@ -1,6 +1,6 @@
 """ガバナンスシートやメタデータの設定値を扱うモジュールです。"""
 class Data:
-    def need_govrun_token(self, govsheet:dict, metadata:dict)->bool:
+    def need_govrun_token(self, govsheet: dict, metadata: dict)->bool:
         """Governed Runのトークンが必要かどうかを判定する関数です。
 
         Args:

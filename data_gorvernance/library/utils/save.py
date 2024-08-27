@@ -72,7 +72,7 @@ class TaskSave(TaskLog):
         self.save_form_box.width = 900
         # 確定ボタン
         self._save_submit_button = Button(width=500)
-        self.API_V2_BASE_URL = con_config.get('GRDM', 'API_V2_BASE_URL')
+        self._base_url = con_config.get('DG_WEB', 'BASE_URL')
 
     def get_grdm_params(self) -> tuple[str, str]:
         """ GRDMのトークンとプロジェクトIDを取得するメソッドです。
@@ -157,11 +157,13 @@ class TaskSave(TaskLog):
         grdmmain = grdm.Grdm()
 
         try:
+            external = grdm.External()
+            api_url_grdm = external.build_api_url(self._base_url,'')
             for i, path in enumerate(self._source):
                 self.save_msg_output.update_info(f'{msg} {i+1}/{size}')
                 grdmmain.sync(
                     token=self.token,
-                    api_url= self.API_V2_BASE_URL,
+                    api_url= api_url_grdm,
                     project_id=self.project_id,
                     abs_source = path,
                     abs_root=self._abs_root_path

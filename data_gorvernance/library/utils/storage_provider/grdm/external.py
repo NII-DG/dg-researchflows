@@ -119,7 +119,7 @@ class External:
             raise
         return response.json()
 
-    def get_projects(self, base_url, token):
+    def get_projects(self, base_url: str, token: str):
         """ https://api.rdm.nii.ac.jp/v2/nodes/
 
         Raises:
@@ -205,7 +205,7 @@ class External:
             raise
         return response.json()
 
-    def upload(self, token:str, base_url:str, project_id:str, source:str, destination:str, recursive:bool=False, force:bool=False):
+    def upload(self, token: str, base_url: str, project_id: str, source: str, destination: str, recursive: bool=False, force: bool=False):
         """ ファイルまたはフォルダをアップロードするメソッドです。
 
         Args:
@@ -266,7 +266,7 @@ class External:
             raise UnauthorizedError(str(e)) from e
 
 
-    def download(self, token:str, project_id:str, base_url:str, remote_path:str, base_path=None) -> Union[bytes, None]:
+    def download(self, token: str, project_id: str, base_url: str, remote_path: str, base_path=None) -> Union[bytes, None]:
         """ ファイルの内容を取得するメソッドです。
 
         Args:

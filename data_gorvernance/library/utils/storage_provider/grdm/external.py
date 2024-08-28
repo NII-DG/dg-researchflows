@@ -21,14 +21,6 @@ from typing import Union
 class External:
     """ GRDMのAPI通信への通信、動作確認、データの取得などを行うクラスです。"""
 
-    def __init__(self) -> None:
-        """Api コンストラクタのメソッドです。
-
-        Args:
-            base_url (str): GRDMのURL
-        """
-        self.base_url = con_config.get('GRDM', 'BASE_URL')
-
     def build_api_url(self, base_url: str, endpoint=''):
         """ API用のURLを作成する
 
@@ -223,7 +215,7 @@ class External:
             raise
         return response.json()
 
-    def upload(self, token: str, project_id: str, source: str, destination: str, recursive: bool=False, force: bool=False):
+    def upload(self, token: str, base_url: str, project_id: str, source: str, destination: str, recursive: bool=False, force: bool=False):
         """ ファイルまたはフォルダをアップロードするメソッドです。
 
         Args:
@@ -241,12 +233,13 @@ class External:
         """
         # Falseで固定
         # Trueにすると指定したパスを見つけ出せずにRuntimeErrorが返ってくる
+        api_url_grdm = self.build_api_url(base_url,'')
         update = False
 
         if source is None or destination is None:
             raise KeyError("too few arguments: source or destination")
 
-        osf = OSF(token=token, base_url=self.base_url)
+        osf = OSF(token=token, base_url=api_url_grdm)
         if not osf.has_auth:
             raise KeyError('To upload a file you need to provide a username and'
                         ' password or token.')
@@ -283,7 +276,7 @@ class External:
             raise UnauthorizedError(str(e)) from e
 
 
-    def download(self, token: str, project_id: str, remote_path: str, base_path=None) -> Union[bytes, None]:
+    def download(self, token: str, base_url: str, project_id: str, remote_path: str, base_path=None) -> Union[bytes, None]:
         """ ファイルの内容を取得するメソッドです。
 
         Args:
@@ -300,7 +293,7 @@ class External:
             requests.exceptions.RequestException: その他の通信エラー
         """
 
-        api_url_grdm = self.build_api_url(self.base_url,'')
+        api_url_grdm = self.build_api_url(base_url,'')
         storage, remote_path = split_storage(remote_path)
 
         osf = OSF(token=token, base_url = api_url_grdm)

@@ -110,7 +110,7 @@ class Grdm():
         data = response['data']
         return {d['id']: d['attributes']['title'] for d in data}
 
-    def sync(self, token: str, project_id: str, abs_source: str, abs_root:str="/home/jovyan"):
+    def sync(self, token: str, base_url: str, project_id: str, abs_source: str, abs_root:str="/home/jovyan"):
         """ GRDMにアップロードするメソッドです。
 
         abs_source は絶対パスでなければならない。
@@ -144,12 +144,12 @@ class Grdm():
         destination = os.path.relpath(abs_source, abs_root)
 
         self.external.upload(
-            token=token, project_id=project_id,
+            token=token, base_url=base_url, project_id=project_id,
             source=abs_source, destination=destination,
             recursive=recursive, force=True
         )
 
-    def download_text_file(self, token: str, project_id: str, remote_path: str, encoding='utf-8'):
+    def download_text_file(self, token: str, base_url: str, project_id: str, remote_path: str, encoding='utf-8'):
         """ テキストファイルの中身を取得するメソッドです。
 
         Args:
@@ -165,14 +165,14 @@ class Grdm():
             requests.exceptions.RequestException: その他の通信エラー
         """
         content = self.external.download(
-            token=token, project_id=project_id,
+            token=token, base_url = base_url, project_id=project_id,
             remote_path=remote_path
         )
         if content is None:
             raise FileNotFoundError(f'The specified file (path: {remote_path}) does not exist.')
         return content.decode(encoding)
 
-    def download_json_file(self, token: str, project_id: str, remote_path: str):
+    def download_json_file(self, token: str, base_url: str, project_id: str, remote_path: str):
         """ jsonファイルの中身を取得するメソッドです。
 
         Args:
@@ -187,7 +187,7 @@ class Grdm():
             UnauthorizedError: 認証が通らない
             requests.exceptions.RequestException: その他の通信エラー
         """
-        content = self.download_text_file(token, project_id, remote_path)
+        content = self.download_text_file(token, base_url, project_id, remote_path)
         return json.loads(content)
 
     def get_project_metadata(self, base_url: str, token: str, project_id: str):

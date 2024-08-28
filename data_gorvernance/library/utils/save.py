@@ -49,6 +49,8 @@ class TaskSave(TaskLog):
             save_msg_output(MessageBox): メッセージ出力
             save_form_box(WidgetBox): フォーム用ボックス
             _save_submit_button(Button): 確定ボタン
+            _base_url(str): WebサーバーのURL
+            _base_url_grdm(str): GRDMのURL
 
     """
 
@@ -73,6 +75,7 @@ class TaskSave(TaskLog):
         # 確定ボタン
         self._save_submit_button = Button(width=500)
         self._base_url = con_config.get('DG_WEB', 'BASE_URL')
+        self._base_url_grdm = con_config.get('GRDM', 'BASE_URL')
 
     def get_grdm_params(self) -> tuple[str, str]:
         """ GRDMのトークンとプロジェクトIDを取得するメソッドです。
@@ -85,7 +88,7 @@ class TaskSave(TaskLog):
         token = ""
         project_id = ""
         try:
-            token, project_id = get_grdm_connection_parameters()
+            token, project_id = get_grdm_connection_parameters(self._base_url_grdm)
         except UnusableVault:
             message = msg_config.get('form', 'no_vault')
             self.save_msg_output.update_error(message)
@@ -157,13 +160,10 @@ class TaskSave(TaskLog):
         grdmmain = grdm.Grdm()
 
         try:
-            external = grdm.External()
-            api_url_grdm = external.build_api_url(self._base_url,'')
             for i, path in enumerate(self._source):
                 self.save_msg_output.update_info(f'{msg} {i+1}/{size}')
                 grdmmain.sync(
                     token=self.token,
-                    api_url= api_url_grdm,
                     project_id=self.project_id,
                     abs_source = path,
                     abs_root=self._abs_root_path

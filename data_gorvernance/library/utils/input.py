@@ -82,8 +82,12 @@ def get_token(key: str, func: Callable[[str], bool], message: str) -> str:
     return token
 
 
-def get_grdm_token(vault_key: str) -> str:
+def get_grdm_token(base_url: str, vault_key: str) -> str:
     """ GRDMのパーソナルアクセストークンを取得する関数です。
+
+    Args:
+        base_url(str):GRDMのURL
+        vault_key(str):grdmのパーソナルアクセストークンキー
 
     Returns:
         str: パーソナルアクセストークンを返す。
@@ -104,13 +108,16 @@ def get_grdm_token(vault_key: str) -> str:
 
         """
         grdmmain = grdm.Grdm()
-        return grdmmain.check_authorization(con_config.get('GRDM', 'BASE_URL'), token)
+        return grdmmain.check_authorization(base_url, token)
 
     return get_token(vault_key, check_auth, msg_config.get('form', 'pls_input_grdm_token'))
 
 
-def get_goveredrun_token() -> str:
+def get_goveredrun_token(base_url: str) -> str:
     """ Governed Runのトークンを取得する関数です。
+
+    Args:
+        base_url(str):WwebサーバーのURL
 
     Returns:
         str: Governed Runのトークンを返す。
@@ -130,13 +137,16 @@ def get_goveredrun_token() -> str:
             bool: Governed Runのトークンの有効性を返す。
         """
         dgweb_api = dg_web.Api()
-        return dgweb_api.check_governedrun_token(con_config.get('DG_WEB', 'BASE_URL'), token)
+        return dgweb_api.check_governedrun_token(base_url, token)
 
     return get_token('govrun_token', check_auth, msg_config.get('form', 'pls_input_govrun_token'))
 
 
-def get_grdm_connection_parameters() -> tuple[str, str]:
+def get_grdm_connection_parameters(base_url: str) -> tuple[str, str]:
     """ GRDMのトークンとプロジェクトIDを取得する関数です。
+
+    Args:
+        base_url(str):GRDMのURL
 
     Returns:
         str: GRDMのトークンを返す。
@@ -155,9 +165,9 @@ def get_grdm_connection_parameters() -> tuple[str, str]:
 
     while True:
         try:
-            token = get_grdm_token(vault_key)
+            token = get_grdm_token(base_url, vault_key)
             grdmmain = grdm.Grdm()
-            if not grdmmain.check_permission(token, project_id):
+            if not grdmmain.check_permission(base_url, token, project_id):
                 raise RepoPermissionError
             break
         except UnauthorizedError:

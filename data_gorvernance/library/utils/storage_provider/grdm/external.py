@@ -10,7 +10,8 @@ import requests
 from http import HTTPStatus
 from urllib import parse
 from requests.exceptions import RequestException
-from ...error import UnauthorizedError, ProjectNotExist
+from library.utils.config import connect as con_config
+from library.utils.error import UnauthorizedError, ProjectNotExist
 from osfclient.cli import OSF, split_storage
 from osfclient.utils import norm_remote_path, split_storage, is_path_matched
 from osfclient.exceptions import UnauthorizedException
@@ -19,6 +20,14 @@ from typing import Union
 
 class External:
     """ GRDMのAPI通信への通信、動作確認、データの取得などを行うクラスです。"""
+
+    def __init__(self) -> None:
+        """Api コンストラクタのメソッドです。
+
+        Args:
+            base_url (str): GRDMのURL
+        """
+        self.base_url = con_config.get('GRDM', 'BASE_URL')
 
     def build_api_url(self, base_url: str, endpoint=''):
         """ API用のURLを作成する
@@ -76,7 +85,7 @@ class External:
             requests.exceptions.RequestException: その他の通信エラー
         """
         endpoint = '/oauth2/profile'
-        api_url = External.build_oauth_url(base_url, endpoint)
+        api_url = self.build_oauth_url(base_url, endpoint)
         headers = {
             'Authorization': 'Bearer {}'.format(token)
         }
@@ -106,7 +115,7 @@ class External:
             ユーザー情報
         """
         endpoint = '/users/me/'
-        api_url = External.build_api_url(base_url, endpoint)
+        api_url = self.build_api_url(base_url, endpoint)
         headers = {
             'Authorization': 'Bearer {}'.format(token)
         }
@@ -121,6 +130,10 @@ class External:
 
     def get_projects(self, base_url: str, token: str):
         """ https://api.rdm.nii.ac.jp/v2/nodes/
+
+        Args:
+            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+            token (str): パーソナルアクセストークン
 
         Raises:
             UnauthorizedError: 認証が通らない
@@ -145,13 +158,18 @@ class External:
 
         https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/registrations
 
+        Args:
+            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+            token (str): パーソナルアクセストークン
+            project_id (str): プロジェクトID
+
         Raises:
             UnauthorizedError: 認証が通らない
             ProjectNotExist: 指定されたプロジェクトIDが存在しない
             requests.exceptions.RequestException: その他の通信エラー
         """
         endpoint = f'/nodes/{project_id}/registrations/'
-        api_url = External.build_api_url(base_url, endpoint)
+        api_url = self.build_api_url(base_url, endpoint)
         headers = {
             'Authorization': 'Bearer {}'.format(token)
         }
@@ -186,7 +204,7 @@ class External:
             requests.exceptions.RequestException: その他の通信エラー
         """
         endpoint = f'/nodes/{project_id}/contributors/'
-        api_url = External.build_api_url(base_url, endpoint)
+        api_url = self.build_api_url(base_url, endpoint)
         headers = {
             'Authorization': 'Bearer {}'.format(token)
         }
@@ -205,12 +223,11 @@ class External:
             raise
         return response.json()
 
-    def upload(self, token: str, base_url: str, project_id: str, source: str, destination: str, recursive: bool=False, force: bool=False):
+    def upload(self, token: str, project_id: str, source: str, destination: str, recursive: bool=False, force: bool=False):
         """ ファイルまたはフォルダをアップロードするメソッドです。
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
-            base_url (str): API URL (e.g. https://api.osf.io/v2/)
             project_id (str): プロジェクトID
             source (str): 保存元パス
             destination (str): 保存先パス
@@ -229,7 +246,7 @@ class External:
         if source is None or destination is None:
             raise KeyError("too few arguments: source or destination")
 
-        osf = OSF(token=token, base_url=base_url)
+        osf = OSF(token=token, base_url=self.base_url)
         if not osf.has_auth:
             raise KeyError('To upload a file you need to provide a username and'
                         ' password or token.')
@@ -266,13 +283,12 @@ class External:
             raise UnauthorizedError(str(e)) from e
 
 
-    def download(self, token: str, project_id: str, base_url: str, remote_path: str, base_path=None) -> Union[bytes, None]:
+    def download(self, token: str, project_id: str, remote_path: str, base_path=None) -> Union[bytes, None]:
         """ ファイルの内容を取得するメソッドです。
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
             project_id (str): プロジェクトID
-            base_url (str): API URL (e.g. https://api.osf.io/v2/)
             remote_path (str): ファイルパス
             base_path (str): ファイルを探すディレクトリのパス
 
@@ -284,9 +300,10 @@ class External:
             requests.exceptions.RequestException: その他の通信エラー
         """
 
+        api_url_grdm = self.build_api_url(self.base_url,'')
         storage, remote_path = split_storage(remote_path)
 
-        osf = OSF(token=token, base_url=base_url)
+        osf = OSF(token=token, base_url = api_url_grdm)
         if base_path is not None:
             if base_path.startswith('/'):
                 base_path = base_path[1:]

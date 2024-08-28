@@ -22,7 +22,7 @@ class Metadata():
         first_value = []
         for data in datas:
             url = data["relationships"]["registration_schema"]["links"]["related"]["href"]
-            schema = Metadata.get_schema(url)
+            schema = self.get_schema(url)
 
             # first_value = [second_layer, ...]
             second_layer = {'title': data['attributes']['title']}

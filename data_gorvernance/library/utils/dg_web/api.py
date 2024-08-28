@@ -8,24 +8,10 @@ from urllib import parse
 
 import requests
 from requests.exceptions import RequestException
-
 from library.utils.error import UnauthorizedError, NotFoundContentsError
-from library.utils.config import connect as con_config
 
 class Api():
-    """dg-webに接続するクラスです。
-    Attributes:
-        instance:
-            scheme_domain(str):WebサーバーのURL
-    """
-
-    def __init__(self, scheme_domain: str) -> None:
-        """Api コンストラクタのメソッドです。
-
-        Args:
-            scheme_domain (str):WebサーバーのURL
-        """
-        self.scheme_domain = scheme_domain
+    """dg-webに接続するクラスです。"""
 
     def get_govsheet_schema(self, scheme_domain: str) -> dict:
         """ガバナンスシートのスキーマを取得する関数です。
@@ -80,7 +66,7 @@ class Api():
         response.raise_for_status()
         return False
 
-    def validate(self, grdm_token: str, project_id: str, govrun_token: str=None, govsheet: dict=None, metadata: dict=None) -> dict:
+    def validate(self, scheme_domain: str, grdm_token: str, project_id: str, govrun_token: str=None, govsheet: dict=None, metadata: dict=None) -> dict:
         """検証する関数です。
 
         Args:
@@ -99,7 +85,7 @@ class Api():
 
         """
         sub_url = '/validations/submit'
-        api_url = self.scheme_domain + sub_url
+        api_url = scheme_domain + sub_url
         data = {
             "grdmToken": grdm_token,
             "govRunToken": govrun_token,
@@ -116,7 +102,7 @@ class Api():
             raise
         return response.json()
 
-    def get_validations(self, grdm_token: str, project_id: str)->dict:
+    def get_validations(self, scheme_domain: str, grdm_token: str, project_id: str)->dict:
         """検証結果を取得する関数です。
 
         Args:
@@ -133,7 +119,7 @@ class Api():
 
         """
         sub_url = '/validations'
-        api_url = self.scheme_domain + sub_url
+        api_url = scheme_domain + sub_url
         data = {
             "grdmToken": grdm_token,
             "grdmProjectId": project_id,
@@ -149,7 +135,7 @@ class Api():
             raise
         return response.json()
 
-    def get_validations_validationId(self, grdm_token: str, project_id: str, validation_id: str)->dict:
+    def get_validations_validationId(self, scheme_domain: str, grdm_token: str, project_id: str, validation_id: str)->dict:
         """idを指定して検証結果を取得する関数です。
 
         Args:
@@ -167,7 +153,7 @@ class Api():
 
         """
         sub_url = f'/validations/{validation_id}'
-        api_url = self.scheme_domain + sub_url
+        api_url = scheme_domain + sub_url
         data = {
             "grdmToken": grdm_token,
             "grdmProjectId": project_id,

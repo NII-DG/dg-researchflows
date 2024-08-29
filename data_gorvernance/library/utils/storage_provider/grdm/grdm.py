@@ -9,10 +9,9 @@ import os
 from typing import Optional
 from urllib import parse
 
-from library.utils.error import NotFoundContentsError, UnauthorizedError
-
 from .external import External
 from .metadata import Metadata
+from library.utils.error import NotFoundContentsError, UnauthorizedError
 
 
 NEED_TOKEN_SCOPE = ["osf.full_write"]
@@ -20,6 +19,7 @@ ALLOWED_PERMISSION = ["admin", "write"]
 
 class Grdm():
     """ GRDMのデータ取得、アップロード、許可のチェックを行うクラスです。
+
     Attributes:
         instance:
             _grdm_base_url(str):DG-webのURL
@@ -49,7 +49,7 @@ class Grdm():
         """ パーソナルアクセストークンの権限をチェックするメソッドです。
 
         Args:
-            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g. https://rcos.rdm.nii.ac.jp)
             token (str): パーソナルアクセストークン
 
         Returns:
@@ -68,7 +68,7 @@ class Grdm():
         """ リポジトリへのアクセス権限のチェックを行うメソッドです。
 
         Args:
-            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g. https://rcos.rdm.nii.ac.jp)
             token (str): パーソナルアクセストークン
             project_id (str): プロジェクトID
 
@@ -95,8 +95,7 @@ class Grdm():
         """ プロジェクトの一覧を取得するメソッドです。
 
         Args:
-            scheme(str): プロトコル名(http, https, ssh)
-            domain(str):ドメイン名
+            base_url (str): Root URL (e.g. https://rcos.rdm.nii.ac.jp)
             token(str):パーソナルアクセストークン
 
         Raises:
@@ -110,14 +109,14 @@ class Grdm():
         data = response['data']
         return {d['id']: d['attributes']['title'] for d in data}
 
-    def sync(self, token: str, api_url: str, project_id: str, abs_source: str, abs_root:str = "/home/jovyan"):
+    def sync(self, token: str, base_url: str, project_id: str, abs_source: str, abs_root: str = "/home/jovyan"):
         """ GRDMにアップロードするメソッドです。
 
         abs_source は絶対パスでなければならない。
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
-            api_url (str): API URL (e.g. https://api.osf.io/v2/)
+            base_url (str): GRDMのURL (e.g. https://rcos.rdm.nii.ac.jp)
             project_id (str): プロジェクトID
             abs_source (str): 同期したいファイルまたはディレクトリ
             abs_root (str): リサーチフローのルートディレクトリ. Defaults to "/home/jovyan".
@@ -144,17 +143,17 @@ class Grdm():
         destination = os.path.relpath(abs_source, abs_root)
 
         self.external.upload(
-            token=token, base_url=api_url, project_id=project_id,
+            token=token, base_url=base_url, project_id=project_id,
             source=abs_source, destination=destination,
             recursive=recursive, force=True
         )
 
-    def download_text_file(self, token: str, api_url: str, project_id: str, remote_path: str, encoding = 'utf-8'):
+    def download_text_file(self, token: str, base_url: str, project_id: str, remote_path: str, encoding = 'utf-8'):
         """ テキストファイルの中身を取得するメソッドです。
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
-            api_url (str): API URL (e.g. https://api.osf.io/v2/)
+            base_url (str): GRDMのURL (e.g. https://rcos.rdm.nii.ac.jp)
             project_id (str): プロジェクトID
             remote_path (str): ファイルパス
             encoding (str): バイトを解析するエンコーディング
@@ -165,19 +164,19 @@ class Grdm():
             requests.exceptions.RequestException: その他の通信エラー
         """
         content = self.external.download(
-            token=token, base_url=api_url, project_id=project_id,
+            token=token, base_url=base_url, project_id=project_id,
             remote_path=remote_path
         )
         if content is None:
             raise FileNotFoundError(f'The specified file (path: {remote_path}) does not exist.')
         return content.decode(encoding)
 
-    def download_json_file(self, token: str, api_url: str, project_id: str, remote_path: str):
+    def download_json_file(self, token: str, base_url: str, project_id: str, remote_path: str):
         """ jsonファイルの中身を取得するメソッドです。
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
-            api_url (str): API URL (e.g. https://api.osf.io/v2/)
+            base_url (str): GRDMのURL (e.g. https://rcos.rdm.nii.ac.jp)
             project_id (str): プロジェクトID
             remote_path (str): ファイルパス
 
@@ -187,14 +186,14 @@ class Grdm():
             UnauthorizedError: 認証が通らない
             requests.exceptions.RequestException: その他の通信エラー
         """
-        content = self.download_text_file(token, api_url, project_id, remote_path)
+        content = self.download_text_file(token, base_url, project_id, remote_path)
         return json.loads(content)
 
     def get_project_metadata(self, base_url: str, token: str, project_id: str):
         """ プロジェクトメタデータを取得するメソッドです。
 
         Args:
-            base_url (str):Root URL (e.g. https://rdm.nii.ac.jp)
+            base_url (str):GRDMのURL (e.g. https://rcos.rdm.nii.ac.jp)
             token (str): パーソナルアクセストークン
             project_id (str): プロジェクトID
 
@@ -214,7 +213,7 @@ class Grdm():
         """ 共同管理者の取得するメソッドです。
 
         Args:
-            base_url (str):Root URL (e.g. https://rdm.nii.ac.jp)
+            base_url (str):GRDMのURL (e.g. https://rcos.rdm.nii.ac.jp)
             token (str): パーソナルアクセストークン
             project_id (str): プロジェクトID
 
@@ -238,7 +237,7 @@ class Grdm():
         """ プロジェクトのメンバー一覧のURLを返すメソッドです。
 
         Args:
-            base_url (str):Root URL (e.g. https://rdm.nii.ac.jp)
+            base_url (str):GRDMのURL (e.g. https://rcos.rdm.nii.ac.jp)
             project_id (str): プロジェクトID
 
         Returns:

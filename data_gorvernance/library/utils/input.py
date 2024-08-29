@@ -116,7 +116,7 @@ def get_goveredrun_token(base_url: str) -> str:
     """ Governed Runのトークンを取得する関数です。
 
     Args:
-        base_url(str):WdG-webのURL
+        base_url(str):DG-webのURL
 
     Returns:
         str: Governed Runのトークンを返す。

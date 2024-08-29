@@ -6,17 +6,16 @@
 from http import HTTPStatus
 import os
 import json
-from osfclient.cli import OSF, split_storage
-from osfclient.utils import norm_remote_path, split_storage, is_path_matched
-from osfclient.exceptions import UnauthorizedException
 from typing import Optional
 from urllib import parse
 
+from osfclient.cli import OSF, split_storage
+from osfclient.utils import norm_remote_path, split_storage, is_path_matched
+from osfclient.exceptions import UnauthorizedException
 import requests
 from requests.exceptions import RequestException
 
 from library.utils.error import UnauthorizedError, ProjectNotExist
-
 
 
 class External:
@@ -26,17 +25,17 @@ class External:
         """ API用のURLを作成する
 
         Args:
-            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g. https://rcos.rdm.nii.ac.jp)
             endpoint (str): APIのエンドポイント(デフォルト値は'')
 
         Returns:
             str: base path
 
         Examples:
-            >>> build_api_base_url('https://rdm.nii.ac.jp')
-            'https://api.rdm.nii.ac.jp/v2/'
-            >>> build_api_base_url('https://rdm.nii.ac.jp', '/users/me/')
-            'https://api.rdm.nii.ac.jp/v2/users/me/'
+            >>> build_api_base_url('https://rcos.rdm.nii.ac.jp')
+            'https://rcos.rdm.nii.ac.jp/v2/'
+            >>> build_api_base_url('https://rcos.rdm.nii.ac.jp', '/users/me/')
+            'https://rcos.rdm.nii.ac.jp/v2/users/me/'
         """
         parsed = parse.urlparse(base_url)
         netloc = f'api.{parsed.netloc}'
@@ -50,12 +49,11 @@ class External:
                 endpoint = endpoint + '/'
         return parse.urlunparse((parsed.scheme, netloc, endpoint, '', '', ''))
 
-
     def build_oauth_url(self, base_url: str,  endpoint: str = ''):
         """ OAuthのAPI用のURLを作成する
 
         Args:
-            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g.  https://rcos.rdm.nii.ac.jp)
             endpoint (str): APIのエンドポイント(デフォルト値は'')
 
         Returns:
@@ -70,7 +68,7 @@ class External:
         """ https://accounts.rdm.nii.ac.jp/oauth2/profile
 
         Args:
-            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g.  https://rcos.rdm.nii.ac.jp)
             token (str): パーソナルアクセストークン
 
         Raises:
@@ -97,7 +95,7 @@ class External:
         https://api.rdm.nii.ac.jp/v2/users/me/
 
         Args:
-            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g.  https://rcos.rdm.nii.ac.jp)
             token (str): パーソナルアクセストークン
 
         Raises:
@@ -125,7 +123,7 @@ class External:
         """ https://api.rdm.nii.ac.jp/v2/nodes/
 
         Args:
-            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g. https://rcos.rdm.nii.ac.jp)
             token (str): パーソナルアクセストークン
 
         Raises:
@@ -149,10 +147,10 @@ class External:
     def get_project_registrations(self, base_url: str, token: str, project_id: str):
         """ プロジェクトメタデータを取得する
 
-        https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/registrations
+        https://rcos.rdm.nii.ac.jp/v2/nodes/{project_id}/registrations
 
         Args:
-            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g. https://rcos.rdm.nii.ac.jp)
             token (str): パーソナルアクセストークン
             project_id (str): プロジェクトID
 
@@ -187,7 +185,7 @@ class External:
         https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/contributors/
 
         Args:
-            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g.  https://rcos.rdm.nii.ac.jp)
             token (str): パーソナルアクセストークン
             project_id (str): プロジェクトID
 
@@ -223,7 +221,7 @@ class External:
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
-            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g.  https://rcos.rdm.nii.ac.jp)
             project_id (str): プロジェクトID
             source (str): 保存元パス
             destination (str): 保存先パス
@@ -275,7 +273,6 @@ class External:
         except UnauthorizedException as e:
             raise UnauthorizedError(str(e)) from e
 
-
     def download(self, token: str, base_url: str, project_id: str,
                  remote_path: str, base_path: Optional[str] = None
     ) -> Optional[bytes]:
@@ -283,7 +280,7 @@ class External:
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
-            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g.  https://rcos.rdm.nii.ac.jp)
             project_id (str): プロジェクトID
             remote_path (str): ファイルパス
             base_path (str): ファイルを探すディレクトリのパス

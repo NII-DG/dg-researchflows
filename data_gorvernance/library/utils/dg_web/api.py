@@ -14,36 +14,43 @@ from library.utils.error import UnauthorizedError, NotFoundContentsError
 class Api():
     """dg-webに接続するクラスです。"""
 
-    def get_govsheet_schema(self, scheme_domain: str) -> dict:
+    def get_govsheet_schema(self, base_url: str) -> dict:
         """ガバナンスシートのスキーマを取得する関数です。
+
+        Args:
+            base_url(str): DG-webのURL
 
         Returns:
             dict: ガバナンスシートのスキーマを返す。
 
         """
         sub_url = '/schemas/govSheet'
-        api_url = scheme_domain + sub_url
+        api_url = base_url + sub_url
         response = requests.get(url=api_url)
         response.raise_for_status()
         return response.json()
 
-    def get_metadata_schema(self, scheme_domain: str) -> dict:
+    def get_metadata_schema(self, base_url: str) -> dict:
         """メタデータのスキーマを取得する関数です。
+
+        Args:
+            base_url(str): DG-webのURL
 
         Returns:
             dict: メタデータのスキーマを返す。
 
         """
         sub_url = '/schemas/metadata'
-        api_url = scheme_domain + sub_url
+        api_url = base_url + sub_url
         response = requests.get(url=api_url)
         response.raise_for_status()
         return response.json()
 
-    def check_governedrun_token(self, scheme_domain: str, token: str) -> bool:
+    def check_governedrun_token(self, base_url: str, token: str) -> bool:
         """Governed Runのトークンの有効性を確認する関数です。
 
         Args:
+            base_url(str): DG-webのURL
             token (str): Governed Runのトークンを設定します。
 
         Returns:
@@ -54,7 +61,7 @@ class Api():
 
         """
         sub_url = '/checkToken'
-        api_url = scheme_domain + sub_url
+        api_url = base_url + sub_url
         data = {
             "grdmToken": None,
             "govRunToken": token
@@ -67,10 +74,11 @@ class Api():
         response.raise_for_status()
         return False
 
-    def validate(self, scheme_domain: str, grdm_token: str, project_id: str, govrun_token: str=None, govsheet: dict=None, metadata: dict=None) -> dict:
+    def validate(self, base_url: str, grdm_token: str, project_id: str, govrun_token: str=None, govsheet: dict=None, metadata: dict=None) -> dict:
         """検証する関数です。
 
         Args:
+            base_url(str): DG-webのURL
             grdm_token(str): GRDMのトークンを設定します。
             project_id(str): プロジェクトidを設定します。
             govrun_token(str|None): Governed Runのトークンを設定します。
@@ -86,7 +94,7 @@ class Api():
 
         """
         sub_url = '/validations/submit'
-        api_url = scheme_domain + sub_url
+        api_url = base_url + sub_url
         data = {
             "grdmToken": grdm_token,
             "govRunToken": govrun_token,
@@ -103,10 +111,11 @@ class Api():
             raise
         return response.json()
 
-    def get_validations(self, scheme_domain: str, grdm_token: str, project_id: str)->dict:
+    def get_validations(self, base_url: str, grdm_token: str, project_id: str) -> dict:
         """検証結果を取得する関数です。
 
         Args:
+            base_url(str): DG-webのURL
             grdm_token (str): GRDMのトークンを設定します。
             project_id (str): プロジェクトidを設定します。
 
@@ -120,7 +129,7 @@ class Api():
 
         """
         sub_url = '/validations'
-        api_url = scheme_domain + sub_url
+        api_url = base_url + sub_url
         data = {
             "grdmToken": grdm_token,
             "grdmProjectId": project_id,
@@ -136,10 +145,11 @@ class Api():
             raise
         return response.json()
 
-    def get_validations_validationId(self, scheme_domain: str, grdm_token: str, project_id: str, validation_id: str)->dict:
+    def get_validations_validationId(self, base_url: str, grdm_token: str, project_id: str, validation_id: str) -> dict:
         """idを指定して検証結果を取得する関数です。
 
         Args:
+            base_url(str): DG-webのURL
             grdm_token (str): GRDMのトークンを設定します。
             project_id (str): プロジェクトidを設定します。
             validation_id (str): 検証のidを設定します。
@@ -154,7 +164,7 @@ class Api():
 
         """
         sub_url = f'/validations/{validation_id}'
-        api_url = scheme_domain + sub_url
+        api_url = base_url + sub_url
         data = {
             "grdmToken": grdm_token,
             "grdmProjectId": project_id,

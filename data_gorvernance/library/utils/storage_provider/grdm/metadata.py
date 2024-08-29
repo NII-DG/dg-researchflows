@@ -5,6 +5,7 @@
 """
 import json
 import requests
+from typing import Optional
 
 
 class Metadata():
@@ -64,7 +65,7 @@ class Metadata():
         response.raise_for_status()
         return response.json()
 
-    def format_display_name(self, schema: dict, page_id: str, qid: str, value=None) -> dict:
+    def format_display_name(self, schema: dict, page_id: str, qid: str, value: Optional[str] = None) -> dict:
         """ メタデータをフォーマットして返却するメソッドです。
 
         Args:

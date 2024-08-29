@@ -10,6 +10,7 @@ import requests
 from requests.exceptions import RequestException
 from library.utils.error import UnauthorizedError, NotFoundContentsError
 
+
 class Api():
     """dg-webに接続するクラスです。"""
 

@@ -4,5 +4,5 @@
 """
 
 from .external import External
-from library.utils.storage_provider.grdm.grdm import Grdm
+from .grdm import Grdm
 from .metadata import Metadata

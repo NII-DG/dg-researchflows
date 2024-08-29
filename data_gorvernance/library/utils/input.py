@@ -12,7 +12,6 @@ from .error import UnusableVault, UnauthorizedError, ProjectNotExist, RepoPermis
 from .storage_provider import grdm
 from .string import StringManager
 from .vault import Vault
-from library.utils.config import connect as con_config
 
 
 def get_project_id() -> str:
@@ -22,8 +21,8 @@ def get_project_id() -> str:
         str: プロジェクトIDを返す。
 
     """
-    grdmmain = grdm.Grdm()
-    project_id = grdmmain.get_project_id()
+    grdm_connect = grdm.Grdm()
+    project_id = grdm_connect.get_project_id()
     if project_id:
         return project_id
     while True:
@@ -107,8 +106,8 @@ def get_grdm_token(base_url: str, vault_key: str) -> str:
             bool: トークンの有効性を返す。
 
         """
-        grdmmain = grdm.Grdm()
-        return grdmmain.check_authorization(base_url, token)
+        grdm_connect = grdm.Grdm()
+        return grdm_connect.check_authorization(base_url, token)
 
     return get_token(vault_key, check_auth, msg_config.get('form', 'pls_input_grdm_token'))
 
@@ -117,7 +116,7 @@ def get_goveredrun_token(base_url: str) -> str:
     """ Governed Runのトークンを取得する関数です。
 
     Args:
-        base_url(str):WwebサーバーのURL
+        base_url(str):WdG-webのURL
 
     Returns:
         str: Governed Runのトークンを返す。
@@ -166,8 +165,8 @@ def get_grdm_connection_parameters(base_url: str) -> tuple[str, str]:
     while True:
         try:
             token = get_grdm_token(base_url, vault_key)
-            grdmmain = grdm.Grdm()
-            if not grdmmain.check_permission(base_url, token, project_id):
+            grdm_connect = grdm.Grdm()
+            if not grdm_connect.check_permission(base_url, token, project_id):
                 raise RepoPermissionError
             break
         except UnauthorizedError:

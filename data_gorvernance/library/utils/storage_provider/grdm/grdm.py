@@ -6,12 +6,13 @@ GRDMにアップロードしたり、"URLの権限やアクセス許可のチェ
 """
 import json
 import os
+from typing import Optional
+from urllib import parse
+
+from library.utils.error import NotFoundContentsError, UnauthorizedError
 
 from .external import External
 from .metadata import Metadata
-from typing import Union
-from urllib import parse
-from library.utils.error import NotFoundContentsError, UnauthorizedError
 
 
 NEED_TOKEN_SCOPE = ["osf.full_write"]
@@ -21,14 +22,14 @@ class Grdm():
     """ GRDMのデータ取得、アップロード、許可のチェックを行うクラスです。
     Attributes:
         instance:
-            _grdm_base_url(str):WebサーバーのURL
+            _grdm_base_url(str):DG-webのURL
     """
 
     def __init__(self) -> None:
         """Grdm コンストラクタのメソッドです。"""
         self.external = External()
 
-    def get_project_id(self) -> Union[str, None]:
+    def get_project_id(self) -> Optional[str]:
         """ プロジェクトIDを取得するメソッドです。
 
         Returns:
@@ -56,7 +57,6 @@ class Grdm():
         """
         try:
             profile = self.external.get_token_profile(base_url=base_url, token=token)
-
             scope = profile['scope']
             if all(element in scope for element in NEED_TOKEN_SCOPE):
                 return True
@@ -110,7 +110,7 @@ class Grdm():
         data = response['data']
         return {d['id']: d['attributes']['title'] for d in data}
 
-    def sync(self, token: str, base_url: str, project_id: str, abs_source: str, abs_root:str="/home/jovyan"):
+    def sync(self, token: str, api_url: str, project_id: str, abs_source: str, abs_root:str = "/home/jovyan"):
         """ GRDMにアップロードするメソッドです。
 
         abs_source は絶対パスでなければならない。
@@ -144,12 +144,12 @@ class Grdm():
         destination = os.path.relpath(abs_source, abs_root)
 
         self.external.upload(
-            token=token, base_url=base_url, project_id=project_id,
+            token=token, base_url=api_url, project_id=project_id,
             source=abs_source, destination=destination,
             recursive=recursive, force=True
         )
 
-    def download_text_file(self, token: str, base_url: str, project_id: str, remote_path: str, encoding='utf-8'):
+    def download_text_file(self, token: str, api_url: str, project_id: str, remote_path: str, encoding = 'utf-8'):
         """ テキストファイルの中身を取得するメソッドです。
 
         Args:
@@ -165,14 +165,14 @@ class Grdm():
             requests.exceptions.RequestException: その他の通信エラー
         """
         content = self.external.download(
-            token=token, base_url = base_url, project_id=project_id,
+            token=token, base_url=api_url, project_id=project_id,
             remote_path=remote_path
         )
         if content is None:
             raise FileNotFoundError(f'The specified file (path: {remote_path}) does not exist.')
         return content.decode(encoding)
 
-    def download_json_file(self, token: str, base_url: str, project_id: str, remote_path: str):
+    def download_json_file(self, token: str, api_url: str, project_id: str, remote_path: str):
         """ jsonファイルの中身を取得するメソッドです。
 
         Args:
@@ -187,7 +187,7 @@ class Grdm():
             UnauthorizedError: 認証が通らない
             requests.exceptions.RequestException: その他の通信エラー
         """
-        content = self.download_text_file(token, base_url, project_id, remote_path)
+        content = self.download_text_file(token, api_url, project_id, remote_path)
         return json.loads(content)
 
     def get_project_metadata(self, base_url: str, token: str, project_id: str):
@@ -207,8 +207,8 @@ class Grdm():
         metadata = self.external.get_project_registrations(base_url, token, project_id)
         if len(metadata['data']) < 1:
             raise NotFoundContentsError(f"Metadata doesn't exist for the project with the specified ID {project_id}.")
-        instance_metadata = Metadata()
-        return instance_metadata.format_metadata(metadata)
+        metadata_class = Metadata()
+        return metadata_class.format_metadata(metadata)
 
     def get_collaborator_list(self, base_url: str, token: str, project_id: str) -> dict:
         """ 共同管理者の取得するメソッドです。

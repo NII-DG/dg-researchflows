@@ -7,6 +7,7 @@ from IPython.display import clear_output
 import panel as pn
 from requests.exceptions import RequestException
 
+from library.utils.config import connect as con_config
 from .config import path_config, message as msg_config
 from .error import UnusableVault, ProjectNotExist, UnauthorizedError, RepoPermissionError
 from .input import get_grdm_connection_parameters
@@ -14,7 +15,7 @@ from .log import TaskLog
 from .storage_provider import grdm
 from .time_tracker import TimeDiff
 from .widgets import Button, MessageBox
-from library.utils.config import connect as con_config
+
 
 def all_sync_path(abs_root: str) -> list:
     """ 指定されたホームディレクトリから特定のディレクトリのパスを返す関数です。
@@ -49,7 +50,7 @@ class TaskSave(TaskLog):
             save_msg_output(MessageBox): メッセージ出力
             save_form_box(WidgetBox): フォーム用ボックス
             _save_submit_button(Button): 確定ボタン
-            _base_url(str): WebサーバーのURL
+            _base_url(str): DG-webのURL
             _base_url_grdm(str): GRDMのURL
 
     """
@@ -157,14 +158,14 @@ class TaskSave(TaskLog):
         self.save_form_box.clear()
         msg = msg_config.get('save', 'doing')
         timediff.start()
-        grdmmain = grdm.Grdm()
+        grdm_connect = grdm.Grdm()
 
         try:
             for i, path in enumerate(self._source):
                 self.save_msg_output.update_info(f'{msg} {i+1}/{size}')
-                grdmmain.sync(
+                grdm_connect.sync(
                     token=self.token,
-                    base_url=self._base_url_grdm,
+                    api_url=self._base_url_grdm,
                     project_id=self.project_id,
                     abs_source = path,
                     abs_root=self._abs_root_path

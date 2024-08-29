@@ -1,4 +1,4 @@
-"""サブフローを管理するモジュールです。"""
+""" サブフローを管理するモジュールです。"""
 from itertools import chain, zip_longest
 import os
 from pathlib import Path
@@ -15,7 +15,7 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 class SubFlowManager:
-    """サブフローを管理するクラスです。
+    """ サブフローを管理するクラスです。
 
     Attributes:
         instance:
@@ -29,7 +29,7 @@ class SubFlowManager:
     """
 
     def __init__(self, current_dir: str, status_file: str,diag_file: str, using_task_dir: str) -> None:
-        """インスタンスの初期化処理を実行するメソッドです。
+        """ インスタンスの初期化処理を実行するメソッドです。
 
         Args:
             current_dir(str) : サブフローメニューの親ディレクトリを設定します。
@@ -44,7 +44,7 @@ class SubFlowManager:
         self.task_dir = using_task_dir
 
     def setup_tasks(self, souce_task_dir: str):
-        """タスクの原本があるディレクトリからタスクファイルをコピーするメソッドです。
+        """ タスクの原本があるディレクトリからタスクファイルをコピーするメソッドです。
 
         Args:
             souce_task_dir(str) : タスクの原本があるディレクトリのパスを設定します。
@@ -55,7 +55,7 @@ class SubFlowManager:
                 self._copy_file_by_name(task.name, souce_task_dir, self.task_dir)
 
     def _copy_file_by_name(self, target_file: str, search_directory: str, destination_directory: str) -> None:
-        """指定した名前のファイルを検索ディレクトリから目的のディレクトリにコピーするメソッドです。
+        """ 指定した名前のファイルを検索ディレクトリから目的のディレクトリにコピーするメソッドです。
 
         Args:
             target_file(str) : コピー元のファイルを設定します。
@@ -86,7 +86,7 @@ class SubFlowManager:
                     os.symlink(source_images, destination_images, target_is_directory=True)
 
     def generate(self, svg_path: str, tmp_diag: str, font: str) -> None:
-        """ダイアグラムを生成するメソッドです。
+        """ ダイアグラムを生成するメソッドです。
 
         Args:
             svg_path (str): SVGファイルの出力パスを設定します。
@@ -108,12 +108,12 @@ class SubFlowManager:
         update_svg(svg_path, self.current_dir, self.svg_config)
 
     def _update(self) -> None:
-        """タスクの状態に基づいてダイアグラムを更新するメソッドです。"""
+        """ タスクの状態に基づいてダイアグラムを更新するメソッドです。"""
         for task in self.tasks:
             self._adjust_by_status(task)
 
     def _adjust_by_status(self, task: SubflowTask) -> None:
-        """フロー図の見た目をタスクの状態によって変えるメソッドです。
+        """ フロー図の見た目をタスクの状態によって変えるメソッドです。
 
         Args:
             task (SubflowTask): 調整するタスクを設定します。
@@ -139,7 +139,7 @@ class SubFlowManager:
             self.diag.update_node_icon(task.id, icon_dir + "/loading.png")
 
     def parse_headers(self, task: SubflowTask) -> None:
-        """タスクタイトルとパスを取得するメソッドです。
+        """ タスクタイトルとパスを取得するメソッドです。
 
         Args:
             task (SubflowTask): 対象とするタスクを設定します。
@@ -173,7 +173,7 @@ class SubFlowManager:
                 break
 
     def change_id(self, task: SubflowTask) -> None:
-        """diagファイルのタスクIDをタスクタイトルに置き換えるメソッドです。
+        """ diagファイルのタスクIDをタスクタイトルに置き換えるメソッドです。
 
         Args:
             task (SubflowTask): タスクIDをタスクタイトルに置き換えるタスクを設定します。

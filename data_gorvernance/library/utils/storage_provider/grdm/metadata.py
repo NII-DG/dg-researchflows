@@ -6,6 +6,7 @@
 import json
 import requests
 
+
 class Metadata():
     """ 取得したメタデータを表示するためのクラスです。"""
 
@@ -29,7 +30,7 @@ class Metadata():
             registration = data['attributes']['registration_responses']
             for key, value in registration.items():
                 if key != 'grdm-files':
-                    second_layer[key] = Metadata.format_display_name(schema, "page1", key, value)
+                    second_layer[key] = self.format_display_name(schema, "page1", key, value)
 
             files = json.loads(registration['grdm-files'])
             # grdm-files > value
@@ -43,7 +44,7 @@ class Metadata():
                 file_datas['metadata'] = file_metadata
                 file_values.append(file_datas)
 
-            second_layer['grdm-files'] = Metadata.format_display_name(schema, "page2", 'grdm-files', file_values)
+            second_layer['grdm-files'] = self.format_display_name(schema, "page2", 'grdm-files', file_values)
             first_value.append(second_layer)
 
         return {'dmp': first_value}

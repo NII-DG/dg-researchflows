@@ -3,30 +3,31 @@
 ファイルの内容を取得し、ファイルまたはフォルダをアップロードします。
 ファイルまたはフォルダをアップロードするメソッドやファイルの内容を取得するメソッドがあります。
 """
+from http import HTTPStatus
 import os
 import json
-import requests
-
-from http import HTTPStatus
-from urllib import parse
-from requests.exceptions import RequestException
-from library.utils.config import connect as con_config
-from library.utils.error import UnauthorizedError, ProjectNotExist
 from osfclient.cli import OSF, split_storage
 from osfclient.utils import norm_remote_path, split_storage, is_path_matched
 from osfclient.exceptions import UnauthorizedException
-from typing import Union
+from typing import Optional
+from urllib import parse
+
+import requests
+from requests.exceptions import RequestException
+
+from library.utils.error import UnauthorizedError, ProjectNotExist
+
 
 
 class External:
     """ GRDMのAPI通信への通信、動作確認、データの取得などを行うクラスです。"""
 
-    def build_api_url(self, base_url: str, endpoint=''):
+    def build_api_url(self, base_url: str, endpoint: str = ''):
         """ API用のURLを作成する
 
         Args:
             base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
-            endpoint (str, optional): endpoint for api. Defaults to ''.
+            endpoint (str): APIのエンドポイント(デフォルト値は'')
 
         Returns:
             str: base path
@@ -50,12 +51,12 @@ class External:
         return parse.urlunparse((parsed.scheme, netloc, endpoint, '', '', ''))
 
 
-    def build_oauth_url(self, base_url: str, endpoint=''):
+    def build_oauth_url(self, base_url: str,  endpoint: str = ''):
         """ OAuthのAPI用のURLを作成する
 
         Args:
             base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
-            endpoint (str, optional): endpoint for api. Defaults to ''.
+            endpoint (str): APIのエンドポイント(デフォルト値は'')
 
         Returns:
             str: base path
@@ -215,11 +216,14 @@ class External:
             raise
         return response.json()
 
-    def upload(self, token: str, base_url: str, project_id: str, source: str, destination: str, recursive: bool=False, force: bool=False):
+    def upload(self, token: str, base_url: str, project_id: str, source: str,
+               destination: str, recursive: bool = False, force: bool = False
+    ):
         """ ファイルまたはフォルダをアップロードするメソッドです。
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
+            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
             project_id (str): プロジェクトID
             source (str): 保存元パス
             destination (str): 保存先パス
@@ -233,11 +237,8 @@ class External:
         """
         # Falseで固定
         # Trueにすると指定したパスを見つけ出せずにRuntimeErrorが返ってくる
-        api_url_grdm = self.build_api_url(base_url,'')
         update = False
-
-        if source is None or destination is None:
-            raise KeyError("too few arguments: source or destination")
+        api_url_grdm = self.build_api_url(base_url,'')
 
         osf = OSF(token=token, base_url=api_url_grdm)
         if not osf.has_auth:
@@ -251,8 +252,7 @@ class External:
             store = project.storage(storage)
             if recursive:
                 if not os.path.isdir(source):
-                    raise RuntimeError("Expected source ({}) to be a directory when "
-                                        "using recursive mode.".format(source))
+                    raise RuntimeError(f"Expected source ({source}) to be a directory when using recursive mode.")
 
                 # local name of the directory that is being uploaded
                 _, dir_name = os.path.split(source)
@@ -276,11 +276,14 @@ class External:
             raise UnauthorizedError(str(e)) from e
 
 
-    def download(self, token: str, base_url: str, project_id: str, remote_path: str, base_path=None) -> Union[bytes, None]:
+    def download(self, token: str, base_url: str, project_id: str,
+                 remote_path: str, base_path: Optional[str] = None
+    ) -> Optional[bytes]:
         """ ファイルの内容を取得するメソッドです。
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
+            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
             project_id (str): プロジェクトID
             remote_path (str): ファイルパス
             base_path (str): ファイルを探すディレクトリのパス
@@ -303,7 +306,8 @@ class External:
             base_file_path = base_path[base_path.index('/'):]
             if not base_file_path.endswith('/'):
                 base_file_path = base_file_path + '/'
-            path_filter = lambda f: is_path_matched(base_file_path, f)
+
+                def path_filter(f): return is_path_matched(base_file_path, f)
         else:
             path_filter = None
 

@@ -7,6 +7,7 @@ from IPython.display import clear_output
 import panel as pn
 from requests.exceptions import RequestException
 
+from library.utils.config import connect as con_config
 from .config import path_config, message as msg_config
 from .error import UnusableVault, ProjectNotExist, UnauthorizedError, RepoPermissionError
 from .input import get_grdm_connection_parameters
@@ -49,6 +50,7 @@ class TaskSave(TaskLog):
             save_msg_output(MessageBox): メッセージ出力
             save_form_box(WidgetBox): フォーム用ボックス
             _save_submit_button(Button): 確定ボタン
+            grdm_url(str): GRDMのURL
 
     """
 
@@ -72,6 +74,7 @@ class TaskSave(TaskLog):
         self.save_form_box.width = 900
         # 確定ボタン
         self._save_submit_button = Button(width=500)
+        self.grdm_url = con_config.get('GRDM', 'BASE_URL')
 
     def get_grdm_params(self) -> tuple[str, str]:
         """ GRDMのトークンとプロジェクトIDを取得するメソッドです。
@@ -84,7 +87,7 @@ class TaskSave(TaskLog):
         token = ""
         project_id = ""
         try:
-            token, project_id = get_grdm_connection_parameters()
+            token, project_id = get_grdm_connection_parameters(self.grdm_url)
         except UnusableVault:
             message = msg_config.get('form', 'no_vault')
             self.save_msg_output.update_error(message)
@@ -153,13 +156,14 @@ class TaskSave(TaskLog):
         self.save_form_box.clear()
         msg = msg_config.get('save', 'doing')
         timediff.start()
+        grdm_connect = grdm.Grdm()
 
         try:
             for i, path in enumerate(self._source):
                 self.save_msg_output.update_info(f'{msg} {i+1}/{size}')
-                grdm.sync(
+                grdm_connect.sync(
                     token=self.token,
-                    api_url=grdm.API_V2_BASE_URL,
+                    base_url=self.grdm_url,
                     project_id=self.project_id,
                     abs_source=path,
                     abs_root=self._abs_root_path

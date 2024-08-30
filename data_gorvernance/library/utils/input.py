@@ -1,4 +1,4 @@
-"""トークン取得のモジュールです。
+""" トークン取得のモジュールです。
 
 各種トークンやプロジェクトIDを取得する関数が記載されています。
 
@@ -21,7 +21,8 @@ def get_project_id() -> str:
         str: プロジェクトIDを返す。
 
     """
-    project_id = grdm.get_project_id()
+    grdm_connect = grdm.Grdm()
+    project_id = grdm_connect.get_project_id()
     if project_id:
         return project_id
     while True:
@@ -80,8 +81,12 @@ def get_token(key: str, func: Callable[[str], bool], message: str) -> str:
     return token
 
 
-def get_grdm_token(vault_key: str) -> str:
+def get_grdm_token(base_url: str, vault_key: str) -> str:
     """ GRDMのパーソナルアクセストークンを取得する関数です。
+
+    Args:
+        base_url(str):GRDMのURL
+        vault_key(str):grdmのパーソナルアクセストークンキー
 
     Returns:
         str: パーソナルアクセストークンを返す。
@@ -101,13 +106,17 @@ def get_grdm_token(vault_key: str) -> str:
             bool: トークンの有効性を返す。
 
         """
-        return grdm.check_authorization(grdm.BASE_URL, token)
+        grdm_connect = grdm.Grdm()
+        return grdm_connect.check_authorization(base_url, token)
 
     return get_token(vault_key, check_auth, msg_config.get('form', 'pls_input_grdm_token'))
 
 
-def get_goveredrun_token() -> str:
+def get_goveredrun_token(base_url: str) -> str:
     """ Governed Runのトークンを取得する関数です。
+
+    Args:
+        base_url(str):DG-webのURL
 
     Returns:
         str: Governed Runのトークンを返す。
@@ -126,13 +135,17 @@ def get_goveredrun_token() -> str:
         Returns:
             bool: Governed Runのトークンの有効性を返す。
         """
-        return dg_web.check_governedrun_token(dg_web.SCHEME, dg_web.DOMAIN, token)
+        dgweb_api = dg_web.Api()
+        return dgweb_api.check_governedrun_token(base_url, token)
 
     return get_token('govrun_token', check_auth, msg_config.get('form', 'pls_input_govrun_token'))
 
 
-def get_grdm_connection_parameters() -> tuple[str, str]:
-    """GRDMのトークンとプロジェクトIDを取得する関数です。
+def get_grdm_connection_parameters(base_url: str) -> tuple[str, str]:
+    """ GRDMのトークンとプロジェクトIDを取得する関数です。
+
+    Args:
+        base_url(str):GRDMのURL
 
     Returns:
         str: GRDMのトークンを返す。
@@ -151,8 +164,9 @@ def get_grdm_connection_parameters() -> tuple[str, str]:
 
     while True:
         try:
-            token = get_grdm_token(vault_key)
-            if not grdm.check_permission(grdm.BASE_URL, token, project_id):
+            token = get_grdm_token(base_url, vault_key)
+            grdm_connect = grdm.Grdm()
+            if not grdm_connect.check_permission(base_url, token, project_id):
                 raise RepoPermissionError
             break
         except UnauthorizedError:

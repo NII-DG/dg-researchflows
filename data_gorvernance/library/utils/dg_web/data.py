@@ -1,19 +1,21 @@
-""" ガバナンスシートやメタデータの設定値を扱うモジュールです。"""
+"""ガバナンスシートやメタデータの設定値を扱うモジュールです。"""
 
 
-def need_govrun_token(govsheet: dict, metadata: dict) -> bool:
-    """ Governed Runのトークンが必要かどうかを判定する関数です。
+class Data:
 
-    Args:
-        govsheet (dict): ガバナンスシートを設定します。
-        metadata (dict): メタデータを設定します。
+    def need_govrun_token(self, govsheet: dict, metadata: dict) -> bool:
+        """Governed Runのトークンが必要かどうかを判定する関数です。
 
-    Returns:
-        bool: Governed Runのトークンが必要かを返す。
+        Args:
+            govsheet (dict): ガバナンスシートを設定します。
+            metadata (dict): メタデータを設定します。
 
-    """
-    if govsheet.get("rerun", {}).get("rerunLevel") == "設定しない":
-        return False
-    if not metadata.get("runCrate"):
-        return False
-    return True
+        Returns:
+            bool: Governed Runのトークンが必要かを返す。
+
+        """
+        if govsheet.get("rerun", {}).get("rerunLevel") == "設定しない":
+            return False
+        if not metadata.get("runCrate"):
+            return False
+        return True

@@ -4,7 +4,6 @@
 ファイルまたはフォルダをアップロードするメソッドやファイルの内容を取得するメソッドがあります。
 """
 from http import HTTPStatus
-import json
 import os
 from typing import Optional
 from urllib import parse
@@ -95,7 +94,7 @@ class External:
     def get_user_info(self, base_url: str, token: str) -> dict:
         """ tokenで指定したユーザーの情報を取得する
 
-       https://rdm.nii.ac.jp/v2/users/me/
+        https://rdm.nii.ac.jp/v2/users/me/
 
         Args:
             base_url (str): GRDMのURL (e.g.  https://rdm.nii.ac.jp)
@@ -253,8 +252,7 @@ class External:
 
         osf = OSF(token=token, base_url=api_url_grdm)
         if not osf.has_auth:
-            raise KeyError('To upload a file you need to provide a username and'
-                        ' password or token.')
+            raise KeyError('To upload a file you need to provide a username and password or token.')
 
         try:
             project = osf.project(project_id)
@@ -274,15 +272,12 @@ class External:
                         local_path = os.path.join(root, fname)
                         with open(local_path, 'rb') as fp:
                             # build the remote path + fname
-                            name = os.path.join(remote_path, dir_name, subdir_path,
-                                                fname)
-                            store.create_file(name, fp, force=force,
-                                                update=update)
+                            name = os.path.join(remote_path, dir_name, subdir_path, fname)
+                            store.create_file(name, fp, force=force, update=update)
 
             else:
                 with open(source, 'rb') as fp:
-                    store.create_file(remote_path, fp, force=force,
-                                        update=update)
+                    store.create_file(remote_path, fp, force=force, update=update)
         except UnauthorizedException as e:
             raise UnauthorizedError(str(e)) from e
 
@@ -310,7 +305,7 @@ class External:
         api_url_grdm = self.build_api_url(base_url,'')
         storage, remote_path = split_storage(remote_path)
 
-        osf = OSF(token=token, base_url = api_url_grdm)
+        osf = OSF(token=token, base_url=api_url_grdm)
         if base_path is not None:
             if base_path.startswith('/'):
                 base_path = base_path[1:]

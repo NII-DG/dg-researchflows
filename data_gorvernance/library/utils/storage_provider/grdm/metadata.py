@@ -5,7 +5,7 @@
 """
 import json
 import requests
-from typing import Optional
+from typing import Union
 
 
 class Metadata():
@@ -50,7 +50,7 @@ class Metadata():
 
         return {'dmp': first_value}
 
-    def get_schema(self, url:str) -> json:
+    def get_schema(self, url:str) -> dict:
         """ メタデータのプロトコル名を取得するメソッドです。
 
         リクエストされたURLに接続し、その接続に問題がないかを確認してプロトコル名を取得する。
@@ -59,20 +59,20 @@ class Metadata():
             url(str):メタデータのURL
 
         Returns:
-            Response.json:メタデータのプロトコル名の値を返す。
+            dict:メタデータのプロトコル名の値を返す。
         """
         response = requests.get(url=url)
         response.raise_for_status()
         return response.json()
 
-    def format_display_name(self, schema: dict, page_id: str, qid: str, value: Optional[str] = None) -> dict:
+    def format_display_name(self, schema: dict, page_id: str, qid: str, value: Union[str, list, None] = None) -> dict:
         """ メタデータをフォーマットして返却するメソッドです。
 
         Args:
             schema (dict): メタデータのプロトコル名
             page_id (str): プロジェクトメタデータ("page1")、ファイルメタデータ("page2")
             qid (str): メタデータのqid
-            value (str): メタデータに設定された値. Defaults to None.
+            value (str, list): メタデータに設定された値. Defaults to None.
 
         Returns:
             dict: フォーマットされたメタデータの値

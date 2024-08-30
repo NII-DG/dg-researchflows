@@ -6,7 +6,7 @@ GRDMにアップロードしたり、"URLの権限やアクセス許可のチェ
 """
 import json
 import os
-from typing import Optional
+from typing import Optional, Union
 from urllib import parse
 
 from .external import External
@@ -175,7 +175,7 @@ class Grdm():
             raise FileNotFoundError(f'The specified file (path: {remote_path}) does not exist.')
         return content.decode(encoding)
 
-    def download_json_file(self, token: str, base_url: str, project_id: str, remote_path: str) -> str:
+    def download_json_file(self, token: str, base_url: str, project_id: str, remote_path: str) -> Union[dict, list]:
         """ jsonファイルの中身を取得するメソッドです。
 
         Args:

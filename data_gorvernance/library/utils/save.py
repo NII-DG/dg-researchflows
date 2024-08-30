@@ -163,7 +163,7 @@ class TaskSave(TaskLog):
                 self.save_msg_output.update_info(f'{msg} {i+1}/{size}')
                 grdm_connect.sync(
                     token=self.token,
-                    api_url=self.grdm_url,
+                    base_url=self.grdm_url,
                     project_id=self.project_id,
                     abs_source=path,
                     abs_root=self._abs_root_path

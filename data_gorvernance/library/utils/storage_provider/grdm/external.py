@@ -21,7 +21,7 @@ from library.utils.error import UnauthorizedError, ProjectNotExist
 class External:
     """ GRDMのAPI通信への通信、動作確認、データの取得などを行うクラスです。"""
 
-    def build_api_url(self, base_url: str, endpoint: str = ''):
+    def build_api_url(self, base_url: str, endpoint: str = '') -> str:
         """ API用のURLを作成する
 
         Args:
@@ -49,7 +49,7 @@ class External:
                 endpoint = endpoint + '/'
         return parse.urlunparse((parsed.scheme, netloc, endpoint, '', '', ''))
 
-    def build_oauth_url(self, base_url: str,  endpoint: str = ''):
+    def build_oauth_url(self, base_url: str,  endpoint: str = '') -> str:
         """ OAuthのAPI用のURLを作成する
 
         Args:
@@ -64,12 +64,15 @@ class External:
         endpoint = endpoint.rstrip('/')
         return parse.urlunparse((parsed.scheme, netloc, endpoint, '', '', ''))
 
-    def get_token_profile(self, base_url: str, token: str):
+    def get_token_profile(self, base_url: str, token: str) -> dict:
         """ https://accounts.rdm.nii.ac.jp/oauth2/profile
 
         Args:
             base_url (str): GRDMのURL (e.g.  http://163.220.176.50)
             token (str): パーソナルアクセストークン
+
+        Returns:
+            dict: プロファイル
 
         Raises:
             UnauthorizedError: 認証が通らない
@@ -78,7 +81,7 @@ class External:
         endpoint = '/oauth2/profile'
         api_url = self.build_oauth_url(base_url, endpoint)
         headers = {
-            'Authorization': 'Bearer {}'.format(token)
+            'Authorization': f'Bearer {token}'
         }
         response = requests.get(url=api_url, headers=headers)
         try:
@@ -89,7 +92,7 @@ class External:
             raise
         return response.json()
 
-    def get_user_info(self, base_url: str, token: str):
+    def get_user_info(self, base_url: str, token: str) -> dict:
         """ tokenで指定したユーザーの情報を取得する
 
        http://163.220.176.50/v2/users/me/
@@ -103,12 +106,12 @@ class External:
             requests.exceptions.RequestException: その他の通信エラー
 
         Returns:
-            ユーザー情報
+            dict: ユーザー情報
         """
         endpoint = '/users/me/'
         api_url = self.build_api_url(base_url, endpoint)
         headers = {
-            'Authorization': 'Bearer {}'.format(token)
+            'Authorization': f'Bearer {token}'
         }
         response = requests.get(url=api_url, headers=headers)
         try:
@@ -119,12 +122,15 @@ class External:
             raise
         return response.json()
 
-    def get_projects(self, base_url: str, token: str):
+    def get_projects(self, base_url: str, token: str) -> dict:
         """ http://163.220.176.50/v2/nodes/
 
         Args:
             base_url (str): GRDMのURL (e.g. http://163.220.176.50)
             token (str): パーソナルアクセストークン
+
+        Returns:
+            dict: プロジェクトのデータ
 
         Raises:
             UnauthorizedError: 認証が通らない
@@ -133,7 +139,7 @@ class External:
         sub_url = 'v2/nodes/'
         api_url = self.build_api_url(base_url, sub_url)
         headers = {
-            'Authorization': 'Bearer {}'.format(token)
+            'Authorization': f'Bearer {token}'
         }
         response = requests.get(url=api_url, headers=headers)
         try:
@@ -144,7 +150,7 @@ class External:
             raise
         return response.json()
 
-    def get_project_registrations(self, base_url: str, token: str, project_id: str):
+    def get_project_registrations(self, base_url: str, token: str, project_id: str) -> dict:
         """ プロジェクトメタデータを取得する
 
         http://163.220.176.50/v2/nodes/{project_id}/registrations
@@ -154,6 +160,9 @@ class External:
             token (str): パーソナルアクセストークン
             project_id (str): プロジェクトID
 
+        Returns:
+            dict: プロジェクトメタデータ
+
         Raises:
             UnauthorizedError: 認証が通らない
             ProjectNotExist: 指定されたプロジェクトIDが存在しない
@@ -162,7 +171,7 @@ class External:
         endpoint = f'/nodes/{project_id}/registrations/'
         api_url = self.build_api_url(base_url, endpoint)
         headers = {
-            'Authorization': 'Bearer {}'.format(token)
+            'Authorization': f'Bearer {token}'
         }
         response = requests.get(url=api_url, headers=headers)
         try:
@@ -179,7 +188,7 @@ class External:
             raise
         return response.json()
 
-    def get_project_collaborators(self, base_url: str, token: str, project_id: str):
+    def get_project_collaborators(self, base_url: str, token: str, project_id: str) -> dict:
         """ プロジェクトメンバーの情報を取得する
 
         http://163.220.176.50/v2/nodes/{project_id}/contributors/
@@ -189,6 +198,9 @@ class External:
             token (str): パーソナルアクセストークン
             project_id (str): プロジェクトID
 
+        Returns:
+            dict: プロジェクトメンバーの情報
+
         Raises:
             UnauthorizedError: 認証が通らない
             ProjectNotExist: 指定されたプロジェクトIDが存在しない
@@ -197,7 +209,7 @@ class External:
         endpoint = f'/nodes/{project_id}/contributors/'
         api_url = self.build_api_url(base_url, endpoint)
         headers = {
-            'Authorization': 'Bearer {}'.format(token)
+            'Authorization': f'Bearer {token}'
         }
         response = requests.get(url=api_url, headers=headers)
         try:
@@ -214,8 +226,9 @@ class External:
             raise
         return response.json()
 
-    def upload(self, token: str, base_url: str, project_id: str, source: str,
-               destination: str, recursive: bool = False, force: bool = False
+    def upload(
+        self, token: str, base_url: str, project_id: str, source: str,
+        destination: str, recursive: bool = False, force: bool = False
     ):
         """ ファイルまたはフォルダをアップロードするメソッドです。
 
@@ -273,8 +286,9 @@ class External:
         except UnauthorizedException as e:
             raise UnauthorizedError(str(e)) from e
 
-    def download(self, token: str, base_url: str, project_id: str,
-                 remote_path: str, base_path: Optional[str] = None
+    def download(
+        self, token: str, base_url: str, project_id: str,
+        remote_path: str, base_path: Optional[str] = None
     ) -> Optional[bytes]:
         """ ファイルの内容を取得するメソッドです。
 

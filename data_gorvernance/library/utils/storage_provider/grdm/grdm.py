@@ -23,7 +23,7 @@ class Grdm():
 
     Attributes:
         instance:
-            _grdm_base_url(str):DG-webのURL
+            external(External):grdmフォルダ内のexterrnalファイルのExternalクラス
     """
 
     def __init__(self) -> None:
@@ -165,7 +165,7 @@ class Grdm():
             requests.exceptions.RequestException: その他の通信エラー
         """
         content = self.external.download(
-            token=token, base_url=base_url, project_id=project_id,
+            token=token, project_id=project_id, base_url=base_url,
             remote_path=remote_path
         )
         if content is None:

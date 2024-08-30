@@ -75,7 +75,7 @@ class Api():
         response.raise_for_status()
         return False
 
-    def validate(self, base_url: str, grdm_token: str, project_id: str, govrun_token: str = None, govsheet: dict = None, metadata: dict = None) -> dict:
+    def validate(self, base_url: str, grdm_token: str, project_id: str, govrun_token: str = None, govsheet: Optional[dict] = None, metadata: Optional[dict] = None) -> dict:
         """検証する関数です。
 
         Args:

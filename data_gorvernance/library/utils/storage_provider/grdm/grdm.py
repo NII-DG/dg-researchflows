@@ -149,7 +149,7 @@ class Grdm():
             recursive=recursive, force=True
         )
 
-    def download_text_file(self, token: str, base_url: str, project_id: str, remote_path: str, encoding = 'utf-8'):
+    def download_text_file(self, token: str, base_url: str, project_id: str, remote_path: str, encoding = 'utf-8') -> str:
         """ テキストファイルの中身を取得するメソッドです。
 
         Args:
@@ -158,6 +158,9 @@ class Grdm():
             project_id (str): プロジェクトID
             remote_path (str): ファイルパス
             encoding (str): バイトを解析するエンコーディング
+
+        Returns:
+            str: テキストファイルの値
 
         Raises:
             FileNotFoundError: 指定したファイルが存在しない
@@ -172,7 +175,7 @@ class Grdm():
             raise FileNotFoundError(f'The specified file (path: {remote_path}) does not exist.')
         return content.decode(encoding)
 
-    def download_json_file(self, token: str, base_url: str, project_id: str, remote_path: str):
+    def download_json_file(self, token: str, base_url: str, project_id: str, remote_path: str) -> str:
         """ jsonファイルの中身を取得するメソッドです。
 
         Args:
@@ -180,6 +183,9 @@ class Grdm():
             base_url (str): GRDMのURL (e.g. http://163.220.176.50)
             project_id (str): プロジェクトID
             remote_path (str): ファイルパス
+
+        Returns:
+            str: jsonファイルの値
 
         Raises:
             FileNotFoundError: 指定したファイルが存在しない
@@ -190,13 +196,16 @@ class Grdm():
         content = self.download_text_file(token, base_url, project_id, remote_path)
         return json.loads(content)
 
-    def get_project_metadata(self, base_url: str, token: str, project_id: str):
+    def get_project_metadata(self, base_url: str, token: str, project_id: str) -> dict[str, list]:
         """ プロジェクトメタデータを取得するメソッドです。
 
         Args:
             base_url (str):GRDMのURL (e.g. http://163.220.176.50)
             token (str): パーソナルアクセストークン
             project_id (str): プロジェクトID
+
+        Returns:
+            dict[str, list]: プロジェクトメタデータの値
 
         Raises:
             NotFoundContentsError: メタデータが存在しない

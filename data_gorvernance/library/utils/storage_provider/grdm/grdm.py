@@ -50,7 +50,7 @@ class Grdm():
         """ パーソナルアクセストークンの権限をチェックするメソッドです。
 
         Args:
-            base_url (str): GRDMのURL (e.g. http://163.220.176.50)
+            base_url (str): GRDMのURL (e.g. https://rdm.nii.ac.jp)
             token (str): パーソナルアクセストークン
 
         Returns:
@@ -69,7 +69,7 @@ class Grdm():
         """ リポジトリへのアクセス権限のチェックを行うメソッドです。
 
         Args:
-            base_url (str): GRDMのURL (e.g. http://163.220.176.50)
+            base_url (str): GRDMのURL (e.g. https://rdm.nii.ac.jp)
             token (str): パーソナルアクセストークン
             project_id (str): プロジェクトID
 
@@ -96,7 +96,7 @@ class Grdm():
         """ プロジェクトの一覧を取得するメソッドです。
 
         Args:
-            base_url (str): Root URL (e.g. http://163.220.176.50)
+            base_url (str): Root URL (e.g. https://rdm.nii.ac.jp)
             token(str):パーソナルアクセストークン
 
         Raises:
@@ -117,7 +117,7 @@ class Grdm():
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
-            base_url (str): GRDMのURL (e.g. http://163.220.176.50)
+            base_url (str): GRDMのURL (e.g. https://rdm.nii.ac.jp)
             project_id (str): プロジェクトID
             abs_source (str): 同期したいファイルまたはディレクトリ
             abs_root (str): リサーチフローのルートディレクトリ. Defaults to "/home/jovyan".
@@ -154,7 +154,7 @@ class Grdm():
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
-            base_url (str): GRDMのURL (e.g. http://163.220.176.50)
+            base_url (str): GRDMのURL (e.g. https://rdm.nii.ac.jp)
             project_id (str): プロジェクトID
             remote_path (str): ファイルパス
             encoding (str): バイトを解析するエンコーディング
@@ -180,7 +180,7 @@ class Grdm():
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
-            base_url (str): GRDMのURL (e.g. http://163.220.176.50)
+            base_url (str): GRDMのURL (e.g. https://rdm.nii.ac.jp)
             project_id (str): プロジェクトID
             remote_path (str): ファイルパス
 
@@ -200,7 +200,7 @@ class Grdm():
         """ プロジェクトメタデータを取得するメソッドです。
 
         Args:
-            base_url (str):GRDMのURL (e.g. http://163.220.176.50)
+            base_url (str):GRDMのURL (e.g. https://rdm.nii.ac.jp)
             token (str): パーソナルアクセストークン
             project_id (str): プロジェクトID
 
@@ -223,7 +223,7 @@ class Grdm():
         """ 共同管理者の取得するメソッドです。
 
         Args:
-            base_url (str):GRDMのURL (e.g. http://163.220.176.50)
+            base_url (str):GRDMのURL (e.g. https://rdm.nii.ac.jp)
             token (str): パーソナルアクセストークン
             project_id (str): プロジェクトID
 
@@ -247,7 +247,7 @@ class Grdm():
         """ プロジェクトのメンバー一覧のURLを返すメソッドです。
 
         Args:
-            base_url (str):GRDMのURL (e.g. http://163.220.176.50)
+            base_url (str):GRDMのURL (e.g. https://rdm.nii.ac.jp)
             project_id (str): プロジェクトID
 
         Returns:

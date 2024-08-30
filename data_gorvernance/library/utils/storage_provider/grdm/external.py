@@ -25,17 +25,17 @@ class External:
         """ API用のURLを作成する
 
         Args:
-            base_url (str): GRDMのURL (e.g. http://163.220.176.50)
+            base_url (str): GRDMのURL (e.g. https://rdm.nii.ac.jp)
             endpoint (str): APIのエンドポイント(デフォルト値は'')
 
         Returns:
             str: base path
 
         Examples:
-            >>> build_api_base_url('http://163.220.176.50')
-            'http://163.220.176.50/v2/'
-            >>> build_api_base_url('http://163.220.176.50', '/users/me/')
-            'http://163.220.176.50/v2/users/me/'
+            >>> build_api_base_url('https://rdm.nii.ac.jp')
+            'https://rdm.nii.ac.jp/v2/'
+            >>> build_api_base_url('https://rdm.nii.ac.jp', '/users/me/')
+            'https://rdm.nii.ac.jp/v2/users/me/'
         """
         parsed = parse.urlparse(base_url)
         netloc = f'api.{parsed.netloc}'
@@ -53,7 +53,7 @@ class External:
         """ OAuthのAPI用のURLを作成する
 
         Args:
-            base_url (str): GRDMのURL (e.g.  http://163.220.176.50)
+            base_url (str): GRDMのURL (e.g.  https://rdm.nii.ac.jp)
             endpoint (str): APIのエンドポイント(デフォルト値は'')
 
         Returns:
@@ -68,7 +68,7 @@ class External:
         """ https://accounts.rdm.nii.ac.jp/oauth2/profile
 
         Args:
-            base_url (str): GRDMのURL (e.g.  http://163.220.176.50)
+            base_url (str): GRDMのURL (e.g.  https://rdm.nii.ac.jp)
             token (str): パーソナルアクセストークン
 
         Returns:
@@ -95,10 +95,10 @@ class External:
     def get_user_info(self, base_url: str, token: str) -> dict:
         """ tokenで指定したユーザーの情報を取得する
 
-       http://163.220.176.50/v2/users/me/
+       https://rdm.nii.ac.jp/v2/users/me/
 
         Args:
-            base_url (str): GRDMのURL (e.g.  http://163.220.176.50)
+            base_url (str): GRDMのURL (e.g.  https://rdm.nii.ac.jp)
             token (str): パーソナルアクセストークン
 
         Raises:
@@ -123,10 +123,10 @@ class External:
         return response.json()
 
     def get_projects(self, base_url: str, token: str) -> dict:
-        """ http://163.220.176.50/v2/nodes/
+        """ https://rdm.nii.ac.jp/v2/nodes/
 
         Args:
-            base_url (str): GRDMのURL (e.g. http://163.220.176.50)
+            base_url (str): GRDMのURL (e.g. https://rdm.nii.ac.jp)
             token (str): パーソナルアクセストークン
 
         Returns:
@@ -153,10 +153,10 @@ class External:
     def get_project_registrations(self, base_url: str, token: str, project_id: str) -> dict:
         """ プロジェクトメタデータを取得する
 
-        http://163.220.176.50/v2/nodes/{project_id}/registrations
+        https://rdm.nii.ac.jp/v2/nodes/{project_id}/registrations
 
         Args:
-            base_url (str): GRDMのURL (e.g. http://163.220.176.50)
+            base_url (str): GRDMのURL (e.g. https://rdm.nii.ac.jp)
             token (str): パーソナルアクセストークン
             project_id (str): プロジェクトID
 
@@ -191,10 +191,10 @@ class External:
     def get_project_collaborators(self, base_url: str, token: str, project_id: str) -> dict:
         """ プロジェクトメンバーの情報を取得する
 
-        http://163.220.176.50/v2/nodes/{project_id}/contributors/
+        https://rdm.nii.ac.jp/v2/nodes/{project_id}/contributors/
 
         Args:
-            base_url (str): GRDMのURL (e.g.  http://163.220.176.50)
+            base_url (str): GRDMのURL (e.g.  https://rdm.nii.ac.jp)
             token (str): パーソナルアクセストークン
             project_id (str): プロジェクトID
 
@@ -234,7 +234,7 @@ class External:
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
-            base_url (str): GRDMのURL (e.g.  http://163.220.176.50)
+            base_url (str): GRDMのURL (e.g.  https://rdm.nii.ac.jp)
             project_id (str): プロジェクトID
             source (str): 保存元パス
             destination (str): 保存先パス
@@ -294,7 +294,7 @@ class External:
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
-            base_url (str): GRDMのURL (e.g.  http://163.220.176.50)
+            base_url (str): GRDMのURL (e.g.  https://rdm.nii.ac.jp)
             project_id (str): プロジェクトID
             remote_path (str): ファイルパス
             base_path (str): ファイルを探すディレクトリのパス

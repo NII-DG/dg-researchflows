@@ -110,7 +110,7 @@ class Grdm():
         data = response['data']
         return {d['id']: d['attributes']['title'] for d in data}
 
-    def sync(self, token: str, base_url: str, project_id: str, abs_source: str, abs_root: str = "/home/jovyan"):
+    def sync(self, token: str, base_url: str, project_id: str, abs_source: str, abs_root: str = "/home/jovyan") -> None:
         """ GRDMにアップロードするメソッドです。
 
         abs_source は絶対パスでなければならない。

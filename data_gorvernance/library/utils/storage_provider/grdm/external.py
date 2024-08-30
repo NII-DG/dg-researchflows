@@ -229,7 +229,7 @@ class External:
     def upload(
         self, token: str, base_url: str, project_id: str, source: str,
         destination: str, recursive: bool = False, force: bool = False
-    ):
+    ) -> None:
         """ ファイルまたはフォルダをアップロードするメソッドです。
 
         Args:

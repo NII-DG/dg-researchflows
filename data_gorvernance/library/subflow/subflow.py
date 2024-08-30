@@ -173,7 +173,7 @@ class SubFlowManager:
                 break
 
     def change_id(self, task: SubflowTask) -> None:
-        """ diagファイルのタスクIDをタスクタイトルに置き換えるメソッドです。
+        """diagファイルのタスクIDをタスクタイトルに置き換えるメソッドです。
 
         Args:
             task (SubflowTask): タスクIDをタスクタイトルに置き換えるタスクを設定します。

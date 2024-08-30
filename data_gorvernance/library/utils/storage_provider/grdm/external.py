@@ -4,8 +4,8 @@
 ファイルまたはフォルダをアップロードするメソッドやファイルの内容を取得するメソッドがあります。
 """
 from http import HTTPStatus
-import os
 import json
+import os
 from typing import Optional
 from urllib import parse
 
@@ -25,17 +25,17 @@ class External:
         """ API用のURLを作成する
 
         Args:
-            base_url (str): GRDMのURL (e.g. https://rcos.rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g. http://163.220.176.50)
             endpoint (str): APIのエンドポイント(デフォルト値は'')
 
         Returns:
             str: base path
 
         Examples:
-            >>> build_api_base_url('https://rcos.rdm.nii.ac.jp')
-            'https://rcos.rdm.nii.ac.jp/v2/'
-            >>> build_api_base_url('https://rcos.rdm.nii.ac.jp', '/users/me/')
-            'https://rcos.rdm.nii.ac.jp/v2/users/me/'
+            >>> build_api_base_url('http://163.220.176.50')
+            'http://163.220.176.50/v2/'
+            >>> build_api_base_url('http://163.220.176.50', '/users/me/')
+            'http://163.220.176.50/v2/users/me/'
         """
         parsed = parse.urlparse(base_url)
         netloc = f'api.{parsed.netloc}'
@@ -53,7 +53,7 @@ class External:
         """ OAuthのAPI用のURLを作成する
 
         Args:
-            base_url (str): GRDMのURL (e.g.  https://rcos.rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g.  http://163.220.176.50)
             endpoint (str): APIのエンドポイント(デフォルト値は'')
 
         Returns:
@@ -68,7 +68,7 @@ class External:
         """ https://accounts.rdm.nii.ac.jp/oauth2/profile
 
         Args:
-            base_url (str): GRDMのURL (e.g.  https://rcos.rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g.  http://163.220.176.50)
             token (str): パーソナルアクセストークン
 
         Raises:
@@ -92,10 +92,10 @@ class External:
     def get_user_info(self, base_url: str, token: str):
         """ tokenで指定したユーザーの情報を取得する
 
-        https://api.rdm.nii.ac.jp/v2/users/me/
+       http://163.220.176.50/v2/users/me/
 
         Args:
-            base_url (str): GRDMのURL (e.g.  https://rcos.rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g.  http://163.220.176.50)
             token (str): パーソナルアクセストークン
 
         Raises:
@@ -120,10 +120,10 @@ class External:
         return response.json()
 
     def get_projects(self, base_url: str, token: str):
-        """ https://api.rdm.nii.ac.jp/v2/nodes/
+        """ http://163.220.176.50/v2/nodes/
 
         Args:
-            base_url (str): GRDMのURL (e.g. https://rcos.rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g. http://163.220.176.50)
             token (str): パーソナルアクセストークン
 
         Raises:
@@ -131,7 +131,7 @@ class External:
             requests.exceptions.RequestException: その他の通信エラー
         """
         sub_url = 'v2/nodes/'
-        api_url = base_url + sub_url
+        api_url = self.build_api_url(base_url, sub_url)
         headers = {
             'Authorization': 'Bearer {}'.format(token)
         }
@@ -147,10 +147,10 @@ class External:
     def get_project_registrations(self, base_url: str, token: str, project_id: str):
         """ プロジェクトメタデータを取得する
 
-        https://rcos.rdm.nii.ac.jp/v2/nodes/{project_id}/registrations
+        http://163.220.176.50/v2/nodes/{project_id}/registrations
 
         Args:
-            base_url (str): GRDMのURL (e.g. https://rcos.rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g. http://163.220.176.50)
             token (str): パーソナルアクセストークン
             project_id (str): プロジェクトID
 
@@ -182,10 +182,10 @@ class External:
     def get_project_collaborators(self, base_url: str, token: str, project_id: str):
         """ プロジェクトメンバーの情報を取得する
 
-        https://api.rdm.nii.ac.jp/v2/nodes/{project_id}/contributors/
+        http://163.220.176.50/v2/nodes/{project_id}/contributors/
 
         Args:
-            base_url (str): GRDMのURL (e.g.  https://rcos.rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g.  http://163.220.176.50)
             token (str): パーソナルアクセストークン
             project_id (str): プロジェクトID
 
@@ -221,7 +221,7 @@ class External:
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
-            base_url (str): GRDMのURL (e.g.  https://rcos.rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g.  http://163.220.176.50)
             project_id (str): プロジェクトID
             source (str): 保存元パス
             destination (str): 保存先パス
@@ -280,7 +280,7 @@ class External:
 
         Args:
             token (str): GRDMのパーソナルアクセストークン
-            base_url (str): GRDMのURL (e.g.  https://rcos.rdm.nii.ac.jp)
+            base_url (str): GRDMのURL (e.g.  http://163.220.176.50)
             project_id (str): プロジェクトID
             remote_path (str): ファイルパス
             base_path (str): ファイルを探すディレクトリのパス

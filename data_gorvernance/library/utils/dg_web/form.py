@@ -14,8 +14,14 @@ from library.utils.widgets import MessageBox, Button
 
 # (vertical, horizontal)
 # (top, right, bottom, and left)
-margin = (0, 15, 5, 15)
+margin = (0, 15, 5, 10)
 
+p_style = """
+p {
+    margin-block-start: 0.5em;
+    margin-block-end: 0.5em;
+}
+"""
 
 class TextInput(pn.widgets.TextInput):
     """ テキスト入力ウィジェットのクラスです。
@@ -118,11 +124,12 @@ class Title(pn.pane.Markdown):
 
     """
 
-    def __init__(self, obj: Optional[str] = None, **params: Any) -> None:
+    def __init__(self, obj: Optional[str] = None, is_root_call:bool = False, **params: Any) -> None:
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
             obj(str|None): Markdownを含む文字列を設定します。
+            is_root_call(bool): この呼び出し元が再帰的な呼び出しのルートであるかどうかを示します。
             **params(dict): pn.pane.Markdownのその他のパラメータを設定します。
 
         """
@@ -130,8 +137,9 @@ class Title(pn.pane.Markdown):
             self.schema_key = params.pop('schema_key')
         if "margin" not in params:
             params["margin"] = (10, 10, 0, 10)
-        if obj:
-            obj = "### " + obj
+        if is_root_call:
+            params["styles"] = {'font-size': "18px"}
+        params["stylesheets"] = [p_style]
         super().__init__(object=obj, **params)
 
     def set_text(self, text: str) -> None:
@@ -164,7 +172,8 @@ class Description(pn.pane.Markdown):
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
         if "margin" not in params:
-            params["margin"] = (0, 10, 0, 20)
+            params["margin"] = (0, 10, 0, 10)
+        params["stylesheets"] = [p_style]
         super().__init__(object=obj, **params)
 
 
@@ -191,7 +200,7 @@ class Column(pn.Column):
         super().__init__(**params)
 
 
-class ArrayBox(pn.WidgetBox):
+class ArrayBox(pn.Column):
     """ 入力欄が増減する項目をまとめたクラスです。
 
     Attributes:
@@ -210,7 +219,7 @@ class ArrayBox(pn.WidgetBox):
         if 'schema_key' in params:
             self.schema_key = params.pop('schema_key')
         if "margin" not in params:
-            params["margin"] = 15
+            params["margin"] = (0, 15, 0, 10)
         super().__init__(**params)
 
 
@@ -273,10 +282,10 @@ class Form:
             value = None
             if isinstance(data, dict):
                 value = data.get(key, {})
-            self.form_box.append(self._generate_widget(properties, key, value))
+            self.form_box.append(self._generate_widget(properties, key, value, is_root_call=True))
 
     def _generate_widget(
-        self, definition: dict, key: str, value: Optional[dict] = None
+        self, definition: dict, key: str, value: Optional[dict] = None, is_root_call: bool = False
     ) -> Union[ArrayBox, ObjectBox, Column]:
         """jsonschemaの設定値からpanelのwidgetを作成するメソッドです。
 
@@ -284,6 +293,7 @@ class Form:
             definition (dict): jsonschemaのkeyに対する定義部分. property value.
             key (str): jsonschemaのproperty key
             value (dict|None): keyに対する初期値を設定します。初期値が存在しない場合はNoneを指定します。
+            is_root_call (bool): この呼び出し元が再帰的な呼び出しのルートであるかどうかを示します。
 
         Returns:
             form (ArrayBox | ObjectBox | Column): 渡されたkeyに対する入力欄を返す。
@@ -302,13 +312,17 @@ class Form:
             else:
                 widget = Select(schema_key=key, options=options)
         elif definition.get("type") == "array":
-            return self._generate_array_widget(
+            widget = self._generate_array_widget(
                 definition=definition, title=title, key=key, values=value
             )
+            widget.insert(0, Title(title, schema_key=key, is_root_call=is_root_call))
+            return widget
         elif definition.get("type") == "object":
-            return self._generate_object_widget(
+            widget = self._generate_object_widget(
                 definition=definition, title=title, key=key, values=value
             )
+            widget.insert(0, Title(title, schema_key=key, is_root_call=is_root_call))
+            return widget
         elif definition.get("type") == "number":
             if isinstance(value, int):
                 widget = IntInput(schema_key=key, value=value)
@@ -322,7 +336,7 @@ class Form:
             form.append(widget)
             description = definition.get("description")
             if description is not None:
-                form.append(Description(description, schema_key=key))
+                form.append(pn.Row(pn.Spacer(width=17), Description(description, schema_key=key)))
             return form
         elif "string" in definition.get("type", ""):
             if isinstance(value, str):
@@ -357,7 +371,6 @@ class Form:
 
         """
         obj_box = ObjectBox(schema_key=key)
-        obj_box.append(Title(title, schema_key=key))
         description = definition.get("description")
         if description is not None:
             obj_box.append(Description(description, schema_key=key))
@@ -385,7 +398,6 @@ class Form:
 
         """
         box = ArrayBox(schema_key=key)
-        box.append(Title(title, schema_key=key))
         description = definition.get("description")
         if description is not None:
             box.append(Description(description, schema_key=key))
@@ -409,7 +421,10 @@ class Form:
             if items.get("type") == "object":
                 return pn.Row(widget, create_remove_button(widget))
             else:
-                return pn.Row(widget, create_remove_button(widget, align='end'))
+                row =  pn.Row(widget, create_remove_button(widget, align='end'))
+            itembox = pn.WidgetBox(margin=(0, 0, 10, 20))
+            itembox.append(row)
+            return itembox
 
         def create_remove_button(widget: Union[ArrayBox, ObjectBox, Column], align: str = 'start') -> Button:
             """ arrayの選択した要素を削除するボタンを生成するメソッドです。
@@ -422,7 +437,8 @@ class Form:
                 Button: 生成した削除ボタンを返す。
 
             """
-            remove_button = Button(name='Remove', button_type='danger', button_style='outline', align=align)
+            remove_button = Button(
+                name='削除', button_type='danger', button_style='outline', align=align)
 
             def remove_item(event: Any) -> None:
                 """ ウィジェットを削除するメソッドです。
@@ -478,8 +494,13 @@ class Form:
                 column.append(create_items(value))
 
         box.append(column)
-
-        add_button = Button(name='Add', button_type='primary', button_style='outline')
+        button_css ="""
+        .bk-btn.bk-btn-primary {
+            color: #357ebd !important;
+        }
+        """
+        add_button = Button(name='追加', button_type='primary',
+                            button_style='outline', stylesheets=[button_css])
         add_button.on_click(add_item)
         box.append(add_button)
 
@@ -623,7 +644,10 @@ class Form:
                 continue
             # Columnがあったら値を取得する
             for row in w.objects:
-                target = row[0]
+                if isinstance(row, pn.Row):
+                    target = row[0]
+                else:
+                    target = row[0][0]
                 data = self._get_property(target, items)
                 for v in data.values():
                     value.append(v)

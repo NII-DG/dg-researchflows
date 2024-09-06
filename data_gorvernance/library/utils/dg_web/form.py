@@ -149,7 +149,7 @@ class Title(pn.pane.Markdown):
             text (str): タイトルのテキストを設定します。
 
         """
-        self.obj = f"### {text}"
+        self.object = text
 
 
 class Description(pn.pane.Markdown):
@@ -455,7 +455,7 @@ class Form:
                     # 指定されたwidgetを削除
                     index = 0
                     for i, obj in enumerate(objects):
-                        now = obj[0]
+                        now = obj[0][0]
                         if now == widget:
                             index = i
                             break
@@ -464,7 +464,7 @@ class Form:
                     # TODO: value_inputが引き継げていない
                     for i, row in enumerate(objects):
                         title_num = f'{title}{i + 1}'
-                        w = row[0]
+                        w = row[0][0]
                         if isinstance(w, pn.Column) or isinstance(w, pn.WidgetBox):
                             wb_list = w.objects
                             wb_list[0].set_text(title_num)

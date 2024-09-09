@@ -124,7 +124,7 @@ class Title(pn.pane.Markdown):
 
     """
 
-    def __init__(self, obj: Optional[str] = None, is_root_call:bool = False, **params: Any) -> None:
+    def __init__(self, obj: Optional[str] = None, is_root_call: bool = False, **params: Any) -> None:
         """ クラスのインスタンス初期化処理を実行するメソッドです。
 
         Args:
@@ -141,15 +141,6 @@ class Title(pn.pane.Markdown):
             params["styles"] = {'font-size': "18px"}
         params["stylesheets"] = [p_style]
         super().__init__(object=obj, **params)
-
-    def set_text(self, text: str) -> None:
-        """ タイトルを設定するメソッドです。
-
-        Args:
-            text (str): タイトルのテキストを設定します。
-
-        """
-        self.object = text
 
 
 class Description(pn.pane.Markdown):
@@ -312,17 +303,13 @@ class Form:
             else:
                 widget = Select(schema_key=key, options=options)
         elif definition.get("type") == "array":
-            widget = self._generate_array_widget(
-                definition=definition, title=title, key=key, values=value
+            return self._generate_array_widget(
+                definition=definition, title=title, key=key, values=value, is_root_call=is_root_call
             )
-            widget.insert(0, Title(title, schema_key=key, is_root_call=is_root_call))
-            return widget
         elif definition.get("type") == "object":
-            widget = self._generate_object_widget(
-                definition=definition, title=title, key=key, values=value
+            return self._generate_object_widget(
+                definition=definition, title=title, key=key, values=value, is_root_call=is_root_call
             )
-            widget.insert(0, Title(title, schema_key=key, is_root_call=is_root_call))
-            return widget
         elif definition.get("type") == "number":
             if isinstance(value, int):
                 widget = IntInput(schema_key=key, value=value)
@@ -357,7 +344,7 @@ class Form:
 
         return form
 
-    def _generate_object_widget(self, definition: dict, title: str, key: str, values: dict) -> ObjectBox:
+    def _generate_object_widget(self, definition: dict, title: str, key: str, values: dict, is_root_call: bool = False) -> ObjectBox:
         """type: objectをwidgetbox化するメソッドです。
 
         Args:
@@ -365,12 +352,14 @@ class Form:
             title (str): keyに対応する表示名を設定します。
             key (str): schemaのkeyを設定します。
             values (dict): keyに対する初期値を設定します。
+            is_root_call (bool): この呼び出し元が再帰的な呼び出しのルートであるかどうかを示します。
 
         Returns:
             obj_box (ObjectBox): 渡されたkeyに対する入力欄を返す。
 
         """
         obj_box = ObjectBox(schema_key=key)
+        obj_box.append(Title(title, schema_key=key, is_root_call=is_root_call))
         description = definition.get("description")
         if description is not None:
             obj_box.append(Description(description, schema_key=key))
@@ -384,7 +373,7 @@ class Form:
             obj_box.append(self._generate_widget(properties, i_key, value))
         return obj_box
 
-    def _generate_array_widget(self, definition: dict, title: str, key: str, values: Any) -> ArrayBox:
+    def _generate_array_widget(self, definition: dict, title: str, key: str, values: Any, is_root_call: bool = False) -> ArrayBox:
         """type: arrayをwidgetbox化するメソッドです。
 
         Args:
@@ -392,12 +381,14 @@ class Form:
             title (str): keyに対応する表示名を設定します。
             key (str): schemaのkeyを設定します。
             values (Any): keyに対する初期値を設定します。
+            is_root_call (bool): この呼び出し元が再帰的な呼び出しのルートであるかどうかを示します。
 
         Returns:
             box (ArrayBox): 渡されたkeyに対する入力欄を返す。
 
         """
         box = ArrayBox(schema_key=key)
+        box.append(Title(title, schema_key=key, is_root_call=is_root_call))
         description = definition.get("description")
         if description is not None:
             box.append(Description(description, schema_key=key))
@@ -467,7 +458,7 @@ class Form:
                         w = row[0][0]
                         if isinstance(w, pn.Column) or isinstance(w, pn.WidgetBox):
                             wb_list = w.objects
-                            wb_list[0].set_text(title_num)
+                            wb_list[0].object = title_num
                             w.clear()
                             w.extend(wb_list)
                         column.append(row)

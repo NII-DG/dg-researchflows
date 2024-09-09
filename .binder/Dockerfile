@@ -53,6 +53,7 @@ RUN pip install --no-cache gitpython==3.1.43
 RUN pip install --no-cache git+https://github.com/RCOSDP/rdmclient.git@master
 RUN pip install --no-cache git+https://github.com/NII-DG/nii-dg.git@230419_8c684da
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-packager.git@master
+
 # TODO: リリース時にはdg-drawerのブランチを変更する(@Rel20230929のようにする)
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-drawer.git@develop/Rel_V2.0
 
@@ -62,7 +63,7 @@ RUN jupyter nbextensions_configurator enable --user
 RUN jupyter nbextension enable codefolding/main
 
 # TODO: リリース時にはdg_Jupyter-LC_run_throughのタグを変更する(@Rel20230929のようにする)
-RUN pip install --no-cache git+https://github.com/NII-DG/dg_Jupyter-LC_run_through.git@20240216
+RUN pip install --no-cache git+https://github.com/NII-DG/dg_Jupyter-LC_run_through.git@20240909
 RUN jupyter run-through quick-setup --user
 
 RUN pip install --no-cache git+https://github.com/NII-DG/dg_Jupyter-multi_outputs.git@master

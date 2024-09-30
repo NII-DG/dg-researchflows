@@ -1,4 +1,4 @@
-""" 設定ファイルからメッセージを取得するためのモジュールです。"""
+""" 設定ファイルから接続先を取得するためのモジュールです。"""
 import os
 
 from .config_parser_base import ConfigParserBase
@@ -12,13 +12,13 @@ class Connect(ConfigParserBase):
 
 
 def get(section: str, option: str) -> str:
-    """ メッセージを取得する関数です。
+    """ 接続先を取得する関数です。
 
     Args:
         section (str): connect.iniのセクションを設定します。
         option (str): connect.iniのキーを設定します。
     Returns:
-        str: メッセージを返す。
+        str: 接続先を返す。
     """
     config = Connect(connect_ini_path)
     return config.get(section, option)

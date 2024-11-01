@@ -90,11 +90,9 @@ class SubflowMenu(TaskLog):
             font_folder(Path):フォントフォルダー
         """
         with TemporaryDirectory() as workdir:
-            tmp_diag = Path(workdir) / 'skeleton.diag'
             skeleton = Path(workdir) / 'skeleton.svg'
             subflow.generate(
                 svg_path=str(skeleton),
-                tmp_diag=str(tmp_diag),
                 font=str(font_folder / '.fonts/ipag.ttf')
             )
             self.diagram.object = self._get_contents(str(skeleton))

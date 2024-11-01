@@ -3,6 +3,7 @@ from library.utils.file import JsonFile
 
 
 _IS_COMPLETED = 'is_completed'
+_ORDER = 'order'
 _TASKS = 'tasks'
 
 
@@ -48,6 +49,7 @@ class SubflowTask:
     __STATUS = 'status'
     __EXECUTION_ENVIRONMENTS = 'execution_environments'
     __DISABLED = 'disabled'
+    __ACTIVE = 'active'
 
     STATUS_UNFEASIBLE = "unfeasible"
     STATUS_UNEXECUTED = "unexecuted"
@@ -57,7 +59,7 @@ class SubflowTask:
 
     def __init__(
         self, id: str, name: str, is_multiple: bool, is_required: bool, completed_count: int,
-        dependent_task_ids: list[str], status: str, execution_environments: list[str], disabled: bool
+        dependent_task_ids: list[str], status: str, execution_environments: list[str], disabled: bool, active: bool
     ) -> None:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
@@ -82,6 +84,7 @@ class SubflowTask:
         self._set_status(status)
         self._execution_environments = execution_environments
         self._disable = disabled
+        self._active = active
 
     def _set_status(self, status: str):
         """ステータスの設定を行うメソッドです。
@@ -221,6 +224,27 @@ class SubflowTask:
         """
         return self._execution_environments
 
+    @property
+    def active(self) -> bool:
+        """タスクの表示、非表示を切り替えるフラグを取得するためのゲッターです。
+
+        Returns:
+            bool:タスクの表示、非表示を切り替えるフラグ
+
+        """
+        return self._execution_environments
+
+    @active.setter
+    def active(self, is_active: bool):
+        """使用不可の状態とするためのフラグを設定するためのセッターです。
+
+        Args:
+            is_disable (bool):_disableにセットする値
+
+        """
+        self._active = is_active
+
+
     def to_dict(self) -> dict[str, any]:
         """インスタンスが保持しているデータを辞書型のデータに変換するメソッドです。
 
@@ -237,7 +261,8 @@ class SubflowTask:
             self.__DEPENDENT_TASK_IDS: self._dependent_task_ids,
             self.__STATUS: self._status,
             self.__EXECUTION_ENVIRONMENTS: self._execution_environments,
-            self.__DISABLED: self._disable
+            self.__DISABLED: self._disable,
+            self.__ACTIVE: self._active
         }
 
 
@@ -251,7 +276,7 @@ class SubflowStatus:
 
     """
 
-    def __init__(self, is_completed: bool, tasks: list[dict]) -> None:
+    def __init__(self, is_completed: bool, order, tasks: list[dict]) -> None:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
         Args:
@@ -260,6 +285,7 @@ class SubflowStatus:
 
         """
         self._is_completed = is_completed
+        self._order = order
         self._tasks = [SubflowTask(**task) for task in tasks]
 
     @property
@@ -271,6 +297,16 @@ class SubflowStatus:
 
         """
         return self._is_completed
+
+    @property
+    def order(self) -> dict:
+        """サブフロータスクの表示順を取得するためのゲッターです。
+
+        Returns:
+            dict:サブフロータスクの表示順の定義
+
+        """
+        return self._order
 
     @property
     def tasks(self) -> list[SubflowTask]:
@@ -407,7 +443,7 @@ class SubflowStatusFile(JsonFile):
 
         """
         content = super().read()
-        return SubflowStatus(content[_IS_COMPLETED], content[_TASKS])
+        return SubflowStatus(content[_IS_COMPLETED], content[_ORDER], content[_TASKS])
 
     def write(self, subflow_status: SubflowStatus):
         """ジェイソンファイルへの書き込みを行うメソッドです。

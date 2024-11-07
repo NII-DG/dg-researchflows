@@ -1,7 +1,7 @@
 {
     "is_completed": false,
     "order": {
-        "sequence": ["RF002003", "RF009006"],
+        "sequence": ["RF009006", "RF002003"],
         "whenever":["RF009004", "RF009002", "RF009007", "RF009001", "RF009005"]
     },
     "tasks": [

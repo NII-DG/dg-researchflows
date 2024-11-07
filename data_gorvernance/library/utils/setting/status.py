@@ -232,7 +232,7 @@ class SubflowTask:
             bool:タスクの表示、非表示を切り替えるフラグ
 
         """
-        return self._execution_environments
+        return self._active
 
     @active.setter
     def active(self, is_active: bool):

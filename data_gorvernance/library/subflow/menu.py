@@ -77,24 +77,23 @@ class SubflowMenu(TaskLog):
     # 各要素の設定
     def _set_width(self):
         """フロー図の大きさをもとにwidgetboxの大きさを統一するメソッドです。"""
-        d = self.diagram.width + 20
+        d = self.diagram.width + 160
         self.menu_widgetbox.width = d
         self.diagram_widgetbox.width = d
         self._msg_output = d
 
-    def set_diagram(self, subflow: SubFlowManager, font_folder: Path):
+    def set_diagram(self, subflow: SubFlowManager):
         """フロー図の生成と表示設定のメソッドです。
 
         Args:
             subflow(SubFlowManager):サブフロー図
-            font_folder(Path):フォントフォルダー
+
         """
         with TemporaryDirectory() as workdir:
             skeleton = Path(workdir) / 'skeleton.svg'
-            subflow.generate(
-                svg_path=str(skeleton),
-                font=str(font_folder / '.fonts/ipag.ttf')
-            )
+            #フロー図の作成
+            subflow.generate(svg_path=str(skeleton))
+
             self.diagram.object = self._get_contents(str(skeleton))
             self.diagram.width = self._get_svg_size(str(skeleton))
             self._set_width()
@@ -130,8 +129,8 @@ class SubflowMenu(TaskLog):
         if viewbox_value:
             viewbox_parts = viewbox_value.split()
             if len(viewbox_parts) == 4:
-                viewbox_width = int(viewbox_parts[2])
-                viewbox_height = int(viewbox_parts[3])
+                viewbox_width = int(float(viewbox_parts[2]))
+                viewbox_height = int(float(viewbox_parts[3]))
         # 大きさを調節
         if 800 < viewbox_width:
             viewbox_width = 800
@@ -165,22 +164,18 @@ class SubflowMenu(TaskLog):
 
         # create path
         status_file = parent / path_config.STATUS_JSON
-        diag_file = (
-            root_folder / path_config.DG_SUB_FLOW_BASE_DATA_FOLDER
-            / subflow_type / path_config.FLOW_DIAG
-        )
         using_task_dir = (
             root_folder / path_config.DG_WORKING_RESEARCHFLOW_FOLDER
             / subflow_rel_path / path_config.TASK
         )
         souce_task_dir = root_folder / path_config.DG_TASK_BASE_DATA_FOLDER
-        font_folder = Path(os.environ['HOME'])
+
 
         try:
             # setup
-            subflow = SubFlowManager(str(parent), str(status_file), str(diag_file), str(using_task_dir))
+            subflow = SubFlowManager(str(parent), str(status_file), str(using_task_dir))
             subflow.setup_tasks(str(souce_task_dir))
-            subflow_menu.set_diagram(subflow, font_folder)
+            subflow_menu.set_diagram(subflow)
             subflow_menu.menu_widgetbox.append(subflow_menu.diagram_widgetbox)
         except Exception:
             message_box = MessageBox().update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')

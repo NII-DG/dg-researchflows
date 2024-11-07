@@ -1,5 +1,8 @@
 """ ダイアグラムの管理を行うモジュールです。"""
 import traceback
+import os
+import logging
+import subprocess
 
 from graphviz import Digraph
 
@@ -11,6 +14,7 @@ class DiagManager:
         class:
             node_attr(dict): 全てのノードで共通となる設定
         instance:
+            dot(Digraph): ダイアグラムの情報を保持するオブジェクト
             path(Path): ファイルのパス
             content(str): ファイルの内容
 
@@ -34,84 +38,63 @@ class DiagManager:
         self.dot = Digraph(format='svg', node_attr= self.node_attr)
         self.dot.attr(ranksep='0.4')
 
-        self.left_group = self.dot.subgraph(name='cluster_left')
-        self.left_group.attr(style='filled',color='#FFE6CC')
-
-        self.right_group = self.dot.subgraph(name='cluster_right')
-        self.right_group.attr()
-        self.right_group.edge_attr.update(style='invis')
-
-    def add_node(self, node_id: str, node_label: str, node_group):
+    def add_node(self, node_group, node_id: str, node_label: str, **kwargs):
         """新たにノードを追加するメソッドです。
 
         Args:
+            node_group(subgraph): ノードを追加するサブグラフのオブジェクト
             node_id (str): ノードIDを設定します。
             node_label (str): ノードの名前を設定します。
-            node_group(subgraph): ノードを追加するサブグラフのオブジェクト
+            **kwargs(dict): ノードに設定する情報
 
         """
-        node_group.node(node_id, node_label)
+        node_group.node(node_id, label=node_label, **kwargs)
 
-        node_list = self.left_group.body
-        if len(node_list) >= 2:
-            self.left_group.edge(node_list[-1].split(' ')[0] , node_id)
+        #ノードが複数ある場合、エッジを作成する。
+        node_list = node_group.body
+        node_lines = [line for line in node_list if 'label' in line]
+        if len(node_lines) >= 2:
+            prev_node_id = node_lines[-2].split(' ')[0].strip()  # ひとつ前のノードID
+            node_group.edge(prev_node_id, node_id)
 
-    def embed_url(self, node_id: str,url: str) -> None:
-        """ ノードにURLを埋め込むメソッドです。
+    def create_left_subgraph(self, tasks: list, node_config: dict):
+        """左側に配置される実行順の決まっているタスクのノード群を作成するメソッドです。
 
-        Args:
-            node_id (str): ノードIDを設定します。
-            url (str): 押下された際に遷移するノートブックのパス
-
-        """
-        self.dot.node(node_id, URL=url)
-
-    def update_node_color(self, node_id: str, color: str) -> None:
-        """ ノードの色を設定するメソッドです。
-
-        Args:
-            node_id (str): ノードIDを設定します。
-            color (str): 追加する色を設定します。
+        args:
+            tasks(list): 追加するノードの一覧
+            node_config(dict): ノードの設定に用いる情報
 
         """
-        self.dot.node(node_id, fontcolor='black', fillcolor=color )
+        with self.dot.subgraph(name='cluster_left') as left_group:
+            left_group.attr(style='filled', color='#FFE6CC')
+            for task in tasks:
+                kwargs = node_config[task]["task_parameter"]
+                self.add_node(left_group, task, node_config[task]['text'], **kwargs)
 
-    def update_node_icon(self, node_id: str, path: str) -> None:
-        """ ノードのアイコンを設定するメソッドです。
+    def create_right_subgraph(self, tasks: list, node_config: dict):
+        """右側に配置されるいつ実行しても構わないタスクのノード群を作成するメソッドです。
 
-        Args:
-            node_id (str): ノードIDを設定します。
-            path (str): アイコンのパスを設定します。
+        args:
+            tasks(list): 追加するノードの一覧
+            node_config(dict): ノードの設定に用いる情報
 
         """
-        self.dot.node(node_id, image = path)
+        with self.dot.subgraph(name='cluster_right') as right_group:
+            right_group.attr(style='invis')
+            right_group.edge_attr.update(style='invis')
+            for task in tasks:
+                kwargs = node_config[task]["task_parameter"]
+                self.add_node(right_group, task, node_config[task]['text'], **kwargs)
 
-    #def update_node_style(self, node_id: str, style: str) -> None:
-        #""" ノードのスタイルを設定するメソッドです。一回も呼び出されていない
-
-        #Args:
-            #node_id (str): ノードIDを設定します。
-            #style (str): 新しいスタイルを設定します。
-
-        #"""
-        #self.add_node_property(node_id, f'style={style}')
-
-    #def update_node_stacked(self, node_id: str) -> None:
-        #""" ノードの重ね合わせのメソッドです。代替案が出るまで放置
-
-        #Args:
-            #node_id (str): ノードIDを設定します。
-
-        #"""
-        #self.add_node_property(node_id, f'stacked')
-
-    def generate_svg(self, output: str, font: str) -> None:
+    def generate_svg(self, output: str) -> None:
         """ diagファイルからsvgファイルを生成するメソッドです。
 
         Args:
             output (str): 出力するパスを設定します。
-            font (str): フォントを設定します。
 
         """
-        self.dot.attr('node', fontname=str(font))
-        self.dot.render(output, cleanup=True)
+        svg_data = self.dot.pipe(format='svg').decode('utf-8')
+
+        with open(output, 'w', encoding='utf-8') as file:
+            file.write(svg_data)
+            print(svg_data)

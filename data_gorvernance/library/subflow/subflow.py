@@ -7,7 +7,7 @@ from nbformat import NO_CONVERT, read
 
 from library.utils import file
 from library.utils.config import path_config
-from library.utils.diagram import DiagManager, init_config, update_svg
+from library.utils.diagram import DiagManager, init_config
 from library.utils.setting import SubflowStatusFile, SubflowTask
 
 
@@ -24,7 +24,8 @@ class SubFlowManager:
             diag_file(str): ダイアグラムのファイルへのパス
             task_dir(str): タスクが格納されているディレクトリ
             diag(DiagManager): ダイアグラムを管理するインスタンス
-            svg_config(dict): SVGの設定用の辞書
+            node_config(dict): ダイアグラムのノード設定用の辞書
+            order(dict): サブフローのタスクの順序情報
 
     """
 
@@ -41,6 +42,23 @@ class SubFlowManager:
         self.tasks = SubflowStatusFile(status_file).read().tasks
         self.order = SubflowStatusFile(status_file).read().order
         self.task_dir = using_task_dir
+
+    def _init_node_config(self, id: str, name: str) -> dict:
+        """ 初期設定を行う関数です。
+
+        Args:
+            id (str): 識別子を設定します。
+            name (str): 名前を設定します。
+
+        Returns:
+            dict: 初期設定を含む辞書を返す。
+
+        """
+        return {
+            id: {
+                'name': name,
+            }
+        }
 
     def setup_tasks(self, souce_task_dir: str):
         """ タスクの原本があるディレクトリからタスクファイルをコピーするメソッドです。
@@ -84,21 +102,20 @@ class SubFlowManager:
                 if not os.path.isdir(destination_images):
                     os.symlink(source_images, destination_images, target_is_directory=True)
 
-    def generate(self, svg_path: str, font: str) -> None:
+    def generate(self, svg_path: str) -> None:
         """ ダイアグラムを生成するメソッドです。
 
         Args:
             svg_path (str): SVGファイルの出力パスを設定します。
-            font (str): ダイアグラムに使用するフォントを設定します。
 
         """
         self.diag = DiagManager()
-        self.svg_config = {}
+        self.node_config = {}
         for task in self.tasks:
-            self.svg_config.update(init_config(task.id, task.name))
+            self.node_config.update(self._init_node_config(task.id, task.name))
             self.parse_headers(task)
         self._update()
-        self.diag.generate_svg(svg_path, font)
+        self.diag.generate_svg(svg_path)
 
     def _update(self) -> None:
         """ タスクの状態に基づいてダイアグラムを更新するメソッドです。"""
@@ -107,46 +124,58 @@ class SubFlowManager:
         for task in self.tasks:
             if task.id in order_sequence:
                 #表示しない場合に何か処理するならここにelse
-                if task.active is True:
-                    self.diag.add_node(task.id, self.svg_config[task.id]['text'], self.diag.left_group)
+                if task.active:
                     self._adjust_by_status(task)
+                else:
+                    order_sequence.remove(task.id)
+        self.diag.create_left_subgraph(order_sequence, self.node_config)
 
-        #いつ実行しても構わないテスクの更新
-        order_sequence = self.order.get("whenever")
+        #いつ実行しても構わないタスクの更新
+        order_whenever = self.order.get("whenever")
         for task in self.tasks:
-            if task.id in order_sequence:
+            if task.id in order_whenever:
                 #表示しない場合に何か処理するならここにelse
-                if task.active is True:
-                    self.diag.add_node(task.id, self.svg_config[task.id]['text'], self.diag.left_group)
+                if task.active:
                     self._adjust_by_status(task)
+                else:
+                    order_whenever.remove(task.id)
+        self.diag.create_right_subgraph(order_whenever, self.node_config)
 
-    def _adjust_by_status(self, task: SubflowTask) -> None:
+    def _adjust_by_status(self, task: SubflowTask):
         """ フロー図の見た目をタスクの状態によって変えるメソッドです。
 
         Args:
             task (SubflowTask): 調整するタスクを設定します。
 
         """
-        #if task.is_multiple:
-        #   self.diag.update_node_stacked(task.id)
+        task_parameter = {}
 
         icon_dir = "../data/icon"
         icon_dir = os.path.abspath(os.path.join(script_dir, icon_dir))
         icon_dir = file.relative_path(icon_dir, self.current_dir)
 
+        if task.is_multiple:
+            self.node_config[task.id]["text"] += "　\U0001F501"
+
+
         if task.status == task.STATUS_UNFEASIBLE:
-            self.diag.update_node_color(task.id, "#e6e5e3")
-            self.diag.update_node_icon(task.id, icon_dir + "/lock.png")
-            return
+            task_parameter["fontcolor"] = 'black'
+            task_parameter["fillcolor"] = "#e6e5e3"
+            task_parameter["image"] = str(icon_dir + "/lock.png")#os.path.joinに直す
+            self.node_config[task.id]["task_parameter"] = task_parameter
 
         if task.status == task.STATUS_DONE:
-            self.diag.update_node_icon(task.id, icon_dir + "/check_mark.png")
-            self.svg_config[task.id]['path'] += "?init_nb=true"
+            task_parameter["image"] = str(icon_dir + "/check_mark.png")
+            self.node_config[task.id]['path'] += "?init_nb=true"
+
         elif task.status == task.STATUS_DOING:
-            self.diag.update_node_icon(task.id, icon_dir + "/loading.png")
+            task_parameter["image"] = str(icon_dir + "/loading.png")
 
         #実行不可以外のタスクにURLを埋め込む
-        self.diag.embed_url(task.id,  self.svg_config[task.id]['path'])
+        link = file.relative_path(
+            str(self.node_config[task.id]['path']), self.current_dir).replace("../", "./../")
+        task_parameter["URL"] = link
+        self.node_config[task.id]["task_parameter"] = task_parameter
 
     def parse_headers(self, task: SubflowTask) -> None:
         """ タスクタイトルとパスを取得するメソッドです。
@@ -178,6 +207,6 @@ class SubFlowManager:
             title = headers[0][0] if not headers[0][0].startswith(
                 'About:') else headers[0][0][6:]
             if task.name in str(nb_path):
-                self.svg_config[task.id]['path'] = str(nb_path)
-                self.svg_config[task.id]['text'] = title
+                self.node_config[task.id]['path'] = str(nb_path)
+                self.node_config[task.id]['text'] = title
                 break

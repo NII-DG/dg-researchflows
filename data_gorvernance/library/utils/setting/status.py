@@ -277,7 +277,7 @@ class SubflowStatus:
 
     """
 
-    def __init__(self, is_completed: bool, order, tasks: list[dict]) -> None:
+    def __init__(self, is_completed: bool, order: dict, tasks: list[dict]) -> None:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
         Args:
@@ -339,6 +339,7 @@ class SubflowStatus:
         """
         return {
             _IS_COMPLETED: self.is_completed,
+            _ORDER: self.order,
             _TASKS: [
                 con.to_dict() for con in self.tasks
             ]

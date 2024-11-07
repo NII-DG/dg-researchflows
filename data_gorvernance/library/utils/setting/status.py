@@ -272,6 +272,7 @@ class SubflowStatus:
     Attributes:
         instance:
             _is_completed(bool):サブフローが完了しているかの判定に用いるフラグ。初期値はfalseで必須タスクが全て完了した段階でtrueに更新
+            _order(dict): サブフロータスクの順序情報
             _tasks(list[SubflowTask]):サブフローの各タスクのステータスのリスト
 
     """
@@ -281,6 +282,7 @@ class SubflowStatus:
 
         Args:
             is_completed (bool):サブフローが完了しているかの判定に用いるフラグ
+            _order(dict): サブフロータスクの順序情報
             tasks (list[dict]):サブフローの各タスクのステータスのリスト
 
         """

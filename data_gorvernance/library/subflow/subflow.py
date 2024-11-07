@@ -7,7 +7,7 @@ from nbformat import NO_CONVERT, read
 
 from library.utils import file
 from library.utils.config import path_config
-from library.utils.diagram import DiagManager, init_config
+from library.utils.diagram import DiagManager
 from library.utils.setting import SubflowStatusFile, SubflowTask
 
 

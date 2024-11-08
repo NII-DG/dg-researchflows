@@ -1,8 +1,4 @@
 """ ダイアグラムの管理を行うモジュールです。"""
-import traceback
-import os
-import logging
-import subprocess
 
 from graphviz import Digraph
 

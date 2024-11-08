@@ -134,14 +134,14 @@ class SubflowMenu(TaskLog):
                 viewbox_height = int(float(viewbox_parts[3]))
 
         # 大きさを調節
-        if 400 < viewbox_width:
+        if 800 < viewbox_width:
             viewbox_width = 800
         elif viewbox_width < 200:
             viewbox_width = 200
 
-        viewbox_width = viewbox_width*1.33# pxに変換（DPIの影響を考慮できていない）
+        viewbox_width = viewbox_width*1.33 # フロー図が収まるように調節（サイズ変化に対応しきれていない）
 
-        return viewbox_width
+        return int(viewbox_width)
 
     @classmethod
     def render(cls, working_file: str):

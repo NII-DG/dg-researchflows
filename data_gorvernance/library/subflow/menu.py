@@ -77,7 +77,7 @@ class SubflowMenu(TaskLog):
     # 各要素の設定
     def _set_width(self):
         """フロー図の大きさをもとにwidgetboxの大きさを統一するメソッドです。"""
-        d = self.diagram.width + 160
+        d = self.diagram.width + 20
         self.menu_widgetbox.width = d
         self.diagram_widgetbox.width = d
         self._msg_output = d
@@ -122,6 +122,7 @@ class SubflowMenu(TaskLog):
         # SVGファイルをパース
         tree = ET.parse(svg_file_path)
         root = tree.getroot()
+
         # <svg>要素からviewBox属性を取得
         viewbox_value = root.get('viewBox')
         # viewbox_valueを解析して幅と高さを取得
@@ -131,11 +132,15 @@ class SubflowMenu(TaskLog):
             if len(viewbox_parts) == 4:
                 viewbox_width = int(float(viewbox_parts[2]))
                 viewbox_height = int(float(viewbox_parts[3]))
+
         # 大きさを調節
-        if 800 < viewbox_width:
+        if 400 < viewbox_width:
             viewbox_width = 800
         elif viewbox_width < 200:
             viewbox_width = 200
+
+        viewbox_width = viewbox_width*1.33# pxに変換（DPIの影響を考慮できていない）
+
         return viewbox_width
 
     @classmethod

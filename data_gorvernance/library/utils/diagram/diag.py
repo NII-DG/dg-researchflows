@@ -97,4 +97,3 @@ class DiagManager:
 
         with open(output, 'w', encoding='utf-8') as file:
             file.write(svg_data)
-            print(svg_data)

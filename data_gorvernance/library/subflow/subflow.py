@@ -128,7 +128,8 @@ class SubFlowManager:
                     self._adjust_by_status(task)
                 else:
                     order_sequence.remove(task.id)
-        self.diag.create_left_subgraph(order_sequence, self.node_config)
+        if order_sequence:
+            self.diag.create_left_subgraph(order_sequence, self.node_config)
 
         #いつ実行しても構わないタスクの更新
         order_whenever = self.order.get("whenever")
@@ -139,7 +140,8 @@ class SubFlowManager:
                     self._adjust_by_status(task)
                 else:
                     order_whenever.remove(task.id)
-        self.diag.create_right_subgraph(order_whenever, self.node_config)
+        if order_whenever:
+            self.diag.create_right_subgraph(order_whenever, self.node_config)
 
     def _adjust_by_status(self, task: SubflowTask):
         """ フロー図の見た目をタスクの状態によって変えるメソッドです。

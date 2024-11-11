@@ -16,7 +16,6 @@
             ],
             "status": "unfeasible",
             "execution_environments": [],
-            "disabled": false,
             "active": true
         },
         {
@@ -28,7 +27,6 @@
             "dependent_task_ids": [],
             "status": "unexecuted",
             "execution_environments": [],
-            "disabled": false,
             "active": true
         },
         {
@@ -40,7 +38,6 @@
             "dependent_task_ids": [],
             "status": "unexecuted",
             "execution_environments": [],
-            "disabled": false,
             "active": true
         },
         {
@@ -52,7 +49,6 @@
             "dependent_task_ids": [],
             "status": "unexecuted",
             "execution_environments": [],
-            "disabled": false,
             "active": true
         },
         {
@@ -64,7 +60,6 @@
             "dependent_task_ids": [],
             "status": "unexecuted",
             "execution_environments": [],
-            "disabled": false,
             "active": true
         },
         {
@@ -76,7 +71,6 @@
             "dependent_task_ids": [],
             "status": "unexecuted",
             "execution_environments": [],
-            "disabled": false,
             "active": true
         },
         {
@@ -88,7 +82,6 @@
             "dependent_task_ids": [],
             "status": "unexecuted",
             "execution_environments": [],
-            "disabled": false,
             "active": true
         }
     ]

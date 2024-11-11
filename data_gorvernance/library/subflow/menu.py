@@ -9,6 +9,7 @@ import traceback
 from typing import Callable
 import xml.etree.ElementTree as ET
 
+
 from IPython.core.display import Javascript
 from IPython.display import display
 import panel as pn
@@ -139,7 +140,10 @@ class SubflowMenu(TaskLog):
         elif viewbox_width < 200:
             viewbox_width = 200
 
-        viewbox_width = viewbox_width*1.33 # フロー図が収まるように調節（サイズ変化に対応しきれていない）
+        #表示領域のサイズ調整に用いる係数
+        scale_coefficient = 1.5
+
+        viewbox_width *= scale_coefficient # フロー図が収まるように調節
 
         return int(viewbox_width)
 

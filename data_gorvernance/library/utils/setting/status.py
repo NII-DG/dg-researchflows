@@ -20,7 +20,7 @@ class SubflowTask:
             __DEPENDENT_TASK_IDS(str):依存するタスクの機能IDのキー名
             __STATUS(str):実行状況のキー名
             __EXECUTION_ENVIRONMENTS(str):実行中の実行環境IDのリストのキー名
-            __DISABLED(str):使用不可の状態とするためのフラグのキー名
+            __ACTIVE(str):ガバナンスシートの値によってタスクの表示/非表示を切り替えるためのフラグ
 
             STATUS_UNFEASIBLE(str):実行状況（実行不可能）
             STATUS_UNEXECUTED(str):実行状況（未実行）
@@ -37,7 +37,7 @@ class SubflowTask:
             _dependent_task_ids (list[str]):依存するタスクの機能ID
             _status (str):実行状況
             _execution_environments (list[str]): 実行中の実行環境IDのリスト
-            _disabled (bool):使用不可の状態とするためのフラグ
+            _active (bool):ガバナンスシートの値によってタスクの表示/非表示を切り替えるためのフラグ
 
     """
     __ID = 'id'
@@ -48,7 +48,6 @@ class SubflowTask:
     __DEPENDENT_TASK_IDS = 'dependent_task_ids'
     __STATUS = 'status'
     __EXECUTION_ENVIRONMENTS = 'execution_environments'
-    __DISABLED = 'disabled'
     __ACTIVE = 'active'
 
     STATUS_UNFEASIBLE = "unfeasible"
@@ -59,7 +58,7 @@ class SubflowTask:
 
     def __init__(
         self, id: str, name: str, is_multiple: bool, is_required: bool, completed_count: int,
-        dependent_task_ids: list[str], status: str, execution_environments: list[str], disabled: bool, active: bool
+        dependent_task_ids: list[str], status: str, execution_environments: list[str], active: bool
     ) -> None:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
@@ -72,7 +71,7 @@ class SubflowTask:
             dependent_task_ids (list[str]):依存するタスクの機能ID
             status (str):実行状況
             execution_environments (list[str]): 実行中の実行環境IDのリスト
-            disabled (bool):使用不可の状態とするためのフラグ
+            active (bool):ガバナンスシートの値によってタスクの表示/非表示を切り替えるためのフラグ
 
         """
         self._id = id
@@ -83,7 +82,6 @@ class SubflowTask:
         self._dependent_task_ids = dependent_task_ids
         self._set_status(status)
         self._execution_environments = execution_environments
-        self._disable = disabled
         self._active = active
 
     def _set_status(self, status: str):
@@ -196,25 +194,6 @@ class SubflowTask:
         self._set_status(status)
 
     @property
-    def disable(self) -> bool:
-        """使用不可の状態とするためのフラグを取得するためのゲッターです。
-
-        Returns:
-            bool:使用不可の状態とするためのフラグ
-        """
-        return self._disable
-
-    @disable.setter
-    def disable(self, is_disable: bool):
-        """使用不可の状態とするためのフラグを設定するためのセッターです。
-
-        Args:
-            is_disable (bool):_disableにセットする値
-
-        """
-        self._disable = is_disable
-
-    @property
     def execution_environments(self) -> list[str]:
         """実行中の実行環境IDのリストを取得するためのゲッターです。
 
@@ -261,7 +240,6 @@ class SubflowTask:
             self.__DEPENDENT_TASK_IDS: self._dependent_task_ids,
             self.__STATUS: self._status,
             self.__EXECUTION_ENVIRONMENTS: self._execution_environments,
-            self.__DISABLED: self._disable,
             self.__ACTIVE: self._active
         }
 

@@ -123,7 +123,6 @@ class SubFlowManager:
         order_sequence = self.order.get("sequence")
         for task in self.tasks:
             if task.id in order_sequence:
-                #表示しない場合に何か処理するならここにelse
                 if task.active:
                     self._adjust_by_status(task)
                 else:
@@ -135,7 +134,6 @@ class SubFlowManager:
         order_whenever = self.order.get("whenever")
         for task in self.tasks:
             if task.id in order_whenever:
-                #表示しない場合に何か処理するならここにelse
                 if task.active:
                     self._adjust_by_status(task)
                 else:
@@ -159,19 +157,19 @@ class SubFlowManager:
         if task.is_multiple:
             self.node_config[task.id]["text"] += "　\U0001F501"
 
-
         if task.status == task.STATUS_UNFEASIBLE:
             task_parameter["fontcolor"] = 'black'
             task_parameter["fillcolor"] = "#e6e5e3"
-            task_parameter["image"] = str(icon_dir + "/lock.png")#os.path.joinに直す
+            task_parameter["image"] = os.path.join(icon_dir, "lock.png")
             self.node_config[task.id]["task_parameter"] = task_parameter
+            return
 
         if task.status == task.STATUS_DONE:
-            task_parameter["image"] = str(icon_dir + "/check_mark.png")
+            task_parameter["image"] = os.path.join(icon_dir, "check_mark.png")
             self.node_config[task.id]['path'] += "?init_nb=true"
 
         elif task.status == task.STATUS_DOING:
-            task_parameter["image"] = str(icon_dir + "/loading.png")
+            task_parameter["image"] = os.path.join(icon_dir, "loading.png")
 
         #実行不可以外のタスクにURLを埋め込む
         link = file.relative_path(

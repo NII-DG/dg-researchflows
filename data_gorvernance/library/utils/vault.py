@@ -34,10 +34,17 @@ def start_server():
     os.makedirs(dir_path, exist_ok=True)
     with open(os.path.join(dir_path, 'vault.log'), 'w') as file:
         process = subprocess.Popen(
-            ['vault', 'server', '-config', config_path],
+            ['setsid', 'vault', 'server', '-config', config_path],
             stdout=subprocess.DEVNULL,
             stderr=file
         )
+
+    # PIDを保存
+    pid_path = os.path.join(dir_path, 'vault.pid')
+    with open(pid_path, 'w') as pid_file:
+        pid_file.write(str(process.pid))
+
+    print(f"Vaultサーバーが起動しました。PID: {process.pid}")
 
 
 class Vault():

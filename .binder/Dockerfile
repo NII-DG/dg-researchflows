@@ -38,7 +38,6 @@ USER ${NB_USER}
 RUN pip install --no-cache --upgrade pip
 RUN pip install --no-cache notebook
 RUN pip install --no-cache lxml==4.7.1
-RUN pip install --no-cache blockdiag==3.0.0
 RUN pip install --no-cache -U nbformat==5.2.0
 RUN pip install --no-cache black==21.12b0
 RUN pip install --no-cache boto3

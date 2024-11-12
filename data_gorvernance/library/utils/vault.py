@@ -16,6 +16,7 @@ from typing import Optional
 
 VAULT_ADDR = 'http://127.0.0.1:8200'
 TOKEN_PATH = '/home/jovyan/.vault/token'
+UNSEAL_KEY_PATH = '/home/jovyan/.vault/unseal_key'
 DG_ENGINE_NAME = 'dg-kv'
 DG_POLICY_NAME = 'dg-policy'
 DG_POLICY = '''\
@@ -152,9 +153,15 @@ class Vault():
         for index in range(threshold):
             client.sys.submit_unseal_key(unseal_keys[index])
 
+        # unsealキーを保存
+        self.__write_unseal_key(unseal_keys)
+
         # root token保存
         root_token = result['root_token']
         self.__write_token(root_token)
+
+    def __restrat_server(self):
+        """vaultサーバーを再起動するメソッドです。"""
 
     def __create_dg_engine(self):
         """シークレットエンジン(kv)作成をするメソッドです。"""
@@ -186,9 +193,21 @@ class Vault():
 
         Args:
             token(str):ルートトークン
+
         """
         with open(TOKEN_PATH, 'w') as f:
             f.write(token)
+
+    def __write_unseal_key(self, unseal_keys: list):
+        """アンシールキー保存のメソッドです。
+
+        Args:
+            unseal_keys(list): シールを解除するのに使用する鍵
+
+        """
+        with open(UNSEAL_KEY_PATH, 'w') as f:
+            for key in unseal_keys:
+                f.write(key + '\n')
 
     def __read_token(self) -> str:
         """ルートトークン取得のメソッドです。

@@ -163,6 +163,26 @@ class Vault():
     def __restrat_server(self):
         """vaultサーバーを再起動するメソッドです。"""
 
+        # vaultサーバー起動
+        thread = threading.Thread(target=start_server)
+        thread.start()
+        # 起動処理が終わるまで少し待機
+        time.sleep(1)
+
+        #unsealキーを取得
+        with open(UNSEAL_KEY_PATH, 'r') as f:
+            # ファイルの各行をリストに読み込んで改行文字を取り除く
+            unseal_keys = [line.strip() for line in f.readlines()]
+
+        client = hvac.Client(url=VAULT_ADDR)
+        # unseal
+        for index in range(unseal_keys):
+            client.sys.submit_unseal_key(unseal_keys[index])
+
+        #再設定
+        self.__create_dg_engine()
+        self.__create_dg_policy()
+
     def __create_dg_engine(self):
         """シークレットエンジン(kv)作成をするメソッドです。"""
         token = self.__read_token()
@@ -223,7 +243,26 @@ class Vault():
 
         with open(TOKEN_PATH, 'r') as f:
             root_token = f.read()
+
+        if not  self._is_vault_server_running():
+            self.__restrat_server(root_token)
+
         return root_token
+
+    def _is_vault_server_running(self) -> bool:
+        """Vaultサーバーが稼働しているか確認するメソッドです。
+
+        Returns:
+            bool: サーバーが稼働していればTrue、そうでなければFalseを返す
+
+        """
+        try:
+            response = requests.get(f'{VAULT_ADDR}/v1/sys/health', timeout=5)
+            # サーバーが正常に応答した場合
+            return response.status_code == 200
+        except requests.RequestException:
+            # サーバーが稼働していない、または接続エラー
+            return False
 
     def __get_client(self) -> hvac.Client:
         """vaultに接続するためのクライアントを取得するメソッドです。

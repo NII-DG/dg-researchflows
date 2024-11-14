@@ -52,7 +52,7 @@ RUN pip install --no-cache gitpython==3.1.43
 RUN pip install --no-cache git+https://github.com/RCOSDP/rdmclient.git@ab531e89148c4af48e4e1f123edc8e35690f31bc
 RUN pip install --no-cache git+https://github.com/NII-DG/nii-dg.git@230419_8c684da
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-packager.git@master
-RUN pip install --no-cache graphviz
+RUN pip install --no-cache graphviz==0.20.1
 
 # TODO: リリース時にはdg-drawerのブランチを変更する(@Rel20230929のようにする)
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-drawer.git@develop/Rel_V2.0

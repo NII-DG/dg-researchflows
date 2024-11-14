@@ -4,11 +4,9 @@
 """
 import os
 from pathlib import Path
-from tempfile import TemporaryDirectory
 import traceback
 from typing import Callable
 import xml.etree.ElementTree as ET
-
 
 from IPython.core.display import Javascript
 from IPython.display import display
@@ -28,6 +26,7 @@ def access_main_menu(working_file: str):
 
     Args:
         working_file (str): 実行Notebookファイルパス
+
     """
     root_folder = Path(path_config.get_abs_root_form_working_dg_file_path(working_file))
     main_menu = str(root_folder / path_config.MAIN_MENU_PATH)
@@ -90,39 +89,28 @@ class SubflowMenu(TaskLog):
             subflow(SubFlowManager):サブフロー図
 
         """
-        with TemporaryDirectory() as workdir:
-            skeleton = Path(workdir) / 'skeleton.svg'
-            #フロー図の作成
-            subflow.generate(svg_path=str(skeleton))
+        #フロー図の作成
+        self.diagram.object = subflow.generate()
 
-            self.diagram.object = self._get_contents(str(skeleton))
-            self.diagram.width = self._get_svg_size(str(skeleton))
-            self._set_width()
+        self.diagram.width = self._get_svg_size(self.diagram.object)
+        self._set_width()
 
     # その他
-    def _get_contents(self, svg_file_path: str) -> str:
-        """フロー図を取得するメソッドです。
-
-        Args:
-            svg_file_path (str): svgファイルのパス
-
-        Returns:
-            str:svgファイルの内容を返す。
-        """
-        return file.File(svg_file_path).read()
-
-    def _get_svg_size(self, svg_file_path: str) -> int:
+    def _get_svg_size(self, svg_data: str) -> int:
         """svgの画像の横幅を返すメソッドです。
 
         Args:
-            svg_file_path (str): svgファイルのパス
+            svg_data (str): svg形式で書かれたダイアグラムデータの文字列
 
         Returns:
             int:svgの画像の横幅の値を返す
+
         """
+        #表示領域のサイズ調整に用いる係数
+        scale_coefficient = 1.5
+
         # SVGファイルをパース
-        tree = ET.parse(svg_file_path)
-        root = tree.getroot()
+        root = ET.fromstring(svg_data)
 
         # <svg>要素からviewBox属性を取得
         viewbox_value = root.get('viewBox')
@@ -139,9 +127,6 @@ class SubflowMenu(TaskLog):
             viewbox_width = 800
         elif viewbox_width < 200:
             viewbox_width = 200
-
-        #表示領域のサイズ調整に用いる係数
-        scale_coefficient = 1.5
 
         viewbox_width *= scale_coefficient # フロー図が収まるように調節
 

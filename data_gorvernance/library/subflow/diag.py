@@ -3,10 +3,9 @@
 import os
 from graphviz import Digraph
 
-from data_gorvernance.library.utils import file
-from data_gorvernance.library.utils.setting.status import SubflowTask
+from library.utils import file
+from library.utils.setting.status import SubflowTask
 
-from .subflow import SubFlowManager
 
 #現在のスクリプトのディレクトリパス
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -55,40 +54,46 @@ class DiagManager:
         self.dot = Digraph(format='svg', node_attr= self.node_attr)
         self.dot.attr(ranksep=self.rank_sep)
 
-    def update(self, subflow_manager: SubFlowManager) -> None:
+    def update(self, current_dir: str, tasks: list[SubflowTask], order: dict, node_config: dict) -> None:
         """ タスクの状態に基づいてダイアグラムを更新するメソッドです。
 
         Args:
-            subflow_manager: SubFlowManagerクラスのインスタンス
+            current_dir(str): サブフローメニューの親ディレクトリ
+            tasks(list[SubflowTask]): サブフローのタスクの設定値
+            order(dict): サブフローのタスクの順序情報
+            node_config(dict): ダイアグラムのノード設定用の辞書
 
         """
         #実行順が決まっているタスクの更新
-        order_sequence = subflow_manager.order.get("sequence")
-        active_tasks =[]
-        for task in subflow_manager.tasks:
+        order_sequence = order.get("sequence")
+        active_tasks = order_sequence
+        for task in tasks:
             if task.id in order_sequence:
                 if task.active:
-                    self._adjust_by_status(subflow_manager, task)
-                    active_tasks.append(task.id)
+                    self._adjust_by_status(current_dir, node_config, task)
+                else:
+                    active_tasks.remove(task.id)
         if active_tasks:
-            subflow_manager.diag._create_left_subgraph(active_tasks, subflow_manager.node_config)
+            self._create_left_subgraph(active_tasks, node_config)
 
         #いつ実行しても構わないタスクの更新
-        order_whenever = subflow_manager.order.get("whenever")
-        active_tasks = []
-        for task in subflow_manager.tasks:
+        order_whenever = order.get("whenever")
+        active_tasks = order_whenever
+        for task in tasks:
             if task.id in order_whenever:
                 if task.active:
-                    self._adjust_by_status(subflow_manager, task)
-                    active_tasks.append(task.id)
+                    self._adjust_by_status(current_dir, node_config, task)
+                else:
+                    active_tasks.remove(task.id)
         if active_tasks:
-            subflow_manager.diag._create_right_subgraph(active_tasks, subflow_manager.node_config)
+            self._create_right_subgraph(active_tasks, node_config)
 
-    def _adjust_by_status(self, subflow_manager: SubFlowManager, task: SubflowTask):
+    def _adjust_by_status(self, current_dir: str, node_config: dict, task: SubflowTask):
         """ フロー図の見た目をタスクの状態によって変えるメソッドです。
 
         Args:
-            subflow_manager: SubFlowManagerクラスのインスタンス
+            current_dir(str): サブフローメニューの親ディレクトリ
+            node_config(dict): ダイアグラムのノード設定用の辞書
             task (SubflowTask): 調整するタスクを設定します。
 
         """
@@ -96,30 +101,30 @@ class DiagManager:
 
         icon_dir = "../data/icon"
         icon_dir = os.path.abspath(os.path.join(script_dir, icon_dir))
-        icon_dir = file.relative_path(icon_dir, subflow_manager.current_dir)
+        icon_dir = file.relative_path(icon_dir, current_dir)
 
         if task.is_multiple:
-            subflow_manager.node_config[task.id]["text"] += self.multiple_icon
+            node_config[task.id]["text"] += self.multiple_icon
 
         if task.status == task.STATUS_UNFEASIBLE:
             task_parameter["fontcolor"] = self.unfeasible_font_color
             task_parameter["fillcolor"] = self.unfeasible_fill_color
             task_parameter["image"] = os.path.join(icon_dir, "lock.png")
-            subflow_manager.node_config[task.id]["task_parameter"] = task_parameter
+            node_config[task.id]["task_parameter"] = task_parameter
             return
 
         if task.status == task.STATUS_DONE:
             task_parameter["image"] = os.path.join(icon_dir, "check_mark.png")
-            subflow_manager.node_config[task.id]['path'] += "?init_nb=true"
+            node_config[task.id]['path'] += "?init_nb=true"
 
         elif task.status == task.STATUS_DOING:
             task_parameter["image"] = os.path.join(icon_dir, "loading.png")
 
         #実行不可以外のタスクにURLを埋め込む
         link = file.relative_path(
-            str(subflow_manager.node_config[task.id]['path']), subflow_manager.current_dir).replace("../", "./../")
+            str(node_config[task.id]['path']), current_dir).replace("../", "./../")
         task_parameter["URL"] = link
-        subflow_manager.node_config[task.id]["task_parameter"] = task_parameter
+        node_config[task.id]["task_parameter"] = task_parameter
 
     def _add_node(self, node_group, node_id: str, node_label: str, **kwargs):
         """新たにノードを追加するメソッドです。

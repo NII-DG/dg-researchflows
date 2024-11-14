@@ -93,7 +93,7 @@ class SubFlowManager:
         for task in self.tasks:
             self.node_config[task.id] = {'name': task.name}
             self.parse_headers(task)
-        self.diag.update(self)
+        self.diag.update(self.current_dir, self.tasks, self.order, self.node_config)
         svg_data = self.diag.generate_svg()
 
         return svg_data

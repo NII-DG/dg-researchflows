@@ -163,6 +163,7 @@ class Vault():
     def __restrat_server(self):
         """vaultサーバーを再起動するメソッドです。"""
 
+        print("再起動開始")
         # vaultサーバー起動
         thread = threading.Thread(target=start_server)
         thread.start()
@@ -176,8 +177,11 @@ class Vault():
 
         client = hvac.Client(url=VAULT_ADDR)
         # unseal
-        for index in range(unseal_keys):
-            client.sys.submit_unseal_key(unseal_keys[index])
+        for unseal_key in unseal_keys:
+            client.sys.submit_unseal_key(unseal_key)
+
+        if client.sys.is_sealed():
+            print("アンシール失敗")
 
         #再設定
         self.__create_dg_engine()
@@ -245,7 +249,7 @@ class Vault():
             root_token = f.read()
 
         if not  self._is_vault_server_running():
-            self.__restrat_server(root_token)
+            self.__restrat_server()
 
         return root_token
 

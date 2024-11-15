@@ -1,6 +1,8 @@
 """ ダイアグラムの管理を行うモジュールです。"""
 
+import copy
 import os
+
 from graphviz import Digraph
 
 from library.utils import file
@@ -21,8 +23,7 @@ class DiagManager:
             invisible_status(str): スタイルやエッジなどの要素を表示しない場合のステータス
             rank_sep(str): ランクの異なるノード間の距離の設定
             multiple_icon(str): 複数回実行可能なタスクに付与するアイコン
-            unfeasible_font_color(str): 実行不可能なタスクのフォントの色
-            unfeasible_fill_color(str): 実行不可能なタスクの塗りつぶしの色
+            unfeasible_status(dict): 実行不可能なタスクの設定
 
         instance:
             dot(Digraph): ダイアグラムの情報を保持するオブジェクト
@@ -46,55 +47,26 @@ class DiagManager:
     invisible_status = 'invis'
     rank_sep = '0.4'
     multiple_icon = '　\U0001F501'
-    unfeasible_font_color = 'black'
-    unfeasible_fill_color = '#e6e5e3'
+    unfeasible_status = {
+        "fontcolor": 'black',
+        "fillcolor": '#e6e5e3'
+    }
 
     def __init__(self):
         """ クラスのインスタンスの初期化処理を実行するメソッドです。"""
-        self.dot = Digraph(format='svg', node_attr= self.node_attr)
+        self.dot = Digraph(format='svg', node_attr=self.node_attr)
         self.dot.attr(ranksep=self.rank_sep)
 
-    def update(self, current_dir: str, tasks: list[SubflowTask], order: dict, node_config: dict) -> None:
-        """ タスクの状態に基づいてダイアグラムを更新するメソッドです。
-
-        Args:
-            current_dir(str): サブフローメニューの親ディレクトリ
-            tasks(list[SubflowTask]): サブフローのタスクの設定値
-            order(dict): サブフローのタスクの順序情報
-            node_config(dict): ダイアグラムのノード設定用の辞書
-
-        """
-        #実行順が決まっているタスクの更新
-        order_sequence = order.get("sequence")
-        active_tasks = order_sequence
-        for task in tasks:
-            if task.id in order_sequence:
-                if task.active:
-                    self._adjust_by_status(current_dir, node_config, task)
-                else:
-                    active_tasks.remove(task.id)
-        if active_tasks:
-            self._create_left_subgraph(active_tasks, node_config)
-
-        #いつ実行しても構わないタスクの更新
-        order_whenever = order.get("whenever")
-        active_tasks = order_whenever
-        for task in tasks:
-            if task.id in order_whenever:
-                if task.active:
-                    self._adjust_by_status(current_dir, node_config, task)
-                else:
-                    active_tasks.remove(task.id)
-        if active_tasks:
-            self._create_right_subgraph(active_tasks, node_config)
-
-    def _adjust_by_status(self, current_dir: str, node_config: dict, task: SubflowTask):
+    def _adjust_by_status(self, current_dir: str, node_config: dict, task: SubflowTask) -> dict:
         """ フロー図の見た目をタスクの状態によって変えるメソッドです。
 
         Args:
             current_dir(str): サブフローメニューの親ディレクトリ
             node_config(dict): ダイアグラムのノード設定用の辞書
             task (SubflowTask): 調整するタスクを設定します。
+
+        Returns:
+            dict: ノードに設定する情報
 
         """
         task_parameter = {}
@@ -107,11 +79,9 @@ class DiagManager:
             node_config[task.id]["text"] += self.multiple_icon
 
         if task.status == task.STATUS_UNFEASIBLE:
-            task_parameter["fontcolor"] = self.unfeasible_font_color
-            task_parameter["fillcolor"] = self.unfeasible_fill_color
+            task_parameter = copy.copy(self.unfeasible_status)
             task_parameter["image"] = os.path.join(icon_dir, "lock.png")
-            node_config[task.id]["task_parameter"] = task_parameter
-            return
+            return task_parameter
 
         if task.status == task.STATUS_DONE:
             task_parameter["image"] = os.path.join(icon_dir, "check_mark.png")
@@ -124,7 +94,7 @@ class DiagManager:
         link = file.relative_path(
             str(node_config[task.id]['path']), current_dir).replace("../", "./../")
         task_parameter["URL"] = link
-        node_config[task.id]["task_parameter"] = task_parameter
+        return task_parameter
 
     def _add_node(self, node_group, node_id: str, node_label: str, **kwargs):
         """新たにノードを追加するメソッドです。
@@ -145,34 +115,40 @@ class DiagManager:
             prev_node_id = node_lines[-2].split(' ')[0].strip()  # ひとつ前のノードID
             node_group.edge(prev_node_id, node_id)
 
-    def _create_left_subgraph(self, tasks: list, node_config: dict):
+    def create_left_subgraph(self, current_dir: str, tasks: list[SubflowTask], node_config: dict, order_sequence: list):
         """左側に配置される実行順の決まっているタスクのノード群を作成するメソッドです。
 
         args:
-            tasks(list): 追加するノードの一覧
-            node_config(dict): ノードの設定に用いる情報
+            current_dir(str): サブフローメニューの親ディレクトリ
+            tasks(list[SubflowTask]): サブフローのタスクの設定値
+            node_config(dict): ダイアグラムのノード設定用の辞書
+            order_sequence(list): 左側に配置される実行順の決まっているタスクの順序情報
 
         """
         with self.dot.subgraph(name='cluster_left') as left_group:
             left_group.attr(style=self.left_group_style, color=self.left_group_color)
             for task in tasks:
-                kwargs = node_config[task]["task_parameter"]
-                self._add_node(left_group, task, node_config[task]['text'], **kwargs)
+                if task.id in order_sequence and task.active:
+                    kwargs = self._adjust_by_status(current_dir, node_config, task)
+                    self._add_node(left_group, task, node_config[task]['text'], **kwargs)
 
-    def _create_right_subgraph(self, tasks: list, node_config: dict):
+    def create_right_subgraph(self, current_dir: str, tasks: list[SubflowTask], node_config: dict, order_whenever: list):
         """右側に配置されるいつ実行しても構わないタスクのノード群を作成するメソッドです。
 
         args:
-            tasks(list): 追加するノードの一覧
-            node_config(dict): ノードの設定に用いる情報
+            current_dir(str): サブフローメニューの親ディレクトリ
+            tasks(list[SubflowTask]): サブフローのタスクの設定値
+            node_config(dict): ダイアグラムのノード設定用の辞書
+            order_sequence(list): 右側に配置される実行順の決まっていないタスクの順序情報
 
         """
         with self.dot.subgraph(name='cluster_right') as right_group:
             right_group.attr(style=self.invisible_status)
             right_group.edge_attr.update(style=self.invisible_status)
             for task in tasks:
-                kwargs = node_config[task]["task_parameter"]
-                self._add_node(right_group, task, node_config[task]['text'], **kwargs)
+                if task.id in order_whenever and task.active:
+                    kwargs = self._adjust_by_status(current_dir, node_config, task)
+                    self._add_node(right_group, task, node_config[task]['text'], **kwargs)
 
     def generate_svg(self) -> str:
         """ ダイアグラムをsvg形式に変換し、文字列で出力するメソッドです。

@@ -171,19 +171,17 @@ class Vault():
         for unseal_key in unseal_keys:
             client.sys.submit_unseal_key(unseal_key)
 
-        #再設定
+        #再設定（実際にはこの設定は保持されるが確認のため実行）
         self.__create_dg_engine()
         self.__create_dg_policy()
 
     def __create_dg_engine(self):
         """シークレットエンジン(kv)作成をするメソッドです。"""
-        print("再設定実行１")
         token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=token)
 
         secrets_engines = client.sys.list_mounted_secrets_engines()['data']
         if f'{DG_ENGINE_NAME}/' not in secrets_engines:
-            print("エンジン追加")
             client.sys.enable_secrets_engine(
                 backend_type='kv',
                 path=DG_ENGINE_NAME,
@@ -192,13 +190,11 @@ class Vault():
 
     def __create_dg_policy(self):
         """ポリシー作成をするメソッドです。"""
-        print("再設定実行１")
         token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=token)
 
         policies = client.sys.list_policies()['data']['policies']
         if DG_POLICY_NAME not in policies:
-            print("ポリシー追加")
             client.sys.create_or_update_policy(
                 name=DG_POLICY_NAME,
                 policy=DG_POLICY,

@@ -40,14 +40,6 @@ def start_server():
             stderr=file
         )
 
-    # PIDを保存
-    pid_path = os.path.join(dir_path, 'vault.pid')
-    with open(pid_path, 'w') as pid_file:
-        pid_file.write(str(process.pid))
-
-    print(f"Vaultサーバーが起動しました。PID: {process.pid}")
-
-
 class Vault():
     """Vault Server操作クラスです。"""
 
@@ -163,7 +155,6 @@ class Vault():
     def __restrat_server(self):
         """vaultサーバーを再起動するメソッドです。"""
 
-        print("再起動開始")
         # vaultサーバー起動
         thread = threading.Thread(target=start_server)
         thread.start()
@@ -172,16 +163,13 @@ class Vault():
 
         #unsealキーを取得
         with open(UNSEAL_KEY_PATH, 'r') as f:
-            # ファイルの各行をリストに読み込んで改行文字を取り除く
             unseal_keys = [line.strip() for line in f.readlines()]
 
         client = hvac.Client(url=VAULT_ADDR)
+
         # unseal
         for unseal_key in unseal_keys:
             client.sys.submit_unseal_key(unseal_key)
-
-        if client.sys.is_sealed():
-            print("アンシール失敗")
 
         #再設定
         self.__create_dg_engine()
@@ -189,11 +177,13 @@ class Vault():
 
     def __create_dg_engine(self):
         """シークレットエンジン(kv)作成をするメソッドです。"""
+        print("再設定実行１")
         token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=token)
 
         secrets_engines = client.sys.list_mounted_secrets_engines()['data']
         if f'{DG_ENGINE_NAME}/' not in secrets_engines:
+            print("エンジン追加")
             client.sys.enable_secrets_engine(
                 backend_type='kv',
                 path=DG_ENGINE_NAME,
@@ -202,11 +192,13 @@ class Vault():
 
     def __create_dg_policy(self):
         """ポリシー作成をするメソッドです。"""
+        print("再設定実行１")
         token = self.__read_token()
         client = hvac.Client(url=VAULT_ADDR, token=token)
 
         policies = client.sys.list_policies()['data']['policies']
         if DG_POLICY_NAME not in policies:
+            print("ポリシー追加")
             client.sys.create_or_update_policy(
                 name=DG_POLICY_NAME,
                 policy=DG_POLICY,

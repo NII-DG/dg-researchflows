@@ -127,10 +127,11 @@ class DiagManager:
         """
         with self.dot.subgraph(name='cluster_left') as left_group:
             left_group.attr(style=self.left_group_style, color=self.left_group_color)
-            for task in tasks:
-                if task.id in order_sequence and task.active:
-                    kwargs = self._adjust_by_status(current_dir, node_config, task)
-                    self._add_node(left_group, task, node_config[task]['text'], **kwargs)
+            for task_id in  order_sequence:
+                for task in tasks:
+                    if task_id == task.id and task.active:
+                        kwargs = self._adjust_by_status(current_dir, node_config, task)
+                        self._add_node(left_group, task.id, node_config[task.id]['text'], **kwargs)
 
     def create_right_subgraph(self, current_dir: str, tasks: list[SubflowTask], node_config: dict, order_whenever: list):
         """右側に配置されるいつ実行しても構わないタスクのノード群を作成するメソッドです。
@@ -145,10 +146,11 @@ class DiagManager:
         with self.dot.subgraph(name='cluster_right') as right_group:
             right_group.attr(style=self.invisible_status)
             right_group.edge_attr.update(style=self.invisible_status)
-            for task in tasks:
-                if task.id in order_whenever and task.active:
-                    kwargs = self._adjust_by_status(current_dir, node_config, task)
-                    self._add_node(right_group, task, node_config[task]['text'], **kwargs)
+            for task_id in order_whenever:
+                for task in tasks:
+                    if task_id == task.id and task.active:
+                        kwargs = self._adjust_by_status(current_dir, node_config, task)
+                        self._add_node(right_group, task.id, node_config[task.id]['text'], **kwargs)
 
     def generate_svg(self) -> str:
         """ ダイアグラムをsvg形式に変換し、文字列で出力するメソッドです。

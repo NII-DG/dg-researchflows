@@ -2,6 +2,7 @@
 
 import copy
 import os
+from typing import Optional
 
 from graphviz import Digraph
 
@@ -43,33 +44,23 @@ class DiagManager:
         'fontcolor': '#FF8C00',
         'fontsize': '9'
     }
-    #表示しない場合のステータス
-    invisible_status = 'invis'
     #左側に配置するグループの設定
     left_group_status = {
         'style': 'filled',
         'color': '#FFE6CC'
     }
-    #複数回実行可能な場合に付与する絵文字
-    multiple_icon = '　\U0001F501'
     #実行不能な場合の設定
     unfeasible_status = {
         "fontcolor": 'black',
         "fillcolor": '#e6e5e3'
     }
-    #アイコンの保存場所へのパス
-    task_statuses = {
-        'unfeasible': lambda icon_dir: os.path.join(icon_dir, "lock.png"),
-        'done': lambda icon_dir: os.path.join(icon_dir, "check_mark.png"),
-        'doing':lambda icon_dir: os.path.join(icon_dir, "loading.png")
-    }
 
     def __init__(self):
         """ クラスのインスタンスの初期化処理を実行するメソッドです。"""
-        self.dot = Digraph(format='svg', node_attr=self.node_attr)
+        self.dot = Digraph(node_attr=self.node_attr)
         self.dot.attr(ranksep=self.rank_sep)
 
-    def _adjust_by_status(self, current_dir: str, node_config: dict, task: SubflowTask) -> dict:
+    def _set_task_status(self, current_dir: str, node_config: dict, task: SubflowTask) -> dict:
         """ フロー図の見た目をタスクの状態によって変えるための情報を設定するメソッドです。
 
         Args:
@@ -88,19 +79,19 @@ class DiagManager:
         icon_dir = file.relative_path(icon_dir, current_dir)
 
         if task.is_multiple:
-            node_config[task.id]["text"] += self.multiple_icon
+            node_config[task.id]["text"] += '　\U0001F501'
 
         if task.status == task.STATUS_UNFEASIBLE:
             task_parameter = copy.copy(self.unfeasible_status)
-            task_parameter["image"] = self.task_statuses[task.status](icon_dir)
+            task_parameter["image"] = os.path.join(icon_dir, "lock.png")
             return task_parameter
 
         if task.status == task.STATUS_DONE:
-            task_parameter["image"] = self.task_statuses[task.status](icon_dir)
+            task_parameter["image"] = os.path.join(icon_dir, "check_mark.png")
             node_config[task.id]['path'] += "?init_nb=true"
 
         elif task.status == task.STATUS_DOING:
-            task_parameter["image"] = self.task_statuses[task.status](icon_dir)
+            task_parameter["image"] = os.path.join(icon_dir, "loading.png")
 
         #実行不可以外のタスクにURLを埋め込む
         link = file.relative_path(
@@ -108,22 +99,22 @@ class DiagManager:
         task_parameter["URL"] = link
         return task_parameter
 
-    def _add_node(self, node_group: Digraph, node_id: str, node_label: str, active_tasks: list, **kwargs, ):
+    def _add_node(self, node_group: Digraph, node_id: str, node_label: str, prev_task: Optional[str], **kwargs, ):
         """新たにノードを追加するメソッドです。
 
         Args:
             node_group(Digraph): ノードを追加するサブグラフのオブジェクト
             node_id (str): ノードIDを設定します。
             node_label (str): ノードの名前を設定します。
-            active_tasks(list): 表示するタスク
+            prev_task(str): 表示した際にひとつ上に並ぶタスクのid。デフォルトはNone
             **kwargs(dict): ノードに設定する情報
 
         """
         node_group.node(node_id, label=node_label, **kwargs)
 
         #ノードが複数ある場合、エッジを作成する
-        if len(active_tasks) >= 2:
-            node_group.edge(active_tasks[-2], node_id)
+        if prev_task:
+            node_group.edge(prev_task, node_id)
 
     def create_left_subgraph(self, current_dir: str, tasks: list[SubflowTask], node_config: dict, order_sequence: list):
         """左側に配置される実行順の決まっているタスクのノード群を作成するメソッドです。
@@ -137,13 +128,13 @@ class DiagManager:
         """
         with self.dot.subgraph(name='cluster_left') as left_group:
             left_group.attr(**self.left_group_status)
-            active_tasks =[]
+            prev_task = None
             for task_id in order_sequence:
                 for task in tasks:
                     if task_id == task.id and task.active:
-                        active_tasks.append(task_id)
-                        kwargs = self._adjust_by_status(current_dir, node_config, task)
-                        self._add_node(left_group, task.id, node_config[task.id]['text'], active_tasks, **kwargs)
+                        kwargs = self._set_task_status(current_dir, node_config, task)
+                        self._add_node(left_group, task.id, node_config[task.id]['text'], prev_task, **kwargs)
+                        prev_task = task.id
 
     def create_right_subgraph(self, current_dir: str, tasks: list[SubflowTask], node_config: dict, order_whenever: list):
         """右側に配置されるいつ実行しても構わないタスクのノード群を作成するメソッドです。
@@ -156,14 +147,15 @@ class DiagManager:
 
         """
         with self.dot.subgraph(name='cluster_right') as right_group:
-            right_group.attr(style=self.invisible_status)
-            right_group.edge_attr.update(style=self.invisible_status)
-            active_tasks =[]
+            right_group.attr(style='invis')
+            right_group.edge_attr.update(style='invis')
+            prev_task = None
             for task_id in order_whenever:
                 for task in tasks:
                     if task_id == task.id and task.active:
-                        kwargs = self._adjust_by_status(current_dir, node_config, task)
-                        self._add_node(right_group, task.id, node_config[task.id]['text'], active_tasks, **kwargs)
+                        kwargs = self._set_task_status(current_dir, node_config, task)
+                        self._add_node(right_group, task.id, node_config[task.id]['text'], prev_task, **kwargs)
+                        prev_task = task.id
 
     def generate_diagram(self, current_dir: str, tasks: list[SubflowTask], node_config: dict, order:dict) -> str:
         """"ダイアグラムを生成するメソッドです。

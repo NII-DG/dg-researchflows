@@ -83,7 +83,6 @@ ARG font_deb=fonts-ipafont-gothic_00303-18ubuntu1_all.deb
 RUN mkdir ${HOME}/.fonts
 RUN wget -P ${HOME}/.fonts http://archive.ubuntu.com/ubuntu/pool/universe/f/fonts-ipafont/${font_deb}
 RUN dpkg-deb -x ${HOME}/.fonts/${font_deb} ~/.fonts
-RUN cp ~/.fonts/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf ~/.fonts/ipag.ttf
 RUN rm ${HOME}/.fonts/${font_deb}
 RUN rm -rf ${HOME}/.fonts/etc ${HOME}/.fonts/usr
 RUN rm .wget-hsts

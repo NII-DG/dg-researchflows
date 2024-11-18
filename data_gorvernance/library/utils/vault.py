@@ -38,7 +38,7 @@ def start_server():
             ['setsid', 'vault', 'server', '-config', config_path],
             stdout=subprocess.DEVNULL,
             stderr=file
-        )
+    )
 
 class Vault():
     """Vault Server操作クラスです。"""

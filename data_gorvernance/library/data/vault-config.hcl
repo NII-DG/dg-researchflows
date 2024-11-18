@@ -9,3 +9,10 @@ listener "tcp" {
 
 ui = true
 disable_mlock = true
+
+audit "file" {
+  options = {
+    path = "/home/jovyan/.vault/log/vault.log"
+    log_raw = true
+  }
+}

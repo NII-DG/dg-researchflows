@@ -20,8 +20,6 @@ class SubFlowManager:
             tasks(list[SubflowTask]): サブフローのタスクの設定値
             order(dict): サブフローのタスクの順序情報
             task_dir(str): タスクが格納されているディレクトリ
-            diag(DiagManager): ダイアグラムを管理するインスタンス
-            node_config(dict): ダイアグラムのノード設定用の辞書
 
     """
 
@@ -88,20 +86,24 @@ class SubFlowManager:
             str: svg形式で書かれたダイアグラムデータの文字列
 
         """
-        self.diag = DiagManager()
-        self.node_config = {}
+        diag = DiagManager()
+        node_config = {}
         for task in self.tasks:
-            self.node_config[task.id] = {}
-            self.parse_headers(task)
-        svg_data = self.diag.generate_diagram(self.current_dir, self.tasks, self.node_config, self.order)
+            node_config[task.id] = {}
+            node_config = self.parse_headers(task, node_config)
+        svg_data = diag.generate_diagram(self.current_dir, self.tasks, node_config, self.order)
 
         return svg_data
 
-    def parse_headers(self, task: SubflowTask) -> None:
+    def parse_headers(self, task: SubflowTask, node_config: dict) -> dict:
         """ タスクタイトルとパスを取得するメソッドです。
 
         Args:
             task (SubflowTask): 対象とするタスクを設定します。
+            node_config(dict): ノードに設定する情報の辞書
+
+        Returns:
+            dict: ノードに設定する情報の辞書
 
         """
         nb_dir = Path(self.task_dir)
@@ -127,6 +129,7 @@ class SubFlowManager:
             title = headers[0][0] if not headers[0][0].startswith(
                 'About:') else headers[0][0][6:]
             if task.name in str(nb_path):
-                self.node_config[task.id]['path'] = str(nb_path)
-                self.node_config[task.id]['text'] = title
-                break
+                node_config[task.id]['path'] = str(nb_path)
+                node_config[task.id]['text'] = title
+
+                return node_config

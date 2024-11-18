@@ -20,11 +20,8 @@ class DiagManager:
         class:
             rank_sep(str): ランクの異なるノード間の距離の設定
             node_attr(dict): 全てのノードで共通となる設定
-            invisible_status(str): スタイルやエッジなどの要素を表示しない場合のステータス
             left_group_status(dict): 左側に表示する実行順の決まっているグループの設定
-            multiple_icon(str): 複数回実行可能なタスクに付与するアイコン
             unfeasible_status(dict): 実行不可能なタスクの設定
-            task_statuses(dict): タスクの状態によって付与するアイコンの取得元へのパス
 
         instance:
             dot(Digraph): ダイアグラムの情報を保持するオブジェクト
@@ -165,6 +162,9 @@ class DiagManager:
             tasks(list[SubflowTask]): サブフローのタスクの設定値
             node_config(dict): ダイアグラムのノード設定用の辞書
             order_sequence(list): 右側に配置される実行順の決まっていないタスクの順序情報
+
+        Returns:
+            str: svg形式で書かれたダイアグラムデータの文字列
 
         """
         order_sequence = order.get("sequence")

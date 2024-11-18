@@ -91,7 +91,7 @@ class SubFlowManager:
         for task in self.tasks:
             node_config[task.id] = {}
             title, nb_path = self.parse_headers(task)
-            node_config[task.id]['path'] = str(nb_path)
+            node_config[task.id]['path'] = nb_path
             node_config[task.id]['text'] = title
 
         svg_data = diag.generate_diagram(self.current_dir, self.tasks, node_config, self.order)

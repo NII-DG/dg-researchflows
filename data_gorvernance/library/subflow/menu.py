@@ -122,12 +122,6 @@ class SubflowMenu(TaskLog):
                 viewbox_width = int(float(viewbox_parts[2]))
                 viewbox_height = int(float(viewbox_parts[3]))
 
-        # 大きさを調節
-        if 800 < viewbox_width:
-            viewbox_width = 800
-        elif viewbox_width < 200:
-            viewbox_width = 200
-
         viewbox_width *= scale_coefficient # フロー図が収まるように調節
 
         return int(viewbox_width)

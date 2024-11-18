@@ -171,16 +171,7 @@ class DiagManager:
         self.create_left_subgraph(current_dir, tasks, node_config, order_sequence)
         order_whenever = order.get("whenever")
         self.create_right_subgraph(current_dir, tasks, node_config, order_whenever)
-        svg_data = self.generate_svg()
-        return svg_data
 
-    def generate_svg(self) -> str:
-        """ ダイアグラムをsvg形式に変換し、文字列で出力するメソッドです。
-
-        Returns:
-            str: svg形式で書かれたダイアグラムデータの文字列
-
-        """
         svg_data = self.dot.pipe(format='svg').decode('utf-8')
 
         return svg_data

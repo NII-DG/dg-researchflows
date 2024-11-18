@@ -99,7 +99,7 @@ class DiagManager:
         task_parameter["URL"] = link
         return task_parameter
 
-    def _add_node(self, node_group: Digraph, node_id: str, node_label: str, prev_task: Optional[str], **kwargs, ):
+    def _add_node(self, node_group: Digraph, node_id: str, node_label: str, prev_task: Optional[str], **kwargs):
         """新たにノードを追加するメソッドです。
 
         Args:

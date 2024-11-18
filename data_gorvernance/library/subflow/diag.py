@@ -96,22 +96,22 @@ class DiagManager:
         task_parameter["URL"] = link
         return task_parameter
 
-    def _add_node(self, node_group: Digraph, node_id: str, node_label: str, prev_task: Optional[str], **kwargs):
+    def _add_node(self, node_group: Digraph, node_id: str, node_label: str, prev_id: Optional[str], **kwargs):
         """新たにノードを追加するメソッドです。
 
         Args:
             node_group(Digraph): ノードを追加するサブグラフのオブジェクト
             node_id (str): ノードIDを設定します。
             node_label (str): ノードの名前を設定します。
-            prev_task(str): 表示した際にひとつ上に並ぶタスクのid。デフォルトはNone
+            prev_id(str): 表示した際にひとつ上に並ぶタスクのid。デフォルトはNone
             **kwargs(dict): ノードに設定する情報
 
         """
         node_group.node(node_id, label=node_label, **kwargs)
 
         #ノードが複数ある場合、エッジを作成する
-        if prev_task:
-            node_group.edge(prev_task, node_id)
+        if prev_id:
+            node_group.edge(prev_id, node_id)
 
     def create_left_subgraph(self, current_dir: str, tasks: list[SubflowTask], node_config: dict, order_sequence: list):
         """左側に配置される実行順の決まっているタスクのノード群を作成するメソッドです。
@@ -125,13 +125,13 @@ class DiagManager:
         """
         with self.dot.subgraph(name='cluster_left') as left_group:
             left_group.attr(**self.left_group_status)
-            prev_task = None
+            prev_id = None
             for task_id in order_sequence:
                 for task in tasks:
                     if task_id == task.id and task.active:
                         kwargs = self._set_task_status(current_dir, node_config, task)
-                        self._add_node(left_group, task.id, node_config[task.id]['text'], prev_task, **kwargs)
-                        prev_task = task.id
+                        self._add_node(left_group, task.id, node_config[task.id]['text'], prev_id, **kwargs)
+                        prev_id = task.id
 
     def create_right_subgraph(self, current_dir: str, tasks: list[SubflowTask], node_config: dict, order_whenever: list):
         """右側に配置されるいつ実行しても構わないタスクのノード群を作成するメソッドです。
@@ -146,13 +146,13 @@ class DiagManager:
         with self.dot.subgraph(name='cluster_right') as right_group:
             right_group.attr(style='invis')
             right_group.edge_attr.update(style='invis')
-            prev_task = None
+            prev_id = None
             for task_id in order_whenever:
                 for task in tasks:
                     if task_id == task.id and task.active:
                         kwargs = self._set_task_status(current_dir, node_config, task)
-                        self._add_node(right_group, task.id, node_config[task.id]['text'], prev_task, **kwargs)
-                        prev_task = task.id
+                        self._add_node(right_group, task.id, node_config[task.id]['text'], prev_id, **kwargs)
+                        prev_id = task.id
 
     def generate_diagram(self, current_dir: str, tasks: list[SubflowTask], node_config: dict, order:dict) -> str:
         """"ダイアグラムを生成するメソッドです。

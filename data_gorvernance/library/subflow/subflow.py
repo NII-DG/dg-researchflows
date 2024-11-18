@@ -93,11 +93,7 @@ class SubFlowManager:
         for task in self.tasks:
             self.node_config[task.id] = {}
             self.parse_headers(task)
-        order_sequence = self.order.get("sequence")
-        self.diag.create_left_subgraph(self.current_dir, self.tasks, self.node_config, order_sequence)
-        order_whenever = self.order.get("whenever")
-        self.diag.create_right_subgraph(self.current_dir, self.tasks, self.node_config, order_whenever)
-        svg_data = self.diag.generate_svg()
+        svg_data = self.diag.generate_diagram(self.current_dir, self.tasks, self.node_config, self.order)
 
         return svg_data
 

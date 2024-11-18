@@ -78,15 +78,6 @@ RUN jupyter nbextension enable --py dg_nb_extensions --user
 # upgrade nbclassic ( after nbextension installed )
 RUN pip install --no-cache nbclassic==0.4.8
 
-# install Japanese-font (for blockdiag)
-ARG font_deb=fonts-ipafont-gothic_00303-18ubuntu1_all.deb
-RUN mkdir ${HOME}/.fonts
-RUN wget -P ${HOME}/.fonts http://archive.ubuntu.com/ubuntu/pool/universe/f/fonts-ipafont/${font_deb}
-RUN dpkg-deb -x ${HOME}/.fonts/${font_deb} ~/.fonts
-RUN rm ${HOME}/.fonts/${font_deb}
-RUN rm -rf ${HOME}/.fonts/etc ${HOME}/.fonts/usr
-RUN rm .wget-hsts
-
 # install vcpsdk
 RUN wget https://s3-ap-northeast-1.amazonaws.com/vcp-jupyternotebook/23.11.0/jupyternotebook_vcpsdk-23.11.0.tgz
 RUN mkdir -p ~/data_gorvernance/library/vcp

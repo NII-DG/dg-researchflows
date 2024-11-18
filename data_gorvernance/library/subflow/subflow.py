@@ -90,12 +90,15 @@ class SubFlowManager:
         node_config = {}
         for task in self.tasks:
             node_config[task.id] = {}
-            node_config = self.parse_headers(task, node_config)
+            title, nb_path = self.parse_headers(task)
+            node_config[task.id]['path'] = str(nb_path)
+            node_config[task.id]['text'] = title
+
         svg_data = diag.generate_diagram(self.current_dir, self.tasks, node_config, self.order)
 
         return svg_data
 
-    def parse_headers(self, task: SubflowTask, node_config: dict) -> dict:
+    def parse_headers(self, task: SubflowTask) -> tuple[str, str]:
         """ タスクタイトルとパスを取得するメソッドです。
 
         Args:
@@ -103,7 +106,8 @@ class SubFlowManager:
             node_config(dict): ノードに設定する情報の辞書
 
         Returns:
-            dict: ノードに設定する情報の辞書
+            str: タスクのタイトル
+            str: タスク実行時に遷移するノートブックのパス
 
         """
         nb_dir = Path(self.task_dir)
@@ -129,7 +133,4 @@ class SubFlowManager:
             title = headers[0][0] if not headers[0][0].startswith(
                 'About:') else headers[0][0][6:]
             if task.name in str(nb_path):
-                node_config[task.id]['path'] = str(nb_path)
-                node_config[task.id]['text'] = title
-
-                return node_config
+                return title, str(nb_path)

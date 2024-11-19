@@ -3,6 +3,7 @@ from library.utils.file import JsonFile
 
 
 _IS_COMPLETED = 'is_completed'
+_ORDER = 'order'
 _TASKS = 'tasks'
 
 
@@ -19,7 +20,7 @@ class SubflowTask:
             __DEPENDENT_TASK_IDS(str):依存するタスクの機能IDのキー名
             __STATUS(str):実行状況のキー名
             __EXECUTION_ENVIRONMENTS(str):実行中の実行環境IDのリストのキー名
-            __DISABLED(str):使用不可の状態とするためのフラグのキー名
+            __ACTIVE(str):ガバナンスシートの値によってタスクの表示/非表示を切り替えるためのフラグ
 
             STATUS_UNFEASIBLE(str):実行状況（実行不可能）
             STATUS_UNEXECUTED(str):実行状況（未実行）
@@ -36,7 +37,7 @@ class SubflowTask:
             _dependent_task_ids (list[str]):依存するタスクの機能ID
             _status (str):実行状況
             _execution_environments (list[str]): 実行中の実行環境IDのリスト
-            _disabled (bool):使用不可の状態とするためのフラグ
+            _active (bool):ガバナンスシートの値によってタスクの表示/非表示を切り替えるためのフラグ
 
     """
     __ID = 'id'
@@ -47,7 +48,7 @@ class SubflowTask:
     __DEPENDENT_TASK_IDS = 'dependent_task_ids'
     __STATUS = 'status'
     __EXECUTION_ENVIRONMENTS = 'execution_environments'
-    __DISABLED = 'disabled'
+    __ACTIVE = 'active'
 
     STATUS_UNFEASIBLE = "unfeasible"
     STATUS_UNEXECUTED = "unexecuted"
@@ -57,7 +58,7 @@ class SubflowTask:
 
     def __init__(
         self, id: str, name: str, is_multiple: bool, is_required: bool, completed_count: int,
-        dependent_task_ids: list[str], status: str, execution_environments: list[str], disabled: bool
+        dependent_task_ids: list[str], status: str, execution_environments: list[str], active: bool
     ) -> None:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
@@ -70,7 +71,7 @@ class SubflowTask:
             dependent_task_ids (list[str]):依存するタスクの機能ID
             status (str):実行状況
             execution_environments (list[str]): 実行中の実行環境IDのリスト
-            disabled (bool):使用不可の状態とするためのフラグ
+            active (bool):ガバナンスシートの値によってタスクの表示/非表示を切り替えるためのフラグ
 
         """
         self._id = id
@@ -81,7 +82,7 @@ class SubflowTask:
         self._dependent_task_ids = dependent_task_ids
         self._set_status(status)
         self._execution_environments = execution_environments
-        self._disable = disabled
+        self._active = active
 
     def _set_status(self, status: str):
         """ステータスの設定を行うメソッドです。
@@ -193,25 +194,6 @@ class SubflowTask:
         self._set_status(status)
 
     @property
-    def disable(self) -> bool:
-        """使用不可の状態とするためのフラグを取得するためのゲッターです。
-
-        Returns:
-            bool:使用不可の状態とするためのフラグ
-        """
-        return self._disable
-
-    @disable.setter
-    def disable(self, is_disable: bool):
-        """使用不可の状態とするためのフラグを設定するためのセッターです。
-
-        Args:
-            is_disable (bool):_disableにセットする値
-
-        """
-        self._disable = is_disable
-
-    @property
     def execution_environments(self) -> list[str]:
         """実行中の実行環境IDのリストを取得するためのゲッターです。
 
@@ -220,6 +202,27 @@ class SubflowTask:
 
         """
         return self._execution_environments
+
+    @property
+    def active(self) -> bool:
+        """タスクの表示、非表示を切り替えるフラグを取得するためのゲッターです。
+
+        Returns:
+            bool:タスクの表示、非表示を切り替えるフラグ
+
+        """
+        return self._active
+
+    @active.setter
+    def active(self, is_active: bool):
+        """使用不可の状態とするためのフラグを設定するためのセッターです。
+
+        Args:
+            is_disable (bool):_disableにセットする値
+
+        """
+        self._active = is_active
+
 
     def to_dict(self) -> dict[str, any]:
         """インスタンスが保持しているデータを辞書型のデータに変換するメソッドです。
@@ -237,7 +240,7 @@ class SubflowTask:
             self.__DEPENDENT_TASK_IDS: self._dependent_task_ids,
             self.__STATUS: self._status,
             self.__EXECUTION_ENVIRONMENTS: self._execution_environments,
-            self.__DISABLED: self._disable
+            self.__ACTIVE: self._active
         }
 
 
@@ -247,19 +250,22 @@ class SubflowStatus:
     Attributes:
         instance:
             _is_completed(bool):サブフローが完了しているかの判定に用いるフラグ。初期値はfalseで必須タスクが全て完了した段階でtrueに更新
+            _order(dict): サブフロータスクの順序情報
             _tasks(list[SubflowTask]):サブフローの各タスクのステータスのリスト
 
     """
 
-    def __init__(self, is_completed: bool, tasks: list[dict]) -> None:
+    def __init__(self, is_completed: bool, order: dict, tasks: list[dict]) -> None:
         """クラスのインスタンスの初期化を行うメソッドです。コンストラクタ
 
         Args:
             is_completed (bool):サブフローが完了しているかの判定に用いるフラグ
+            _order(dict): サブフロータスクの順序情報
             tasks (list[dict]):サブフローの各タスクのステータスのリスト
 
         """
         self._is_completed = is_completed
+        self._order = order
         self._tasks = [SubflowTask(**task) for task in tasks]
 
     @property
@@ -271,6 +277,16 @@ class SubflowStatus:
 
         """
         return self._is_completed
+
+    @property
+    def order(self) -> dict:
+        """サブフロータスクの表示順を取得するためのゲッターです。
+
+        Returns:
+            dict:サブフロータスクの表示順の定義
+
+        """
+        return self._order
 
     @property
     def tasks(self) -> list[SubflowTask]:
@@ -301,6 +317,7 @@ class SubflowStatus:
         """
         return {
             _IS_COMPLETED: self.is_completed,
+            _ORDER: self.order,
             _TASKS: [
                 con.to_dict() for con in self.tasks
             ]
@@ -407,7 +424,7 @@ class SubflowStatusFile(JsonFile):
 
         """
         content = super().read()
-        return SubflowStatus(content[_IS_COMPLETED], content[_TASKS])
+        return SubflowStatus(content[_IS_COMPLETED], content[_ORDER], content[_TASKS])
 
     def write(self, subflow_status: SubflowStatus):
         """ジェイソンファイルへの書き込みを行うメソッドです。

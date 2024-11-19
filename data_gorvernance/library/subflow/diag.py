@@ -167,9 +167,9 @@ class DiagManager:
             str: svg形式で書かれたダイアグラムデータの文字列
 
         """
-        order_sequence = order.get("sequence")
+        order_sequence = order["sequence"]
         self.create_left_subgraph(current_dir, tasks, node_config, order_sequence)
-        order_whenever = order.get("whenever")
+        order_whenever = order["whenever"]
         self.create_right_subgraph(current_dir, tasks, node_config, order_whenever)
 
         svg_data = self.dot.pipe(format='svg').decode('utf-8')

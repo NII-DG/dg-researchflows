@@ -33,12 +33,11 @@ def start_server():
     config_path = os.path.join(os.environ['HOME'], 'data_gorvernance/library/data/vault-config.hcl')
     dir_path = os.path.join(os.environ['HOME'], '.vault/log')
     os.makedirs(dir_path, exist_ok=True)
-    with open(os.path.join(dir_path, 'vault.log'), 'w') as file:
-        process = subprocess.Popen(
-            ['setsid', 'vault', 'server', '-config', config_path],
-            stdout=subprocess.DEVNULL,
-            stderr=file
-        )
+    process = subprocess.Popen(
+        ['setsid', 'vault', 'server', '-config', config_path],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.STDOUT
+    )
 
 class Vault():
     """Vault Server操作クラスです。"""

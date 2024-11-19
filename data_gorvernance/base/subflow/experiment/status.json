@@ -1,5 +1,9 @@
 {
     "is_completed": false,
+    "order": {
+        "sequence": ["RF003001", "RF003010", "RF003011", "RF003012"],
+        "whenever":["RF009004", "RF009002", "RF009006", "RF009007", "RF009001", "RF009005" ]
+    },
     "tasks": [
         {
             "id": "RF003001",
@@ -10,7 +14,7 @@
             "dependent_task_ids": [],
             "status": "unexecuted",
             "execution_environments": [],
-            "disabled": false
+            "active": true
         },
         {
             "id": "RF003010",
@@ -23,7 +27,7 @@
             ],
             "status": "unfeasible",
             "execution_environments": [],
-            "disabled": false
+            "active": true
         },
         {
             "id": "RF003011",
@@ -36,7 +40,7 @@
             ],
             "status": "unfeasible",
             "execution_environments": [],
-            "disabled": false
+            "active": true
         },
         {
             "id": "RF003012",
@@ -49,7 +53,7 @@
             ],
             "status": "unfeasible",
             "execution_environments": [],
-            "disabled": false
+            "active": true
         },
         {
             "id": "RF009001",
@@ -60,7 +64,7 @@
             "dependent_task_ids": [],
             "status": "unexecuted",
             "execution_environments": [],
-            "disabled": false
+            "active": true
         },
         {
             "id": "RF009002",
@@ -71,7 +75,7 @@
             "dependent_task_ids": [],
             "status": "unexecuted",
             "execution_environments": [],
-            "disabled": false
+            "active": true
         },
         {
             "id": "RF009004",
@@ -82,7 +86,7 @@
             "dependent_task_ids": [],
             "status": "unexecuted",
             "execution_environments": [],
-            "disabled": false
+            "active": true
         },
         {
             "id": "RF009005",
@@ -93,7 +97,7 @@
             "dependent_task_ids": [],
             "status": "unexecuted",
             "execution_environments": [],
-            "disabled": false
+            "active": true
         },
         {
             "id": "RF009006",
@@ -104,7 +108,7 @@
             "dependent_task_ids": [],
             "status": "unexecuted",
             "execution_environments": [],
-            "disabled": false
+            "active": true
         },
         {
             "id": "RF009007",
@@ -115,7 +119,7 @@
             "dependent_task_ids": [],
             "status": "unexecuted",
             "execution_environments": [],
-            "disabled": false
+            "active": true
         }
     ]
 }

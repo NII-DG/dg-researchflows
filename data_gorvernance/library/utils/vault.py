@@ -111,7 +111,7 @@ class Vault():
         return read_res['data']['secret']
 
     def __start_server(self):
-        """Vaultサーバー起動するメソッドです。
+        """Vaultサーバーを起動するメソッドです。
 
         Raises:
             UnusableVault:vaultが利用できない場合のエラー
@@ -227,18 +227,20 @@ class Vault():
         Returns:
             str:ルートトークンの値を返す。
         """
+        # ルートトークンが存在しない場合はサーバーを起動して初期化する
         if not os.path.isfile(TOKEN_PATH):
             raise UnusableVault
 
         with open(TOKEN_PATH, 'r') as f:
             root_token = f.read()
 
-        if not self._is_vault_server_running():
+        # ルートトークンは存在するがサーバーが停止している場合は再起動する
+        if not self.__is_vault_server_running():
             self.__restrat_server()
 
         return root_token
 
-    def _is_vault_server_running(self) -> bool:
+    def __is_vault_server_running(self) -> bool:
         """Vaultサーバーが稼働しているか確認するメソッドです。
 
         Returns:

@@ -10,5 +10,6 @@ listener "tcp" {
 ui = true
 disable_mlock = true
 
-log_level = "debug"  # ログレベルを設定
+log_level = "debug"
+log_requests_level = "debug"
 log_file  = "/home/jovyan/.vault/log//vault.log"

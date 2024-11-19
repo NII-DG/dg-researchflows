@@ -30,14 +30,16 @@ MAX_RETRY_COUNT = 5
 
 def start_server():
     """サーバーを起動するメソッドです。"""
-    config_path = os.path.join(os.environ['HOME'], 'data_gorvernance/library/data/vault-config.hcl')
+    config_path = os.path.join(
+        os.environ['HOME'], 'data_gorvernance/library/data/vault-config.hcl')
     dir_path = os.path.join(os.environ['HOME'], '.vault/log')
     os.makedirs(dir_path, exist_ok=True)
-    process = subprocess.Popen(
+    subprocess.Popen(
         ['setsid', 'vault', 'server', '-config', config_path],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.STDOUT
     )
+
 
 class Vault():
     """Vault Server操作クラスです。"""
@@ -160,7 +162,7 @@ class Vault():
         # 起動処理が終わるまで少し待機
         time.sleep(1)
 
-        #unsealキーを取得
+        # unsealキーを取得
         with open(UNSEAL_KEY_PATH, 'r') as f:
             unseal_keys = [line.strip() for line in f.readlines()]
 
@@ -169,10 +171,6 @@ class Vault():
         # unseal
         for unseal_key in unseal_keys:
             client.sys.submit_unseal_key(unseal_key)
-
-        #再設定（実際にはこの設定は保持されるが確認のため実行）
-        self.__create_dg_engine()
-        self.__create_dg_policy()
 
     def __create_dg_engine(self):
         """シークレットエンジン(kv)作成をするメソッドです。"""
@@ -235,7 +233,7 @@ class Vault():
         with open(TOKEN_PATH, 'r') as f:
             root_token = f.read()
 
-        if not  self._is_vault_server_running():
+        if not self._is_vault_server_running():
             self.__restrat_server()
 
         return root_token

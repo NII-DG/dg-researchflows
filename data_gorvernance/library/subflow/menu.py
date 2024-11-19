@@ -5,7 +5,6 @@
 import os
 from pathlib import Path
 import traceback
-from typing import Callable
 import xml.etree.ElementTree as ET
 
 from IPython.core.display import Javascript
@@ -157,7 +156,6 @@ class SubflowMenu(TaskLog):
             / subflow_rel_path / path_config.TASK
         )
         souce_task_dir = root_folder / path_config.DG_TASK_BASE_DATA_FOLDER
-
 
         try:
             # setup

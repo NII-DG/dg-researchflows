@@ -4,9 +4,7 @@
 """
 import os
 from pathlib import Path
-from tempfile import TemporaryDirectory
 import traceback
-from typing import Callable
 import xml.etree.ElementTree as ET
 
 from IPython.core.display import Javascript
@@ -27,6 +25,7 @@ def access_main_menu(working_file: str):
 
     Args:
         working_file (str): 実行Notebookファイルパス
+
     """
     root_folder = Path(path_config.get_abs_root_form_working_dg_file_path(working_file))
     main_menu = str(root_folder / path_config.MAIN_MENU_PATH)
@@ -82,49 +81,36 @@ class SubflowMenu(TaskLog):
         self.diagram_widgetbox.width = d
         self._msg_output = d
 
-    def set_diagram(self, subflow: SubFlowManager, font_folder: Path):
+    def set_diagram(self, subflow: SubFlowManager):
         """フロー図の生成と表示設定のメソッドです。
 
         Args:
             subflow(SubFlowManager):サブフロー図
-            font_folder(Path):フォントフォルダー
+
         """
-        with TemporaryDirectory() as workdir:
-            tmp_diag = Path(workdir) / 'skeleton.diag'
-            skeleton = Path(workdir) / 'skeleton.svg'
-            subflow.generate(
-                svg_path=str(skeleton),
-                tmp_diag=str(tmp_diag),
-                font=str(font_folder / '.fonts/ipag.ttf')
-            )
-            self.diagram.object = self._get_contents(str(skeleton))
-            self.diagram.width = self._get_svg_size(str(skeleton))
-            self._set_width()
+        #フロー図の作成
+        self.diagram.object = subflow.generate()
+
+        self.diagram.width = self._get_svg_size(self.diagram.object)
+        self._set_width()
 
     # その他
-    def _get_contents(self, svg_file_path: str) -> str:
-        """フロー図を取得するメソッドです。
-
-        Args:
-            svg_file_path (str): svgファイルのパス
-
-        Returns:
-            str:svgファイルの内容を返す。
-        """
-        return file.File(svg_file_path).read()
-
-    def _get_svg_size(self, svg_file_path: str) -> int:
+    def _get_svg_size(self, svg_data: str) -> int:
         """svgの画像の横幅を返すメソッドです。
 
         Args:
-            svg_file_path (str): svgファイルのパス
+            svg_data (str): svg形式で書かれたダイアグラムデータの文字列
 
         Returns:
             int:svgの画像の横幅の値を返す
+
         """
+        #表示領域のサイズ調整に用いる係数
+        scale_coefficient = 1.5
+
         # SVGファイルをパース
-        tree = ET.parse(svg_file_path)
-        root = tree.getroot()
+        root = ET.fromstring(svg_data)
+
         # <svg>要素からviewBox属性を取得
         viewbox_value = root.get('viewBox')
         # viewbox_valueを解析して幅と高さを取得
@@ -132,14 +118,12 @@ class SubflowMenu(TaskLog):
         if viewbox_value:
             viewbox_parts = viewbox_value.split()
             if len(viewbox_parts) == 4:
-                viewbox_width = int(viewbox_parts[2])
-                viewbox_height = int(viewbox_parts[3])
-        # 大きさを調節
-        if 800 < viewbox_width:
-            viewbox_width = 800
-        elif viewbox_width < 200:
-            viewbox_width = 200
-        return viewbox_width
+                viewbox_width = int(float(viewbox_parts[2]))
+                viewbox_height = int(float(viewbox_parts[3]))
+
+        viewbox_width *= scale_coefficient # フロー図が収まるように調節
+
+        return int(viewbox_width)
 
     @classmethod
     def render(cls, working_file: str):
@@ -167,22 +151,17 @@ class SubflowMenu(TaskLog):
 
         # create path
         status_file = parent / path_config.STATUS_JSON
-        diag_file = (
-            root_folder / path_config.DG_SUB_FLOW_BASE_DATA_FOLDER
-            / subflow_type / path_config.FLOW_DIAG
-        )
         using_task_dir = (
             root_folder / path_config.DG_WORKING_RESEARCHFLOW_FOLDER
             / subflow_rel_path / path_config.TASK
         )
         souce_task_dir = root_folder / path_config.DG_TASK_BASE_DATA_FOLDER
-        font_folder = Path(os.environ['HOME'])
 
         try:
             # setup
-            subflow = SubFlowManager(str(parent), str(status_file), str(diag_file), str(using_task_dir))
+            subflow = SubFlowManager(str(parent), str(status_file), str(using_task_dir))
             subflow.setup_tasks(str(souce_task_dir))
-            subflow_menu.set_diagram(subflow, font_folder)
+            subflow_menu.set_diagram(subflow)
             subflow_menu.menu_widgetbox.append(subflow_menu.diagram_widgetbox)
         except Exception:
             message_box = MessageBox().update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')

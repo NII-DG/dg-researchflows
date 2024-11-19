@@ -38,7 +38,6 @@ USER ${NB_USER}
 RUN pip install --no-cache --upgrade pip
 RUN pip install --no-cache notebook
 RUN pip install --no-cache lxml==4.7.1
-RUN pip install --no-cache blockdiag==3.0.0
 RUN pip install --no-cache -U nbformat==5.2.0
 RUN pip install --no-cache black==21.12b0
 RUN pip install --no-cache boto3
@@ -53,6 +52,7 @@ RUN pip install --no-cache gitpython==3.1.43
 RUN pip install --no-cache git+https://github.com/RCOSDP/rdmclient.git@b56fb29d40bfe2b9dfa903527dadfd569bd169b5
 RUN pip install --no-cache git+https://github.com/NII-DG/nii-dg.git@230419_8c684da
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-packager.git@master
+RUN pip install --no-cache graphviz==0.20.1
 
 # TODO: リリース時にはdg-drawerのブランチを変更する(@Rel20230929のようにする)
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-drawer.git@develop/Rel_V2.0
@@ -77,16 +77,6 @@ RUN jupyter nbextension enable --py dg_nb_extensions --user
 
 # upgrade nbclassic ( after nbextension installed )
 RUN pip install --no-cache nbclassic==0.4.8
-
-# install Japanese-font (for blockdiag)
-ARG font_deb=fonts-ipafont-gothic_00303-18ubuntu1_all.deb
-RUN mkdir ${HOME}/.fonts
-RUN wget -P ${HOME}/.fonts http://archive.ubuntu.com/ubuntu/pool/universe/f/fonts-ipafont/${font_deb}
-RUN dpkg-deb -x ${HOME}/.fonts/${font_deb} ~/.fonts
-RUN cp ~/.fonts/usr/share/fonts/opentype/ipafont-gothic/ipag.ttf ~/.fonts/ipag.ttf
-RUN rm ${HOME}/.fonts/${font_deb}
-RUN rm -rf ${HOME}/.fonts/etc ${HOME}/.fonts/usr
-RUN rm .wget-hsts
 
 # install vcpsdk
 RUN wget https://s3-ap-northeast-1.amazonaws.com/vcp-jupyternotebook/23.11.0/jupyternotebook_vcpsdk-23.11.0.tgz

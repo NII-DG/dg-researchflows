@@ -3,15 +3,14 @@
 このモジュールはVaultサーバーに接続するために必要な値の設定とチェックを行い、キーやポリシーを作成してサーバーを起動させ、接続確認を行うメソッドがあります。
 """
 import os
-import requests
 import subprocess
-import threading
 import time
+from typing import Optional
 
 import hvac
+import requests
 
 from .error import UnusableVault
-from typing import Optional
 
 
 VAULT_ADDR = 'http://127.0.0.1:8200'
@@ -34,10 +33,11 @@ def start_server():
         os.environ['HOME'], 'data_gorvernance/library/data/vault-config.hcl')
     dir_path = os.path.join(os.environ['HOME'], '.vault/log')
     os.makedirs(dir_path, exist_ok=True)
-    subprocess.Popen(
-        ['setsid', 'vault', 'server', '-config', config_path],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.STDOUT
+    with open(os.path.join(dir_path, 'vault.log'), 'w') as file:
+        subprocess.Popen(
+            ['setsid', 'vault', 'server', '-config', config_path],
+            stdout=file,
+            stderr=file
     )
 
 
@@ -48,6 +48,9 @@ class Vault():
         """Vault初期化を行うメソッドです。"""
         try:
             self.__read_token()
+            #サーバーが停止している場合は再起動
+            if not self.__is_vault_process_running:
+                self.__restrat_server()
             return
         except UnusableVault:
             pass
@@ -118,10 +121,17 @@ class Vault():
         """
 
         # vaultサーバー起動
-        thread = threading.Thread(target=start_server)
-        thread.start()
-        # 起動処理が終わるまで少し待機
-        time.sleep(1)
+        start_server()
+        #起動処理が終了するのを待つ。（最大5回確認する）
+        retry_count = 0
+        while retry_count < MAX_RETRY_COUNT:
+            if not self.__is_vault_process_running():
+                retry_count += 1
+                time.sleep(1)
+            else:
+                break
+        else:
+            raise UnusableVault
 
         shares = 5
         threshold = 3
@@ -154,13 +164,20 @@ class Vault():
         self.__write_token(root_token)
 
     def __restrat_server(self):
-        """vaultサーバーを再起動するメソッドです。"""
+        """vaultサーバーを初期化せずに再起動するメソッドです。"""
 
         # vaultサーバー起動
-        thread = threading.Thread(target=start_server)
-        thread.start()
-        # 起動処理が終わるまで少し待機
-        time.sleep(1)
+        start_server()
+        #起動処理が終了するのを待つ。（最大5回確認する）
+        retry_count = 0
+        while retry_count < MAX_RETRY_COUNT:
+            if not self.__is_vault_process_running():
+                retry_count += 1
+                time.sleep(1)
+            else:
+                break
+        else:
+            raise UnusableVault
 
         # unsealキーを取得
         with open(UNSEAL_KEY_PATH, 'r') as f:
@@ -198,7 +215,7 @@ class Vault():
             )
 
     def __write_token(self, token: str):
-        """ルートトークン保存のメソッドです。
+        """ルートトークンを保存するメソッドです。
 
         Args:
             token(str):ルートトークン
@@ -208,10 +225,10 @@ class Vault():
             f.write(token)
 
     def __write_unseal_key(self, unseal_keys: list):
-        """アンシールキー保存のメソッドです。
+        """アンシールキーを保存するメソッドです。
 
         Args:
-            unseal_keys(list): シールを解除するのに使用する鍵
+            unseal_keys(list): シール状態を解除するのに使用する鍵
 
         """
         with open(UNSEAL_KEY_PATH, 'w') as f:
@@ -219,7 +236,7 @@ class Vault():
                 f.write(key + '\n')
 
     def __read_token(self) -> str:
-        """ルートトークン取得のメソッドです。
+        """ルートトークンを取得するメソッドです。
 
         Raises:
             UnusableVault:vaultが利用できないエラー
@@ -227,32 +244,23 @@ class Vault():
         Returns:
             str:ルートトークンの値を返す。
         """
-        # ルートトークンが存在しない場合はサーバーを起動して初期化する
+        # ルートトークンが存在しない場合
         if not os.path.isfile(TOKEN_PATH):
             raise UnusableVault
 
         with open(TOKEN_PATH, 'r') as f:
             root_token = f.read()
 
-        # ルートトークンは存在するがサーバーが停止している場合は再起動する
-        if not self.__is_vault_server_running():
-            self.__restrat_server()
-
         return root_token
 
-    def __is_vault_server_running(self) -> bool:
-        """Vaultサーバーが稼働しているか確認するメソッドです。
-
-        Returns:
-            bool: サーバーが稼働していればTrue、そうでなければFalseを返す
-
-        """
+    def __is_vault_process_running(self) -> bool:
+        """vaultのプロセスが実行されているかを確認するメソッドです。"""
         try:
-            response = requests.get(f'{VAULT_ADDR}/v1/sys/health', timeout=5)
-            # サーバーが正常に応答した場合
-            return response.status_code == 200
-        except requests.RequestException:
-            # サーバーが稼働していない、または接続エラー
+            result = subprocess.run(['pgrep', '-f', 'vault'], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            #vaultのプロセスが実行中
+            return result.returncode == 0
+
+        except subprocess.CalledProcessError:
             return False
 
     def __get_client(self) -> hvac.Client:
@@ -262,6 +270,11 @@ class Vault():
             hvac.Client:vaultサーバーのクライアント
         """
         root_token = self.__read_token()
+
+        # vaultサーバーが停止している場合は再起動する
+        if not self.__is_vault_process_running:
+            self.__restrat_server()
+
         client = hvac.Client(url=VAULT_ADDR, token=root_token)
         token_res = client.auth.token.create(
             policies=[DG_POLICY_NAME],
@@ -269,3 +282,4 @@ class Vault():
         )
         token = token_res['auth']['client_token']
         return hvac.Client(url=VAULT_ADDR, token=token)
+

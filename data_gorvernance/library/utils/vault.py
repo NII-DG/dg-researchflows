@@ -281,3 +281,4 @@ class Vault():
         )
         token = token_res['auth']['client_token']
         return hvac.Client(url=VAULT_ADDR, token=token)
+

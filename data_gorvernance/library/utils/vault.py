@@ -27,20 +27,6 @@ TOKEN_TTL = '1m'
 MAX_RETRY_COUNT = 5
 
 
-def start_server():
-    """サーバーを起動するメソッドです。"""
-    config_path = os.path.join(
-        os.environ['HOME'], 'data_gorvernance/library/data/vault-config.hcl')
-    dir_path = os.path.join(os.environ['HOME'], '.vault/log')
-    os.makedirs(dir_path, exist_ok=True)
-    with open(os.path.join(dir_path, 'vault.log'), 'w') as file:
-        subprocess.Popen(
-            ['setsid', 'vault', 'server', '-config', config_path],
-            stdout=file,
-            stderr=file
-        )
-
-
 class Vault():
     """Vault Server操作クラスです。"""
 
@@ -113,6 +99,19 @@ class Vault():
         )
         return read_res['data']['secret']
 
+    def __launch_server(self):
+        """サーバーを起動するメソッドです。"""
+        config_path = os.path.join(
+            os.environ['HOME'], 'data_gorvernance/library/data/vault-config.hcl')
+        dir_path = os.path.join(os.environ['HOME'], '.vault/log')
+        os.makedirs(dir_path, exist_ok=True)
+        with open(os.path.join(dir_path, 'vault.log'), 'w') as file:
+            subprocess.Popen(
+                ['setsid', 'vault', 'server', '-config', config_path],
+                stdout=file,
+                stderr=file
+            )
+
     def __start_server(self):
         """Vaultサーバーを起動するメソッドです。
 
@@ -121,7 +120,7 @@ class Vault():
 
         """
         # vaultサーバー起動
-        start_server()
+        self.__launch_server()
         # 起動処理が終わるまで少し待機
         time.sleep(1)
 
@@ -163,7 +162,7 @@ class Vault():
 
         """
         # vaultサーバー起動
-        start_server()
+        self.__launch_server()
         # 起動処理が終わるまで少し待機
         time.sleep(1)
 
@@ -254,8 +253,8 @@ class Vault():
         try:
             result = subprocess.run(
                 ['pgrep', '-f', 'vault'], check=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
             )
             # vaultのプロセスが実行中
             return result.returncode == 0

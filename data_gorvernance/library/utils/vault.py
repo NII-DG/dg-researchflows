@@ -50,7 +50,7 @@ class Vault():
             self.__read_token()
             # tokenが存在する（初期化済み）でサーバーが停止している場合は再起動
             if not self.__is_vault_process_running():
-                self.__restrat_server()
+                self.__restart_server()
             return
         except UnusableVault:
             pass
@@ -155,7 +155,7 @@ class Vault():
         root_token = result['root_token']
         self.__write_token(root_token)
 
-    def __restrat_server(self):
+    def __restart_server(self):
         """vaultサーバーを初期化せずに再起動するメソッドです。
 
         Raises:
@@ -272,7 +272,7 @@ class Vault():
         root_token = self.__read_token()
 
         if not self.__is_vault_process_running():
-            self.__restrat_server()
+            self.__restart_server()
 
         client = hvac.Client(url=VAULT_ADDR, token=root_token)
         token_res = client.auth.token.create(

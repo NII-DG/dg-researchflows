@@ -9,7 +9,7 @@ from typing import Optional
 from urllib import parse
 
 from osfclient.cli import OSF, split_storage
-from osfclient.utils import norm_remote_path, split_storage, is_path_matched
+from osfclient.utils import norm_remote_path, split_storage, _is_path_matched
 from osfclient.exceptions import UnauthorizedException
 import requests
 from requests.exceptions import RequestException
@@ -313,7 +313,7 @@ class External:
             if not base_file_path.endswith('/'):
                 base_file_path = base_file_path + '/'
 
-                def path_filter(f): return is_path_matched(base_file_path, f)
+                def path_filter(f): return _is_path_matched(base_file_path, f)
         else:
             path_filter = None
 

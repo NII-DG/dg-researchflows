@@ -269,6 +269,7 @@ class Form:
         if "properties" not in schema:
             return
         self.schema = schema
+        self.form_box.clear()
         for key, properties in schema["properties"].items():
             value = None
             if isinstance(data, dict):

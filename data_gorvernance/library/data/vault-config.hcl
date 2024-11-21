@@ -12,4 +12,4 @@ disable_mlock = true
 
 log_level = "debug"
 log_requests_level = "debug"
-log_file  = "/home/jovyan/.vault/log//vault.log"
+log_file  = "/home/jovyan/.vault/log/vault.log"

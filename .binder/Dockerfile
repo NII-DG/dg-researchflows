@@ -54,6 +54,9 @@ RUN pip install --no-cache git+https://github.com/NII-DG/nii-dg.git@230419_8c684
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-packager.git@master
 RUN pip install --no-cache graphviz==0.20.1
 
+# TODO: リリース時にブランチを最新のタグに変更する
+RUN pip install --no-cache git+https://github.com/NII-DG/dg-metadata-manager.git@3670dc0bacdb5e00501b88e126a10c52657e9355
+
 # TODO: リリース時にはdg-drawerのブランチを変更する(@Rel20230929のようにする)
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-drawer.git@develop/Rel_V2.0
 

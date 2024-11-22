@@ -225,7 +225,7 @@ class External:
             raise
         return response.json()
 
-    def upload(
+    async def upload(
         self, token: str, base_url: str, project_id: str, source: str,
         destination: str, recursive: bool = False, force: bool = False
     ) -> None:
@@ -255,10 +255,10 @@ class External:
             raise KeyError('To upload a file you need to provide a username and password or token.')
 
         try:
-            project = osf.project(project_id)
+            project = await osf.project(project_id)
             storage, remote_path = split_storage(destination)
 
-            store = project.storage(storage)
+            store = await project.storage(storage)
             if recursive:
                 if not os.path.isdir(source):
                     raise RuntimeError(f"Expected source ({source}) to be a directory when using recursive mode.")
@@ -273,11 +273,11 @@ class External:
                         with open(local_path, 'rb') as fp:
                             # build the remote path + fname
                             name = os.path.join(remote_path, dir_name, subdir_path, fname)
-                            store.create_file(name, fp, force=force, update=update)
+                            await store.create_file(name, fp, force=force, update=update)
 
             else:
                 with open(source, 'rb') as fp:
-                    store.create_file(remote_path, fp, force=force, update=update)
+                    await store.create_file(remote_path, fp, force=force, update=update)
         except UnauthorizedException as e:
             raise UnauthorizedError(str(e)) from e
 
@@ -322,7 +322,7 @@ class External:
             store = await project.storage(storage)
             files = store.files if path_filter is None \
                     else store.matched_files(path_filter)
-            for file_ in files:
+            async for file_ in files:
                 if norm_remote_path(file_.path) == remote_path:
                     try:
                         response = file_._get(file_._download_url, stream=True)

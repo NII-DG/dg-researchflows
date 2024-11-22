@@ -149,7 +149,7 @@ class Grdm():
             recursive=recursive, force=True
         )
 
-    def download_text_file(self, token: str, base_url: str, project_id: str, remote_path: str, encoding = 'utf-8') -> str:
+    async def download_text_file(self, token: str, base_url: str, project_id: str, remote_path: str, encoding = 'utf-8') -> str:
         """ テキストファイルの中身を取得するメソッドです。
 
         Args:
@@ -167,7 +167,7 @@ class Grdm():
             UnauthorizedError: 認証が通らない
             requests.exceptions.RequestException: その他の通信エラー
         """
-        content = self.external.download(
+        content = await self.external.download(
             token=token, project_id=project_id, base_url=base_url,
             remote_path=remote_path
         )
@@ -175,7 +175,7 @@ class Grdm():
             raise FileNotFoundError(f'The specified file (path: {remote_path}) does not exist.')
         return content.decode(encoding)
 
-    def download_json_file(self, token: str, base_url: str, project_id: str, remote_path: str) -> Union[dict, list]:
+    async def download_json_file(self, token: str, base_url: str, project_id: str, remote_path: str) -> Union[dict, list]:
         """ jsonファイルの中身を取得するメソッドです。
 
         Args:
@@ -193,7 +193,7 @@ class Grdm():
             UnauthorizedError: 認証が通らない
             requests.exceptions.RequestException: その他の通信エラー
         """
-        content = self.download_text_file(token, base_url, project_id, remote_path)
+        content =  await self.download_text_file(token, base_url, project_id, remote_path)
         return json.loads(content)
 
     def get_project_metadata(self, base_url: str, token: str, project_id: str) -> dict[str, list]:

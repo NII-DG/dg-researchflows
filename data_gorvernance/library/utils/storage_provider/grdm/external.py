@@ -281,7 +281,7 @@ class External:
         except UnauthorizedException as e:
             raise UnauthorizedError(str(e)) from e
 
-    def download(
+    async def download(
         self, token: str, base_url: str, project_id: str,
         remote_path: str, base_path: Optional[str] = None
     ) -> Optional[bytes]:
@@ -318,8 +318,8 @@ class External:
             path_filter = None
 
         try:
-            project = osf.project(project_id)
-            store = project.storage(storage)
+            project = await osf.project(project_id)
+            store = await project.storage(storage)
             files = store.files if path_filter is None \
                     else store.matched_files(path_filter)
             for file_ in files:

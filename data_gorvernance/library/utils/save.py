@@ -134,8 +134,12 @@ class TaskSave(TaskLog):
         # define form
         if not self.save_msg_output.has_message():
             self._save_submit_button.set_looks_init(msg_config.get('save', 'submit'))
-            self._save_submit_button.on_click(await self._save_submit_callback)
+            self._save_submit_button.on_click(self._handle_click)
             self.save_form_box.append(self._save_submit_button)
+
+    async def _handle_click(self, event):
+        self.log.error(f'実行されたhandle\n{traceback.format_exc()}')
+        await self._save_submit_callback(event)
 
     @TaskLog.callback_form("input_token")
     async def _save_submit_callback(self, event: Any) -> None:

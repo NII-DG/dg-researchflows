@@ -4,11 +4,14 @@
 ファイルまたはフォルダをアップロードするメソッドやファイルの内容を取得するメソッドがあります。
 """
 from http import HTTPStatus
+import logging
 import os
 from typing import Optional
 from urllib import parse
 
+import aiofiles
 from osfclient.cli import OSF, split_storage
+from osfclient.models import File
 from osfclient.utils import norm_remote_path, split_storage, _is_path_matched
 from osfclient.exceptions import UnauthorizedException
 import requests
@@ -270,13 +273,13 @@ class External:
                     subdir_path = os.path.relpath(root, source)
                     for fname in files:
                         local_path = os.path.join(root, fname)
-                        with open(local_path, 'rb') as fp:
+                        async with aiofiles.open(local_path, 'rb') as fp:
                             # build the remote path + fname
                             name = os.path.join(remote_path, dir_name, subdir_path, fname)
                             await store.create_file(name, fp, force=force, update=update)
 
             else:
-                with open(source, 'rb') as fp:
+                async with aiofiles.open(source, 'rb') as fp:
                     await store.create_file(remote_path, fp, force=force, update=update)
         except UnauthorizedException as e:
             raise UnauthorizedError(str(e)) from e
@@ -316,22 +319,25 @@ class External:
                 def path_filter(f): return _is_path_matched(base_file_path, f)
         else:
             path_filter = None
-
         try:
             project = await osf.project(project_id)
             store = await project.storage(storage)
-            files = store.files if path_filter is None \
-                    else store.matched_files(path_filter)
+
+            if path_filter is None:
+                files = store._iter_children(store._files_url, 'file', File, recurse=('links', 'upload'))
+            else:
+                files = store.matched_files(path_filter)
+
             async for file_ in files:
                 if norm_remote_path(file_.path) == remote_path:
                     try:
-                        response = file_._get(file_._download_url, stream=True)
+                        response = await file_._get(file_._download_url)#stream=trueを削除
                     except UnauthorizedException:
-                        response = file_._get(file_._upload_url, stream=True)
+                        response = await file_._get(file_._upload_url)
                     response.raise_for_status()
 
                     file_content = []
-                    for chunk in response.iter_content(chunk_size=8192):
+                    async for chunk in response.aiter_bytes():
                         file_content.append(chunk)
                     return b''.join(file_content)
         except UnauthorizedException as e:

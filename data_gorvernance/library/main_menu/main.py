@@ -450,6 +450,8 @@ class MainMenu(TaskLog):
         self.input_button.set_looks_init()
         self.research_flow_message.clear()
         self.field_box.clear()
+        self.token_input.value = ''
+        self.project_id_input.value = ''
         self.token = utils.get_token()
         self.project_id = utils.get_project_id()
         if self.project_id is None and self.token is None:

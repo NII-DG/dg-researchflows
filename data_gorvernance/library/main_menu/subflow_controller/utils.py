@@ -77,13 +77,6 @@ def create_float_panel(abs_root: str, field_box: pn.WidgetBox, message: MessageB
         schema = get_schema()
         data = get_default_govsheet(schema)
         file.JsonFile(file_path).write(data)
-        grdm_connect.sync(
-            token,
-            grdm_url,
-            project_id,
-            file_path,
-            abs_root
-        )
 
     def select_cancel(event):
         """適用しない押下後エラーメッセージを表示する関数です。

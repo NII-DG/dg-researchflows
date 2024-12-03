@@ -55,6 +55,7 @@ class CreateSubflowForm(BaseSubflowForm):
         self.grdm_url = con_config.get('GRDM', 'BASE_URL')
         self.remote_path = con_config.get('DG_WEB', 'GOVSHEET_PATH')
         self._sub_flow_widget_box = widget_box
+        self.current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 
     def generate_sub_flow_type_options(self, research_flow_status: list[PhaseStatus]) -> dict[str, int]:
         """サブフロー種別(フェーズ)を表示するメソッドです。
@@ -195,8 +196,8 @@ class CreateSubflowForm(BaseSubflowForm):
             self._data_dir_name_form,
             self._parent_sub_flow_type_selector,
             self._parent_sub_flow_selector,
-            self.project_id_input,
             self.token_input,
+            self.project_id_input,
             self.submit_button
         )
 
@@ -240,17 +241,18 @@ class CreateSubflowForm(BaseSubflowForm):
             self.change_submit_button_warning(str(e))
             raise
 
+        research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
+        govsheet = utils.get_govsheet(token, self.grdm_url, project_id, self.remote_path)
         if utils.get_govsheet_rf(self.abs_root) == {}:
-            if utils.get_govsheet(token, self.grdm_url, project_id, self.remote_path) == {}:
+            if govsheet == {}:
                 utils.display_float_panel(self.abs_root, self._sub_flow_widget_box, self._err_output, token, project_id)
             else:
                 # サブフローバックアップ
-                utils.backup_zipfile(self.abs_root, research_flow_dict, current_time)
-                govsheet_rf_path = os.path.abspath(govsheet_rf)
+                utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
+                govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
                 utils.copy_govsheet(govsheet_rf_path, govsheet)
 
         # 既存のサブフロー作り直し
-        research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
         if research_flow_dict:
             for exist_phase, exist_subflow_data in research_flow_dict.items():
                 exist_status = os.path.join(

@@ -8,7 +8,7 @@ import panel as pn
 from requests.exceptions import RequestException
 
 from library.utils.config import path_config, message as msg_config, connect as con_config
-from library.utils.widgets import Button
+from library.utils.widgets import Button, MessageBox
 from library.utils import dg_web
 from library.utils.storage_provider import grdm
 from library.utils.dg_web import form
@@ -30,7 +30,7 @@ def input_widget() -> Union[pn.widgets.PasswordInput, pn.widgets.TextInput]:
     project_id_input = pn.widgets.TextInput(name=msg_config.get('main_menu', 'project_id_input'), visible=False)
     return token_input, project_id_input
 
-def create_float_panel(abs_root: str, field_box: pn.WidgetBox, message: MessageBox, token: str, project_id: str) -> pn.layput.FloatPanel:
+def create_float_panel(abs_root: str, field_box: pn.WidgetBox, message: MessageBox, token: str, project_id: str) -> pn.layout.FloatPanel:
     """FloatPanelの設定をする関数です。
 
     Args:

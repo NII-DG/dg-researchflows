@@ -193,7 +193,7 @@ class MainMenu(TaskLog):
         self.input_button.set_looks_init()
         self.input_button.on_click(self.callback_input_button)
 
-        self.govsheet_rf_path = utils.get_govhseet_rf_path(self.abs_root)
+        self.govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
         self.current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 
     def is_govsheet(self, token: str, project_id: str):

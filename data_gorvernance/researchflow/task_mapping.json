@@ -1,0 +1,32 @@
+{
+    "accessRights": {
+        "accessRightsConditionOfAccess": [
+            {
+                "value": true,
+                "display":[],
+                "hide":["RF003001"]
+            },
+            {
+                "value": false,
+                "display":["RF003001"],
+                "hide":[]
+            }
+        ],
+        "accessRightsDateAvailable":[
+            {
+                "value": true,
+                "display":["RF003001", "RF003010"],
+                "hide":["RF002003"]
+            }
+        ]
+    },
+    "resource": {
+        "resourceDateCreated": [
+            {
+                "value": true,
+                "display":["RF009007"],
+                "hide":[]
+            }
+        ]
+    }
+}

@@ -5,19 +5,21 @@
 import os
 import shutil
 import traceback
-
+import datetime
 
 from dg_drawer.research_flow import PhaseStatus
 import panel as pn
 
 from library.utils import file
-from library.utils.config import path_config, message as msg_config
+from library.utils.config import path_config, message as msg_config, connect as con_config
 from library.utils.error import InputWarning
 from library.utils.nb_file import NbFile
 from library.utils.string import StringManager
-from library.utils.widgets import MessageBox
+from library.utils.widgets import MessageBox, Button
+from library.main_menu.subflow_controller import utils
+from library.utils.storage_provider import grdm
+from library.utils.vault import Vault
 from .base import BaseSubflowForm
-
 
 
 class CreateSubflowForm(BaseSubflowForm):
@@ -36,16 +38,23 @@ class CreateSubflowForm(BaseSubflowForm):
             _data_dir_name_form(TextInput):データディレクトリ名のフォーム
     """
 
-    def __init__(self, abs_root: str, message_box: MessageBox) -> None:
+    def __init__(self, abs_root: str, widget_box: pn.WidgetBox, message_box: MessageBox) -> None:
         """CreateSubflowForm コンストラクタのメソッドです。
 
         Args:
             abs_root (str): リサーチフローのルートディレクトリ
+            widget_box (pn.WidgetBox): ウィジェットボックスを格納する。
             message_box (MessageBox): メッセージを格納する。
         """
         super().__init__(abs_root, message_box)
         # 処理開始ボタン
         self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
+        self.token_input, self.project_id_input = utils.input_widget()
+        self.project_id_input.param.watch(self.callback_menu_form, 'value')
+        self.token_input.param.watch(self.callback_menu_form, 'value')
+        self.grdm_url = con_config.get('GRDM', 'BASE_URL')
+        self.remote_path = con_config.get('DG_WEB', 'GOVSHEET_PATH')
+        self._sub_flow_widget_box = widget_box
 
     def generate_sub_flow_type_options(self, research_flow_status: list[PhaseStatus]) -> dict[str, int]:
         """サブフロー種別(フェーズ)を表示するメソッドです。
@@ -75,6 +84,15 @@ class CreateSubflowForm(BaseSubflowForm):
         """
         self.submit_button.set_looks_init(name)
         self.submit_button.icon = 'plus'
+
+    def is_display_widgets(self):
+        """入力欄の表示切り替えを行うメソッドです。"""
+        self.project_id = utils.get_project_id()
+        self.token = utils.get_token()
+        if self.project_id is None:
+            self.project_id_input.visible = True
+        if self.token is None:
+            self.token_input.visible = True
 
     # overwrite
     def callback_sub_flow_type_selector(self, event):
@@ -141,6 +159,26 @@ class CreateSubflowForm(BaseSubflowForm):
             self.submit_button.disabled = True
             return
 
+        if self.project_id_input.visible:
+            value = self.project_id_input.value_input
+            value = utils.check_input(value)
+            if value is None and self.project_id_input.visible:
+                self.submit_button.disabled = True
+                return
+            elif len(value) < 1:
+                self.submit_button.disabled = True
+                return
+
+        if self.token_input.visible:
+            value = self.token_input.value_input
+            value = utils.check_input(value)
+            if value is None:
+                self.submit_button.disabled = True
+                return
+            elif len(value) < 1:
+                self.submit_button.disabled = True
+                return
+
         self.submit_button.disabled = False
 
     def define_input_form(self) -> pn.Column:
@@ -149,6 +187,7 @@ class CreateSubflowForm(BaseSubflowForm):
         Returns:
             pn.Column:サブフロー新規作成フォームに必要な値を返す。
         """
+        self.is_display_widgets()
         return pn.Column(
             f'### {msg_config.get("main_menu", "create_sub_flow_title")}',
             self._sub_flow_type_selector,
@@ -156,6 +195,8 @@ class CreateSubflowForm(BaseSubflowForm):
             self._data_dir_name_form,
             self._parent_sub_flow_type_selector,
             self._parent_sub_flow_selector,
+            self.project_id_input,
+            self.token_input,
             self.submit_button
         )
 
@@ -177,6 +218,8 @@ class CreateSubflowForm(BaseSubflowForm):
         sub_flow_name = self._sub_flow_name_form.value_input
         data_dir_name = self._data_dir_name_form.value_input
         parent_sub_flow_ids = self._parent_sub_flow_selector.value
+        token = self.token_input.value_input
+        project_id = self.project_id_input.value_input
 
         # 入力値の検証
         try:
@@ -187,9 +230,35 @@ class CreateSubflowForm(BaseSubflowForm):
             data_dir_name = StringManager.strip(data_dir_name)
             self.validate_data_dir_name(data_dir_name)
             self.is_unique_data_dir(data_dir_name, phase_seq_number)
+
+            if not utils.grdm_access_check(self.grdm_url, token, project_id):
+                vault = Vault()
+                vault.set_value('grdm_token', '')
+                self.token_input.value_input = ''
+                self.project_id_input.value_input = ''
         except InputWarning as e:
             self.change_submit_button_warning(str(e))
             raise
+
+        if utils.get_govsheet_rf(self.abs_root) == {}:
+            if utils.get_govsheet(token, self.grdm_url, project_id, self.remote_path) == {}:
+                utils.display_float_panel(self.abs_root, self._sub_flow_widget_box, self._err_output, token, project_id)
+            else:
+                # サブフローバックアップ
+                utils.backup_zipfile(self.abs_root, research_flow_dict, current_time)
+                govsheet_rf_path = os.path.abspath(govsheet_rf)
+                utils.copy_govsheet(govsheet_rf_path, govsheet)
+
+        # 既存のサブフロー作り直し
+        research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
+        if research_flow_dict:
+            for exist_phase, exist_subflow_data in research_flow_dict.items():
+                exist_status = os.path.join(
+                    self.abs_root,
+                    path_config.get_sub_flow_status_file_path(exist_phase, exist_subflow_data['id'])
+                )
+                exist_working = utils.get_working_path(self.abs_root, exist_phase, exist_subflow_data)
+                utils.update_status_file(self.abs_root, exist_status, exist_working)
 
         # リサーチフローステータス管理JSONの更新
         try:
@@ -215,7 +284,7 @@ class CreateSubflowForm(BaseSubflowForm):
 
         # 新規サブフローデータの用意
         try:
-            self.prepare_new_subflow_data(phase_name, new_sub_flow_id, sub_flow_name)
+            self.prepare_new_subflow_data(phase_name, new_sub_flow_id, sub_flow_name, False)
         except Exception:
             # 失敗した場合に/data/<phase_name>/<data_dir_name>の削除
             os.remove(data_dir_path)
@@ -225,12 +294,28 @@ class CreateSubflowForm(BaseSubflowForm):
             self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             raise
 
+        new_status_json_path = os.path.join(
+            self.abs_root,
+            path_config.get_sub_flow_status_file_path(phase_name, new_sub_flow_id)
+        )
+        new_working_path = os.path.join(
+            self.abs_root, path_config.DG_WORKING_RESEARCHFLOW_FOLDER,
+            phase_name,
+            new_sub_flow_id,
+            path_config.TASK
+        )
+        utils.update_status_file(self.abs_root, new_status_json_path, new_working_path)
+
         # フォームの初期化
         self._sub_flow_type_selector.value = 0
         self._sub_flow_name_form.value = ''
         self._sub_flow_name_form.value_input = ''
         self._data_dir_name_form.value = ''
         self._data_dir_name_form.value_input = ''
+        self.project_id_input.value = ''
+        self.project_id_input.value_input = ''
+        self.token_input.value = ''
+        self.token_input.value_input = ''
         self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
 
     def create_data_dir(self, phase_name: str, data_dir_name: str) -> str:
@@ -252,13 +337,14 @@ class CreateSubflowForm(BaseSubflowForm):
         os.makedirs(path)
         return path
 
-    def prepare_new_subflow_data(self, phase_name: str, new_sub_flow_id: str, sub_flow_name: str):
+    def prepare_new_subflow_data(self, phase_name: str, new_sub_flow_id: str, sub_flow_name: str, flg: bool):
         """新しいサブフローのデータを用意するメソッドです。
 
         Args:
             phase_name (str): フェーズ名
             new_sub_flow_id (str): 新しいサブフローのID
             sub_flow_name (str): サブフロー名
+            flg (bool): フォルダ作成時にエラーにさせるかのフラグ。エラーにさせるならfalse、させないならtrue
         """
 
         # 新規サブフローデータの用意
@@ -271,7 +357,7 @@ class CreateSubflowForm(BaseSubflowForm):
         dect_dir_path = os.path.join(dg_researchflow_path, phase_name, new_sub_flow_id)
 
         # コピー先フォルダの作成
-        os.makedirs(dect_dir_path)  # 既に存在している場合はエラーになる
+        os.makedirs(dect_dir_path, exist_ok=flg)  # 新規作成の時、既に存在している場合はエラーになる
 
         # 対象コピーファイルorディレクトリリスト
         copy_files = path_config.get_prepare_file_name_list_for_subflow()

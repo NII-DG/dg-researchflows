@@ -42,6 +42,7 @@ DG_TASK_BASE_DATA_FOLDER = os.path.join(DATA_GOVERNANCE, BASE, TASK)
 DG_RESEARCHFLOW_FOLDER = os.path.join(DATA_GOVERNANCE, RESEARCHFLOW)
 # ログフォルダ
 DG_LOG_FOLDER = os.path.join(DATA_GOVERNANCE, LOG, RESEARCHFLOW)
+DG_SUBFLOW_LOG_FOLDER = os.path.join(DATA_GOVERNANCE, LOG, SUB_FLOW)
 # 画像フォルダ
 DG_IMAGES_FOLDER = os.path.join(DATA_GOVERNANCE, IMAGES)
 # 非同期フォルダパス
@@ -71,7 +72,6 @@ MAIN_NOTEBOOK = 'main.ipynb'
 ## subflow
 MENU_NOTEBOOK = 'menu.ipynb'
 STATUS_JSON = 'status.json'
-PROPERTY_JSON = 'property.json'
 PLAN_JSON = 'plan.json'
 FLOW_DIAG = 'flow.diag'
 ## config file
@@ -186,4 +186,4 @@ def get_prepare_file_name_list_for_subflow() -> list[str]:
         list[str]: 新規サブフローデータ作成時にコピーするファイルのリストを返す。
 
     """
-    return [MENU_NOTEBOOK, STATUS_JSON, PROPERTY_JSON]
+    return [MENU_NOTEBOOK, STATUS_JSON]

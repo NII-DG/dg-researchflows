@@ -176,13 +176,7 @@ class ResearchFlowStatusFile(JsonFile):
         """
         while True:
             candidate_id = self.issue_uuidv4()
-            research_flow_status = self.load_research_flow_status()
-            if self.exist_sub_flow_id_in_research_flow_status(research_flow_status, candidate_id):
-                # 存在する場合は、発行し直し
-                continue
-            else:
-                # ユニークID取得に成功
-                return candidate_id
+            return candidate_id
 
     def is_unique_subflow_name(self, phase_seq_number: int, sub_flow_name: str) -> bool:
         """フェーズ内に同じ名前のサブフローが存在するかの確認を行うメソッドです。
@@ -502,7 +496,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
             raise Exception(f'There is no phase. phase_seq_number : {phase_seq_number}')
 
     def get_subflow_phases(self) -> list[str]:
-        """リーサーチフローステータスに存在する全てのフェーズ名を取得するメソッドです。
+        """リサーチフローステータスに存在する全てのフェーズ名を取得するメソッドです。
 
         Returns:
             list[str]:全フェーズ名のリスト
@@ -532,3 +526,18 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
             for subflow_data in phase_status._sub_flow_data:
                 id_list.append(subflow_data._id)
         return id_list
+
+    def get_phase_subflow_id_name(self):
+        """研究準備を除くリサーチフローステータスに存在する全てのフェーズとサブフローID、サブフロー名を取得するメソッドです。
+
+        Returns:
+            dict: フェーズとサブフローID、サブフロー名を返す
+        """
+        research_flow_status = self.load_research_flow_status()
+        sub_flow_dict = {}
+        for phase in research_flow_status:
+            phase_name = phase._name
+            if phase._name != "plan":
+                for sub_flow_item in phase._sub_flow_data:
+                    sub_flow_dict[phase_name] = {"id": sub_flow_item._id, "name": sub_flow_item._name}
+        return sub_flow_dict

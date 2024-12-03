@@ -4,23 +4,27 @@
 """
 import os
 import traceback
+import datetime
+import json
 
 from IPython.core.display import Javascript
 from IPython.display import display
 import panel as pn
 
-from library.utils.config import path_config, message as msg_config
+from library.utils.config import path_config, message as msg_config, connect as con_config
 from library.utils.error import InputWarning
 from library.utils.html import button as html_button
+from library.utils import file
 from library.utils.log import TaskLog
 from library.utils.setting import ResearchFlowStatusOperater, SubflowStatusFile
 from library.utils.vault import Vault
-from library.utils.widgets import MessageBox
-from .subflow_controller import (
+from library.utils.widgets import MessageBox, Button
+from library.main_menu.subflow_controller import (
     CreateSubflowForm,
     RelinkSubflowForm,
     RenameSubflowForm,
-    DeleteSubflowForm
+    DeleteSubflowForm,
+    utils
 )
 
 # git clone https://github.com/NII-DG/dg-researchflows.git -b feature/main_menu_v2 ./demo
@@ -158,6 +162,105 @@ class MainMenu(TaskLog):
         # 必須タスクが完了している場合は、何もしない
         self.check_status_research_preparation_flow()
 
+        self.grdm_url = con_config.get('GRDM', 'BASE_URL')
+        self.remote_path = con_config.get('DG_WEB', 'GOVSHEET_PATH')
+
+        pn.extension('floatpanel')
+
+        self.research_flow_widget_box = pn.WidgetBox()
+        self.research_flow_widget_box.width = 900
+
+        # パーソナルアクセストークンとプロジェクトID入力欄
+        self.token_input, self.project_id_input = utils.input_widget()
+        self.token_input.param.watch(self.input, 'value')
+        self.project_id_input.param.watch(self.input, 'value')
+
+        # ガバナンスシート適用ボタン
+        apply_govsheet_button_title = msg_config.get('main_menu', 'apply_gov_sheet')
+        self.apply_gov_sheet_button = Button(width=10)
+        self.apply_gov_sheet_button.set_looks_init(apply_govsheet_button_title)
+        self.apply_gov_sheet_button.on_click(self.apply_click)
+
+        self.update_research_flow_widget_box_init()
+
+        self.field_box = pn.WidgetBox()
+        self.field_box.width = 900
+
+        self.research_flow_message = MessageBox()
+        self.research_flow_message.width = 900
+
+        self.input_button = Button(width=10, visible=False, disabled=True)
+        self.input_button.set_looks_init()
+        self.input_button.on_click(self.callback_input_button)
+
+        self.govsheet_rf_path = utils.get_govhseet_rf_path(self.abs_root)
+        self.current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+
+    def is_govsheet(self, token: str, project_id: str):
+        """RFガバナンスシートやガバナンスシートの存在で処理を変えるためのメソッドです。
+
+        Args:
+            token (str): パーソナルアクセストークン
+            project_id (str): プロジェクトID
+        """
+        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
+        govsheet = utils.get_govsheet(token, self.grdm_url, project_id, self.remote_path)
+        research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
+        if govsheet:
+            if govsheet_rf == govsheet:
+                self.token_input.visible = False
+                self.project_id_input.visible = False
+                message = msg_config.get('main_menu', 'current_version_govsheet')
+                self.research_flow_message.update_info(message)
+                self.research_flow_widget_box.append(self.research_flow_message)
+            else:
+                if govsheet_rf == {}:
+                    utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
+                    utils.copy_govsheet(self.govsheet_rf_path, govsheet)
+                else:
+                    self.backup_gov_sheet_rf_file(self)
+                    utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
+                    utils.copy_govsheet(self.govsheet_rf_path, govsheet)
+                self.remove_and_copy_file_notebook()
+        else:
+            self.field_box.clear()
+            utils.display_float_panel(self.abs_root, self.field_box, self.research_flow_message, self.token, self.project_id)
+
+    def remove_and_copy_file_notebook(self):
+        """サブフローの設定ファイル群とタスクノートブックを削除しbaseからコピーするメソッドです。"""
+        for phase_name, sub_flow_data in self.reserch_flow_status_operater.get_phase_subflow_id_name().items():
+            menu_notebook_path, status_json_path = utils.get_options_path(self.abs_root, phase_name, sub_flow_data)
+            working_path = utils.get_working_path(self.abs_root, phase_name, sub_flow_data)
+            self.remove_file(working_path)
+            file.File(str(menu_notebook_path)).remove()
+            file.File(str(status_json_path)).remove()
+            CreateSubflowForm.prepare_new_subflow_data(self, phase_name, sub_flow_data['id'], sub_flow_data['name'], True)
+            utils.update_status_file(self.abs_root, status_json_path, working_path)
+
+    def remove_file(self, drc_path: str):
+        """フォルダ内のファイルを全て削除するメソッドです。
+
+        Args:
+            drc_path (str): 対象のディレクトリのパス
+        """
+        if not os.path.isdir(drc_path):
+            pass
+        for root, dirs, files in os.walk(drc_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                os.remove(file_path)
+
+    def backup_gov_sheet_rf_file(self):
+        """RFガバナンスシートのバックアップを行うメソッドです。"""
+        backup_file_path = os.path.join(
+            self.abs_root,
+            path_config.DATA_GOVERNANCE,
+            path_config.LOG,
+            'gov-sheet-rf',
+            f'{self.current_time}.json'
+        )
+        file.copy_file(self.govsheet_rf_path, backup_file_path)
+
     def check_status_research_preparation_flow(self):
         """研究準備の実行ステータス確認をするメソッドです。"""
         sf = SubflowStatusFile(os.path.join(self.abs_root, path_config.PLAN_TASK_STATUS_FILE_PATH))
@@ -230,7 +333,7 @@ class MainMenu(TaskLog):
                 return
             elif selected_value == 1:  # サブフロー新規作成
                 self.callback_type = "create"
-                self.subflow_form = CreateSubflowForm(self.abs_root, self._err_output)
+                self.subflow_form = CreateSubflowForm(self.abs_root, self._sub_flow_widget_box, self._err_output)
             elif selected_value == 2:  # サブフロー間接続編集
                 self.callback_type = "relink"
                 self.subflow_form = RelinkSubflowForm(self.abs_root, self._err_output)
@@ -243,6 +346,36 @@ class MainMenu(TaskLog):
             self.update_sub_flow_widget_box()
         except Exception as e:
             self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
+
+    def input(self, event):
+        """パーソナルアクセストークンとプロジェクトIDが正しい形式で記入されているか確認するメソッドです。
+
+        Args:
+            event: 入力イベント
+        """
+        if self.token_input.visible and self.project_id_input.visible:
+            token_value = utils.check_input(self.token_input.value_input)
+            project_id_value = utils.check_input(self.project_id_input.value_input)
+            if token_value and project_id_value:
+                self.input_button.visible = True
+            else:
+                self.token_input.value = ''
+                self.project_id_input.value = ''
+                self.input_button.visible = False
+        elif self.token_input.visible:
+            token_value = utils.check_input(self.token_input.value_input)
+            if token_value:
+                self.input_button.visible = True
+            else:
+                self.token_input.value = ''
+                self.input_button.visible = False
+        else:
+            project_id_value = utils.check_input(self.project_id_input.value_input)
+            if project_id_value:
+                self.input_button.visible = True
+            else:
+                self.project_id_input.value = ''
+                self.input_button.visible = False
 
     #########################
     # サブフロー操作フォーム #
@@ -287,6 +420,98 @@ class MainMenu(TaskLog):
             self.log.error(message)
             self._err_output.update_error(message)
 
+    def update_research_flow_widget_box_init(self):
+        """リサーチフロー関係図とガバナンスシート適用ボタンを表示するメソッドです。"""
+        self.research_flow_widget_box.clear()
+        research_flow_image_title = f'### {msg_config.get("main_menu", "subflow_relationship_diagram")}'
+        layout = pn.Row(
+            research_flow_image_title,
+            pn.Spacer(width=580),
+            self.apply_gov_sheet_button
+        )
+        self.research_flow_widget_box.append(layout)
+
+    def update_field_box(self):
+        """パーソナルアクセストークンとプロジェクトIDと確定ボタンを表示するメソッドです。"""
+        self.field_box.clear()
+        input_layout = pn.Row(
+            self.token_input,
+            self.project_id_input,
+            self.input_button
+        )
+        self.field_box.append(input_layout)
+
+    def apply_click(self, event):
+        """ガバナンスシート適用ボタン押下後の表示を変えるメソッドです。
+
+        Args:
+            event: ボタンクリックイベント
+        """
+        self.input_button.set_looks_init()
+        self.research_flow_message.clear()
+        self.field_box.clear()
+        self.token = utils.get_token()
+        self.project_id = utils.get_project_id()
+        if self.project_id is None and self.token is None:
+            self.project_id_input.visible = True
+            self.token_input.visible = True
+        elif self.token is None:
+            self.token_input.visible = True
+        else:
+            self.project_id_input.visible = False
+            self.token_input.visible = False
+            self.is_govsheet(token, project_id)
+        self.update_field_box()
+
+    def callback_input_button(self, event):
+        """入力内容のチェックをするメソッドです。
+
+        Args:
+            event: クリックイベント
+        """
+        self.input_button.set_looks_processing()
+        try:
+            vault = Vault()
+            token = self.token_input.value if self.token_input.visible else None
+            project_id = self.project_id_input.value if self.project_id_input.visible else None
+
+            if self.token_input.visible and self.project_id_input.visible:
+                if project_id and token:
+                    if not utils.grdm_access_check(self.grdm_url, token, project_id):
+                        vault.set_value('grdm_token', '')
+                        self.token_input.value = ''
+                        self.project_id_input.value = ''
+                    else:
+                        self.field_box.clear()
+                        self.is_govsheet(token, project_id)
+                else:
+                    self.project_id_input.value = ''
+                    self.token_input.value = ''
+            else:
+                if self.token_input.visible and token is not None:
+                    if not utils.grdm_access_check(self.grdm_url, token, self.project_id):
+                        vault.set_value('grdm_token', '')
+                        self.token_input.value = ''
+                    else:
+                        self.field_box.clear()
+                        self.is_govsheet(token, self.project_id)
+                else:
+                    if not utils.grdm_access_check(self.grdm_url, self.token, project_id):
+                        self.project_id_input.value = ''
+                    else:
+                        self.field_box.clear()
+                        self.is_govsheet(self.token, project_id)
+                        self.token = token
+            self.project_id = project_id
+            self.input_button.visible = False
+            utils.display_float_panel(
+                self.abs_root, self.field_box, self.research_flow_message, self.token, self.project_id)
+        except Exception:
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self._err_output.update_error(message)
+            self.log.error(message)
+
+
     #################
     # クラスメソッド #
     #################
@@ -328,11 +553,8 @@ class MainMenu(TaskLog):
             main_menu._menu_tabs, main_menu._err_output
         )
         display(main_menu_box)
-        # リサーチフロー図を配置
-        research_flow_image_title = pn.pane.Markdown(
-            f'### {msg_config.get("main_menu", "subflow_relationship_diagram")}'
-        )
-        display(research_flow_image_title)
+        main_menu.research_flow_widget_box.append(main_menu.field_box)
+        display(main_menu.research_flow_widget_box)
         display(main_menu._research_flow_image)
 
         # Hidden Setup

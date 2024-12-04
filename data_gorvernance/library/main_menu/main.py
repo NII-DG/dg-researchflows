@@ -196,7 +196,7 @@ class MainMenu(TaskLog):
         self.govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
         self.current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 
-    def is_govsheet(self, token: str, project_id: str):
+    def is_govsheet(self):
         """RFガバナンスシートやガバナンスシートの存在で処理を変えるためのメソッドです。
 
         Args:
@@ -204,7 +204,7 @@ class MainMenu(TaskLog):
             project_id (str): プロジェクトID
         """
         govsheet_rf = utils.get_govsheet_rf(self.abs_root)
-        govsheet = utils.get_govsheet(token, self.grdm_url, project_id, self.remote_path)
+        govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
         research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
         if govsheet:
             if govsheet_rf == govsheet:
@@ -216,15 +216,22 @@ class MainMenu(TaskLog):
             else:
                 if govsheet_rf == {}:
                     utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
-                    utils.copy_govsheet(self.govsheet_rf_path, govsheet)
                 else:
-                    self.backup_gov_sheet_rf_file(self)
+                    self.backup_gov_sheet_rf_file()
                     utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
-                    utils.copy_govsheet(self.govsheet_rf_path, govsheet)
-                self.remove_and_copy_file_notebook()
         else:
-            self.field_box.clear()
             utils.display_float_panel(self.abs_root, self.field_box, self.research_flow_message, self.token, self.project_id)
+            if govsheet_rf:
+                self.backup_gov_sheet_rf_file()
+            utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
+            utils.copy_govsheet(self.govsheet_rf_path, govsheet)
+        if research_flow_dict:
+            utils.copy_govsheet(self.govsheet_rf_path, govsheet)
+            self.remove_and_copy_file_notebook()
+        else:
+            msg = msg_config.get('main_menu', 'success_govsheet')
+            self.research_flow_message.update_success(msg)
+            self.research_flow_widget_box.append(self.research_flow_message)
 
     def remove_and_copy_file_notebook(self):
         """サブフローの設定ファイル群とタスクノートブックを削除しbaseからコピーするメソッドです。"""
@@ -358,9 +365,11 @@ class MainMenu(TaskLog):
             project_id_value = utils.check_input(self.project_id_input.value_input)
             if token_value and project_id_value:
                 self.input_button.visible = True
+            elif token_value:
+                self.project_id_input.value = ''
+                self.input_button.visible = False
             else:
                 self.token_input.value = ''
-                self.project_id_input.value = ''
                 self.input_button.visible = False
         elif self.token_input.visible:
             token_value = utils.check_input(self.token_input.value_input)
@@ -476,38 +485,31 @@ class MainMenu(TaskLog):
             vault = Vault()
             token = self.token_input.value if self.token_input.visible else None
             project_id = self.project_id_input.value if self.project_id_input.visible else None
-
-            if self.token_input.visible and self.project_id_input.visible:
-                if project_id and token:
-                    if not utils.grdm_access_check(self.grdm_url, token, project_id):
-                        vault.set_value('grdm_token', '')
-                        self.token_input.value = ''
-                        self.project_id_input.value = ''
-                    else:
-                        self.field_box.clear()
-                        self.is_govsheet(token, project_id)
-                else:
-                    self.project_id_input.value = ''
+            if token and project_id:
+                if not utils.grdm_access_check(self.grdm_url, token, project_id):
+                    vault.set_value('grdm_token', '')
                     self.token_input.value = ''
-            else:
-                if self.token_input.visible and token is not None:
-                    if not utils.grdm_access_check(self.grdm_url, token, self.project_id):
-                        vault.set_value('grdm_token', '')
-                        self.token_input.value = ''
-                    else:
-                        self.field_box.clear()
-                        self.is_govsheet(token, self.project_id)
+                    self.project_id_input.value = ''
                 else:
-                    if not utils.grdm_access_check(self.grdm_url, self.token, project_id):
-                        self.project_id_input.value = ''
-                    else:
-                        self.field_box.clear()
-                        self.is_govsheet(self.token, project_id)
-                        self.token = token
-            self.project_id = project_id
-            self.input_button.visible = False
-            utils.display_float_panel(
-                self.abs_root, self.field_box, self.research_flow_message, self.token, self.project_id)
+                    self.field_box.clear()
+                    self.token = token
+                    self.project_id = project_id
+                    self.is_govsheet()
+            elif token:
+                if not utils.grdm_access_check(self.grdm_url, token, self.project_id):
+                    vault.set_value('grdm_token', '')
+                    self.token_input.value = ''
+                else:
+                    self.field_box.clear()
+                    self.token = token
+                    self.is_govsheet()
+            else:
+                if not utils.grdm_access_check(self.grdm_url, self.token, project_id):
+                    self.project_id_input.value = ''
+                else:
+                    self.field_box.clear()
+                    self.project_id = project_id
+                    self.is_govsheet()
         except Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
             self._err_output.update_error(message)

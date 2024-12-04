@@ -537,7 +537,7 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         sub_flow_dict = {}
         for phase in research_flow_status:
             phase_name = phase._name
-            if phase._name != "plan":
+            if phase._name != "plan" and phase._sub_flow_data != []:
                 for sub_flow_item in phase._sub_flow_data:
                     sub_flow_dict[phase_name] = {"id": sub_flow_item._id, "name": sub_flow_item._name}
         return sub_flow_dict

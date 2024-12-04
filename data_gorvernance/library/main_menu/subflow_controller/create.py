@@ -163,7 +163,7 @@ class CreateSubflowForm(BaseSubflowForm):
         if self.project_id_input.visible:
             value = self.project_id_input.value_input
             value = utils.check_input(value)
-            if value is None and self.project_id_input.visible:
+            if value is None:
                 self.submit_button.disabled = True
                 return
             elif len(value) < 1:
@@ -246,13 +246,11 @@ class CreateSubflowForm(BaseSubflowForm):
         if utils.get_govsheet_rf(self.abs_root) == {}:
             if govsheet == {}:
                 utils.display_float_panel(self.abs_root, self._sub_flow_widget_box, self._err_output, token, project_id)
-            else:
-                # サブフローバックアップ
-                utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
-                govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
-                utils.copy_govsheet(govsheet_rf_path, govsheet)
 
-        # 既存のサブフロー作り直し
+            utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
+            govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
+            utils.copy_govsheet(govsheet_rf_path, govsheet)
+
         if research_flow_dict:
             for exist_phase, exist_subflow_data in research_flow_dict.items():
                 exist_status = os.path.join(
@@ -261,6 +259,9 @@ class CreateSubflowForm(BaseSubflowForm):
                 )
                 exist_working = utils.get_working_path(self.abs_root, exist_phase, exist_subflow_data)
                 utils.update_status_file(self.abs_root, exist_status, exist_working)
+        else:
+            msg = msg_config.get('main_menu', 'success_govsheet')
+            self._err_output.update_success(msg)
 
         # リサーチフローステータス管理JSONの更新
         try:
@@ -296,17 +297,21 @@ class CreateSubflowForm(BaseSubflowForm):
             self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             raise
 
-        new_status_json_path = os.path.join(
-            self.abs_root,
-            path_config.get_sub_flow_status_file_path(phase_name, new_sub_flow_id)
-        )
-        new_working_path = os.path.join(
-            self.abs_root, path_config.DG_WORKING_RESEARCHFLOW_FOLDER,
-            phase_name,
-            new_sub_flow_id,
-            path_config.TASK
-        )
-        utils.update_status_file(self.abs_root, new_status_json_path, new_working_path)
+        try:
+            new_status_json_path = os.path.join(
+                self.abs_root,
+                path_config.get_sub_flow_status_file_path(phase_name, new_sub_flow_id)
+            )
+            new_working_path = os.path.join(
+                self.abs_root, path_config.DG_WORKING_RESEARCHFLOW_FOLDER,
+                phase_name,
+                new_sub_flow_id,
+                path_config.TASK
+            )
+            utils.update_status_file(self.abs_root, new_status_json_path, new_working_path)
+        except Exception:
+            msg = msg_config.get('main_menu', 'success_govsheet')
+            self._err_output.update_success(msg)
 
         # フォームの初期化
         self._sub_flow_type_selector.value = 0
@@ -381,4 +386,28 @@ class CreateSubflowForm(BaseSubflowForm):
         except Exception:
             # 失敗した場合は、コピー先フォルダごと削除する（ロールバック）
             shutil.rmtree(dect_dir_path)
+            raise
+
+def a(self):
+    research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
+    govsheet = utils.get_govsheet(token, self.grdm_url, project_id, self.remote_path)
+    if utils.get_govsheet_rf(self.abs_root) == {}:
+        if govsheet == {}:
+            utils.display_float_panel(self.abs_root, self._sub_flow_widget_box, self._err_output, token, project_id)
+
+        utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
+        govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
+        utils.copy_govsheet(govsheet_rf_path, govsheet)
+
+        if research_flow_dict:
+            for exist_phase, exist_subflow_data in research_flow_dict.items():
+                exist_status = os.path.join(
+                    self.abs_root,
+                    path_config.get_sub_flow_status_file_path(exist_phase, exist_subflow_data['id'])
+                )
+                exist_working = utils.get_working_path(self.abs_root, exist_phase, exist_subflow_data)
+                utils.update_status_file(self.abs_root, exist_status, exist_working)
+        else:
+            msg = msg_config.get('main_menu', 'success_govsheet')
+            self._err_output.update_success(msg)
             raise

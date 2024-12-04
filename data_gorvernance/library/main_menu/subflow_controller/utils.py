@@ -68,6 +68,7 @@ def create_float_panel(abs_root: str, field_box: pn.WidgetBox, message: MessageB
         Args:
             event: クリックイベント
         """
+        govsheet_rf_path = get_govsheet_rf_path(abs_root)
         grdm_connect = grdm.Grdm()
         grdm_url = con_config.get('GRDM', 'BASE_URL')
         reomote_path = con_config.get('DG_WEB', 'GOVSHEET_PATH')
@@ -76,7 +77,14 @@ def create_float_panel(abs_root: str, field_box: pn.WidgetBox, message: MessageB
         float_panel.visible = False
         schema = get_schema()
         data = get_default_govsheet(schema)
-        file.JsonFile(file_path).write(data)
+        default_govsheet = file.JsonFile(file_path).write(data)
+        grdm_connect.sync(
+            token,
+            grdm_url,
+            project_id,
+            file_path,
+            abs_root
+        )
 
     def select_cancel(event):
         """適用しない押下後エラーメッセージを表示する関数です。
@@ -159,7 +167,7 @@ def get_govsheet(token: str, base_url: str, project_id: str, remote_path: str) -
         govsheet = grdm_connect.download_json_file(
             token, base_url, project_id, remote_path
         )
-    except (FileNotFoundError):
+    except FileNotFoundError:
         govsheet = {}
     return govsheet
 
@@ -202,9 +210,7 @@ def mapping_file(abs_root: str) -> dict:
     task_mapping_path = os.path.join(
         abs_root, path_config.DG_RESEARCHFLOW_FOLDER, 'task_mapping.json'
     )
-    govsheet_rf_path = os.path.join(
-        abs_root, path_config.DG_RESEARCHFLOW_FOLDER, 'gov-sheet-rf.json'
-    )
+    govsheet_rf_path = get_govsheet_rf_path(abs_root)
     with open(task_mapping_path, 'r') as task:
         task_mapping = json.load(task)
     with open(govsheet_rf_path, 'r') as govsheet:
@@ -301,7 +307,7 @@ def update_file(data: dict, tasks: SubflowTask):
     for task_id, active_flg in data.items():
         for task in tasks:
             if task_id == task.id:
-                active_flg = task.active
+                task.active = active_flg
             if len(task.dependent_task_ids) > 0:
                 for dependent_id in task.dependent_task_ids:
                     if dependent_id == task.id:
@@ -390,13 +396,17 @@ def get_backup_govsheet_rf_path(abs_root: str, current_time: str) -> str:
     Returns:
         str: RFガバナンスシートのバックアップ先のパスを返す。
     """
-    return os.path.join(
-        abs_root,
-        path_config.DATA_GOVERNANCE,
-        path_config.LOG,
-        'gov-sheet-rf',
-        f'{current_time}.json'
-    )
+    try:
+        govsheet_rf = os.path.join(
+            abs_root,
+            path_config.DATA_GOVERNANCE,
+            path_config.LOG,
+            'gov-sheet-rf',
+            f'{current_time}.json'
+        )
+    except FileNotFoundError:
+        govsheet_rf = {}
+    return govsheet_rf
 
 def get_zipfile_path(abs_root: str, phase_name: str, sub_flow_data: list, current_time: str) -> str:
     """サブフローファイル群のバックアップ先のパスを取得する関数です。
@@ -455,7 +465,6 @@ def get_options_path(abs_root: str, phase_name: str, subflow_data: list) -> str:
     )
     status_json_path = os.path.join(
         abs_root,
-        path_config.DATA_GOVERNANCE,
         path_config.get_sub_flow_status_file_path(phase_name, subflow_data['id'])
     )
     return menu_notebook_path, status_json_path

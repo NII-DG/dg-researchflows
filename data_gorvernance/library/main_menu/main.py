@@ -226,8 +226,6 @@ class MainMenu(TaskLog):
             utils.copy_govsheet(self.govsheet_rf_path, govsheet)
         utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
         file_dir = os.path.dirname(self.govsheet_rf_path)
-        if os.path.exists(file_dir):
-            os.makedirs(file_dir)
         file.JsonFile(self.govsheet_rf_path).write(govsheet)
         self.remove_and_copy_file_notebook()
 

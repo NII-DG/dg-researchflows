@@ -241,27 +241,7 @@ class CreateSubflowForm(BaseSubflowForm):
             self.change_submit_button_warning(str(e))
             raise
 
-        research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
-        govsheet = utils.get_govsheet(token, self.grdm_url, project_id, self.remote_path)
-        if utils.get_govsheet_rf(self.abs_root) == {}:
-            if govsheet == {}:
-                utils.display_float_panel(self.abs_root, self._sub_flow_widget_box, self._err_output, token, project_id)
-
-            utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
-            govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
-            utils.copy_govsheet(govsheet_rf_path, govsheet)
-
-        if research_flow_dict:
-            for exist_phase, exist_subflow_data in research_flow_dict.items():
-                exist_status = os.path.join(
-                    self.abs_root,
-                    path_config.get_sub_flow_status_file_path(exist_phase, exist_subflow_data['id'])
-                )
-                exist_working = utils.get_working_path(self.abs_root, exist_phase, exist_subflow_data)
-                utils.update_status_file(self.abs_root, exist_status, exist_working)
-        else:
-            msg = msg_config.get('main_menu', 'success_govsheet')
-            self._err_output.update_success(msg)
+        self.check_govsheet_rf()
 
         # リサーチフローステータス管理JSONの更新
         try:
@@ -388,26 +368,34 @@ class CreateSubflowForm(BaseSubflowForm):
             shutil.rmtree(dect_dir_path)
             raise
 
-def a(self):
-    research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
-    govsheet = utils.get_govsheet(token, self.grdm_url, project_id, self.remote_path)
-    if utils.get_govsheet_rf(self.abs_root) == {}:
-        if govsheet == {}:
-            utils.display_float_panel(self.abs_root, self._sub_flow_widget_box, self._err_output, token, project_id)
-
-        utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
+    def check_govsheet_rf(self):
         govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
-        utils.copy_govsheet(govsheet_rf_path, govsheet)
-
-        if research_flow_dict:
-            for exist_phase, exist_subflow_data in research_flow_dict.items():
-                exist_status = os.path.join(
-                    self.abs_root,
-                    path_config.get_sub_flow_status_file_path(exist_phase, exist_subflow_data['id'])
-                )
-                exist_working = utils.get_working_path(self.abs_root, exist_phase, exist_subflow_data)
-                utils.update_status_file(self.abs_root, exist_status, exist_working)
+        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
+        govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
+        research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
+        if govsheet_rf:
+            pass
         else:
-            msg = msg_config.get('main_menu', 'success_govsheet')
-            self._err_output.update_success(msg)
-            raise
+            if govsheet:
+                utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
+                file.JsonFile(govsheet_rf_path).write(govsheet)
+                for phase_name, sub_flow_data in research_flow_dict.items():
+                    for sub_flow_id, sub_flow_name in sub_flow_data.items():
+                        menu_notebook_path ,status_json_path = utils.get_options_path(self.abs_root, phase_name, sub_flow_id)
+                        working_path = utils.get_working_path(self.abs_root, phase_name, sub_flow_id)
+                        utils.update_status_file(self.abs_root, status_json_path, working_path)
+            else:
+                utils.display_float_panel(self.abs_root, self._sub_flow_widget_box, self._err_output, self.token, self.project_id)
+
+    def new_status_file(self, new_phase_name, new_subflow_id):
+        new_status_file = os.path.join(
+            self.abs_root,
+            path_config.get_sub_flow_status_file_path(new_phase_name, new_subflow_id)
+        )
+        new_working_path = os.path.join(
+            self.abs_root, path_config.DG_WORKING_FOLDER,
+            new_phase_name,
+            new_subflow_id,
+            path_config.TASK
+        )
+        utils.update_status_file(self.abs_root, new_status_file, new_working_path)

@@ -68,6 +68,7 @@ def create_float_panel(abs_root: str, field_box: pn.WidgetBox, message: MessageB
         Args:
             event: クリックイベント
         """
+        apply_button.set_looks_processing()
         govsheet_rf_path = get_govsheet_rf_path(abs_root)
         grdm_connect = grdm.Grdm()
         grdm_url = con_config.get('GRDM', 'BASE_URL')
@@ -355,21 +356,22 @@ def backup_zipfile(abs_root: str, research_flow_dict: dict, current_time: str):
         abs_root, path_config.DG_IMAGES_FOLDER
     )
     for phase_name, subflow_data in research_flow_dict.items():
-        zip_file_path = get_zipfile_path(abs_root, phase_name, subflow_data, current_time)
-        working_path = get_working_path(abs_root, phase_name, subflow_data)
-        menu_notebook_path, status_json_path = get_options_path(abs_root, phase_name, subflow_data)
-        os.makedirs(os.path.dirname(zip_file_path), exist_ok=True)
-        notebook_list = get_notebook_list(working_path)
-        with zipfile.ZipFile(zip_file_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            for file in os.listdir(image_folder):
-                file_path = os.path.join(image_folder, file)
-                if os.path.isfile(file_path):
-                    zip_path = os.path.join(path_config.IMAGES, file)
-                    zipf.write(file_path, zip_path)
-            zipf.write(menu_notebook_path, arcname=os.path.basename(menu_notebook_path))
-            zipf.write(status_json_path, arcname=os.path.basename(status_json_path))
-            for notebook in notebook_list:
-                zipf.write(notebook, arcname=os.path.basename(notebook))
+        for sub_flow_id, sub_flow_name in subflow_data.items():
+            zip_file_path = get_zipfile_path(abs_root, phase_name, subflow_id, sub_flow_name, current_time)
+            working_path = get_working_path(abs_root, phase_name, sub_flow_id, sub_flow_name)
+            menu_notebook_path, status_json_path = get_options_path(abs_root, phase_name, sub_flow_id, sub_flow_name)
+            os.makedirs(os.path.dirname(zip_file_path), exist_ok=True)
+            notebook_list = get_notebook_list(working_path)
+            with zipfile.ZipFile(zip_file_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                for file in os.listdir(image_folder):
+                    file_path = os.path.join(image_folder, file)
+                    if os.path.isfile(file_path):
+                        zip_path = os.path.join(path_config.IMAGES, file)
+                        zipf.write(file_path, zip_path)
+                zipf.write(menu_notebook_path, arcname=os.path.basename(menu_notebook_path))
+                zipf.write(status_json_path, arcname=os.path.basename(status_json_path))
+                for notebook in notebook_list:
+                    zipf.write(notebook, arcname=os.path.basename(notebook))
 
 def get_govsheet_rf_path(abs_root: str) -> str:
     """RFガバナンスシートのパスを取得する関数です。
@@ -408,7 +410,7 @@ def get_backup_govsheet_rf_path(abs_root: str, current_time: str) -> str:
         govsheet_rf = {}
     return govsheet_rf
 
-def get_zipfile_path(abs_root: str, phase_name: str, sub_flow_data: list, current_time: str) -> str:
+def get_zipfile_path(abs_root: str, phase_name: str, sub_flow_id: str, sub_flow_name: str, current_time: str) -> str:
     """サブフローファイル群のバックアップ先のパスを取得する関数です。
 
     Args:
@@ -424,11 +426,11 @@ def get_zipfile_path(abs_root: str, phase_name: str, sub_flow_data: list, curren
         abs_root,
         path_config.DG_SUBFLOW_LOG_FOLDER,
         phase_name,
-        sub_flow_data['id'],
+        sub_flow_id,
         f'{current_time}.zip'
     )
 
-def get_working_path(abs_root: str, phase_name: str, subflow_data: list) -> str:
+def get_working_path(abs_root: str, phase_name: str, subflow_id: str) -> str:
     """workingファイルのパスを取得する関数です。
 
     Args:
@@ -443,11 +445,11 @@ def get_working_path(abs_root: str, phase_name: str, subflow_data: list) -> str:
         abs_root,
         path_config.DG_WORKING_RESEARCHFLOW_FOLDER,
         phase_name,
-        subflow_data['id'],
+        subflow_id,
         path_config.TASK
     )
 
-def get_options_path(abs_root: str, phase_name: str, subflow_data: list) -> str:
+def get_options_path(abs_root: str, phase_name: str, subflow_id: str) -> str:
     """サブフローの設定ファイルのパスを取得する関数です。
 
     Args:
@@ -461,11 +463,11 @@ def get_options_path(abs_root: str, phase_name: str, subflow_data: list) -> str:
     menu_notebook_path = os.path.join(
         abs_root,
         path_config.DATA_GOVERNANCE,
-        path_config.get_sub_flow_menu_path(phase_name, subflow_data['id'])
+        path_config.get_sub_flow_menu_path(phase_name, subflow_id)
     )
     status_json_path = os.path.join(
         abs_root,
-        path_config.get_sub_flow_status_file_path(phase_name, subflow_data['id'])
+        path_config.get_sub_flow_status_file_path(phase_name, subflow_id)
     )
     return menu_notebook_path, status_json_path
 

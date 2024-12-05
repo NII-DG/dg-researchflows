@@ -205,44 +205,49 @@ class MainMenu(TaskLog):
         """
         govsheet_rf = utils.get_govsheet_rf(self.abs_root)
         govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
-        research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
         if govsheet:
             if govsheet_rf == govsheet:
                 self.token_input.visible = False
                 self.project_id_input.visible = False
                 message = msg_config.get('main_menu', 'current_version_govsheet')
                 self.research_flow_message.update_info(message)
-                self.research_flow_widget_box.append(self.research_flow_message)
+                self.field_box.append(self.research_flow_message)
             else:
-                if govsheet_rf == {}:
-                    utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
-                else:
-                    self.backup_gov_sheet_rf_file()
-                    utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
+                self.backup_file()
         else:
             utils.display_float_panel(self.abs_root, self.field_box, self.research_flow_message, self.token, self.project_id)
-            if govsheet_rf:
-                self.backup_gov_sheet_rf_file()
-            utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
+
+    def backup_file(self):
+        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
+        govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
+        research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
+        if govsheet_rf:
+            self.backup_gov_sheet_rf_file()
             utils.copy_govsheet(self.govsheet_rf_path, govsheet)
-        if research_flow_dict:
-            utils.copy_govsheet(self.govsheet_rf_path, govsheet)
-            self.remove_and_copy_file_notebook()
-        else:
-            msg = msg_config.get('main_menu', 'success_govsheet')
-            self.research_flow_message.update_success(msg)
-            self.research_flow_widget_box.append(self.research_flow_message)
+        utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
+        file_dir = os.path.dirname(self.govsheet_rf_path)
+        if os.path.exists(file_dir):
+            os.makedirs(file_dir)
+        file.JsonFile(self.govsheet_rf_path).write(govsheet)
+        self.remove_and_copy_file_notebook()
 
     def remove_and_copy_file_notebook(self):
         """サブフローの設定ファイル群とタスクノートブックを削除しbaseからコピーするメソッドです。"""
-        for phase_name, sub_flow_data in self.reserch_flow_status_operater.get_phase_subflow_id_name().items():
-            menu_notebook_path, status_json_path = utils.get_options_path(self.abs_root, phase_name, sub_flow_data)
-            working_path = utils.get_working_path(self.abs_root, phase_name, sub_flow_data)
-            self.remove_file(working_path)
-            file.File(str(menu_notebook_path)).remove()
-            file.File(str(status_json_path)).remove()
-            CreateSubflowForm.prepare_new_subflow_data(self, phase_name, sub_flow_data['id'], sub_flow_data['name'], True)
-            utils.update_status_file(self.abs_root, status_json_path, working_path)
+        research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
+        if research_flow_dict:
+            for phase_name, sub_flow_data in research_flow_dict.items():
+                for sub_flow_id, sub_flow_name in sub_flow_data.items():
+                    menu_notebook_path, status_json_path = utils.get_options_path(self.abs_root, phase_name, sub_flow_id, sub_flow_name)
+                    working_path = utils.get_working_path(self.abs_root, phase_name, sub_flow_id, sub_flow_name)
+                    self.remove_file(working_path)
+                    file.File(str(menu_notebook_path)).remove()
+                    file.File(str(status_json_path)).remove()
+                    CreateSubflowForm.prepare_new_subflow_data(self, phase_name, sub_flow_id, sub_flow_name, True)
+                    utils.update_status_file(self.abs_root, status_json_path, working_path)
+        else:
+            msg = msg_config.get('main_menu', 'success_govsheet')
+            self.research_flow_message.update_success(msg)
+            self.field_box.append(self.research_flow_message)
 
     def remove_file(self, drc_path: str):
         """フォルダ内のファイルを全て削除するメソッドです。

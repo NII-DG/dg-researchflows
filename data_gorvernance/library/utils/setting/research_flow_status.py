@@ -536,8 +536,13 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         research_flow_status = self.load_research_flow_status()
         sub_flow_dict = {}
         for phase in research_flow_status:
-            phase_name = phase._name
-            if phase._name != "plan" and phase._sub_flow_data != []:
-                for sub_flow_item in phase._sub_flow_data:
-                    sub_flow_dict[phase_name] = {"id": sub_flow_item._id, "name": sub_flow_item._name}
+            if phase._name != 'plan' and phase._sub_flow_data != []:
+                value = self.get_id_name(phase)
+                sub_flow_dict[phase._name] = value
         return sub_flow_dict
+
+    def get_id_name(self, phase):
+        id_name_dict = {}
+        for data in phase._sub_flow_data:
+            id_name_dict[data._id] = data._name
+        return id_name_dict

@@ -277,21 +277,7 @@ class CreateSubflowForm(BaseSubflowForm):
             self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             raise
 
-        try:
-            new_status_json_path = os.path.join(
-                self.abs_root,
-                path_config.get_sub_flow_status_file_path(phase_name, new_sub_flow_id)
-            )
-            new_working_path = os.path.join(
-                self.abs_root, path_config.DG_WORKING_RESEARCHFLOW_FOLDER,
-                phase_name,
-                new_sub_flow_id,
-                path_config.TASK
-            )
-            utils.update_status_file(self.abs_root, new_status_json_path, new_working_path)
-        except Exception:
-            msg = msg_config.get('main_menu', 'success_govsheet')
-            self._err_output.update_success(msg)
+        self.new_status_file()
 
         # フォームの初期化
         self._sub_flow_type_selector.value = 0

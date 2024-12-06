@@ -241,7 +241,7 @@ class CreateSubflowForm(BaseSubflowForm):
             self.change_submit_button_warning(str(e))
             raise
 
-        self.check_govsheet_rf()
+        self.check_govsheet_rf(token, project_id)
 
         # リサーチフローステータス管理JSONの更新
         try:
@@ -267,7 +267,7 @@ class CreateSubflowForm(BaseSubflowForm):
 
         # 新規サブフローデータの用意
         try:
-            self.prepare_new_subflow_data(phase_name, new_sub_flow_id, sub_flow_name, False)
+            utils.prepare_new_subflow_data(phase_name, new_sub_flow_id, sub_flow_name, False)
         except Exception:
             # 失敗した場合に/data/<phase_name>/<data_dir_name>の削除
             os.remove(data_dir_path)
@@ -277,7 +277,7 @@ class CreateSubflowForm(BaseSubflowForm):
             self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             raise
 
-        self.new_status_file()
+        self.new_status_file(phase_name, new_sub_flow_id)
 
         # フォームの初期化
         self._sub_flow_type_selector.value = 0
@@ -354,10 +354,10 @@ class CreateSubflowForm(BaseSubflowForm):
             shutil.rmtree(dect_dir_path)
             raise
 
-    def check_govsheet_rf(self):
+    def check_govsheet_rf(self, token, project_id):
         govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
         govsheet_rf = utils.get_govsheet_rf(self.abs_root)
-        govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
+        govsheet = utils.get_govsheet(token, self.grdm_url, project_id, self.remote_path)
         research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
         if govsheet_rf:
             pass
@@ -371,7 +371,7 @@ class CreateSubflowForm(BaseSubflowForm):
                         working_path = utils.get_working_path(self.abs_root, phase_name, sub_flow_id)
                         utils.update_status_file(self.abs_root, status_json_path, working_path)
             else:
-                utils.display_float_panel(self.abs_root, self._sub_flow_widget_box, self._err_output, self.token, self.project_id)
+                utils.display_float_panel(self.abs_root, self._sub_flow_widget_box, self._err_output, token, project_id, research_flow_dict, self.current_time)
 
     def new_status_file(self, new_phase_name, new_subflow_id):
         new_status_file = os.path.join(

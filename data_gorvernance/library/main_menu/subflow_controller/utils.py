@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 import datetime
 import zipfile
 from typing import Union
@@ -30,7 +31,7 @@ def input_widget() -> Union[pn.widgets.PasswordInput, pn.widgets.TextInput]:
     project_id_input = pn.widgets.TextInput(name=msg_config.get('main_menu', 'project_id_input'), visible=False)
     return token_input, project_id_input
 
-def create_float_panel(abs_root: str, field_box: pn.WidgetBox, message: MessageBox, token: str, project_id: str) -> pn.layout.FloatPanel:
+def create_float_panel(abs_root: str, field_box: pn.WidgetBox, message: MessageBox, token: str, project_id: str, research_flow_dict: dict, current_time: str) -> pn.layout.FloatPanel:
     """FloatPanelの設定をする関数です。
 
     Args:
@@ -69,7 +70,7 @@ def create_float_panel(abs_root: str, field_box: pn.WidgetBox, message: MessageB
             event: クリックイベント
         """
         apply_button.set_looks_processing()
-        govsheet_rf_path = get_govsheet_rf_path(abs_root)
+        govsheet_rf = get_govsheet_rf(abs_root)
         grdm_connect = grdm.Grdm()
         grdm_url = con_config.get('GRDM', 'BASE_URL')
         reomote_path = con_config.get('DG_WEB', 'GOVSHEET_PATH')
@@ -78,7 +79,6 @@ def create_float_panel(abs_root: str, field_box: pn.WidgetBox, message: MessageB
         float_panel.visible = False
         schema = get_schema()
         data = get_default_govsheet(schema)
-        default_govsheet = file.JsonFile(file_path).write(data)
         grdm_connect.sync(
             token,
             grdm_url,
@@ -86,6 +86,8 @@ def create_float_panel(abs_root: str, field_box: pn.WidgetBox, message: MessageB
             file_path,
             abs_root
         )
+        file_backup_and_copy(abs_root, govsheet_rf, data, research_flow_dict, current_time)
+        remove_and_copy_file_notebook(abs_root, research_flow_dict, field_box, message)
 
     def select_cancel(event):
         """適用しない押下後エラーメッセージを表示する関数です。
@@ -244,11 +246,11 @@ def task_map(mapping: dict, govsheet: dict) -> dict:
             for map_key, map_value in value_dict.items():
                 if map_key in new_dict:
                     if map_value == new_dict[map_key]:
-                        new_dict = value_dict
+                        new_dict.update(value_dict)
                     else:
                         new_dict[map_key] = True
                 else:
-                    new_dict = value_dict
+                    new_dict.update(value_dict)
     return new_dict
 
 def _copy_file_by_name(target_file: str, search_directory: str, destination_directory: str) -> None:
@@ -357,9 +359,9 @@ def backup_zipfile(abs_root: str, research_flow_dict: dict, current_time: str):
     )
     for phase_name, subflow_data in research_flow_dict.items():
         for sub_flow_id, sub_flow_name in subflow_data.items():
-            zip_file_path = get_zipfile_path(abs_root, phase_name, subflow_id, sub_flow_name, current_time)
-            working_path = get_working_path(abs_root, phase_name, sub_flow_id, sub_flow_name)
-            menu_notebook_path, status_json_path = get_options_path(abs_root, phase_name, sub_flow_id, sub_flow_name)
+            zip_file_path = get_zipfile_path(abs_root, phase_name, sub_flow_id, current_time)
+            working_path = get_working_path(abs_root, phase_name, sub_flow_id)
+            menu_notebook_path, status_json_path = get_options_path(abs_root, phase_name, sub_flow_id)
             os.makedirs(os.path.dirname(zip_file_path), exist_ok=True)
             notebook_list = get_notebook_list(working_path)
             with zipfile.ZipFile(zip_file_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
@@ -410,7 +412,7 @@ def get_backup_govsheet_rf_path(abs_root: str, current_time: str) -> str:
         govsheet_rf = {}
     return govsheet_rf
 
-def get_zipfile_path(abs_root: str, phase_name: str, sub_flow_id: str, sub_flow_name: str, current_time: str) -> str:
+def get_zipfile_path(abs_root: str, phase_name: str, sub_flow_id: str, current_time: str) -> str:
     """サブフローファイル群のバックアップ先のパスを取得する関数です。
 
     Args:
@@ -471,7 +473,7 @@ def get_options_path(abs_root: str, phase_name: str, subflow_id: str) -> str:
     )
     return menu_notebook_path, status_json_path
 
-def display_float_panel(abs_root: str, field_box: pn.WidgetBox, message: MessageBox, token: str, project_id: str):
+def display_float_panel(abs_root: str, field_box: pn.WidgetBox, message: MessageBox, token: str, project_id: str, research_flow_dict: dict, current_time: str):
     """FloatPanelを表示する関数です。
 
     Args:
@@ -482,7 +484,7 @@ def display_float_panel(abs_root: str, field_box: pn.WidgetBox, message: Message
         project_id (str): プロジェクトID
     """
     field_box.clear()
-    float_panel = create_float_panel(abs_root, field_box, message, token, project_id)
+    float_panel = create_float_panel(abs_root, field_box, message, token, project_id, research_flow_dict, current_time)
     float_panel.visible = True
     float_panel_layout = pn.Row(
         pn.Spacer(width=270),
@@ -572,3 +574,94 @@ def get_sync_path(abs_root: str, research_flow_dict: dict, current_time: str) ->
         menu_path, status_path = get_options_path(abs_root, phase_name, sub_flow_data)
         backup_path = get_zipfile_path(abs_root, phase_name, sub_flow_data, current_time)
     return [govsheet_rf_path, backup_govsheet_rf_path, menu_path, backup_path]
+
+def file_backup_and_copy(abs_root, govsheet_rf, govsheet, research_flow_dict, current_time):
+    govsheet_rf_path = get_govsheet_rf_path(abs_root)
+    if research_flow_dict:
+        if govsheet_rf:
+            backup_govsheet_rf_file(abs_root, govsheet_rf_path, current_time)
+        backup_zipfile(abs_root, research_flow_dict, current_time)
+    file.JsonFile(govsheet_rf_path).write(govsheet)
+
+def remove_and_copy_file_notebook(abs_root, research_flow_dict, box, message):
+    if research_flow_dict:
+        for phase_name, sub_flow_data in research_flow_dict.items():
+            for sub_flow_id, sub_flow_name in sub_flow_data.items():
+                menu_notebook_path, status_json_path = get_options_path(abs_root, phase_name, sub_flow_id)
+                working_path = get_working_path(abs_root, phase_name, sub_flow_id)
+                remove_file(working_path)
+                file.File(str(menu_notebook_path)).remove()
+                file.File(str(status_json_path)).remove()
+                prepare_new_subflow_data(abs_root, phase_name, sub_flow_id, sub_flow_name, True)
+                update_status_file(abs_root, status_json_path, working_path)
+    else:
+        msg = msg_config.get('main_mmenu', 'success_govsheet')
+        message.update_success(msg)
+        box.append(message)
+
+def prepare_new_subflow_data(abs_root: str, phase_name: str, new_sub_flow_id: str, sub_flow_name: str, flg: bool):
+    """新しいサブフローのデータを用意するメソッドです。
+
+    Args:
+        phase_name (str): フェーズ名
+        new_sub_flow_id (str): 新しいサブフローのID
+        sub_flow_name (str): サブフロー名
+        flg (bool): フォルダ作成時にエラーにさせるかのフラグ。エラーにさせるならfalse、させないならtrue
+    """
+
+    # 新規サブフローデータの用意
+    # data_gorvernance\researchflowを取得
+    dg_researchflow_path = os.path.join(abs_root, path_config.DG_RESEARCHFLOW_FOLDER)
+    # data_gorvernance\base\subflowを取得する
+    dg_base_subflow_path = os.path.join(abs_root, path_config.DG_SUB_FLOW_BASE_DATA_FOLDER)
+
+    # コピー先フォルダパス
+    dect_dir_path = os.path.join(dg_researchflow_path, phase_name, new_sub_flow_id)
+
+    # コピー先フォルダの作成
+    os.makedirs(dect_dir_path, exist_ok=flg)  # 新規作成の時、既に存在している場合はエラーになる
+
+    # 対象コピーファイルorディレクトリリスト
+    copy_files = path_config.get_prepare_file_name_list_for_subflow()
+
+    try:
+        for copy_file_name in copy_files:
+            # コピー元ファイルパス
+            src_path = os.path.join(dg_base_subflow_path, phase_name, copy_file_name)
+            dect_path = os.path.join(dg_researchflow_path, phase_name, new_sub_flow_id, copy_file_name)
+            # コピーする。
+            if os.path.isfile(src_path):
+                shutil.copyfile(src_path, dect_path)
+            if os.path.isdir(src_path):
+                file.copy_dir(src_path, dect_path, overwrite=True)
+            # menu.ipynbファイルの場合は、menu.ipynbのヘッダーにサブフロー名を埋め込む
+            if copy_file_name == path_config.MENU_NOTEBOOK:
+                nb_file = NbFile(dect_path)
+                nb_file.embed_subflow_name_on_header(sub_flow_name)
+    except Exception:
+        # 失敗した場合は、コピー先フォルダごと削除する（ロールバック）
+        shutil.rmtree(dect_dir_path)
+        raise
+
+def backup_govsheet_rf_file(abs_root, govsheet_rf_path, current_time):
+    backup_file_path = os.path.join(
+        abs_root,
+        path_config.DATA_GOVERNANCE,
+        path_config.LOG,
+        'gov-sheet-rf',
+        f'{current_time}.json'
+    )
+    file.copy_file(govsheet_rf_path, backup_file_path)
+
+def remove_file(drc_path: str):
+    """フォルダ内のファイルを全て削除するメソッドです。
+
+    Args:
+        drc_path (str): 対象のディレクトリのパス
+    """
+    if not os.path.isdir(drc_path):
+        pass
+    for root, dirs, files in os.walk(drc_path):
+        for file in files:
+            file_path = os.path.join(root, file)
+            os.remove(file_path)

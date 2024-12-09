@@ -1,21 +1,19 @@
 import json
 import os
 import shutil
-import datetime
+from datetime import datetime
 import zipfile
 from typing import Union
 
 import panel as pn
-from requests.exceptions import RequestException
 
 from library.utils.config import path_config, message as msg_config, connect as con_config
+from library.utils.nb_file import NbFile
 from library.utils.widgets import Button, MessageBox
 from library.utils import dg_web
 from library.utils.storage_provider import grdm
-from library.utils.dg_web import form
 from library.utils.vault import Vault
 from library.utils import file
-from library.utils.setting.research_flow_status import ResearchFlowStatusOperater
 from library.utils.setting.status import SubflowTask ,SubflowStatusFile
 from library.utils.string import StringManager
 from library.utils.error import UnusableVault, RepoPermissionError, UnauthorizedError, ProjectNotExist
@@ -31,20 +29,12 @@ def input_widget() -> Union[pn.widgets.PasswordInput, pn.widgets.TextInput]:
     project_id_input = pn.widgets.TextInput(name=msg_config.get('main_menu', 'project_id_input'), visible=False)
     return token_input, project_id_input
 
-def create_float_panel(abs_root: str, field_box: pn.WidgetBox, message: MessageBox, token: str, project_id: str, research_flow_dict: dict, current_time: str) -> pn.layout.FloatPanel:
+def create_float_panel() -> Union[pn.layout.FloatPanel, Button, Button]:
     """FloatPanelの設定をする関数です。
 
-    Args:
-        abs_root (str): リサーチフローのルートディレクトリ
-        field_box (pn.WidgetBox): ウィジェットボックス
-        message (MessageBox): メッセージ
-        token (str): パーソナルアクセストークン
-        project_id (str): プロジェクトID
-
     Returns:
-        pn.layout.FloatPanel: FloatPanelを返す。
+        pn.layout.FloatPanel, Button, Button: FloatPanelを表示するオブジェクトを返す。
     """
-    message.clear()
     apply_button = Button(width=50)
     cancel_button = Button(width=50)
     apply_button.set_looks_init(msg_config.get('main_menu', 'apply'))
@@ -62,50 +52,7 @@ def create_float_panel(abs_root: str, field_box: pn.WidgetBox, message: MessageB
         config={'header': False},
         visible=False
     )
-
-    def select_apply(event):
-        """適用する押下後デフォルトのガバナンスシートで登録をする関数です。
-
-        Args:
-            event: クリックイベント
-        """
-        apply_button.set_looks_processing()
-        govsheet_rf = get_govsheet_rf(abs_root)
-        grdm_connect = grdm.Grdm()
-        grdm_url = con_config.get('GRDM', 'BASE_URL')
-        reomote_path = con_config.get('DG_WEB', 'GOVSHEET_PATH')
-        file_path = os.path.join(abs_root, reomote_path)
-        message.clear()
-        float_panel.visible = False
-        schema = get_schema()
-        data = get_default_govsheet(schema)
-        grdm_connect.sync(
-            token,
-            grdm_url,
-            project_id,
-            file_path,
-            abs_root
-        )
-        file_backup_and_copy(abs_root, govsheet_rf, data, research_flow_dict, current_time)
-        remove_and_copy_file_notebook(abs_root, research_flow_dict, field_box, message)
-
-    def select_cancel(event):
-        """適用しない押下後エラーメッセージを表示する関数です。
-
-        Args:
-            event: クリックイベント
-        """
-        float_panel.visible = False
-        message.clear()
-        field_box.clear()
-        msg = msg_config.get('main_menu', 'create_task_gov_sheet')
-        message.update_warning(msg)
-        field_box.append(message)
-
-    float_panel[1][1].on_click(select_apply)
-    float_panel[1][3].on_click(select_cancel)
-
-    return float_panel
+    return float_panel, apply_button, cancel_button
 
 def get_project_id() -> str:
     """プロジェクトIDを取得する関数です。
@@ -173,15 +120,6 @@ def get_govsheet(token: str, base_url: str, project_id: str, remote_path: str) -
     except FileNotFoundError:
         govsheet = {}
     return govsheet
-
-def copy_govsheet(govsheet_rf_path: str, govsheet: dict):
-    """ガバナンスシートをRFガバナンスシートにコピーする関数です。
-
-    Args:
-        govsheet_rf_path (str): RFガバナンスシートのパス
-        govsheet (dict): ガバナンスシート
-    """
-    file.JsonFile(govsheet_rf_path).write(govsheet)
 
 def get_notebook_list(path: str) -> list:
     """ディレクトリ配下のノートブックファイルを取得する関数です。
@@ -296,11 +234,16 @@ def update_status_file(abs_root: str, status_json_path: str, working_path: str):
     update_date = mapping_file(abs_root)
     sf = SubflowStatusFile(status_json_path)
     sf_status = sf.read()
-    update_file(update_date, sf_status._tasks)
+    update_flg(update_date, sf_status._tasks)
     sf.write(sf_status)
-    active_name(task_dir, working_path, sf_status._tasks)
+    after_sf = SubflowStatusFile(status_json_path)
+    update_sf_status = after_sf.read()
+    dependent_id_list = get_dependent_id_list(update_sf_status._tasks)
+    update_dependent_task(update_date, dependent_id_list, update_sf_status._tasks)
+    after_sf.write(update_sf_status)
+    active_name(task_dir, working_path, update_sf_status._tasks)
 
-def update_file(data: dict, tasks: SubflowTask):
+def update_flg(data: dict, tasks: SubflowTask):
     """タスクの表示フラグを更新する関数です。
 
     Args:
@@ -311,10 +254,34 @@ def update_file(data: dict, tasks: SubflowTask):
         for task in tasks:
             if task_id == task.id:
                 task.active = active_flg
-            if len(task.dependent_task_ids) > 0:
-                for dependent_id in task.dependent_task_ids:
-                    if dependent_id == task.id:
-                        task.active = True
+
+def get_dependent_id_list(tasks: SubflowTask) -> list:
+    """依存タスクが設定されているタスクのタスクIDを取得する関数です。
+
+    Args:
+        tasks (SubflowTask): サブフローのタスクの設定値
+
+    Returns:
+        list: タスクIDのリストを返す。
+    """
+    dependent_id_list = []
+    for task in tasks:
+        if len(task.dependent_task_ids) > 0:
+            for dependent_id in task.dependent_task_ids:
+                dependent_id_list.append(dependent_id)
+    return dependent_id_list
+
+def update_dependent_task(dependent_list: list, tasks: SubflowTask):
+    """依存タスクのactiveフラグをTrueにする関数です。
+
+    Args:
+        dependent_list (list): タスクIDのリスト
+        tasks (SubflowTask): サブフローのタスクの設定値
+    """
+    for task in tasks:
+        for dependent_id in dependent_list:
+            if task.id == dependent_id:
+                task.active = True
 
 def active_name(search_dir: str, working_path: str, tasks: SubflowTask):
     """表示フラグがTrueのタスクノートブックを用意する関数です。
@@ -390,28 +357,6 @@ def get_govsheet_rf_path(abs_root: str) -> str:
         'gov-sheet-rf.json'
     )
 
-def get_backup_govsheet_rf_path(abs_root: str, current_time: str) -> str:
-    """RFガバナンスシートのバックアップ先のパスを取得する関数です。
-
-    Args:
-        abs_root (str): リサーチフローのルートディレクトリ
-        current_time (str): 現在時刻
-
-    Returns:
-        str: RFガバナンスシートのバックアップ先のパスを返す。
-    """
-    try:
-        govsheet_rf = os.path.join(
-            abs_root,
-            path_config.DATA_GOVERNANCE,
-            path_config.LOG,
-            'gov-sheet-rf',
-            f'{current_time}.json'
-        )
-    except FileNotFoundError:
-        govsheet_rf = {}
-    return govsheet_rf
-
 def get_zipfile_path(abs_root: str, phase_name: str, sub_flow_id: str, current_time: str) -> str:
     """サブフローファイル群のバックアップ先のパスを取得する関数です。
 
@@ -472,25 +417,6 @@ def get_options_path(abs_root: str, phase_name: str, subflow_id: str) -> str:
         path_config.get_sub_flow_status_file_path(phase_name, subflow_id)
     )
     return menu_notebook_path, status_json_path
-
-def display_float_panel(abs_root: str, field_box: pn.WidgetBox, message: MessageBox, token: str, project_id: str, research_flow_dict: dict, current_time: str):
-    """FloatPanelを表示する関数です。
-
-    Args:
-        abs_root (str): リサーチフローのルートディレクトリ
-        field_box (pn.WidgetBox): ウィジェットボックス
-        message (MessageBox): メッセージ
-        token (str): パーソナルアクセストークン
-        project_id (str): プロジェクトID
-    """
-    field_box.clear()
-    float_panel = create_float_panel(abs_root, field_box, message, token, project_id, research_flow_dict, current_time)
-    float_panel.visible = True
-    float_panel_layout = pn.Row(
-        pn.Spacer(width=270),
-        float_panel
-    )
-    field_box.append(float_panel_layout)
 
 def get_schema() -> dict:
     """スキーマを取得する関数です。
@@ -557,33 +483,33 @@ def check_input(input_value: str) -> str:
         input_value = ''
     return input_value
 
-def get_sync_path(abs_root: str, research_flow_dict: dict, current_time: str) -> list:
-    """同期するファイルのパスを設定する関数です。
+def file_backup_and_copy(abs_root: str, govsheet_rf: dict, govsheet: dict, research_flow_dict: dict, current_time: dict, file_path: str, govsheet_rf_path: str):
+    """サブフロー群のバックアップをし、ガバナンスシートをRFガバナンスシートにコピーする関数です。
+
+    Args:
+        abs_root (str): リサーチフローのルートディレクトリ
+        govsheet_rf (dict): RFガバナンスシート
+        govsheet (dict): ガバナンスシート
+        research_flow_dict (dict): 存在するフェーズをkeyとし対応するサブフローIDとサブフロー名をvalueとした辞書
+        current_time (dict): 現在時刻
+        file_path (str): ガバナンスシートのパス
+        govsheet_rf_path (str): RFガバナンスシートのパス
+    """
+    if research_flow_dict:
+        if govsheet_rf:
+            backup_govsheet_rf_file(abs_root, path, current_time)
+        backup_zipfile(abs_root, research_flow_dict, current_time)
+    file.JsonFile(govsheet_rf_path).write(govsheet)
+
+def remove_and_copy_file_notebook(abs_root: str, research_flow_dict: dict, box: pn.WidgetBox, message: MessageBox):
+    """baseフォルダからファイルをコピーしstatus.jsonファイルを更新する関数です。
 
     Args:
         abs_root (str): リサーチフローのルートディレクトリ
         research_flow_dict (dict): 存在するフェーズをkeyとし対応するサブフローIDとサブフロー名をvalueとした辞書
-        current_time (str): 現在時刻
-
-    Returns:
-        list: ファイルのパスのリスト
+        box (pn.WidgetBox): ウィジェットボックス
+        message (MessageBox): メッセージボックス
     """
-    govsheet_rf_path = get_govsheet_rf_path(abs_root)
-    backup_govsheet_rf_path = get_backup_govsheet_rf_path(abs_root, current_time)
-    for phase_name, sub_flow_data in reserach_flow_dict.items():
-        menu_path, status_path = get_options_path(abs_root, phase_name, sub_flow_data)
-        backup_path = get_zipfile_path(abs_root, phase_name, sub_flow_data, current_time)
-    return [govsheet_rf_path, backup_govsheet_rf_path, menu_path, backup_path]
-
-def file_backup_and_copy(abs_root, govsheet_rf, govsheet, research_flow_dict, current_time):
-    govsheet_rf_path = get_govsheet_rf_path(abs_root)
-    if research_flow_dict:
-        if govsheet_rf:
-            backup_govsheet_rf_file(abs_root, govsheet_rf_path, current_time)
-        backup_zipfile(abs_root, research_flow_dict, current_time)
-    file.JsonFile(govsheet_rf_path).write(govsheet)
-
-def remove_and_copy_file_notebook(abs_root, research_flow_dict, box, message):
     if research_flow_dict:
         for phase_name, sub_flow_data in research_flow_dict.items():
             for sub_flow_id, sub_flow_name in sub_flow_data.items():
@@ -595,7 +521,7 @@ def remove_and_copy_file_notebook(abs_root, research_flow_dict, box, message):
                 prepare_new_subflow_data(abs_root, phase_name, sub_flow_id, sub_flow_name, True)
                 update_status_file(abs_root, status_json_path, working_path)
     else:
-        msg = msg_config.get('main_mmenu', 'success_govsheet')
+        msg = msg_config.get('main_menu', 'success_govsheet')
         message.update_success(msg)
         box.append(message)
 
@@ -643,7 +569,14 @@ def prepare_new_subflow_data(abs_root: str, phase_name: str, new_sub_flow_id: st
         shutil.rmtree(dect_dir_path)
         raise
 
-def backup_govsheet_rf_file(abs_root, govsheet_rf_path, current_time):
+def backup_govsheet_rf_file(abs_root :str, govsheet_rf_path: str, current_time: str):
+    """RFガバナンスシートのバックアップを取る関数です。
+
+    Args:
+        abs_root (str): リサーチフローのルートディレクトリ
+        govsheet_rf_path (str): RFガバナンスシートのパス
+        current_time (str): 現在時刻
+    """
     backup_file_path = os.path.join(
         abs_root,
         path_config.DATA_GOVERNANCE,
@@ -665,3 +598,22 @@ def remove_file(drc_path: str):
         for file in files:
             file_path = os.path.join(root, file)
             os.remove(file_path)
+
+def create_data_dir(abs_root, phase_name: str, data_dir_name: str) -> str:
+    """データディレクトリを作成するメソッドです。
+
+    Args:
+        phase_name (str): フェーズ名
+        data_dir_name (str): データディレクトリ名
+
+    Raises:
+        Exception: 既にファイルが存在しているエラー
+
+    Returns:
+        str: データディレクトリを作成するパスの値を返す。
+    """
+    path = path_config.get_task_data_dir(abs_root, phase_name, data_dir_name)
+    if os.path.exists(path):
+        raise Exception(f'{path} is already exist.')
+    os.makedirs(path)
+    return path

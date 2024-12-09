@@ -15,6 +15,7 @@ from library.utils.config import path_config, message as msg_config, connect as 
 from library.utils.error import InputWarning
 from library.utils.html import button as html_button
 from library.utils import file
+from library.utils.storage_provider import grdm
 from library.utils.log import TaskLog
 from library.utils.setting import ResearchFlowStatusOperater, SubflowStatusFile
 from library.utils.vault import Vault
@@ -162,6 +163,7 @@ class MainMenu(TaskLog):
         # 必須タスクが完了している場合は、何もしない
         self.check_status_research_preparation_flow()
 
+        self.grdm = grdm.Grdm()
         self.grdm_url = con_config.get('GRDM', 'BASE_URL')
         self.remote_path = con_config.get('DG_WEB', 'GOVSHEET_PATH')
 
@@ -176,7 +178,7 @@ class MainMenu(TaskLog):
         self.project_id_input.param.watch(self.input, 'value')
 
         # ガバナンスシート適用ボタン
-        apply_govsheet_button_title = msg_config.get('main_menu', 'apply_gov_sheet')
+        apply_govsheet_button_title = msg_config.get('main_menu', 'apply_govsheet')
         self.apply_gov_sheet_button = Button(width=10)
         self.apply_gov_sheet_button.set_looks_init(apply_govsheet_button_title)
         self.apply_gov_sheet_button.on_click(self.apply_click)
@@ -196,16 +198,17 @@ class MainMenu(TaskLog):
         self.govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
         self.current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 
-    def is_govsheet(self):
-        """RFガバナンスシートやガバナンスシートの存在で処理を変えるためのメソッドです。
+        self.float_panel, self.apply_button, self.cancel_button = utils.create_float_panel()
+        self.apply_button.on_click(self.callback_apply_button)
+        self.cancel_button.on_click(self.callback_cancel_button)
 
-        Args:
-            token (str): パーソナルアクセストークン
-            project_id (str): プロジェクトID
-        """
+    def is_govsheet(self):
+        """RFガバナンスシートやガバナンスシートの存在で処理を変えるためのメソッドです。"""
         govsheet_rf = utils.get_govsheet_rf(self.abs_root)
         govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
         research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
+        file_path = os.path.join(self.abs_root, self.remote_path)
+        govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
         if govsheet:
             if govsheet_rf == govsheet:
                 self.token_input.visible = False
@@ -214,63 +217,11 @@ class MainMenu(TaskLog):
                 self.research_flow_message.update_info(message)
                 self.field_box.append(self.research_flow_message)
             else:
-                utils.file_backup_and_copy(self.abs_root, govsheet_rf, govsheet, research_flow_dict, self.current_time)
+                utils.file_backup_and_copy(self.abs_root, govsheet_rf, govsheet, research_flow_dict, self.current_time, file_path, govsheet_rf_path)
                 utils.remove_and_copy_file_notebook(self.abs_root, research_flow_dict, self.field_box, self.research_flow_message)
         else:
-            utils.display_float_panel(self.abs_root, self.field_box, self.research_flow_message, self.token, self.project_id, research_flow_dict, self.current_time)
-
-    def backup_file(self):
-        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
-        govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
-        if govsheet_rf:
-            self.backup_gov_sheet_rf_file()
-            utils.copy_govsheet(self.govsheet_rf_path, govsheet)
-        utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
-        file_dir = os.path.dirname(self.govsheet_rf_path)
-        file.JsonFile(self.govsheet_rf_path).write(govsheet)
-        self.remove_and_copy_file_notebook()
-
-    def remove_and_copy_file_notebook(self):
-        """サブフローの設定ファイル群とタスクノートブックを削除しbaseからコピーするメソッドです。"""
-        research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
-        if research_flow_dict:
-            for phase_name, sub_flow_data in research_flow_dict.items():
-                for sub_flow_id, sub_flow_name in sub_flow_data.items():
-                    menu_notebook_path, status_json_path = utils.get_options_path(self.abs_root, phase_name, sub_flow_id)
-                    working_path = utils.get_working_path(self.abs_root, phase_name, sub_flow_id)
-                    self.remove_file(working_path)
-                    file.File(str(menu_notebook_path)).remove()
-                    file.File(str(status_json_path)).remove()
-                    CreateSubflowForm.prepare_new_subflow_data(self, phase_name, sub_flow_id, sub_flow_name, True)
-                    utils.update_status_file(self.abs_root, status_json_path, working_path)
-        else:
-            msg = msg_config.get('main_menu', 'success_govsheet')
-            self.research_flow_message.update_success(msg)
-            self.field_box.append(self.research_flow_message)
-
-    def remove_file(self, drc_path: str):
-        """フォルダ内のファイルを全て削除するメソッドです。
-
-        Args:
-            drc_path (str): 対象のディレクトリのパス
-        """
-        if not os.path.isdir(drc_path):
-            pass
-        for root, dirs, files in os.walk(drc_path):
-            for file in files:
-                file_path = os.path.join(root, file)
-                os.remove(file_path)
-
-    def backup_gov_sheet_rf_file(self):
-        """RFガバナンスシートのバックアップを行うメソッドです。"""
-        backup_file_path = os.path.join(
-            self.abs_root,
-            path_config.DATA_GOVERNANCE,
-            path_config.LOG,
-            'gov-sheet-rf',
-            f'{self.current_time}.json'
-        )
-        file.copy_file(self.govsheet_rf_path, backup_file_path)
+            self.float_panel.visible = True
+            self.research_flow_widget_box.append(self.float_panel)
 
     def check_status_research_preparation_flow(self):
         """研究準備の実行ステータス確認をするメソッドです。"""
@@ -475,7 +426,7 @@ class MainMenu(TaskLog):
         else:
             self.project_id_input.visible = False
             self.token_input.visible = False
-            self.is_govsheet(token, project_id)
+            self.is_govsheet(self.token, self.project_id)
         self.update_field_box()
 
     def callback_input_button(self, event):
@@ -519,6 +470,39 @@ class MainMenu(TaskLog):
             self._err_output.update_error(message)
             self.log.error(message)
 
+    def callback_apply_button(self, event):
+        """デフォルトのガバナンスシートで登録するメソッドです。
+
+        Args:
+            event: ボタンクリックイベント
+        """
+        self.research_flow_message.clear()
+        self.apply_button.set_looks_processing()
+        self.float_panel.visible = False
+        research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
+        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
+        govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
+        govsheet = utils.get_govsheet(self.abs_root, self.token, self.project_id, self.remote_path)
+        gov_file_path = os.path.join(self.abs_root, self.remote_path)
+        schema = utils.get_schema()
+        data = utils.get_default_govsheet(schema)
+        default_govsheet = file.JsonFile(gov_file_path).write(data)
+        self.grdm.sync(self.token, self.grdm_url, self.project_id, gov_file_path, self.abs_root)
+        utils.file_backup_and_copy(self.abs_root, govsheet_rf, govsheet, research_flow_dict, self.current_time, gov_file_path, govsheet_rf_path)
+        utils.remove_and_copy_file_notebook(self.abs_root, research_flow_dict, self.field_box, self.research_flow_message)
+
+    def callback_cancel_button(self, event):
+        """適用しないを押した後エラーメッセージを表示するメソッドです。
+
+        Args:
+            event: ボタンクリックイベント
+        """
+        self.research_flow_message.clear()
+        self.cancel_button.set_looks_processing()
+        self.float_panel.visible = False
+        msg = msg_config.get('main_menu', 'create_task_govsheet')
+        self.research_flow_message.update_warning(msg)
+        self.field_box.append(msg)
 
     #################
     # クラスメソッド #

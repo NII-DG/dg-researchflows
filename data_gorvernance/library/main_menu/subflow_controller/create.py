@@ -3,7 +3,6 @@
 このモジュールはサブフロー新規作成クラスを始め、新しいサブフローのデータを用意したり、データの検証を行うメソッドなどがあります。
 """
 import os
-import shutil
 import traceback
 import datetime
 
@@ -13,7 +12,6 @@ import panel as pn
 from library.utils import file
 from library.utils.config import path_config, message as msg_config, connect as con_config
 from library.utils.error import InputWarning
-from library.utils.nb_file import NbFile
 from library.utils.string import StringManager
 from library.utils.widgets import MessageBox, Button
 from library.main_menu.subflow_controller import utils
@@ -56,6 +54,9 @@ class CreateSubflowForm(BaseSubflowForm):
         self.remote_path = con_config.get('DG_WEB', 'GOVSHEET_PATH')
         self._sub_flow_widget_box = widget_box
         self.current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        self.float_panel, self.apply_button, self.cancel_button = utils.create_float_panel()
+        self.apply_button.on_click(self.callback_apply_button)
+        self.cancel_button.on_click(self.callback_cancel_button)
 
     def generate_sub_flow_type_options(self, research_flow_status: list[PhaseStatus]) -> dict[str, int]:
         """サブフロー種別(フェーズ)を表示するメソッドです。
@@ -94,6 +95,44 @@ class CreateSubflowForm(BaseSubflowForm):
             self.project_id_input.visible = True
         if self.token is None:
             self.token_input.visible = True
+
+    def callback_apply_button(self, event):
+        """デフォルトのガバナンスシートで登録するメソッドです。
+
+        Args:
+            event: ボタンクリックイベント
+        """
+        self._sub_flow_widget_box.clear()
+        self.apply_button.set_looks_processing()
+        self.float_panel.visible = False
+        token = self.token_input.value
+        project_id = self.project_id_input.value
+        govhseet_rf = utils.get_govsheet_rf(self.abs_root)
+        govhseet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
+        govsheet = utils.get_govsheet(token, self.grdm_url, project_id, self.remote_path)
+        research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
+        grdm_connect = grdm.Grdm()
+        gov_file_path = os.path.join(self.abs_root, self.remote_path)
+        schema = utils.get_schema()
+        data = utils.get_default_govsheet(schema)
+        default_govsheet = file.JsonFile(gov_file_path).write(data)
+        grdm_connect.sync(token, self.grdm_url, project_id, gov_file_path, self.abs_root)
+        utils.file_backup_and_copy(self.abs_root, govhseet_rf, govsheet, research_flow_dict, self.current_time, gov_file_path, govhseet_rf_path)
+        utils.remove_and_copy_file_notebook(self.abs_root, research_flow_dict, self._sub_flow_widget_box, self._err_output)
+        self.new_create_subflow(self._sub_flow_type_selector, self._sub_flow_name_form, self._data_dir_name_form, self._parent_sub_flow_selector)
+
+    def callback_cancel_button(self, event):
+        """適用しない押下後エラーメッセージを表示するメソッドです。
+
+        Args:
+            event: ボタンクリックイベント
+        """
+        self._err_output.clear()
+        self.cancel_button.set_looks_processing()
+        self.float_panel.visible = False
+        msg = msg_config.get('main_menu', 'create_task_govsheet')
+        self._err_output.update_warning(msg)
+        self._sub_flow_widget_box.append(self._err_output)
 
     # overwrite
     def callback_sub_flow_type_selector(self, event):
@@ -241,8 +280,75 @@ class CreateSubflowForm(BaseSubflowForm):
             self.change_submit_button_warning(str(e))
             raise
 
-        self.check_govsheet_rf(token, project_id)
+        research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
+        file_path = os.path.join(self.abs_root, self.remote_path)
+        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
+        if govsheet_rf == {}:
+            self.check_govsheet_rf(
+                token, project_id, research_flow_dict, phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
+        if self.float_panel.visible:
+            return
+        self.new_create_subflow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
 
+    def check_govsheet_rf(self, token: str, project_id: str, research_flow_dict: dict, phase_seq_number: int, sub_flow_name: str, data_dir_name: str, parent_sub_flow_ids: list[str]):
+        """既存のサブフローを作り直すかFloatPanelを表示するメソッドです。
+
+        Args:
+            token (str): パーソナルアクセストークン
+            project_id (str): プロジェクトID
+            research_flow_dict (dict): 存在するフェーズをkeyとし対応するサブフローIDとサブフロー名をvalueとした辞書
+            phase_seq_number (int): サブフローを作成するフェーズのシーケンス番号
+            sub_flow_name (str): 新規サブフロー名
+            data_dir_name (str): 作成するディレクトリ名
+            parent_sub_flow_ids (list[str]): 親サブフローID
+        """
+        govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
+        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
+        govsheet = utils.get_govsheet(token, self.grdm_url, project_id, self.remote_path)
+        if govsheet:
+            utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
+            file.JsonFile(govsheet_rf_path).write(govsheet)
+            if research_flow_dict:
+                for phase_name, sub_flow_data in research_flow_dict.items():
+                    for sub_flow_id, sub_flow_name in sub_flow_data.items():
+                        menu_notebook_path ,status_json_path = utils.get_options_path(self.abs_root, phase_name, sub_flow_id)
+                        working_path = utils.get_working_path(self.abs_root, phase_name, sub_flow_id)
+                        utils.update_status_file(self.abs_root, status_json_path, working_path)
+        else:
+            self.float_panel.visible = True
+            self._sub_flow_widget_box.append(self.float_panel)
+
+    def new_status_file(self, new_phase_name: str, new_subflow_id: str):
+        """新規サブフローのファイル群を用意するメソッドです。
+
+        Args:
+            new_phase_name (str): フェーズ名
+            new_subflow_id (str): 新しいサブフローのID
+        """
+        new_status_file = os.path.join(
+            self.abs_root,
+            path_config.get_sub_flow_status_file_path(new_phase_name, new_subflow_id)
+        )
+        new_working_path = os.path.join(
+            self.abs_root, path_config.DG_WORKING_FOLDER,
+            new_phase_name,
+            new_subflow_id,
+            path_config.TASK
+        )
+        utils.update_status_file(self.abs_root, new_status_file, new_working_path)
+
+    def new_create_subflow(self, phase_seq_number: int, sub_flow_name: str, data_dir_name: str, parent_sub_flow_ids: list[str]):
+        """新規サブフローを作成するメソッドです。
+
+        Args:
+            phase_seq_number (int): サブフローを作成するフェーズのシーケンス番号
+            sub_flow_name (str): 新規サブフロー名
+            data_dir_name (str): 作成するディレクトリ
+            parent_sub_flow_ids (str)): 親サブフロー名
+
+        Raises:
+            InputWarning: 入力不備によるエラー
+        """
         # リサーチフローステータス管理JSONの更新
         try:
             phase_name, new_sub_flow_id = self.reserch_flow_status_operater.create_sub_flow(
@@ -255,7 +361,7 @@ class CreateSubflowForm(BaseSubflowForm):
         # /data/<phase_name>/<data_dir_name>の作成
         data_dir_path = ""
         try:
-            data_dir_path = self.create_data_dir(phase_name, data_dir_name)
+            data_dir_path = utils.create_data_dir(self.abs_root, phase_name, data_dir_name)
         except Exception as e:
             # ディレクトリ名が存在した場合
             # リサーチフローステータス管理JSONをロールバック
@@ -267,7 +373,8 @@ class CreateSubflowForm(BaseSubflowForm):
 
         # 新規サブフローデータの用意
         try:
-            utils.prepare_new_subflow_data(phase_name, new_sub_flow_id, sub_flow_name, False)
+            utils.prepare_new_subflow_data(self.abs_root, phase_name, new_sub_flow_id, sub_flow_name, False)
+            self.new_status_file(phase_name, new_sub_flow_id)
         except Exception:
             # 失敗した場合に/data/<phase_name>/<data_dir_name>の削除
             os.remove(data_dir_path)
@@ -276,8 +383,6 @@ class CreateSubflowForm(BaseSubflowForm):
             # 新規作成ボタンを作成失敗ステータスに更新する
             self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             raise
-
-        self.new_status_file(phase_name, new_sub_flow_id)
 
         # フォームの初期化
         self._sub_flow_type_selector.value = 0
@@ -290,98 +395,3 @@ class CreateSubflowForm(BaseSubflowForm):
         self.token_input.value = ''
         self.token_input.value_input = ''
         self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
-
-    def create_data_dir(self, phase_name: str, data_dir_name: str) -> str:
-        """データディレクトリを作成するメソッドです。
-
-        Args:
-            phase_name (str): フェーズ名
-            data_dir_name (str): データディレクトリ名
-
-        Raises:
-            Exception: 既にファイルが存在しているエラー
-
-        Returns:
-            str: データディレクトリを作成するパスの値を返す。
-        """
-        path = path_config.get_task_data_dir(self.abs_root, phase_name, data_dir_name)
-        if os.path.exists(path):
-            raise Exception(f'{path} is already exist.')
-        os.makedirs(path)
-        return path
-
-    def prepare_new_subflow_data(self, phase_name: str, new_sub_flow_id: str, sub_flow_name: str, flg: bool):
-        """新しいサブフローのデータを用意するメソッドです。
-
-        Args:
-            phase_name (str): フェーズ名
-            new_sub_flow_id (str): 新しいサブフローのID
-            sub_flow_name (str): サブフロー名
-            flg (bool): フォルダ作成時にエラーにさせるかのフラグ。エラーにさせるならfalse、させないならtrue
-        """
-
-        # 新規サブフローデータの用意
-        # data_gorvernance\researchflowを取得
-        dg_researchflow_path = os.path.join(self.abs_root, path_config.DG_RESEARCHFLOW_FOLDER)
-        # data_gorvernance\base\subflowを取得する
-        dg_base_subflow_path = os.path.join(self.abs_root, path_config.DG_SUB_FLOW_BASE_DATA_FOLDER)
-
-        # コピー先フォルダパス
-        dect_dir_path = os.path.join(dg_researchflow_path, phase_name, new_sub_flow_id)
-
-        # コピー先フォルダの作成
-        os.makedirs(dect_dir_path, exist_ok=flg)  # 新規作成の時、既に存在している場合はエラーになる
-
-        # 対象コピーファイルorディレクトリリスト
-        copy_files = path_config.get_prepare_file_name_list_for_subflow()
-
-        try:
-            for copy_file_name in copy_files:
-                # コピー元ファイルパス
-                src_path = os.path.join(dg_base_subflow_path, phase_name, copy_file_name)
-                dect_path = os.path.join(dg_researchflow_path, phase_name, new_sub_flow_id, copy_file_name)
-                # コピーする。
-                if os.path.isfile(src_path):
-                    shutil.copyfile(src_path, dect_path)
-                if os.path.isdir(src_path):
-                    file.copy_dir(src_path, dect_path, overwrite=True)
-                # menu.ipynbファイルの場合は、menu.ipynbのヘッダーにサブフロー名を埋め込む
-                if copy_file_name == path_config.MENU_NOTEBOOK:
-                    nb_file = NbFile(dect_path)
-                    nb_file.embed_subflow_name_on_header(sub_flow_name)
-        except Exception:
-            # 失敗した場合は、コピー先フォルダごと削除する（ロールバック）
-            shutil.rmtree(dect_dir_path)
-            raise
-
-    def check_govsheet_rf(self, token, project_id):
-        govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
-        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
-        govsheet = utils.get_govsheet(token, self.grdm_url, project_id, self.remote_path)
-        research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
-        if govsheet_rf:
-            pass
-        else:
-            if govsheet:
-                utils.backup_zipfile(self.abs_root, research_flow_dict, self.current_time)
-                file.JsonFile(govsheet_rf_path).write(govsheet)
-                for phase_name, sub_flow_data in research_flow_dict.items():
-                    for sub_flow_id, sub_flow_name in sub_flow_data.items():
-                        menu_notebook_path ,status_json_path = utils.get_options_path(self.abs_root, phase_name, sub_flow_id)
-                        working_path = utils.get_working_path(self.abs_root, phase_name, sub_flow_id)
-                        utils.update_status_file(self.abs_root, status_json_path, working_path)
-            else:
-                utils.display_float_panel(self.abs_root, self._sub_flow_widget_box, self._err_output, token, project_id, research_flow_dict, self.current_time)
-
-    def new_status_file(self, new_phase_name, new_subflow_id):
-        new_status_file = os.path.join(
-            self.abs_root,
-            path_config.get_sub_flow_status_file_path(new_phase_name, new_subflow_id)
-        )
-        new_working_path = os.path.join(
-            self.abs_root, path_config.DG_WORKING_FOLDER,
-            new_phase_name,
-            new_subflow_id,
-            path_config.TASK
-        )
-        utils.update_status_file(self.abs_root, new_status_file, new_working_path)

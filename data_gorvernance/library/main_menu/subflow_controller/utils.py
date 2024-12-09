@@ -497,7 +497,7 @@ def file_backup_and_copy(abs_root: str, govsheet_rf: dict, govsheet: dict, resea
     """
     if research_flow_dict:
         if govsheet_rf:
-            backup_govsheet_rf_file(abs_root, path, current_time)
+            backup_govsheet_rf_file(abs_root, govsheet_rf_path, current_time)
         backup_zipfile(abs_root, research_flow_dict, current_time)
     file.JsonFile(govsheet_rf_path).write(govsheet)
 

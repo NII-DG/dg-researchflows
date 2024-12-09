@@ -239,7 +239,7 @@ def update_status_file(abs_root: str, status_json_path: str, working_path: str):
     after_sf = SubflowStatusFile(status_json_path)
     update_sf_status = after_sf.read()
     dependent_id_list = get_dependent_id_list(update_sf_status._tasks)
-    update_dependent_task(update_date, dependent_id_list, update_sf_status._tasks)
+    update_dependent_task(dependent_id_list, update_sf_status._tasks)
     after_sf.write(update_sf_status)
     active_name(task_dir, working_path, update_sf_status._tasks)
 

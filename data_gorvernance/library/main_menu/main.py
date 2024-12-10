@@ -482,7 +482,7 @@ class MainMenu(TaskLog):
         research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
         govsheet_rf = utils.get_govsheet_rf(self.abs_root)
         govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
-        govsheet = utils.get_govsheet(self.abs_root, self.token, self.project_id, self.remote_path)
+        govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
         gov_file_path = os.path.join(self.abs_root, self.remote_path)
         schema = utils.get_schema()
         data = utils.get_default_govsheet(schema)

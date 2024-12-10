@@ -354,7 +354,7 @@ def get_govsheet_rf_path(abs_root: str) -> str:
     return os.path.join(
         abs_root,
         path_config.DG_RESEARCHFLOW_FOLDER,
-        'gov-sheet-rf.json'
+        '.gov-sheet-rf'
     )
 
 def get_zipfile_path(abs_root: str, phase_name: str, sub_flow_id: str, current_time: str) -> str:

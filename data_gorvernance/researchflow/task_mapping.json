@@ -24,6 +24,11 @@
         "resourceDateCreated": [
             {
                 "value": true,
+                "display":[],
+                "hide":["RF009007"]
+            },
+            {
+                "value": false,
                 "display":["RF009007"],
                 "hide":[]
             }

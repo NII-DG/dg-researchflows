@@ -36,11 +36,12 @@ class CreateSubflowForm(BaseSubflowForm):
             _data_dir_name_form(TextInput):データディレクトリ名のフォーム
     """
 
-    def __init__(self, abs_root: str, message_box: MessageBox) -> None:
+    def __init__(self, abs_root: str, widget_box: pn.WidgetBox, message_box: MessageBox) -> None:
         """CreateSubflowForm コンストラクタのメソッドです。
 
         Args:
             abs_root (str): リサーチフローのルートディレクトリ
+            widget_box (pn.WidgetBox): ウィジェットボックスを格納する。
             message_box (MessageBox): メッセージを格納する。
         """
         super().__init__(abs_root, message_box)
@@ -51,6 +52,7 @@ class CreateSubflowForm(BaseSubflowForm):
         self.token_input.param.watch(self.callback_menu_form, 'value')
         self.grdm_url = con_config.get('GRDM', 'BASE_URL')
         self.remote_path = con_config.get('DG_WEB', 'GOVSHEET_PATH')
+        self._sub_flow_widget_box = widget_box
         self.current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
         self.float_panel, self.apply_button, self.cancel_button = utils.create_float_panel()
         self.apply_button.on_click(self.callback_apply_button)

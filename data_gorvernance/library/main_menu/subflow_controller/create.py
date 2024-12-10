@@ -132,7 +132,6 @@ class CreateSubflowForm(BaseSubflowForm):
         self.float_panel.visible = False
         msg = msg_config.get('main_menu', 'create_task_govsheet')
         self._err_output.update_warning(msg)
-        self._sub_flow_widget_box.append(self._err_output)
 
     # overwrite
     def callback_sub_flow_type_selector(self, event):

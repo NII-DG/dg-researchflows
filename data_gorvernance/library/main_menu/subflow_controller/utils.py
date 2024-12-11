@@ -1,7 +1,7 @@
 import json
 import os
 import shutil
-from datetime import datetime
+import datetime
 import zipfile
 from typing import Union
 
@@ -72,14 +72,15 @@ def get_token() -> str:
     Returns:
         str: パーソナルアクセストークンを返す。
     """
+    grdm_url = con_config.get('GRDM', 'BASE_URL')
     vault_key = 'grdm_token'
     try:
         vault = Vault()
         token = vault.get_value(vault_key)
     except Exception as e:
         raise UnusableVault from e
-    vault.set_value(vault_key, token)
-    return token
+    if token and grdm.check_authorization(grdm_url, token):
+        return token
 
 def get_govsheet_rf(abs_root: str) -> dict:
     """RFガバナンスシートを取得する関数です。
@@ -95,8 +96,6 @@ def get_govsheet_rf(abs_root: str) -> dict:
     if os.path.isfile(file_path):
         with open(file_path, 'r') as f:
             govsheet_rf = json.load(f)
-    else:
-        govsheet_rf = {}
     return govsheet_rf
 
 def get_govsheet(token: str, base_url: str, project_id: str, remote_path: str) -> dict:
@@ -111,9 +110,9 @@ def get_govsheet(token: str, base_url: str, project_id: str, remote_path: str) -
     Returns:
         dict: ガバナンスシートの内容(存在しない場合は{})を返す。
     """
+    grdm_connect = grdm.Grdm()
     govsheet = {}
     try:
-        grdm_connect = grdm.Grdm()
         govsheet = grdm_connect.download_json_file(
             token, base_url, project_id, remote_path
         )
@@ -121,7 +120,7 @@ def get_govsheet(token: str, base_url: str, project_id: str, remote_path: str) -
         govsheet = {}
     return govsheet
 
-def get_notebook_list(path: str) -> list:
+def get_notebook_list(working_dir_path: str) -> list:
     """ディレクトリ配下のノートブックファイルを取得する関数です。
 
     Args:
@@ -131,7 +130,7 @@ def get_notebook_list(path: str) -> list:
         list 取得したタスクノートブックリストを返す。
     """
     file_list = []
-    for dirpath, dirname, filenames in os.walk(path):
+    for dirpath, dirname, filenames in os.walk(working_dir_path):
         for filename in filenames:
             if filename.startswith('.ipynb'):
                 file_path = os.path.join(dirpath, dirname)
@@ -175,7 +174,7 @@ def task_map(mapping: dict, govsheet: dict) -> dict:
             for map_dict in mapping[key]:
                 if map_dict["value"] == govsheet[key]:
                     for hide_id in map_dict["hide"]:
-                        if not hide_id in new_dict:
+                        if hide_id not in new_dict:
                             new_dict[hide_id] = False
                     for display_id in map_dict["display"]:
                         new_dict[display_id] = True
@@ -222,26 +221,23 @@ def _copy_file_by_name(target_file: str, search_directory: str, destination_dire
             if not os.path.isdir(destination_images):
                 os.symlink(source_images, destination_images, target_is_directory=True)
 
-def update_status_file(abs_root: str, status_json_path: str, working_path: str):
-    """status.jsonを更新する関数です。
+def update_status_file(abs_root: str, status_json_path: str):
+    """RFガバナンスシートとtask_mapping.jsonのマッピング結果と依存タスクによってactiveフラグを切り替えるメソッドです。
 
     Args:
         abs_root (str): リサーチフローのルートディレクトリ
         status_json_path (str): status.jsonまでのパス
-        working_path (str): workingフォルダのパス
     """
-    task_dir = os.path.join(abs_root, path_config.DG_TASK_BASE_DATA_FOLDER)
     update_date = mapping_file(abs_root)
     sf = SubflowStatusFile(status_json_path)
     sf_status = sf.read()
     update_flg(update_date, sf_status._tasks)
-    sf.write(sf_status)
+
     after_sf = SubflowStatusFile(status_json_path)
     update_sf_status = after_sf.read()
     dependent_id_list = get_dependent_id_list(update_sf_status._tasks)
     update_dependent_task(dependent_id_list, update_sf_status._tasks)
     after_sf.write(update_sf_status)
-    active_name(task_dir, working_path, update_sf_status._tasks)
 
 def update_flg(data: dict, tasks: SubflowTask):
     """タスクの表示フラグを更新する関数です。
@@ -331,6 +327,7 @@ def backup_zipfile(abs_root: str, research_flow_dict: dict, current_time: str):
             menu_notebook_path, status_json_path = get_options_path(abs_root, phase_name, sub_flow_id)
             os.makedirs(os.path.dirname(zip_file_path), exist_ok=True)
             notebook_list = get_notebook_list(working_path)
+
             with zipfile.ZipFile(zip_file_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
                 for file in os.listdir(image_folder):
                     file_path = os.path.join(image_folder, file)
@@ -483,7 +480,7 @@ def check_input(input_value: str) -> str:
         input_value = ''
     return input_value
 
-def file_backup_and_copy(abs_root: str, govsheet_rf: dict, govsheet: dict, research_flow_dict: dict, current_time: dict, file_path: str, govsheet_rf_path: str):
+def file_backup_and_copy(abs_root: str, govsheet_rf: dict, govsheet: dict, research_flow_dict: dict, current_time: dict, govsheet_rf_path: str, message: MessageBox):
     """サブフロー群のバックアップをし、ガバナンスシートをRFガバナンスシートにコピーする関数です。
 
     Args:
@@ -492,16 +489,20 @@ def file_backup_and_copy(abs_root: str, govsheet_rf: dict, govsheet: dict, resea
         govsheet (dict): ガバナンスシート
         research_flow_dict (dict): 存在するフェーズをkeyとし対応するサブフローIDとサブフロー名をvalueとした辞書
         current_time (dict): 現在時刻
-        file_path (str): ガバナンスシートのパス
         govsheet_rf_path (str): RFガバナンスシートのパス
     """
-    if research_flow_dict:
-        if govsheet_rf:
-            backup_govsheet_rf_file(abs_root, govsheet_rf_path, current_time)
-        backup_zipfile(abs_root, research_flow_dict, current_time)
-    file.JsonFile(govsheet_rf_path).write(govsheet)
+    if not research_flow_dict and not govsheet_rf:
+        file.JsonFile(govsheet_rf_path).write(govsheet)
+        message.update_success(msg_config.get('main_menu', 'success_govsheet'))
+        return
 
-def remove_and_copy_file_notebook(abs_root: str, research_flow_dict: dict, box: pn.WidgetBox, message: MessageBox):
+    if govsheet_rf:
+        backup_govsheet_rf_file(abs_root, govsheet_rf_path, current_time)
+    else:
+        file.JsonFile(govsheet_rf_path).write(govsheet)
+    backup_zipfile(abs_root, research_flow_dict, current_time)
+
+def remove_and_copy_file_notebook(abs_root: str, research_flow_dict: dict):
     """baseフォルダからファイルをコピーしstatus.jsonファイルを更新する関数です。
 
     Args:
@@ -510,20 +511,18 @@ def remove_and_copy_file_notebook(abs_root: str, research_flow_dict: dict, box: 
         box (pn.WidgetBox): ウィジェットボックス
         message (MessageBox): メッセージボックス
     """
-    if research_flow_dict:
-        for phase_name, sub_flow_data in research_flow_dict.items():
-            for sub_flow_id, sub_flow_name in sub_flow_data.items():
-                menu_notebook_path, status_json_path = get_options_path(abs_root, phase_name, sub_flow_id)
-                working_path = get_working_path(abs_root, phase_name, sub_flow_id)
-                remove_file(working_path)
-                file.File(str(menu_notebook_path)).remove()
-                file.File(str(status_json_path)).remove()
-                prepare_new_subflow_data(abs_root, phase_name, sub_flow_id, sub_flow_name, True)
-                update_status_file(abs_root, status_json_path, working_path)
-    else:
-        msg = msg_config.get('main_menu', 'success_govsheet')
-        message.update_success(msg)
-        box.append(message)
+    for phase_name, sub_flow_data in research_flow_dict.items():
+        for sub_flow_id, sub_flow_name in sub_flow_data.items():
+            menu_notebook_path, status_json_path = get_options_path(abs_root, phase_name, sub_flow_id)
+            working_path = get_working_path(abs_root, phase_name, sub_flow_id)
+
+            shutil.rmtree(working_path)
+            file.File(str(menu_notebook_path)).remove()
+            file.File(str(status_json_path)).remove()
+
+            prepare_new_subflow_data(abs_root, phase_name, sub_flow_id, sub_flow_name, True)
+            update_status_file(abs_root, status_json_path)
+            preparation_notebook_file(abs_root, status_json_path, working_path)
 
 def prepare_new_subflow_data(abs_root: str, phase_name: str, new_sub_flow_id: str, sub_flow_name: str, flg: bool):
     """新しいサブフローのデータを用意するメソッドです。
@@ -586,34 +585,20 @@ def backup_govsheet_rf_file(abs_root :str, govsheet_rf_path: str, current_time: 
     )
     file.copy_file(govsheet_rf_path, backup_file_path)
 
-def remove_file(drc_path: str):
-    """フォルダ内のファイルを全て削除するメソッドです。
+def preparation_notebook_file(abs_root: str, status_path_json: str, working_path: str):
+    """status.jsonのactiveがTrueのタスクのnotebookファイルをコピーする関数です。
 
     Args:
-        drc_path (str): 対象のディレクトリのパス
+        abs_root (str): リサーチフローのルートディレクトリ
+        status_path_json (str): status.jsonのパス
+        working_path (str): workingのディレクトリ
     """
-    if not os.path.isdir(drc_path):
-        pass
-    for root, dirs, files in os.walk(drc_path):
-        for file in files:
-            file_path = os.path.join(root, file)
-            os.remove(file_path)
+    notebook_name_list = []
 
-def create_data_dir(abs_root, phase_name: str, data_dir_name: str) -> str:
-    """データディレクトリを作成するメソッドです。
+    task_dir = os.path.join(abs_root, path_config.DG_TASK_BASE_DATA_FOLDER)
+    status_file = SubflowStatusFile(status_path_json)
+    read_status_file = status_file.read()
 
-    Args:
-        phase_name (str): フェーズ名
-        data_dir_name (str): データディレクトリ名
-
-    Raises:
-        Exception: 既にファイルが存在しているエラー
-
-    Returns:
-        str: データディレクトリを作成するパスの値を返す。
-    """
-    path = path_config.get_task_data_dir(abs_root, phase_name, data_dir_name)
-    if os.path.exists(path):
-        raise Exception(f'{path} is already exist.')
-    os.makedirs(path)
-    return path
+    for task in read_status_file._tasks:
+        if task.active == True:
+            _copy_file_by_name(task.name, task_dir, working_path)

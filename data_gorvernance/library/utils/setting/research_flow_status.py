@@ -541,7 +541,15 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
                 sub_flow_dict[phase._name] = value
         return sub_flow_dict
 
-    def get_id_name(self, phase):
+    def get_id_name(self, phase: str) -> dict:
+        """研究準備を除くリサーチフローステータスに存在する全てのサブフローID、サブフロー名を取得するメソッドです。
+
+        Args:
+            phase (str): フェーズ名
+
+        Returns:
+            dict: サブフローIDとサブフロー名の辞書を返す。
+        """
         id_name_dict = {}
         for data in phase._sub_flow_data:
             id_name_dict[data._id] = data._name

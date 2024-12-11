@@ -163,65 +163,67 @@ class MainMenu(TaskLog):
         # 必須タスクが完了している場合は、何もしない
         self.check_status_research_preparation_flow()
 
+        ################################
+        # ガバナンスシート適用 #
+        ################################
         self.grdm = grdm.Grdm()
         self.grdm_url = con_config.get('GRDM', 'BASE_URL')
         self.remote_path = con_config.get('DG_WEB', 'GOVSHEET_PATH')
+        self.govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
 
         pn.extension('floatpanel')
 
+        # ガバナンスシート適用ウィジェットボックス
         self.research_flow_widget_box = pn.WidgetBox()
         self.research_flow_widget_box.width = 900
+        # ガバナンスシート適用メッセージオブジェクト
+        self.research_flow_message = MessageBox()
+        self.research_flow_message.width = 900
 
         # パーソナルアクセストークンとプロジェクトID入力欄
         self.token_input, self.project_id_input = utils.input_widget()
         self.token_input.param.watch(self.input, 'value')
         self.project_id_input.param.watch(self.input, 'value')
-
-        # ガバナンスシート適用ボタン
-        apply_govsheet_button_title = msg_config.get('main_menu', 'apply_govsheet')
-        self.apply_gov_sheet_button = Button(width=10)
-        self.apply_gov_sheet_button.set_looks_init(apply_govsheet_button_title)
-        self.apply_gov_sheet_button.on_click(self.apply_click)
-
-        self.update_research_flow_widget_box_init()
-
-        self.field_box = pn.WidgetBox()
-        self.field_box.width = 900
-
-        self.research_flow_message = MessageBox()
-        self.research_flow_message.width = 900
-
-        self.input_button = Button(width=10, visible=False, disabled=True)
+        # 確定ボタン
+        self.input_button = Button(width=10, visible=False)
         self.input_button.set_looks_init()
         self.input_button.on_click(self.callback_input_button)
 
-        self.govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
-        self.current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        # ガバナンスシート適用ボタン
+        apply_govsheet_button_title = msg_config.get('main_menu', 'apply_govsheet')
+        self.apply_govsheet_button = Button(width=10)
+        self.apply_govsheet_button.set_looks_init(apply_govsheet_button_title)
+        self.apply_govsheet_button.on_click(self.apply_click)
 
+        # FloatPanel、適用する/しないボタン
         self.float_panel, self.apply_button, self.cancel_button = utils.create_float_panel()
         self.apply_button.on_click(self.callback_apply_button)
         self.cancel_button.on_click(self.callback_cancel_button)
 
-    def is_govsheet(self):
-        """RFガバナンスシートやガバナンスシートの存在で処理を変えるためのメソッドです。"""
-        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
-        govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
-        research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
-        file_path = os.path.join(self.abs_root, self.remote_path)
-        govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
-        if govsheet:
-            if govsheet_rf == govsheet:
-                self.token_input.visible = False
-                self.project_id_input.visible = False
-                message = msg_config.get('main_menu', 'current_version_govsheet')
-                self.research_flow_message.update_info(message)
-                self.field_box.append(self.research_flow_message)
-            else:
-                utils.file_backup_and_copy(self.abs_root, govsheet_rf, govsheet, research_flow_dict, self.current_time, file_path, govsheet_rf_path)
-                utils.remove_and_copy_file_notebook(self.abs_root, research_flow_dict, self.field_box, self.research_flow_message)
-        else:
+        self.update_research_flow_widget_box_init()
+
+    def file_operation(self):
+        """ガバナンスシートを適用して必要なファイルを用意するメソッドです。"""
+        self.govsheet_rf = utils.get_govsheet_rf(self.abs_root)
+        self.govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
+        self.research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
+        current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+
+        if not govsheet:
             self.float_panel.visible = True
             self.research_flow_widget_box.append(self.float_panel)
+            return
+
+        if govsheet_rf == govsheet:
+            self.token_input.visible = False
+            self.project_id_input.visible = False
+            message = msg_config.get('main_menu', 'current_version_govsheet')
+            self.research_flow_message.update_info(message)
+            return
+
+        utils.file_backup_and_copy(self.abs_root, self.govsheet_rf, self.govsheet, self.research_flow_dict, current_time, self.govsheet_rf_path, self.research_flow_message)
+        utils.remove_and_copy_file_notebook(self.abs_root, self.research_flow_dict)
+        self.research_flow_message.update_success(msg_config.get('main_menu', 'success_govsheet'))
 
     def check_status_research_preparation_flow(self):
         """研究準備の実行ステータス確認をするメソッドです。"""
@@ -385,39 +387,37 @@ class MainMenu(TaskLog):
             self._err_output.update_error(message)
 
     def update_research_flow_widget_box_init(self):
-        """リサーチフロー関係図とガバナンスシート適用ボタンを表示するメソッドです。"""
+        """ガバナンスシート適用ボタンを表示するメソッドです。"""
         self.research_flow_widget_box.clear()
-        research_flow_image_title = f'### {msg_config.get("main_menu", "subflow_relationship_diagram")}'
-        layout = pn.Row(
-            research_flow_image_title,
+        button = pn.Row(
             pn.Spacer(width=580),
-            self.apply_gov_sheet_button
+            self.apply_govsheet_button
         )
-        self.research_flow_widget_box.append(layout)
+        self.research_flow_widget_box.append(button)
 
-    def update_field_box(self):
-        """パーソナルアクセストークンとプロジェクトIDと確定ボタンを表示するメソッドです。"""
-        self.field_box.clear()
+    def display_input_box(self):
+        """パーソナルアクセストークンとプロジェクトIDの入力欄と確定ボタン表示用メソッドです。"""
+        self.research_flow_widget_box.clear()
         input_layout = pn.Row(
             self.token_input,
             self.project_id_input,
             self.input_button
         )
-        self.field_box.append(input_layout)
+        self.research_flow_widget_box.append(input_layout)
 
     def apply_click(self, event):
-        """ガバナンスシート適用ボタン押下後の表示を変えるメソッドです。
+        """パーソナルアクセストークンとプロジェクトIDが取得できたかによって表示欄を変えるメソッドです。
 
         Args:
             event: ボタンクリックイベント
         """
         self.input_button.set_looks_init()
         self.research_flow_message.clear()
-        self.field_box.clear()
         self.token_input.value = ''
         self.project_id_input.value = ''
         self.token = utils.get_token()
         self.project_id = utils.get_project_id()
+
         if self.project_id is None and self.token is None:
             self.project_id_input.visible = True
             self.token_input.visible = True
@@ -426,11 +426,12 @@ class MainMenu(TaskLog):
         else:
             self.project_id_input.visible = False
             self.token_input.visible = False
-            self.is_govsheet(self.token, self.project_id)
-        self.update_field_box()
+            self.file_operation()
+
+        self.display_input_box()
 
     def callback_input_button(self, event):
-        """入力内容のチェックをするメソッドです。
+        """パーソナルアクセストークンとプロジェクトIDの接続確認をするメソッドです。
 
         Args:
             event: クリックイベント
@@ -446,25 +447,25 @@ class MainMenu(TaskLog):
                     self.token_input.value = ''
                     self.project_id_input.value = ''
                 else:
-                    self.field_box.clear()
+                    self.research_flow_widget_box.clear()
                     self.token = token
                     self.project_id = project_id
-                    self.is_govsheet()
+                    self.file_operation()
             elif token:
                 if not utils.grdm_access_check(self.grdm_url, token, self.project_id):
                     vault.set_value('grdm_token', '')
                     self.token_input.value = ''
                 else:
-                    self.field_box.clear()
+                    self.research_flow_widget_box.clear()
                     self.token = token
-                    self.is_govsheet()
+                    self.file_operation()
             else:
                 if not utils.grdm_access_check(self.grdm_url, self.token, project_id):
                     self.project_id_input.value = ''
                 else:
-                    self.field_box.clear()
+                    self.research_flow_widget_box.clear()
                     self.project_id = project_id
-                    self.is_govsheet()
+                    self.file_operation()
         except Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
             self._err_output.update_error(message)
@@ -479,17 +480,17 @@ class MainMenu(TaskLog):
         self.research_flow_message.clear()
         self.apply_button.set_looks_processing()
         self.float_panel.visible = False
-        research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
-        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
-        govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
-        govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
-        gov_file_path = os.path.join(self.abs_root, self.remote_path)
+        govsheet_path = os.path.join(self.abs_root, self.remote_path)
+        current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+
         schema = utils.get_schema()
         data = utils.get_default_govsheet(schema)
-        default_govsheet = file.JsonFile(gov_file_path).write(data)
-        self.grdm.sync(self.token, self.grdm_url, self.project_id, gov_file_path, self.abs_root)
-        utils.file_backup_and_copy(self.abs_root, govsheet_rf, govsheet, research_flow_dict, self.current_time, gov_file_path, govsheet_rf_path)
-        utils.remove_and_copy_file_notebook(self.abs_root, research_flow_dict, self.field_box, self.research_flow_message)
+        file.JsonFile(self.govsheet_rf_path).write(data)
+
+        utils.file_backup_and_copy(self.abs_root, self.govsheet_rf, self.govsheet, self.research_flow_dict, current_time, self.govsheet_rf_path, self.research_flow_message)
+        utils.remove_and_copy_file_notebook(self.abs_root, self.research_flow_dict)
+        self.research_flow_message.update_success(msg_config.get('main_menu', 'success_govsheet'))
+        self.grdm.sync(self.token, self.grdm_url, self.project_id, govsheet_path, self.abs_root)
 
     def callback_cancel_button(self, event):
         """適用しないを押した後エラーメッセージを表示するメソッドです。
@@ -502,7 +503,6 @@ class MainMenu(TaskLog):
         self.float_panel.visible = False
         msg = msg_config.get('main_menu', 'create_task_govsheet')
         self.research_flow_message.update_warning(msg)
-        self.field_box.append(msg)
 
     #################
     # クラスメソッド #
@@ -545,8 +545,15 @@ class MainMenu(TaskLog):
             main_menu._menu_tabs, main_menu._err_output
         )
         display(main_menu_box)
-        main_menu.research_flow_widget_box.append(main_menu.field_box)
-        display(main_menu.research_flow_widget_box)
+        research_flow_image_title = pn.pane.Markdown(
+            f'### {msg_config.get("main_menu", "subflow_relationship_diagram")}'
+        )
+        research_flow_box = pn.WidgetBox(
+            research_flow_image_title,
+            main_menu.research_flow_widget_box,
+            main_menu.research_flow_message
+        )
+        display(research_flow_box)
         display(main_menu._research_flow_image)
 
         # Hidden Setup

@@ -299,8 +299,7 @@ class CreateSubflowForm(BaseSubflowForm):
 
         self.file_path = os.path.join(self.abs_root, self.remote_path)
         self.govsheet_rf = utils.get_govsheet_rf(self.abs_root)
-        if self.govsheet_rf == {}:
-            self.check_govsheet_rf(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
+        self.check_govsheet_rf(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
         if self.float_panel.visible:
             return
         self.new_create_subflow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
@@ -318,16 +317,18 @@ class CreateSubflowForm(BaseSubflowForm):
         self.govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
         current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 
-        if not govsheet:
-            self.float_panel.visible = True
-            self._sub_flow_widget_box.append(self.float_panel)
-            return
+        if not self.govsheet_rf:
+            if not self.govsheet:
+                self.float_panel.visible = True
+                self._sub_flow_widget_box.append(self.float_panel)
+                return
 
         if not self.research_flow_dict:
+            file.JsonFile(self.govsheet_rf_path).write(self.govsheet)
             return
 
         utils.backup_zipfile(self.abs_root, self.research_flow_dict, current_time)
-        file.JsonFile(govsheet_rf_path).write(govsheet)
+        file.JsonFile(self.govsheet_rf_path).write(self.govsheet)
         for phase_name, sub_flow_data in self.research_flow_dict.items():
             for sub_flow_id, sub_flow_name in sub_flow_data.items():
                 menu_notebook_path, status_json_path = utils.get_options_path(self.abs_root, phase_name, sub_flow_id)
@@ -351,7 +352,8 @@ class CreateSubflowForm(BaseSubflowForm):
             new_subflow_id,
             path_config.TASK
         )
-        utils.update_status_file(self.abs_root, new_status_file, new_working_path)
+        utils.update_status_file(self.abs_root, new_status_file)
+        utils.preparation_notebook_file(self.abs_root, new_status_file, new_working_path)
 
     def create_data_dir(self, phase_name: str, data_dir_name: str) -> str:
         """データディレクトリを作成するメソッドです。

@@ -209,12 +209,12 @@ class MainMenu(TaskLog):
         self.research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
         current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 
-        if not govsheet:
+        if not self.govsheet:
             self.float_panel.visible = True
             self.research_flow_widget_box.append(self.float_panel)
             return
 
-        if govsheet_rf == govsheet:
+        if self.govsheet_rf == self.govsheet:
             self.token_input.visible = False
             self.project_id_input.visible = False
             message = msg_config.get('main_menu', 'current_version_govsheet')

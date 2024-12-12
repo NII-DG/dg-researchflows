@@ -51,6 +51,7 @@ class CreateSubflowForm(BaseSubflowForm):
         self.grdm_url = con_config.get('GRDM', 'BASE_URL')
         self.remote_path = con_config.get('DG_WEB', 'GOVSHEET_PATH')
         self._sub_flow_widget_box = widget_box
+        self.govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
 
         # パーソナルアクセストークンとプロジェクトID入力欄
         self.token_input, self.project_id_input = utils.input_widget()
@@ -113,14 +114,16 @@ class CreateSubflowForm(BaseSubflowForm):
         self.apply_button.set_looks_processing()
         self.float_panel.visible = False
 
+        # デフォルトでガバナンスシートを作成する
         current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
         grdm_connect = grdm.Grdm()
         schema = utils.get_schema()
         data = utils.get_default_govsheet(schema)
         file.JsonFile(govsheet_path).write(data)
 
-        utils.file_backup_and_copy(self.abs_root, self.govsheet_rf, self.govsheet, self.research_flow_dict, current_time, self.file_path, self.govsheet_rf_path)
-        utils.remove_and_copy_file_notebook(self.abs_root, self.research_flow_dict)
+        # サブフローを作り直す
+        utils.recreate_subflow(
+            self.abs_root, self.govsheet_rf, self.govsheet, self.research_flow_dict, current_time, self.govsheet_rf_path)
         self.new_create_subflow(self._sub_flow_type_selector, self._sub_flow_name_form, self._data_dir_name_form, self._parent_sub_flow_selector)
         grdm_connect.sync(self.token, self.grdm_url, self.project_id, self.file_path, self.abs_root)
 
@@ -297,14 +300,18 @@ class CreateSubflowForm(BaseSubflowForm):
             self.change_submit_button_warning(str(e))
             raise
 
+        self.govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
         self.file_path = os.path.join(self.abs_root, self.remote_path)
         self.govsheet_rf = utils.get_govsheet_rf(self.abs_root)
-        self.check_govsheet_rf(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
+        if self.research_flow_dict:
+            self.recreate_current_subflow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
+        else:
+            file.JsonFile(self.govsheet_rf_path).write(self.govsheet)
         if self.float_panel.visible:
             return
         self.new_create_subflow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
 
-    def check_govsheet_rf(self, phase_seq_number: int, sub_flow_name: str, data_dir_name: str, parent_sub_flow_ids: list[str]):
+    def recreate_current_subflow(self, phase_seq_number: int, sub_flow_name: str, data_dir_name: str, parent_sub_flow_ids: list[str]):
         """既存のサブフローを作り直すメソッドです。
 
         Args:
@@ -313,27 +320,15 @@ class CreateSubflowForm(BaseSubflowForm):
             data_dir_name (str): 作成するディレクトリ名
             parent_sub_flow_ids (list[str]): 親サブフローID
         """
-        self.govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
-        self.govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
         current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 
-        if not self.govsheet_rf:
-            if not self.govsheet:
-                self.float_panel.visible = True
-                self._sub_flow_widget_box.append(self.float_panel)
-                return
-
-        if not self.research_flow_dict:
-            file.JsonFile(self.govsheet_rf_path).write(self.govsheet)
+        if not self.govsheet_rf and not self.govsheet:
+            self.float_panel.visible = True
+            self._sub_flow_widget_box.append(self.float_panel)
             return
 
-        utils.backup_zipfile(self.abs_root, self.research_flow_dict, current_time)
-        file.JsonFile(self.govsheet_rf_path).write(self.govsheet)
-        for phase_name, sub_flow_data in self.research_flow_dict.items():
-            for sub_flow_id, sub_flow_name in sub_flow_data.items():
-                menu_notebook_path, status_json_path = utils.get_options_path(self.abs_root, phase_name, sub_flow_id)
-                working_path = utils.get_working_path(self.abs_root, phase_name, sub_flow_id)
-                utils.remove_and_copy_file_notebook(self.abs_root, self.research_flow_dict)
+        utils.recreate_subflow(
+            self.abs_root, self.govsheet_rf, self.govsheet, self.research_flow_dict, current_time, self.govsheet_rf_path)
 
     def new_status_file(self, new_phase_name: str, new_subflow_id: str):
         """新規サブフローのファイル群を用意するメソッドです。

@@ -182,12 +182,9 @@ def task_map(mapping: dict, govsheet: dict) -> dict:
             value_dict = task_map(mapping[key], govsheet[key])
             for map_key, map_value in value_dict.items():
                 if map_key in new_dict:
-                    if map_value == new_dict[map_key]:
-                        new_dict.update(value_dict)
-                    else:
-                        new_dict[map_key] = True
+                    new_dict[map_key] = new_dict[map_key] or map_value
                 else:
-                    new_dict.update(value_dict)
+                    new_dict[map_key] = map_value
     return new_dict
 
 def _copy_file_by_name(target_file: str, search_directory: str, destination_directory: str) -> None:
@@ -231,13 +228,11 @@ def update_status_file(abs_root: str, status_json_path: str):
     update_date = mapping_file(abs_root)
     sf = SubflowStatusFile(status_json_path)
     sf_status = sf.read()
-    update_flg(update_date, sf_status._tasks)
+    update_flg(update_date, sf_status.tasks)
 
-    after_sf = SubflowStatusFile(status_json_path)
-    update_sf_status = after_sf.read()
-    dependent_id_list = get_dependent_id_list(update_sf_status._tasks)
-    update_dependent_task(dependent_id_list, update_sf_status._tasks)
-    after_sf.write(update_sf_status)
+    dependent_id_list = get_dependent_id_list(sf_status.tasks)
+    update_dependent_task(dependent_id_list, sf_status.tasks)
+    sf.write(sf_status)
 
 def update_flg(data: dict, tasks: SubflowTask):
     """タスクの表示フラグを更新する関数です。
@@ -278,19 +273,6 @@ def update_dependent_task(dependent_list: list, tasks: SubflowTask):
         for dependent_id in dependent_list:
             if task.id == dependent_id:
                 task.active = True
-
-def active_name(search_dir: str, working_path: str, tasks: SubflowTask):
-    """表示フラグがTrueのタスクノートブックを用意する関数です。
-
-    Args:
-        search_dir (str): ノートブックが格納されているディレクトリパス
-        working_path (str): workingフォルダのパス
-        tasks (SubflowTask): サブフローのタスクの設定値
-    """
-    notebook_name_list = []
-    for task in tasks:
-        if task.active == True:
-            _copy_file_by_name(task.name, search_dir, working_path)
 
 def grdm_access_check(base_url: str, token: str, project_id: str) -> bool:
     """アクセス権限のチェックを行う関数です。
@@ -480,50 +462,6 @@ def check_input(input_value: str) -> str:
         input_value = ''
     return input_value
 
-def file_backup_and_copy(abs_root: str, govsheet_rf: dict, govsheet: dict, research_flow_dict: dict, current_time: dict, govsheet_rf_path: str, message: MessageBox):
-    """サブフロー群のバックアップをし、ガバナンスシートをRFガバナンスシートにコピーする関数です。
-
-    Args:
-        abs_root (str): リサーチフローのルートディレクトリ
-        govsheet_rf (dict): RFガバナンスシート
-        govsheet (dict): ガバナンスシート
-        research_flow_dict (dict): 存在するフェーズをkeyとし対応するサブフローIDとサブフロー名をvalueとした辞書
-        current_time (dict): 現在時刻
-        govsheet_rf_path (str): RFガバナンスシートのパス
-    """
-    if not research_flow_dict and not govsheet_rf:
-        file.JsonFile(govsheet_rf_path).write(govsheet)
-        message.update_success(msg_config.get('main_menu', 'success_govsheet'))
-        return
-
-    if govsheet_rf:
-        backup_govsheet_rf_file(abs_root, govsheet_rf_path, current_time)
-    else:
-        file.JsonFile(govsheet_rf_path).write(govsheet)
-    backup_zipfile(abs_root, research_flow_dict, current_time)
-
-def remove_and_copy_file_notebook(abs_root: str, research_flow_dict: dict):
-    """baseフォルダからファイルをコピーしstatus.jsonファイルを更新する関数です。
-
-    Args:
-        abs_root (str): リサーチフローのルートディレクトリ
-        research_flow_dict (dict): 存在するフェーズをkeyとし対応するサブフローIDとサブフロー名をvalueとした辞書
-        box (pn.WidgetBox): ウィジェットボックス
-        message (MessageBox): メッセージボックス
-    """
-    for phase_name, sub_flow_data in research_flow_dict.items():
-        for sub_flow_id, sub_flow_name in sub_flow_data.items():
-            menu_notebook_path, status_json_path = get_options_path(abs_root, phase_name, sub_flow_id)
-            working_path = get_working_path(abs_root, phase_name, sub_flow_id)
-
-            shutil.rmtree(working_path)
-            file.File(str(menu_notebook_path)).remove()
-            file.File(str(status_json_path)).remove()
-
-            prepare_new_subflow_data(abs_root, phase_name, sub_flow_id, sub_flow_name, True)
-            update_status_file(abs_root, status_json_path)
-            preparation_notebook_file(abs_root, status_json_path, working_path)
-
 def prepare_new_subflow_data(abs_root: str, phase_name: str, new_sub_flow_id: str, sub_flow_name: str, flg: bool):
     """新しいサブフローのデータを用意するメソッドです。
 
@@ -599,6 +537,48 @@ def preparation_notebook_file(abs_root: str, status_path_json: str, working_path
     status_file = SubflowStatusFile(status_path_json)
     read_status_file = status_file.read()
 
-    for task in read_status_file._tasks:
+    for task in read_status_file.tasks:
         if task.active == True:
             _copy_file_by_name(task.name, task_dir, working_path)
+
+def recreate_subflow(abs_root: str, govsheet_rf: dict, govsheet: dict, research_flow_dict: dict, current_time: str, govsheet_rf_path: str):
+    """サブフローを作り直す関数です。
+
+    Args:
+        abs_root (str): リサーチフローのルートディレクトリ
+        govsheet_rf (dict): RFガバナンスシートの内容
+        govsheet (dict): ガバナンスシートの内容
+        research_flow_dict (dict): 存在するフェーズをkeyとし対応するサブフローIDとサブフロー名をvalueとした辞書
+        current_time (str): 現在時刻
+        govsheet_rf_path (str): RFガバナンスシートのパス
+    """
+    if govsheet_rf:
+        backup_govsheet_rf_file(abs_root, govsheet_rf_path, current_time)
+    else:
+        file.JsonFile(govsheet_rf_path).write(govsheet)
+    backup_zipfile(abs_root, research_flow_dict, current_time)
+
+    for phase_name, subflow_data in research_flow_dict.items():
+        for subflow_id, subflow_name in subflow_data.items():
+            menu_notebook_path, status_json_path = get_options_path(abs_root, phase_name, subflow_id)
+            working_path = get_working_path(abs_root, phase_name, subflow_id)
+
+            remove_file(working_path)
+            file.File(str(menu_notebook_path)).remove()
+            file.File(str(status_json_path)).remove()
+
+            prepare_new_subflow_data(abs_root, phase_name, subflow_id, subflow_name, True)
+            update_status_file(abs_root, status_json_path)
+            preparation_notebook_file(abs_root, status_json_path, working_path)
+
+def remove_file(drc_path: str):
+    """フォルダ内のファイルを全て削除するメソッドです。
+    Args:
+        drc_path (str): 対象のディレクトリのパス
+    """
+    if not os.path.isdir(drc_path):
+        pass
+    for root, dirs, files in os.walk(drc_path):
+        for file in files:
+            file_path = os.path.join(root, file)
+            os.remove(file_path)

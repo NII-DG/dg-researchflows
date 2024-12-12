@@ -204,6 +204,7 @@ class MainMenu(TaskLog):
 
     def file_operation(self):
         """ガバナンスシートを適用して必要なファイルを用意するメソッドです。"""
+        self.research_flow_message.clear()
         self.govsheet_rf = utils.get_govsheet_rf(self.abs_root)
         self.govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
         self.research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
@@ -221,8 +222,13 @@ class MainMenu(TaskLog):
             self.research_flow_message.update_info(message)
             return
 
-        utils.file_backup_and_copy(self.abs_root, self.govsheet_rf, self.govsheet, self.research_flow_dict, current_time, self.govsheet_rf_path, self.research_flow_message)
-        utils.remove_and_copy_file_notebook(self.abs_root, self.research_flow_dict)
+        if not self.research_flow_dict:
+            file.JsonFile(self.govsheet_rf_path).write(self.govsheet)
+            self.research_flow_message.update_success(msg_config.get('main_menu', 'success_govsheet'))
+            return
+
+        utils.recreate_subflow(
+            self.abs_root, self.govsheet_rf, self.govsheet, self.research_flow_dict, current_time, self.govsheet_rf_path)
         self.research_flow_message.update_success(msg_config.get('main_menu', 'success_govsheet'))
 
     def check_status_research_preparation_flow(self):
@@ -390,7 +396,7 @@ class MainMenu(TaskLog):
         """ガバナンスシート適用ボタンを表示するメソッドです。"""
         self.research_flow_widget_box.clear()
         button = pn.Row(
-            pn.Spacer(width=580),
+            pn.Spacer(width=700),
             self.apply_govsheet_button
         )
         self.research_flow_widget_box.append(button)
@@ -439,8 +445,8 @@ class MainMenu(TaskLog):
         self.input_button.set_looks_processing()
         try:
             vault = Vault()
-            token = self.token_input.value if self.token_input.visible else None
-            project_id = self.project_id_input.value if self.project_id_input.visible else None
+            token = self.token_input.value
+            project_id = self.project_id_input.value
             if token and project_id:
                 if not utils.grdm_access_check(self.grdm_url, token, project_id):
                     vault.set_value('grdm_token', '')
@@ -483,12 +489,14 @@ class MainMenu(TaskLog):
         govsheet_path = os.path.join(self.abs_root, self.remote_path)
         current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 
+        # デフォルトでガバナンスシートを作成する
         schema = utils.get_schema()
         data = utils.get_default_govsheet(schema)
         file.JsonFile(self.govsheet_rf_path).write(data)
 
-        utils.file_backup_and_copy(self.abs_root, self.govsheet_rf, self.govsheet, self.research_flow_dict, current_time, self.govsheet_rf_path, self.research_flow_message)
-        utils.remove_and_copy_file_notebook(self.abs_root, self.research_flow_dict)
+        # サブフローを作り直す
+        utils.recreate_subflow(
+            self.abs_root, self.govsheet_rf, self.govsheet, self.research_flow_dict, current_time, self.govsheet_rf_path)
         self.research_flow_message.update_success(msg_config.get('main_menu', 'success_govsheet'))
         self.grdm.sync(self.token, self.grdm_url, self.project_id, govsheet_path, self.abs_root)
 

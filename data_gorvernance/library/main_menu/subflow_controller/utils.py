@@ -3,17 +3,19 @@ import os
 import shutil
 import datetime
 import zipfile
-from typing import Union
+from typing import Union, Optional
 
 import panel as pn
 
 from library.utils.config import path_config, message as msg_config, connect as con_config
+from library.utils.error import InputWarning
 from library.utils.nb_file import NbFile
 from library.utils.widgets import Button, MessageBox
 from library.utils import dg_web
 from library.utils.storage_provider import grdm
 from library.utils.vault import Vault
 from library.utils import file
+from library.utils.setting.research_flow_status import ResearchFlowStatusOperater
 from library.utils.setting.status import SubflowTask ,SubflowStatusFile
 from library.utils.string import StringManager
 from library.utils.error import UnusableVault, RepoPermissionError, UnauthorizedError, ProjectNotExist
@@ -54,7 +56,7 @@ def create_float_panel() -> Union[pn.layout.FloatPanel, Button, Button]:
     )
     return float_panel, apply_button, cancel_button
 
-def get_project_id() -> str:
+def get_project_id() -> Optional[str]:
     """プロジェクトIDを取得する関数です。
 
     Returns:
@@ -63,7 +65,7 @@ def get_project_id() -> str:
     grdm_connect = grdm.Grdm()
     return grdm_connect.get_project_id()
 
-def get_token() -> str:
+def get_token() -> Optional[str]:
     """パーソナルアクセストークンを取得する関数です。
 
     Raises:
@@ -72,6 +74,7 @@ def get_token() -> str:
     Returns:
         str: パーソナルアクセストークンを返す。
     """
+    grdm_connect = grdm.Grdm()
     grdm_url = con_config.get('GRDM', 'BASE_URL')
     vault_key = 'grdm_token'
     try:
@@ -79,23 +82,28 @@ def get_token() -> str:
         token = vault.get_value(vault_key)
     except Exception as e:
         raise UnusableVault from e
-    if token and grdm.check_authorization(grdm_url, token):
+    if token and grdm_connect.check_authorization(grdm_url, token):
         return token
+    return token
 
-def get_govsheet_rf(abs_root: str) -> dict:
+def get_govsheet_rf(abs_root: str, token: str, base_url: str, project_id: str) -> dict:
     """RFガバナンスシートを取得する関数です。
 
     Args:
-        abs_root (str): リサーチフローのルートディレクトリ
+        token (str): パーソナルアクセストークン
+        base_url (str): GRDMのURL
+        project_id (str): プロジェクトID
 
     Returns:
         dict: RFガバナンスシートの内容(存在しない場合は{})を返す。
     """
     govsheet_rf = {}
-    file_path = get_govsheet_rf_path(abs_root)
-    if os.path.isfile(file_path):
-        with open(file_path, 'r') as f:
-            govsheet_rf = json.load(f)
+    grdm_connect = grdm.Grdm()
+    govsheet_rf_path = get_govsheet_rf_path(abs_root)
+    try:
+        govsheet_rf = grdm_connect.download_json_file(token, base_url, project_id, govsheet_rf_path)
+    except FileNotFoundError:
+        govsheet_rf = {}
     return govsheet_rf
 
 def get_govsheet(token: str, base_url: str, project_id: str, remote_path: str) -> dict:
@@ -137,11 +145,14 @@ def get_notebook_list(working_dir_path: str) -> list:
                 file_list.append(file_path)
     return file_list
 
-def mapping_file(abs_root: str) -> dict:
+def mapping_file(abs_root: str, token: str, base_url: str, project_id: str) -> dict:
     """jsonファイルを読み込みマッピングを行う処理を呼ぶ関数です。
 
     Args:
         abs_root (str): リサーチフローのルートディレクトリ
+        token (str): パーソナルアクセストークン
+        base_url (str): GRDMのURL
+        project_id (str): プロジェクトID
 
     Returns:
         dict: マッピングされたIDとフラグの辞書を返す。
@@ -150,11 +161,9 @@ def mapping_file(abs_root: str) -> dict:
     task_mapping_path = os.path.join(
         abs_root, path_config.DG_RESEARCHFLOW_FOLDER, 'task_mapping.json'
     )
-    govsheet_rf_path = get_govsheet_rf_path(abs_root)
+    govsheet_rf = get_govsheet_rf(abs_root, token, base_url, project_id)
     with open(task_mapping_path, 'r') as task:
         task_mapping = json.load(task)
-    with open(govsheet_rf_path, 'r') as govsheet:
-        govsheet_rf = json.load(govsheet)
     active_dict = task_map(task_mapping, govsheet_rf)
     return active_dict
 
@@ -218,14 +227,17 @@ def _copy_file_by_name(target_file: str, search_directory: str, destination_dire
             if not os.path.isdir(destination_images):
                 os.symlink(source_images, destination_images, target_is_directory=True)
 
-def update_status_file(abs_root: str, status_json_path: str):
+def update_status_file(abs_root: str, status_json_path: str, token: str, base_url: str, project_id: str):
     """RFガバナンスシートとtask_mapping.jsonのマッピング結果と依存タスクによってactiveフラグを切り替えるメソッドです。
 
     Args:
         abs_root (str): リサーチフローのルートディレクトリ
         status_json_path (str): status.jsonまでのパス
+        token (str): パーソナルアクセストークン
+        base_url (str): GRDMのURL
+        project_id (str): プロジェクトID
     """
-    update_date = mapping_file(abs_root)
+    update_date = mapping_file(abs_root, token, base_url, project_id)
     sf = SubflowStatusFile(status_json_path)
     sf_status = sf.read()
     update_flg(update_date, sf_status.tasks)
@@ -274,22 +286,38 @@ def update_dependent_task(dependent_list: list, tasks: SubflowTask):
             if task.id == dependent_id:
                 task.active = True
 
-def grdm_access_check(base_url: str, token: str, project_id: str) -> bool:
+def check_grdm_access(base_url: str, token: str, project_id: str) -> bool:
     """アクセス権限のチェックを行う関数です。
 
     Args:
-        base_url (str): リサーチフローのルートディレクトリ
+        base_url (str): GRDMのURL
         token (str): パーソナルアクセストークン
         project_id (str): プロジェクトID
 
     Returns:
-        bool: 問題が無ければTrue、問題があればFalseを返す
+        bool: 問題が無ければTrue、問題があればFalseを返す。
     """
     grdm_connect = grdm.Grdm()
-    if not grdm_connect.check_permission(base_url, token, project_id):
-        return False
-    else:
+    if grdm_connect.check_permission(base_url, token, project_id):
         return True
+    else:
+        return False
+
+def check_grdm_token(base_url: str, token: str) -> bool:
+    """パーソナルアクセストークンのアクセス権限をチェックを行う関数です。
+
+    Args:
+        base_url (str): GRDMのURL
+        token (str): パーソナルアクセストークン
+
+    Returns:
+        bool: 問題が無ければTrue、問題があればFalseを返す。
+    """
+    grdm_connect = grdm.Grdm()
+    if grdm_connect.check_authorization(base_url, token):
+        return True
+    else:
+        return False
 
 def backup_zipfile(abs_root: str, research_flow_dict: dict, current_time: str):
     """サブフローのファイル群をzip化する関数です。
@@ -306,7 +334,8 @@ def backup_zipfile(abs_root: str, research_flow_dict: dict, current_time: str):
         for sub_flow_id, sub_flow_name in subflow_data.items():
             zip_file_path = get_zipfile_path(abs_root, phase_name, sub_flow_id, current_time)
             working_path = get_working_path(abs_root, phase_name, sub_flow_id)
-            menu_notebook_path, status_json_path = get_options_path(abs_root, phase_name, sub_flow_id)
+            menu_notebook_path = os.path.join(abs_root, path_config.get_sub_flow_menu_path(phase_name, sub_flow_id))
+            status_json_path = os.path.join(abs_root, path_config.get_sub_flow_status_file_path(phase_name, sub_flow_id))
             os.makedirs(os.path.dirname(zip_file_path), exist_ok=True)
             notebook_list = get_notebook_list(working_path)
 
@@ -375,28 +404,6 @@ def get_working_path(abs_root: str, phase_name: str, subflow_id: str) -> str:
         path_config.TASK
     )
 
-def get_options_path(abs_root: str, phase_name: str, subflow_id: str) -> str:
-    """サブフローの設定ファイルのパスを取得する関数です。
-
-    Args:
-        abs_root (str): リサーチフローのルートディレクトリ
-        phase_name (str): フェーズ名
-        subflow_data (list): サブフローステータスリスト
-
-    Returns:
-        str: サブフローの設定ファイルのパスを取得する関数です。
-    """
-    menu_notebook_path = os.path.join(
-        abs_root,
-        path_config.DATA_GOVERNANCE,
-        path_config.get_sub_flow_menu_path(phase_name, subflow_id)
-    )
-    status_json_path = os.path.join(
-        abs_root,
-        path_config.get_sub_flow_status_file_path(phase_name, subflow_id)
-    )
-    return menu_notebook_path, status_json_path
-
 def get_schema() -> dict:
     """スキーマを取得する関数です。
 
@@ -446,21 +453,57 @@ def get_schema_value(value: dict) -> dict:
             value_dict[key] = value['default']
     return value_dict
 
-def check_input(input_value: str) -> str:
-    """入力の形式をチェックする関数です。
+def validate_input_token(input_value: str):
+    """トークンが入力されているか確認する関数です。
 
     Args:
-        input_value (str): 入力内容
+        input_value (str): パーソナルアクセストークン
 
-    Returns:
-        str: 正しければそのまま入力内容を、間違っていれば空文字を返す。
+    Raises:
+        InputWarning: 入力不備のエラー
     """
-    input_value = StringManager.strip(input_value)
     if StringManager.is_empty(input_value):
-        input_value = ''
+        message = msg_config.get('main_menu', 'not_input_token')
+        raise InputWarning(message)
+
+def is_half_width_alphanumeric_token(input_value: str):
+    """トークンが半角英数記号で入力されているか確認する関数です。
+
+    Args:
+        input_value (str): パーソナルアクセストークン
+
+    Raises:
+        InputWarning: 入力不備のエラー
+    """
     if not StringManager.is_half(input_value):
-        input_value = ''
-    return input_value
+        message = msg_config.get('main_menu', 'token_pattern_error')
+        raise InputWarning(message)
+
+def validate_input_project_id(input_value: str):
+    """プロジェクトIDが入力されているか確認する関数です。
+
+    Args:
+        input_value (str): プロジェクトID
+
+    Raises:
+        InputWarning: 入力不備のエラー
+    """
+    if StringManager.is_empty(input_value):
+        message = msg_config.get('main_menu', 'not_input_project_id')
+        raise InputWarning(message)
+
+def is_half_width_alphanumeric_project_id(input_value: str):
+    """プロジェクトIDが半角英数記号で書かれているか確認する関数です。
+
+    Args:
+        input_value (str): プロジェクトID
+
+    Raises:
+        InputWarning: 入力不備のエラー
+    """
+    if not StringManager.is_half(input_value):
+        message = msg_config.get('main_menu', 'project_id_pattern_error')
+        raise InputWarning(message)
 
 def prepare_new_subflow_data(abs_root: str, phase_name: str, new_sub_flow_id: str, sub_flow_name: str, flg: bool):
     """新しいサブフローのデータを用意するメソッドです。
@@ -541,44 +584,65 @@ def preparation_notebook_file(abs_root: str, status_path_json: str, working_path
         if task.active == True:
             _copy_file_by_name(task.name, task_dir, working_path)
 
-def recreate_subflow(abs_root: str, govsheet_rf: dict, govsheet: dict, research_flow_dict: dict, current_time: str, govsheet_rf_path: str):
+def recreate_subflow(abs_root: str, token: str, base_url: str, project_id: str, govsheet_rf_path: str):
     """サブフローを作り直す関数です。
 
     Args:
         abs_root (str): リサーチフローのルートディレクトリ
-        govsheet_rf (dict): RFガバナンスシートの内容
         govsheet (dict): ガバナンスシートの内容
-        research_flow_dict (dict): 存在するフェーズをkeyとし対応するサブフローIDとサブフロー名をvalueとした辞書
         current_time (str): 現在時刻
         govsheet_rf_path (str): RFガバナンスシートのパス
     """
+    current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+    govsheet_rf = get_govsheet_rf(abs_root, token, base_url, project_id)
+    research_flow_path = os.path.join(abs_root, path_config.get_research_flow_status_file_path(abs_root))
+    research_flow_dict = ResearchFlowStatusOperater(research_flow_path).get_phase_subflow_id_name()
+
     if govsheet_rf:
         backup_govsheet_rf_file(abs_root, govsheet_rf_path, current_time)
-    else:
-        file.JsonFile(govsheet_rf_path).write(govsheet)
+    file.JsonFile(govsheet_rf_path).write(govsheet)
     backup_zipfile(abs_root, research_flow_dict, current_time)
+
+    researchflow_path = os.path.join(abs_root, path_config.DG_RESEARCHFLOW_FOLDER)
+    delete_files = path_config.get_prepare_file_name_list_for_subflow()
 
     for phase_name, subflow_data in research_flow_dict.items():
         for subflow_id, subflow_name in subflow_data.items():
-            menu_notebook_path, status_json_path = get_options_path(abs_root, phase_name, subflow_id)
             working_path = get_working_path(abs_root, phase_name, subflow_id)
+            shutil.rmtree(working_path)
+            for delete_file_name in delete_files:
+                delete_file_path = os.path.join(researchflow_path, phase_name, delete_file_name)
+                shutil.rmtree(delete_file_path)
 
-            remove_file(working_path)
-            file.File(str(menu_notebook_path)).remove()
-            file.File(str(status_json_path)).remove()
-
+            status_json_path = os.path.join(abs_root, path_config.get_sub_flow_status_file_path(phase_name, subflow_id))
             prepare_new_subflow_data(abs_root, phase_name, subflow_id, subflow_name, True)
-            update_status_file(abs_root, status_json_path)
+            update_status_file(abs_root, status_json_path, token, base_url, project_id)
             preparation_notebook_file(abs_root, status_json_path, working_path)
 
-def remove_file(drc_path: str):
-    """フォルダ内のファイルを全て削除するメソッドです。
+def get_sync_path(abs_root: str) -> list:
+    """GRDMに同期するファイルのディレクトリ/ファイルパスのリストを取得する関数です。
+
     Args:
-        drc_path (str): 対象のディレクトリのパス
+        abs_root (str): リサーチフローのルートディレクトリ
+
+    Returns:
+        list: ディレクトリ/ファイルパスのリスト
     """
-    if not os.path.isdir(drc_path):
-        pass
-    for root, dirs, files in os.walk(drc_path):
-        for file in files:
-            file_path = os.path.join(root, file)
-            os.remove(file_path)
+    sync_path_list = []
+    govsheet_rf_path = get_govsheet_rf_path(abs_root)
+    backup_govsheet_rf_dir = os.path.join(
+        abs_root, path_config.DATA_GOVERNANCE, path_config.LOG, 'gov-sheet-rf')
+    sync_path = [govsheet_rf_path, backup_govsheet_rf_dir]
+
+    research_flow_path = os.path.join(abs_root, path_config.get_research_flow_status_file_path(abs_root))
+    research_flow_dict = ResearchFlowStatusOperater(research_flow_path).get_phase_subflow_id_name()
+
+    for phase_name, subflow_data in research_flow_dict.items():
+        for subflow_id, subflow_name in subflow_data.items():
+            menu_notebook_path = os.path.join(abs_root, path_config.get_sub_flow_menu_path(phase_name, subflow_id))
+            status_json_path = os.path.join(path_config.get_sub_flow_status_file_path(phase_name, subflow_id))
+            zipdir_path = os.path.join(abs_root, path_config.DG_SUBFLOW_LOG_FOLDER, phase_name, subflow_id)
+            sync_path_list.append(menu_notebook_path)
+            sync_path_list.append(status_json_path)
+            sync_path_list.append(zipdir_path)
+    return sync_path_list

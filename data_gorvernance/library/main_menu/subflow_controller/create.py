@@ -11,7 +11,7 @@ import panel as pn
 
 from library.utils import file
 from library.utils.config import path_config, message as msg_config, connect as con_config
-from library.utils.error import InputWarning
+from library.utils.error import InputWarning, UnusableVault, ProjectNotExist, RepoPermissionError
 from library.utils.string import StringManager
 from library.utils.widgets import MessageBox, Button
 from library.main_menu.subflow_controller import utils
@@ -48,6 +48,7 @@ class CreateSubflowForm(BaseSubflowForm):
         # 処理開始ボタン
         self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
 
+        self.grdm = grdm.Grdm()
         self.grdm_url = con_config.get('GRDM', 'BASE_URL')
         self.remote_path = con_config.get('DG_WEB', 'GOVSHEET_PATH')
         self._sub_flow_widget_box = widget_box
@@ -55,8 +56,8 @@ class CreateSubflowForm(BaseSubflowForm):
 
         # パーソナルアクセストークンとプロジェクトID入力欄
         self.token_input, self.project_id_input = utils.input_widget()
-        self.project_id_input.param.watch(self.callback_menu_form, 'value')
-        self.token_input.param.watch(self.callback_menu_form, 'value')
+        self.token_input.param.watch(self.callback_menu_form, 'value_input')
+        self.project_id_input.param.watch(self.callback_menu_form, 'value_input')
 
         # FloatPanelと適用する/しないボタン
         self.float_panel, self.apply_button, self.cancel_button = utils.create_float_panel()
@@ -97,12 +98,34 @@ class CreateSubflowForm(BaseSubflowForm):
 
     def is_display_widgets(self):
         """入力欄の表示切り替えを行うメソッドです。"""
-        self.project_id = utils.get_project_id()
-        self.token = utils.get_token()
-        if self.project_id is None:
-            self.project_id_input.visible = True
-        if self.token is None:
-            self.token_input.visible = True
+        try:
+            token = utils.get_token()
+            project_id = utils.get_project_id()
+            if token is None and project_id is None:
+                self.token_input.visible = True
+                self.project_id_input.visible = True
+            elif project_id is None:
+                self.project_id_input.visible = True
+                self.token = token
+            elif token is None:
+                self.token_input.visible = True
+                self.project_id = project_id
+            else:
+                if utils.check_grdm_access(self.grdm_url, token, project_id):
+                    self.token = token
+                    self.project_id = project_id
+        except UnusableVault:
+            message = msg_config.get('from', 'no_vault')
+            self._err_output.update_error(message)
+        except RepoPermissionError:
+            message = msg_config.get('from', 'insufficient_permission')
+            self._err_output.update_error(message)
+        except ProjectNotExist as e:
+            message = msg_config.get('form', 'project_id_not_exist').format(project_id)
+            self._err_output.update_error(message)
+        except Exception:
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self._err_output.update_error(message)
 
     def callback_apply_button(self, event):
         """デフォルトのガバナンスシートで登録するメソッドです。
@@ -115,17 +138,17 @@ class CreateSubflowForm(BaseSubflowForm):
         self.float_panel.visible = False
 
         # デフォルトでガバナンスシートを作成する
-        current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-        grdm_connect = grdm.Grdm()
         schema = utils.get_schema()
         data = utils.get_default_govsheet(schema)
         file.JsonFile(govsheet_path).write(data)
 
         # サブフローを作り直す
         utils.recreate_subflow(
-            self.abs_root, self.govsheet_rf, self.govsheet, self.research_flow_dict, current_time, self.govsheet_rf_path)
+            self.abs_root, self.token, self.grdm_url, self.project_id, self.govsheet_rf_path)
+        sync_path_list = utils.get_sync_path(self.abs_root)
+        for i, path in enumerate(sync_path_list):
+            self.grdm.sync(self.token, self.grdm_url, self.project_id, path, self.abs_root)
         self.new_create_subflow(self._sub_flow_type_selector, self._sub_flow_name_form, self._data_dir_name_form, self._parent_sub_flow_selector)
-        grdm_connect.sync(self.token, self.grdm_url, self.project_id, self.file_path, self.abs_root)
 
     def callback_cancel_button(self, event):
         """適用しない押下後エラーメッセージを表示するメソッドです。
@@ -276,62 +299,63 @@ class CreateSubflowForm(BaseSubflowForm):
             self.validate_data_dir_name(data_dir_name)
             self.is_unique_data_dir(data_dir_name, phase_seq_number)
 
+            token = StringManager.strip(token)
+            utils.validate_input_token(token)
+            utils.is_half_width_alphanumeric_token(token)
+
+            project_id = StringManager.strip(project_id)
+            utils.validate_input_project_id(project_id)
+            utils.is_half_width_alphanumeric_project_id(project_id)
+
             vault = Vault()
-            if self.token and self.project_id:
-                if not utils.grdm_access_check(self.grdm_url, self.token, self.project_id):
-                    vault.set_value('grdm_token', '')
-            elif self.token:
-                if not utils.grdm_access_check(self.grdm_url, self.token, project_id):
-                    vault.set_value('grdm_token', '')
-                self.project_id = project_id
-            elif self.project_id:
-                if not utils.grdm_access_check(self.grdm_url, token, self.project_id):
-                    vault.set_value('grdm_token', '')
-                self.token = token
+            if token and project_id:
+                if utils.check_grdm_token(self.grdm_url, token):
+                    pass
+                if utils.check_grdm_access(self.grdm_url, token, project_id):
+                    vault.set_value('grdm_token', token)
+                    self.token = token
+                    self.project_id = project_id
+            elif token:
+                if utils.check_grdm_token(self.grdm_url, token):
+                    pass
+                if utils.check_grdm_access(self.grdm_url, token, self.project_id):
+                    vault.set_value('grdm_token', token)
+                    self.token = token
             else:
-                if not utils.grdm_access_check(self.grdm_url, token, project_id):
-                    vault = Vault()
-                    vault.set_value('grdm_token', '')
-                    self.token_input.value_input = ''
-                    self.project_id_input.value_input = ''
-                self.token = token
-                self.project_id = project_id
+                if utils.check_grdm_access(self.grdm_url, self.token, project_id):
+                    self.project_id = project_id
         except InputWarning as e:
             self.change_submit_button_warning(str(e))
             raise
 
         self.govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
-        self.file_path = os.path.join(self.abs_root, self.remote_path)
-        self.govsheet_rf = utils.get_govsheet_rf(self.abs_root)
-        if self.research_flow_dict:
-            self.recreate_current_subflow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
-        else:
-            file.JsonFile(self.govsheet_rf_path).write(self.govsheet)
+        self.govsheet_path = os.path.join(self.abs_root, self.remote_path)
+        self.govsheet_rf = utils.get_govsheet_rf(self.abs_root, self.token, self.grdm_url, self.project_id)
+
+        self.recreate_current_subflow()
         if self.float_panel.visible:
             return
         self.new_create_subflow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
+        sync_path_list = utils.get_sync_path(self.abs_root)
+        for i, path in enumerate(sync_path_list):
+            self.grdm.sync(self.token, self.grdm_url, self.project_id, path, self.abs_root)
 
-    def recreate_current_subflow(self, phase_seq_number: int, sub_flow_name: str, data_dir_name: str, parent_sub_flow_ids: list[str]):
-        """既存のサブフローを作り直すメソッドです。
-
-        Args:
-            phase_seq_number (int): サブフローを作成するフェーズのシーケンス番号
-            sub_flow_name (str): 新規サブフロー名
-            data_dir_name (str): 作成するディレクトリ名
-            parent_sub_flow_ids (list[str]): 親サブフローID
-        """
-        current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-
+    def recreate_current_subflow(self):
+        """既存のサブフローを作り直すメソッドです。"""
         if not self.govsheet_rf and not self.govsheet:
             self.float_panel.visible = True
             self._sub_flow_widget_box.append(self.float_panel)
             return
 
-        utils.recreate_subflow(
-            self.abs_root, self.govsheet_rf, self.govsheet, self.research_flow_dict, current_time, self.govsheet_rf_path)
+        if not self.research_flow_dict:
+            file.JsonFile(self.govsheet_rf_path).write(self.govsheet)
+            return
 
-    def new_status_file(self, new_phase_name: str, new_subflow_id: str):
-        """新規サブフローのファイル群を用意するメソッドです。
+        utils.recreate_subflow(
+            self.abs_root, self.token, self.grdm_url, self.project_id, self.govsheet_rf_path)
+
+    def update_new_status_and_preparation_notebook(self, phase_name: str, new_subflow_id: str, token: str, project_id: str):
+        """新規サブフローのstatus.jsonを更新し、必要なタスクノートブックを用意するメソッドです。
 
         Args:
             new_phase_name (str): フェーズ名
@@ -339,15 +363,16 @@ class CreateSubflowForm(BaseSubflowForm):
         """
         new_status_file = os.path.join(
             self.abs_root,
-            path_config.get_sub_flow_status_file_path(new_phase_name, new_subflow_id)
+            path_config.get_sub_flow_status_file_path(phase_name, new_subflow_id)
         )
         new_working_path = os.path.join(
-            self.abs_root, path_config.DG_WORKING_FOLDER,
+            self.abs_root,
+            path_config.DG_WORKING_RESEARCHFLOW_FOLDER,
             new_phase_name,
             new_subflow_id,
             path_config.TASK
         )
-        utils.update_status_file(self.abs_root, new_status_file)
+        utils.update_status_file(self.abs_root, new_status_file, token, self.grdm_url, project_id)
         utils.preparation_notebook_file(self.abs_root, new_status_file, new_working_path)
 
     def create_data_dir(self, phase_name: str, data_dir_name: str) -> str:
@@ -406,7 +431,7 @@ class CreateSubflowForm(BaseSubflowForm):
         # 新規サブフローデータの用意
         try:
             utils.prepare_new_subflow_data(self.abs_root, phase_name, new_sub_flow_id, sub_flow_name, False)
-            self.new_status_file(phase_name, new_sub_flow_id)
+            self.update_new_status_and_preparation_notebook(phase_name, new_sub_flow_id, self.token, self.project_id)
         except Exception:
             # 失敗した場合に/data/<phase_name>/<data_dir_name>の削除
             os.remove(data_dir_path)

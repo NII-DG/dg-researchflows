@@ -86,24 +86,20 @@ def get_token() -> Optional[str]:
         return token
     return token
 
-def get_govsheet_rf(abs_root: str, token: str, base_url: str, project_id: str) -> dict:
+def get_govsheet_rf(abs_root: str) -> dict:
     """RFガバナンスシートを取得する関数です。
 
     Args:
-        token (str): パーソナルアクセストークン
-        base_url (str): GRDMのURL
-        project_id (str): プロジェクトID
+        abs_root (str): リサーチフローのルートディレクトリ
 
     Returns:
         dict: RFガバナンスシートの内容(存在しない場合は{})を返す。
     """
     govsheet_rf = {}
-    grdm_connect = grdm.Grdm()
-    govsheet_rf_path = get_govsheet_rf_path(abs_root)
-    try:
-        govsheet_rf = grdm_connect.download_json_file(token, base_url, project_id, govsheet_rf_path)
-    except FileNotFoundError:
-        govsheet_rf = {}
+    file_path = get_govsheet_rf_path(abs_root)
+    if os.path.isfile(file_path):
+        with open(file_path, 'r') as f:
+            govsheet_rf = json.load(f)
     return govsheet_rf
 
 def get_govsheet(token: str, base_url: str, project_id: str, remote_path: str) -> dict:
@@ -145,7 +141,7 @@ def get_notebook_list(working_dir_path: str) -> list:
                 file_list.append(file_path)
     return file_list
 
-def mapping_file(abs_root: str, token: str, base_url: str, project_id: str) -> dict:
+def mapping_file(abs_root: str) -> dict:
     """jsonファイルを読み込みマッピングを行う処理を呼ぶ関数です。
 
     Args:
@@ -161,7 +157,7 @@ def mapping_file(abs_root: str, token: str, base_url: str, project_id: str) -> d
     task_mapping_path = os.path.join(
         abs_root, path_config.DG_RESEARCHFLOW_FOLDER, 'task_mapping.json'
     )
-    govsheet_rf = get_govsheet_rf(abs_root, token, base_url, project_id)
+    govsheet_rf = get_govsheet_rf(abs_root)
     with open(task_mapping_path, 'r') as task:
         task_mapping = json.load(task)
     active_dict = task_map(task_mapping, govsheet_rf)
@@ -237,7 +233,7 @@ def update_status_file(abs_root: str, status_json_path: str, token: str, base_ur
         base_url (str): GRDMのURL
         project_id (str): プロジェクトID
     """
-    update_date = mapping_file(abs_root, token, base_url, project_id)
+    update_date = mapping_file(abs_root)
     sf = SubflowStatusFile(status_json_path)
     sf_status = sf.read()
     update_flg(update_date, sf_status.tasks)
@@ -334,7 +330,7 @@ def backup_zipfile(abs_root: str, research_flow_dict: dict, current_time: str):
         for sub_flow_id, sub_flow_name in subflow_data.items():
             zip_file_path = get_zipfile_path(abs_root, phase_name, sub_flow_id, current_time)
             working_path = get_working_path(abs_root, phase_name, sub_flow_id)
-            menu_notebook_path = os.path.join(abs_root, path_config.get_sub_flow_menu_path(phase_name, sub_flow_id))
+            menu_notebook_path = os.path.join(abs_root, path_config.DATA_GOVERNANCE, path_config.get_sub_flow_menu_path(phase_name, sub_flow_id))
             status_json_path = os.path.join(abs_root, path_config.get_sub_flow_status_file_path(phase_name, sub_flow_id))
             os.makedirs(os.path.dirname(zip_file_path), exist_ok=True)
             notebook_list = get_notebook_list(working_path)
@@ -589,12 +585,15 @@ def recreate_subflow(abs_root: str, token: str, base_url: str, project_id: str, 
 
     Args:
         abs_root (str): リサーチフローのルートディレクトリ
-        govsheet (dict): ガバナンスシートの内容
-        current_time (str): 現在時刻
+        token (str): パーソナルアクセストークン
+        base_url (str): GRDMのURL
+        project_id (str): プロジェクトID
         govsheet_rf_path (str): RFガバナンスシートのパス
     """
     current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-    govsheet_rf = get_govsheet_rf(abs_root, token, base_url, project_id)
+    remote_path = con_config.get('DG_WEB', 'GOVSHEET_PATH')
+    govsheet_rf = get_govsheet_rf(abs_root)
+    govsheet = get_govsheet(token, base_url, project_id, remote_path)
     research_flow_path = os.path.join(abs_root, path_config.get_research_flow_status_file_path(abs_root))
     research_flow_dict = ResearchFlowStatusOperater(research_flow_path).get_phase_subflow_id_name()
 
@@ -611,8 +610,8 @@ def recreate_subflow(abs_root: str, token: str, base_url: str, project_id: str, 
             working_path = get_working_path(abs_root, phase_name, subflow_id)
             shutil.rmtree(working_path)
             for delete_file_name in delete_files:
-                delete_file_path = os.path.join(researchflow_path, phase_name, delete_file_name)
-                shutil.rmtree(delete_file_path)
+                delete_file_path = os.path.join(researchflow_path, phase_name, subflow_id, delete_file_name)
+                file.File(delete_file_path).remove()
 
             status_json_path = os.path.join(abs_root, path_config.get_sub_flow_status_file_path(phase_name, subflow_id))
             prepare_new_subflow_data(abs_root, phase_name, subflow_id, subflow_name, True)
@@ -629,18 +628,17 @@ def get_sync_path(abs_root: str) -> list:
         list: ディレクトリ/ファイルパスのリスト
     """
     sync_path_list = []
-    govsheet_rf_path = get_govsheet_rf_path(abs_root)
     backup_govsheet_rf_dir = os.path.join(
         abs_root, path_config.DATA_GOVERNANCE, path_config.LOG, 'gov-sheet-rf')
-    sync_path = [govsheet_rf_path, backup_govsheet_rf_dir]
+    sync_path = [backup_govsheet_rf_dir]
 
     research_flow_path = os.path.join(abs_root, path_config.get_research_flow_status_file_path(abs_root))
     research_flow_dict = ResearchFlowStatusOperater(research_flow_path).get_phase_subflow_id_name()
 
     for phase_name, subflow_data in research_flow_dict.items():
         for subflow_id, subflow_name in subflow_data.items():
-            menu_notebook_path = os.path.join(abs_root, path_config.get_sub_flow_menu_path(phase_name, subflow_id))
-            status_json_path = os.path.join(path_config.get_sub_flow_status_file_path(phase_name, subflow_id))
+            menu_notebook_path = os.path.join(abs_root, path_config.DATA_GOVERNANCE, path_config.get_sub_flow_menu_path(phase_name, subflow_id))
+            status_json_path = os.path.join(abs_root, path_config.get_sub_flow_status_file_path(phase_name, subflow_id))
             zipdir_path = os.path.join(abs_root, path_config.DG_SUBFLOW_LOG_FOLDER, phase_name, subflow_id)
             sync_path_list.append(menu_notebook_path)
             sync_path_list.append(status_json_path)

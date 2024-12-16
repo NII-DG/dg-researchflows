@@ -10,9 +10,10 @@ import json
 from IPython.core.display import Javascript
 from IPython.display import display
 import panel as pn
+from requests.exceptions import RequestException
 
 from library.utils.config import path_config, message as msg_config, connect as con_config
-from library.utils.error import InputWarning, UnusableVault, ProjectNotExist, RepoPermissionError
+from library.utils.error import InputWarning, UnusableVault, ProjectNotExist, RepoPermissionError, UnauthorizedError
 from library.utils.string import StringManager
 from library.utils.html import button as html_button
 from library.utils import file
@@ -415,25 +416,26 @@ class MainMenu(TaskLog):
         Args:
             event: 入力イベント
         """
+        self.token_input.value_input = StringManager.strip(self.token_input.value_input)
+        self.project_id_input.value_input = StringManager.strip(self.project_id_input.value_input)
         try:
             if self.token_input.visible and self.project_id_input.visible:
-                self.token_input.value_input = StringManager.strip(self.token_input.value_input)
-                self.project_id_input.value_input = StringManager.strip(self.project_id_input.value_input)
-
-                utils.validate_input_token(self.token_input.value_input)
-                utils.is_half_width_alphanumeric(self.token_input.value_input)
-                utils.validate_input_project_id(self.project_id_input.value_input)
-                utils.is_half_width_alphanumeric(self.project_id_input.value_input)
-
                 if self.token_input.value_input and self.project_id_input.value_input:
+                    utils.validate_input_token(self.token_input.value_input)
+                    utils.is_half_width_alphanumeric_token(self.token_input.value_input)
+                    utils.validate_input_project_id(self.project_id_input.value_input)
+                    utils.is_half_width_alphanumeric_project_id(self.project_id_input.value_input)
                     self.input_button.visible = True
+
             elif self.token_input.visible:
-                utils.check_input(self.token_input.value_input)
                 if self.token_input.value_input:
+                    utils.validate_input_token(self.token_input.value_input)
+                    utils.is_half_width_alphanumeric_token(self.token_input.value_input)
                     self.input_button.visible = True
             else:
-                utils.check_input(self.project_id_input.value_input)
                 if self.project_id_input.value_input:
+                    utils.validate_input_project_id(self.project_id_input.value_input)
+                    utils.is_half_width_alphanumeric_project_id(self.project_id_input.value_input)
                     self.input_button.visible = True
         except InputWarning as e:
             self.input_button.visible = False
@@ -450,7 +452,7 @@ class MainMenu(TaskLog):
         try:
             vault = Vault()
             if self.token_input.value_input and self.project_id_input.value_input:
-                if utils.check_grdm_token(self.token_input.value_input):
+                if utils.check_grdm_token(self.grdm_url, self.token_input.value_input):
                     vault.set_value('grdm_token', self.token_input.value_input)
                 if utils.check_grdm_access(self.grdm_url, self.token_input.value_input, self.project_id_input.value_input):
                     self.token = self.token_input.value_input
@@ -466,6 +468,7 @@ class MainMenu(TaskLog):
                 if not utils.check_grdm_access(self.grdm_url, self.token, self.project_id_input.value_input):
                     self.project_id = self.project_id_input.value_input
                     self.operation_file()
+            self.research_flow_widget_box.clear()
         except UnusableVault:
             message = msg_config.get('from', 'no_vault')
             self.research_flow_message.update_error(message)
@@ -480,13 +483,13 @@ class MainMenu(TaskLog):
             self.log.error(f'{message}\n{traceback.format_exc()}')
         except Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
-            self.save_msg_output.update_error(message)
+            self.research_flow_message.update_error(message)
             self.log.error(message)
 
     def operation_file(self):
         """ガバナンスシートを適用して必要なファイルを用意するメソッドです。"""
         self.research_flow_message.clear()
-        self.govsheet_rf = utils.get_govsheet_rf(self.abs_root, self.token, self.grdm_url, self.project_id)
+        self.govsheet_rf = utils.get_govsheet_rf(self.abs_root)
         self.govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
         self.research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
 
@@ -525,9 +528,30 @@ class MainMenu(TaskLog):
         self.float_panel.visible = False
 
         # デフォルトでガバナンスシートを作成する
-        schema = utils.get_schema()
-        data = utils.get_default_govsheet(schema)
-        file.JsonFile(self.govsheet_rf_path).write(data)
+        govsheet_path = os.path.join(self.abs_root, self.remote_path)
+        govsheet_file = file.JsonFile(govsheet_path)
+        try:
+            schema = utils.get_schema()
+            data = utils.get_default_govsheet(schema)
+            govsheet_file.write(data)
+            self.grdm.sync(self.token, self.grdm_url, self.project_id, govsheet_path, self.abs_root)
+        except UnauthorizedError:
+            message = msg_config.get('form', 'token_unauthorized')
+            self.research_flow_message.update_warning(message)
+            self.log.warning(f'{message}\n{traceback.format_exc()}')
+            return
+        except RequestException as e:
+            message = msg_config.get('DEFAULT', 'connection_error')
+            self.research_flow_message.update_error(f'{message}\n{str(e)}')
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+            return
+        except Exception:
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self.research_flow_message.update_error(message)
+            self.log.error(message)
+            return
+        finally:
+            govsheet_file.remove(missing_ok=True)
 
         # サブフローを作り直す
         utils.recreate_subflow(

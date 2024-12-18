@@ -379,35 +379,30 @@ class MainMenu(TaskLog):
                 self.project_id = project_id
             elif project_id is None:
                 self.project_id_input.visible = True
-                if utils.check_grdm_token(self.grdm_url, token):
-                    self.token = token
+                self.token = token
             else:
                 self.project_id_input.visible = False
                 self.token_input.visible = False
                 if utils.check_grdm_token(self.grdm_url, token):
-                    pass
-                if not utils.check_grdm_access(self.grdm_url, token, project_id):
-                    vault.set_value('grdm_token', token)
-                    self.token = token
-                    self.project_id = project_id
-                    self.operation_file()
+                    if utils.check_grdm_access(self.grdm_url, token, project_id):
+                        self.token = token
+                        self.project_id = project_id
+                        self.operation_file()
+                    else:
+                        self.research_flow_message.update_error('form', 'project_id_not_exist')
+                        return
+                else:
+                    self.token_input.visible = True
+                    self.project_id_input.visible = True
             self.display_input_box()
 
         except UnusableVault:
             message = msg_config.get('from', 'no_vault')
             self.research_flow_message.update_error(message)
             self.log.error(f'{message}\n{traceback.format_exc()}')
-        except RepoPermissionError:
-            message = msg_config.get('from', 'insufficient_permission')
-            self.research_flow_message.update_error(message)
-            self.log.error(f'{message}\n{traceback.format_exc()}')
-        except ProjectNotExist as e:
-            message = msg_config.get('form', 'project_id_not_exist').format(project_id)
-            self.research_flow_message.update_error(message)
-            self.log.error(f'{message}\n{traceback.format_exc()}')
         except Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
-            self.save_msg_output.update_error(message)
+            self.research_flow_message.update_error(message)
             self.log.error(message)
 
     def input(self, event):
@@ -422,20 +417,16 @@ class MainMenu(TaskLog):
             if self.token_input.visible and self.project_id_input.visible:
                 if self.token_input.value_input and self.project_id_input.value_input:
                     utils.validate_input_token(self.token_input.value_input)
-                    utils.is_half_width_alphanumeric_token(self.token_input.value_input)
                     utils.validate_input_project_id(self.project_id_input.value_input)
-                    utils.is_half_width_alphanumeric_project_id(self.project_id_input.value_input)
                     self.input_button.visible = True
 
             elif self.token_input.visible:
                 if self.token_input.value_input:
                     utils.validate_input_token(self.token_input.value_input)
-                    utils.is_half_width_alphanumeric_token(self.token_input.value_input)
                     self.input_button.visible = True
             else:
                 if self.project_id_input.value_input:
                     utils.validate_input_project_id(self.project_id_input.value_input)
-                    utils.is_half_width_alphanumeric_project_id(self.project_id_input.value_input)
                     self.input_button.visible = True
         except InputWarning as e:
             self.input_button.visible = False
@@ -451,34 +442,46 @@ class MainMenu(TaskLog):
         self.input_button.set_looks_processing()
         try:
             vault = Vault()
+            if self.token_input.value_input is None or self.project_id_input.value_input is None:
+                self.research_flow_message.update_warning(msg_config.get('main_menu', 'not_input_token_project_id'))
+                return
             if self.token_input.value_input and self.project_id_input.value_input:
                 if utils.check_grdm_token(self.grdm_url, self.token_input.value_input):
                     vault.set_value('grdm_token', self.token_input.value_input)
-                if utils.check_grdm_access(self.grdm_url, self.token_input.value_input, self.project_id_input.value_input):
-                    self.token = self.token_input.value_input
-                    self.project_id = self.project_id_input.value_input
-                    self.operation_file()
+                    if utils.check_grdm_access(self.grdm_url, self.token_input.value_input, self.project_id_input.value_input):
+                        self.token = self.token_input.value_input
+                        self.project_id = self.project_id_input.value_input
+                        self.operation_file()
+                    else:
+                        self.research_flow_message.update_error('form', 'project_id_not_exist')
+                        return
+                else:
+                    self.research_flow_message.update_warning(msg_config.get('form', 'token_unauthorized'))
+                    self.input_button.visible = False
+                    self.display_input_box()
             elif self.token_input.value_input:
                 if utils.check_grdm_token(self.grdm_url, self.token_input.value_input):
                     vault.set_value('grdm_token', self.token_input.value_input)
-                if utils.check_grdm_access(self.grdm_url, self.token_input.value_input, self.project_id):
-                    self.token = self.token_input.value_input
-                    self.operation_file()
+                    if utils.check_grdm_access(self.grdm_url, self.token_input.value_input, self.project_id):
+                        self.token = self.token_input.value_input
+                        self.operation_file()
+                    else:
+                        self.research_flow_message.update_error('form', 'project_id_not_exist')
+                        return
+                else:
+                    self.research_flow_message.update_warning(msg_config.get('form', 'token_unauthorized'))
+                    self.display_input_box()
             else:
                 if not utils.check_grdm_access(self.grdm_url, self.token, self.project_id_input.value_input):
                     self.project_id = self.project_id_input.value_input
                     self.operation_file()
+                else:
+                    self.research_flow_message.update_error('form', 'project_id_not_exist')
+                    return
             self.research_flow_widget_box.clear()
+
         except UnusableVault:
-            message = msg_config.get('from', 'no_vault')
-            self.research_flow_message.update_error(message)
-            self.log.error(f'{message}\n{traceback.format_exc()}')
-        except RepoPermissionError:
-            message = msg_config.get('from', 'insufficient_permission')
-            self.research_flow_message.update_error(message)
-            self.log.error(f'{message}\n{traceback.format_exc()}')
-        except ProjectNotExist as e:
-            message = msg_config.get('form', 'project_id_not_exist').format(project_id)
+            message = msg_config.get('form', 'no_vault')
             self.research_flow_message.update_error(message)
             self.log.error(f'{message}\n{traceback.format_exc()}')
         except Exception:
@@ -490,32 +493,50 @@ class MainMenu(TaskLog):
         """ガバナンスシートを適用して必要なファイルを用意するメソッドです。"""
         self.research_flow_message.clear()
         self.govsheet_rf = utils.get_govsheet_rf(self.abs_root)
-        self.govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
         self.research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
+        try:
+            self.govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
 
-        if not self.govsheet:
-            self.float_panel.visible = True
-            self.research_flow_widget_box.append(self.float_panel)
-            return
+            if not self.govsheet:
+                self.float_panel.visible = True
+                self.research_flow_widget_box.append(self.float_panel)
+                return
 
-        if self.govsheet_rf == self.govsheet:
-            self.token_input.visible = False
-            self.project_id_input.visible = False
-            message = msg_config.get('main_menu', 'current_version_govsheet')
-            self.research_flow_message.update_info(message)
-            return
+            if self.govsheet_rf == self.govsheet:
+                self.token_input.visible = False
+                self.project_id_input.visible = False
+                message = msg_config.get('main_menu', 'current_version_govsheet')
+                self.research_flow_message.update_info(message)
+                return
 
-        if not self.research_flow_dict:
-            file.JsonFile(self.govsheet_rf_path).write(self.govsheet)
+            if not self.research_flow_dict:
+                file.JsonFile(self.govsheet_rf_path).write(self.govsheet)
+                self.research_flow_message.update_success(msg_config.get('main_menu', 'success_govsheet'))
+                return
+
+            utils.recreate_subflow(
+                self.abs_root, self.govsheet_rf_path, self.govsheet_rf, self.govsheet, self.research_flow_dict)
+            sync_path_list = utils.get_sync_path(self.abs_root)
+            for sync_path in sync_path_list:
+                self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
             self.research_flow_message.update_success(msg_config.get('main_menu', 'success_govsheet'))
-            return
 
-        utils.recreate_subflow(
-            self.abs_root, self.token, self.grdm_url, self.project_id, self.govsheet_rf_path)
-        sync_path_list = utils.get_sync_path(self.abs_root)
-        for i, path in enumerate(sync_path_list):
-            self.grdm.sync(self.token, self.grdm_url, self.project_id, path, self.abs_root)
-        self.research_flow_message.update_success(msg_config.get('main_menu', 'success_govsheet'))
+        except FileNotFoundError:
+            self.govsheet = None
+        except json.JSONDecodeError:
+            self.govsheet = {}
+        except UnauthorizedError:
+            message = msg_config.get('form', 'token_unauthorized')
+            self.research_flow_message.update_warning(message)
+            self.log.warning(f'{message}\n{traceback.format_exc()}')
+        except RequestException as e:
+            message = msg_config.get('dg_web', 'get_data_error')
+            self.research_flow_message.update_error(f'{message}\n{str(e)}')
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+        except Exception as e:
+            message = msg_config.get('dg_web', 'get_data_error')
+            self.research_flow_message.update_error(message)
+            self.log.error(f'{message}\n{traceback.format_exc()}')
 
     def callback_apply_button(self, event):
         """デフォルトのガバナンスシートで登録するメソッドです。
@@ -555,9 +576,9 @@ class MainMenu(TaskLog):
 
         # サブフローを作り直す
         utils.recreate_subflow(
-            self.abs_root, self.token, self.grdm_url, self.project_id, self.govsheet_rf_path)
+            self.abs_root, self.govsheet_rf_path, self.govsheet_rf, self.govsheet, self.research_flow_dict)
         sync_path_list = utils.get_sync_path(self.abs_root)
-        for i, path in enumerate(sync_path_list):
+        for sync_path in sync_path_list:
             self.grdm.sync(self.token, self.grdm_url, self.project_id, path, self.abs_root)
         self.research_flow_message.update_success(msg_config.get('main_menu', 'success_govsheet'))
 

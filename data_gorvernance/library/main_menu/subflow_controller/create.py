@@ -399,6 +399,8 @@ class CreateSubflowForm(BaseSubflowForm):
             self.recreate_current_subflow()
         if self.float_panel.visible:
             return
+        if not self.govsheet_rf:
+            file.JsonFile(self.govsheet_rf_path).write(self.govsheet)
         self.new_create_subflow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
         sync_path_list = utils.get_sync_path(self.abs_root)
         for sync_path in sync_path_list:

@@ -357,7 +357,7 @@ class MainMenu(TaskLog):
         self.research_flow_widget_box.append(input_layout)
 
     def apply_click(self, event):
-        """パーソナルアクセストークンとプロジェクトIDが取得できたかによって表示欄を変えるメソッドです。
+        """ガバナンスシート適用ボタンを押下してガバナンスシートを適用するメソッドです。
 
         Args:
             event: ボタンクリックイベント
@@ -367,7 +367,6 @@ class MainMenu(TaskLog):
         self.token_input.value_input = ''
         self.project_id_input.value_input = ''
         try:
-            vault = Vault()
             token = utils.get_token()
             project_id = utils.get_project_id()
 
@@ -381,15 +380,13 @@ class MainMenu(TaskLog):
                 self.project_id_input.visible = True
                 self.token = token
             else:
-                self.project_id_input.visible = False
-                self.token_input.visible = False
                 if utils.check_grdm_token(self.grdm_url, token):
                     if utils.check_grdm_access(self.grdm_url, token, project_id):
                         self.token = token
                         self.project_id = project_id
                         self.operation_file()
                     else:
-                        self.research_flow_message.update_error('form', 'project_id_not_exist')
+                        self.research_flow_message.update_error(msg_config.get('form', 'project_id_not_exist'))
                         return
                 else:
                     self.token_input.visible = True
@@ -397,7 +394,15 @@ class MainMenu(TaskLog):
             self.display_input_box()
 
         except UnusableVault:
-            message = msg_config.get('from', 'no_vault')
+            message = msg_config.get('form', 'no_vault')
+            self.research_flow_message.update_error(message)
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+        except UnauthorizedError:
+            message = msg_config.get('form', 'token_unauthorized')
+            self.research_flow_message.update_warning(message)
+            self.log.warning(f'{message}\n{traceback.format_exc()}')
+        except ProjectNotExist:
+            message = msg_config.get('form', 'project_id_not_exist').format(project_id)
             self.research_flow_message.update_error(message)
             self.log.error(f'{message}\n{traceback.format_exc()}')
         except Exception:
@@ -406,7 +411,7 @@ class MainMenu(TaskLog):
             self.log.error(message)
 
     def input(self, event):
-        """パーソナルアクセストークンとプロジェクトIDが正しい形式で記入されているか確認するメソッドです。
+        """確定ボタンを有効化するメソッドです
 
         Args:
             event: 入力イベント
@@ -434,49 +439,62 @@ class MainMenu(TaskLog):
             raise
 
     def callback_input_button(self, event):
-        """パーソナルアクセストークンとプロジェクトIDの接続確認をするメソッドです。
+        """パーソナルアクセストークン及びプロジェクトIDを入力してガバナンスシート適用をするメソッドです。
 
         Args:
             event: クリックイベント
         """
         self.input_button.set_looks_processing()
+
+        if not self.token_input.value_input:
+            self.research_flow_message.update_warning(msg_config.get('main_menu', 'not_input_token'))
+            return
+        if not self.project_id_input.value_input:
+            self.research_flow_message.update_warning(msg_config.get('main_menu', 'not_input_project_id'))
+            return
+
         try:
             vault = Vault()
-            if self.token_input.value_input is None or self.project_id_input.value_input is None:
-                self.research_flow_message.update_warning(msg_config.get('main_menu', 'not_input_token_project_id'))
-                return
             if self.token_input.value_input and self.project_id_input.value_input:
                 if utils.check_grdm_token(self.grdm_url, self.token_input.value_input):
                     vault.set_value('grdm_token', self.token_input.value_input)
                     if utils.check_grdm_access(self.grdm_url, self.token_input.value_input, self.project_id_input.value_input):
                         self.token = self.token_input.value_input
                         self.project_id = self.project_id_input.value_input
+                        self.token_input.visible = False
+                        self.project_id_input.visible = False
                         self.operation_file()
                     else:
-                        self.research_flow_message.update_error('form', 'project_id_not_exist')
+                        self.research_flow_message.update_error(msg_config.get('form', 'project_id_not_exist'))
                         return
                 else:
                     self.research_flow_message.update_warning(msg_config.get('form', 'token_unauthorized'))
                     self.input_button.visible = False
                     self.display_input_box()
+                    return
             elif self.token_input.value_input:
                 if utils.check_grdm_token(self.grdm_url, self.token_input.value_input):
                     vault.set_value('grdm_token', self.token_input.value_input)
                     if utils.check_grdm_access(self.grdm_url, self.token_input.value_input, self.project_id):
                         self.token = self.token_input.value_input
+                        self.token_input.visible = False
                         self.operation_file()
                     else:
-                        self.research_flow_message.update_error('form', 'project_id_not_exist')
+                        self.research_flow_message.update_error(msg_config.get('form', 'project_id_not_exist'))
                         return
                 else:
                     self.research_flow_message.update_warning(msg_config.get('form', 'token_unauthorized'))
+                    self.input_button.visible = False
                     self.display_input_box()
+                    return
             else:
                 if not utils.check_grdm_access(self.grdm_url, self.token, self.project_id_input.value_input):
                     self.project_id = self.project_id_input.value_input
+                    self.token_input.visible = False
+                    self.project_id_input.visible = False
                     self.operation_file()
                 else:
-                    self.research_flow_message.update_error('form', 'project_id_not_exist')
+                    self.research_flow_message.update_error(msg_config.get('form', 'project_id_not_exist'))
                     return
             self.research_flow_widget_box.clear()
 
@@ -494,33 +512,9 @@ class MainMenu(TaskLog):
         self.research_flow_message.clear()
         self.govsheet_rf = utils.get_govsheet_rf(self.abs_root)
         self.research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
+
         try:
             self.govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
-
-            if not self.govsheet:
-                self.float_panel.visible = True
-                self.research_flow_widget_box.append(self.float_panel)
-                return
-
-            if self.govsheet_rf == self.govsheet:
-                self.token_input.visible = False
-                self.project_id_input.visible = False
-                message = msg_config.get('main_menu', 'current_version_govsheet')
-                self.research_flow_message.update_info(message)
-                return
-
-            if not self.research_flow_dict:
-                file.JsonFile(self.govsheet_rf_path).write(self.govsheet)
-                self.research_flow_message.update_success(msg_config.get('main_menu', 'success_govsheet'))
-                return
-
-            utils.recreate_subflow(
-                self.abs_root, self.govsheet_rf_path, self.govsheet_rf, self.govsheet, self.research_flow_dict)
-            sync_path_list = utils.get_sync_path(self.abs_root)
-            for sync_path in sync_path_list:
-                self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
-            self.research_flow_message.update_success(msg_config.get('main_menu', 'success_govsheet'))
-
         except FileNotFoundError:
             self.govsheet = None
         except json.JSONDecodeError:
@@ -537,6 +531,40 @@ class MainMenu(TaskLog):
             message = msg_config.get('dg_web', 'get_data_error')
             self.research_flow_message.update_error(message)
             self.log.error(f'{message}\n{traceback.format_exc()}')
+
+        if not self.govsheet:
+            self.float_panel.visible = True
+            self.research_flow_widget_box.append(self.float_panel)
+            return
+
+        if self.govsheet_rf == self.govsheet:
+            message = msg_config.get('main_menu', 'current_version_govsheet')
+            self.research_flow_message.update_info(message)
+            return
+
+        utils.recreate_subflow(
+            self.abs_root, self.govsheet_rf_path, self.govsheet_rf, self.govsheet, self.research_flow_dict)
+        # GRDMと同期
+        try:
+            sync_path_list = utils.get_sync_path(self.abs_root)
+            for sync_path in sync_path_list:
+                self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
+        except UnauthorizedError:
+            message = msg_config.get('form', 'token_unauthorized')
+            self.research_flow_message.update_warning(message)
+            self.log.warning(f'{message}\n{traceback.format_exc()}')
+            return
+        except RequestException as e:
+            message = msg_config.get('DEFAULT', 'connection_error')
+            self.research_flow_message.update_error(f'{message}\n{str(e)}')
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+            return
+        except Exception:
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self.research_flow_message.update_error(message)
+            self.log.error(message)
+            return
+        self.research_flow_message.update_success(msg_config.get('main_menu', 'success_govsheet'))
 
     def callback_apply_button(self, event):
         """デフォルトのガバナンスシートで登録するメソッドです。
@@ -577,9 +605,26 @@ class MainMenu(TaskLog):
         # サブフローを作り直す
         utils.recreate_subflow(
             self.abs_root, self.govsheet_rf_path, self.govsheet_rf, self.govsheet, self.research_flow_dict)
-        sync_path_list = utils.get_sync_path(self.abs_root)
-        for sync_path in sync_path_list:
-            self.grdm.sync(self.token, self.grdm_url, self.project_id, path, self.abs_root)
+        # GRDMと同期
+        try:
+            sync_path_list = utils.get_sync_path(self.abs_root)
+            for sync_path in sync_path_list:
+                self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
+        except UnauthorizedError:
+            message = msg_config.get('form', 'token_unauthorized')
+            self.research_flow_message.update_warning(message)
+            self.log.warning(f'{message}\n{traceback.format_exc()}')
+            return
+        except RequestException as e:
+            message = msg_config.get('DEFAULT', 'connection_error')
+            self.research_flow_message.update_error(f'{message}\n{str(e)}')
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+            return
+        except Exception:
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self.research_flow_message.update_error(message)
+            self.log.error(message)
+            return
         self.research_flow_message.update_success(msg_config.get('main_menu', 'success_govsheet'))
 
     def callback_cancel_button(self, event):

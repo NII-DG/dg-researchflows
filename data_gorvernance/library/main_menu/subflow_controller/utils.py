@@ -18,7 +18,7 @@ from library.utils import file
 from library.utils.setting.research_flow_status import ResearchFlowStatusOperater
 from library.utils.setting.status import SubflowTask ,SubflowStatusFile
 from library.utils.string import StringManager
-from library.utils.error import UnusableVault, RepoPermissionError, UnauthorizedError, ProjectNotExist
+from library.utils.error import UnusableVault
 
 
 def input_widget() -> Union[pn.widgets.PasswordInput, pn.widgets.TextInput]:
@@ -82,7 +82,7 @@ def get_token() -> Optional[str]:
         token = vault.get_value(vault_key)
     except Exception as e:
         raise UnusableVault from e
-    if not grdm_connect.check_authorization(grdm_url, token):
+    if not token or not grdm_connect.check_authorization(grdm_url, token):
         return None
     return token
 
@@ -115,7 +115,6 @@ def get_govsheet(token: str, base_url: str, project_id: str, remote_path: str) -
         dict: ガバナンスシートの内容(存在しない場合は{})を返す。
     """
     grdm_connect = grdm.Grdm()
-    govsheet = {}
     govsheet = grdm_connect.download_json_file(
         token, base_url, project_id, remote_path
     )
@@ -150,7 +149,6 @@ def mapping_file(abs_root: str) -> dict:
     Returns:
         dict: マッピングされたIDとフラグの辞書を返す。
     """
-    active_dict = {}
     task_mapping_path = os.path.join(
         abs_root, path_config.DG_RESEARCHFLOW_FOLDER, 'task_mapping.json'
     )
@@ -239,23 +237,23 @@ def update_status_file(abs_root: str, status_json_path: str):
     update_dependent_task(dependent_id_list, sf_status.tasks)
     sf.write(sf_status)
 
-def update_flg(data: dict, tasks: SubflowTask):
+def update_flg(data: dict, tasks: list[SubflowTask]):
     """タスクの表示フラグを更新する関数です。
 
     Args:
         data (dict): タスクIDと表示フラグ
-        tasks (SubflowTask): サブフローのタスクの設定値
+        tasks (list[SubflowTask]): サブフローのタスクの設定値
     """
     for task_id, active_flg in data.items():
         for task in tasks:
             if task_id == task.id:
                 task.active = active_flg
 
-def get_dependent_id_list(tasks: SubflowTask) -> list:
+def get_dependent_id_list(tasks: list[SubflowTask]) -> list:
     """依存タスクが設定されているタスクのタスクIDを取得する関数です。
 
     Args:
-        tasks (SubflowTask): サブフローのタスクの設定値
+        tasks (list[SubflowTask]): サブフローのタスクの設定値
 
     Returns:
         list: タスクIDのリストを返す。
@@ -267,12 +265,12 @@ def get_dependent_id_list(tasks: SubflowTask) -> list:
                 dependent_id_list.append(dependent_id)
     return dependent_id_list
 
-def update_dependent_task(dependent_list: list, tasks: SubflowTask):
+def update_dependent_task(dependent_list: list, tasks: list[SubflowTask]):
     """依存タスクのactiveフラグをTrueにする関数です。
 
     Args:
         dependent_list (list): タスクIDのリスト
-        tasks (SubflowTask): サブフローのタスクの設定値
+        tasks (list[SubflowTask]): サブフローのタスクの設定値
     """
     for task in tasks:
         for dependent_id in dependent_list:
@@ -291,10 +289,7 @@ def check_grdm_access(base_url: str, token: str, project_id: str) -> bool:
         bool: 問題が無ければTrue、問題があればFalseを返す。
     """
     grdm_connect = grdm.Grdm()
-    if grdm_connect.check_permission(base_url, token, project_id):
-        return True
-    else:
-        return False
+    return grdm_connect.check_permission(base_url, token, project_id)
 
 def check_grdm_token(base_url: str, token: str) -> bool:
     """パーソナルアクセストークンのアクセス権限をチェックを行う関数です。
@@ -307,10 +302,7 @@ def check_grdm_token(base_url: str, token: str) -> bool:
         bool: 問題が無ければTrue、問題があればFalseを返す。
     """
     grdm_connect = grdm.Grdm()
-    if grdm_connect.check_authorization(base_url, token):
-        return True
-    else:
-        return False
+    return grdm_connect.check_authorization(base_url, token)
 
 def backup_zipfile(abs_root: str, research_flow_dict: dict, current_time: str):
     """サブフローのファイル群をzip化する関数です。
@@ -549,8 +541,6 @@ def preparation_notebook_file(abs_root: str, status_path_json: str, working_path
         status_path_json (str): status.jsonのパス
         working_path (str): workingのディレクトリ
     """
-    notebook_name_list = []
-
     task_dir = os.path.join(abs_root, path_config.DG_TASK_BASE_DATA_FOLDER)
     status_file = SubflowStatusFile(status_path_json)
     read_status_file = status_file.read()
@@ -559,14 +549,14 @@ def preparation_notebook_file(abs_root: str, status_path_json: str, working_path
         if task.active == True:
             _copy_file_by_name(task.name, task_dir, working_path)
 
-def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: str, govsheet: str, research_flow_dict: dict):
+def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, govsheet: dict, research_flow_dict: dict):
     """サブフローを作り直す関数です。
 
     Args:
         abs_root (str): リサーチフローのルートディレクトリ
         govsheet_rf_path (str): RFガバナンスシートのパス
-        govsheet_rf (str): RFガバナンスシートの内容
-        govsheet (str): ガバナンスシートの内容
+        govsheet_rf (dict): RFガバナンスシートの内容
+        govsheet (dict): ガバナンスシートの内容
         research_flow_dict (dict): 存在するフェーズをkeyとし対応するサブフローIDとサブフロー名をvalueとした辞書
     """
     current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
@@ -575,6 +565,9 @@ def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: str, gov
         backup_govsheet_rf_file(abs_root, govsheet_rf_path, current_time)
     backup_zipfile(abs_root, research_flow_dict, current_time)
     file.JsonFile(govsheet_rf_path).write(govsheet)
+
+    if not research_flow_dict:
+        return
 
     researchflow_path = os.path.join(abs_root, path_config.DG_RESEARCHFLOW_FOLDER)
     delete_files = path_config.get_prepare_file_name_list_for_subflow()

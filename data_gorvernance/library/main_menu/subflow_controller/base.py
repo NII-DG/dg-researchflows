@@ -3,6 +3,7 @@
 このモジュールはサブフロー操作基底クラスを始め、サブフローを操作する時に
 ボタンを制御したり、値が入力されているか、あるいはユニークの値になっているかなどを確認するメソッドがあります。
 """
+import os
 import re
 import traceback
 from typing import Callable
@@ -12,6 +13,7 @@ import panel as pn
 
 from library.utils.config import path_config, message as msg_config
 from library.utils.error import InputWarning
+from library.utils.log.models import UserActivityLog
 from library.utils.setting import ResearchFlowStatusOperater
 from library.utils.string import StringManager
 from library.utils.widgets import Button, MessageBox
@@ -47,6 +49,9 @@ class BaseSubflowForm():
         self.reserch_flow_status_operater = ResearchFlowStatusOperater(
             research_flow_status_file_path
         )
+
+        nb_working_file = os.path.join(self.abs_root, path_config.MAIN_MENU_PATH)
+        self.log = UserActivityLog(nb_working_file, path_config.MAIN_NOTEBOOK)
 
         # リサーチフローステータス管理情報の取得
         research_flow_status = self.reserch_flow_status_operater.load_research_flow_status()

@@ -318,14 +318,14 @@ class MainMenu(TaskLog):
         """サブフローのボタンを呼び戻すメソッドです。"""
         try:
             # start
-            self.log.start(detail=self.callback_type)
+            self.subflow_form.log.start(detail=self.callback_type)
             self.subflow_form.main()
 
             # サブフロー関係図を更新
             self._research_flow_image.object = self.reserch_flow_status_operater.get_svg_of_research_flow_status()
             display(Javascript('IPython.notebook.save_checkpoint();'))
             # end
-            self.log.finish(detail=self.callback_type)
+            self.subflow_form.log.finish(detail=self.callback_type)
         except InputWarning:
             self.log.warning(traceback.format_exc())
         except Exception:

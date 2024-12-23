@@ -29,7 +29,7 @@ MAX_RETRY_COUNT = 5
 
 def start_server():
     """サーバーを起動するメソッドです。"""
-    config_path = os.path.join(os.environ['HOME'], 'data_gorvernance/library/data/vault-config.hcl')
+    config_path = os.path.join(os.environ['HOME'], 'data_governance/library/data/vault-config.hcl')
     dir_path = os.path.join(os.environ['HOME'], '.vault/log')
     os.makedirs(dir_path, exist_ok=True)
     with open(os.path.join(dir_path, 'vault.log'), 'w') as file:

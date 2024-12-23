@@ -67,8 +67,8 @@ class TaskDirector(TaskSave):
         self._script_file_name = os.path.splitext(notebook_name)[0]
 
         # サブフローステータス管理JSONパス
-        # 想定値：data_gorvernance\researchflow\plan\status.json
-        # 想定値：data_gorvernance\researchflow\サブフロー種別\サブフローID\status.json
+        # 想定値：data_governance\researchflow\plan\status.json
+        # 想定値：data_governance\researchflow\サブフロー種別\サブフローID\status.json
         subflow_type, subflow_id = get_subflow_type_and_id(nb_working_file_path)
         if not subflow_type:
             raise ValueError('don\'t get subflow type.')

@@ -74,7 +74,7 @@ class MainMenu(TaskLog):
             govsheet(dict):ガバナンスシートの内容
 
     NOTE:
-    Called from data_gorvernance/researchflow/main.ipynb
+    Called from data_governance/researchflow/main.ipynb
     """
 
     def __init__(self, working_file: str) -> None:
@@ -91,7 +91,7 @@ class MainMenu(TaskLog):
         ##############################
         self.abs_root = path_config.get_abs_root_form_working_dg_file_path(working_file)
         # リサーチフロー図の生成
-        # data_gorvernance\researchflow\research_flow_status.json
+        # data_governance\researchflow\research_flow_status.json
         self._research_flow_status_file_path = path_config.get_research_flow_status_file_path(self.abs_root)
 
         self.reserch_flow_status_operater = ResearchFlowStatusOperater(self._research_flow_status_file_path)
@@ -177,7 +177,7 @@ class MainMenu(TaskLog):
         self._menu_tabs.param.watch(self.callback_menu_tabs, 'active')
 
         # TODO:研究準備の実行ステータス確認をする。
-        # ファイル：data_gorvernance\researchflow\plan\status.json
+        # ファイル：data_governance\researchflow\plan\status.json
         # 必須タスクが全て1回以上実行完了していない場合、研究準備サブフローへ誘導する。
         # サブフロー操作コントローラーを無効化する。
         # 必須タスクが完了している場合は、何もしない

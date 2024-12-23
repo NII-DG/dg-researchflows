@@ -2,10 +2,10 @@
 import os
 
 # Folder
-DATA_GOVERNANCE = 'data_gorvernance'
+DATA_GOVERNANCE = 'data_governance'
 DATA = 'data'
 OCS_TEMPLATES = 'ocs-templates'
-## data_gorvernance直下
+## data_governance直下
 BASE = 'base'
 LOG = 'log'
 IMAGES = 'images'
@@ -87,7 +87,7 @@ SETUP_COMPLETED_TEXT_PATH = os.path.join(DG_WORKING_FOLDER, 'setup_completed.txt
 ## config file
 TOKEN_JSON_PAHT = os.path.join(DG_WORKING_FOLDER, TOKEN)
 USER_INFO_PATH = os.path.join(DG_WORKING_FOLDER, USER_INFO)
-## data_gorvernance/researchflow/plan/status.json
+## data_governance/researchflow/plan/status.json
 PLAN_TASK_STATUS_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, STATUS_JSON)
 PLAN_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, PLAN_JSON)
 
@@ -105,18 +105,18 @@ def get_research_flow_status_file_path(abs_root: str) -> str:
     return os.path.join(abs_root, DG_RESEARCHFLOW_FOLDER, 'research_flow_status.json')
 
 
-def get_base_subflow_pahse_status_file_path(pahse: str) -> str:
+def get_base_subflow_phase_status_file_path(phase: str) -> str:
     """ baseディレクトリの指定されたサブフロー種別（フェーズ）のステータスファイルへのパスを取得する関数です。
 
     Args:
-        pahse (str): サブフロー種別（フェーズ）を設定します。
+        phase (str): サブフロー種別（フェーズ）を設定します。
 
     Returns:
         str: サブフロー種別（フェーズ）のステータスファイルへのパスを返す。
 
     """
-    # data_gorvernance\base\subflow\<フェーズ>\status.jsonを更新する。
-    return os.path.join(DG_SUB_FLOW_BASE_DATA_FOLDER, pahse, STATUS_JSON)
+    # data_governance\base\subflow\<フェーズ>\status.jsonを更新する。
+    return os.path.join(DG_SUB_FLOW_BASE_DATA_FOLDER, phase, STATUS_JSON)
 
 
 def get_sub_flow_menu_path(phase: str, subflow_id: str = '') -> str:

@@ -510,9 +510,9 @@ def prepare_new_subflow_data(abs_root: str, phase_name: str, new_sub_flow_id: st
     """
 
     # 新規サブフローデータの用意
-    # data_gorvernance\researchflowを取得
+    # data_governance\researchflowを取得
     dg_researchflow_path = os.path.join(abs_root, path_config.DG_RESEARCHFLOW_FOLDER)
-    # data_gorvernance\base\subflowを取得する
+    # data_governance\base\subflowを取得する
     dg_base_subflow_path = os.path.join(abs_root, path_config.DG_SUB_FLOW_BASE_DATA_FOLDER)
 
     # コピー先フォルダパス

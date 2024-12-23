@@ -1,14 +1,14 @@
 """このモジュールはユニットテストフレームワークを用いてテストを行うモジュールです。
 
-data_gorvernance.library.utils.config.path_configモジュールのテストを行います。
+data_governance.library.utils.config.path_configモジュールのテストを行います。
 
 """
 from unittest import TestCase
 
-from data_gorvernance.library.utils.config import path_config
+from data_governance.library.utils.config import path_config
 
 class TestPathConfig(TestCase):
-    """data_gorvernance.library.utils.config.path_configモジュールのテストを行うクラスです。"""
+    """data_governance.library.utils.config.path_configモジュールのテストを行うクラスです。"""
     # test exec : python -m unittest tests.utils.config.test_path_config
 
     def test_get_prepare_file_name_list_for_subflow(self):

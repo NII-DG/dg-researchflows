@@ -93,15 +93,15 @@ class CreateSubflowForm(BaseSubflowForm):
             dict: フェーズ表示名を返す。
         """
     # サブフロー種別(フェーズ)オプション(表示名をKey、順序値をVauleとする)
-        pahse_options = {}
-        pahse_options['--'] = 0
+        phase_options = {}
+        phase_options['--'] = 0
         for phase_status in research_flow_status:
             if phase_status._seq_number == 1:
                 continue
             else:
                 # plan以外の全てのフェーズ
-                pahse_options[msg_config.get('research_flow_phase_display_name', phase_status._name)] = phase_status._seq_number
-        return pahse_options
+                phase_options[msg_config.get('research_flow_phase_display_name', phase_status._name)] = phase_status._seq_number
+        return phase_options
 
     def change_submit_button_init(self, name: str):
         """ボタンの状態を初期化するメソッドです。

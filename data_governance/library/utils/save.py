@@ -32,7 +32,7 @@ def all_sync_path(abs_root: str) -> list:
     # /home/jovyan/data
     paths.append(os.path.join(abs_root, path_config.DATA))
 
-    # /home/jovyan/data_gorvernance配下のworking以外
+    # /home/jovyan/data_governance配下のworking以外
     dg_dir = os.path.join(abs_root, path_config.DATA_GOVERNANCE)
     contents = os.listdir(dg_dir)
     contents.remove(path_config.WORKING)

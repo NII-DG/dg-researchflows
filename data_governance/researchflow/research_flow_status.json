@@ -1,28 +1,28 @@
 {
-    "research_flow_pahse_data": [
+  "research_flow_phase_data": [
+    {
+      "seq_number": 1,
+      "name": "plan",
+      "sub_flow_data": [
         {
-            "seq_number": 1,
-            "name": "plan",
-            "sub_flow_data": [
-                {
-                    "id": "00000000-0000-0000-0000-000000000000",
-                    "name": "研究準備",
-                    "data_dir": "",
-                    "link": "./plan/menu.ipynb?init_nb=true",
-                    "parent_ids": [],
-                    "create_datetime": -1
-                }
-            ]
-        },
-        {
-            "seq_number": 2,
-            "name": "experiment",
-            "sub_flow_data": []
-        },
-        {
-            "seq_number": 3,
-            "name": "writing",
-            "sub_flow_data": []
+          "id": "00000000-0000-0000-0000-000000000000",
+          "name": "研究準備",
+          "data_dir": "",
+          "link": "./plan/menu.ipynb?init_nb=true",
+          "parent_ids": [],
+          "create_datetime": -1
         }
-    ]
+      ]
+    },
+    {
+      "seq_number": 2,
+      "name": "experiment",
+      "sub_flow_data": []
+    },
+    {
+      "seq_number": 3,
+      "name": "writing",
+      "sub_flow_data": []
+    }
+  ]
 }

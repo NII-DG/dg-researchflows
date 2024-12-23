@@ -11,7 +11,6 @@ from IPython.display import display
 import panel as pn
 from requests.exceptions import RequestException
 
-from library.task_director import TaskDirector
 from library.utils.config import path_config, message as msg_config, connect as con_config
 from library.utils.error import InputWarning, UnusableVault, ProjectNotExist, UnauthorizedError
 from library.utils.html import button as html_button
@@ -372,7 +371,7 @@ class MainMenu(TaskLog):
         )
         self.research_flow_widget_box.append(input_layout)
 
-    @TaskDirector.callback_form('ガバナンスシートを適用する')
+    @TaskLog.callback_form('ガバナンスシートを適用する')
     def apply_click(self, event):
         """ガバナンスシート適用ボタンを押下されたときにガバナンスシートを適用するメソッドです。
 
@@ -392,7 +391,7 @@ class MainMenu(TaskLog):
                 self.token_input.visible = True
             elif token is None:
                 self.token_input.visible = True
-                self.project_id = project_id
+                self.tmp_project_id = project_id
             elif project_id is None:
                 self.project_id_input.visible = True
                 self.token = token
@@ -450,7 +449,7 @@ class MainMenu(TaskLog):
             self.input_button.visible = False
             self.research_flow_message.update_warning(str(e))
 
-    @TaskDirector.callback_form('入力されたパーソナルアクセストークン及びプロジェクトIDでガバナンスシートを適用する')
+    @TaskLog.callback_form('入力されたパーソナルアクセストークン及びプロジェクトIDでガバナンスシートを適用する')
     def callback_input_button(self, event):
         """入力されたパーソナルアクセストークン及びプロジェクトIDでガバナンスシート適用をするメソッドです。
 

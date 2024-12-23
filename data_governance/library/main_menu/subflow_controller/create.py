@@ -10,7 +10,6 @@ from dg_drawer.research_flow import PhaseStatus
 import panel as pn
 from requests.exceptions import RequestException
 
-from library.task_director import TaskDirector
 from library.utils.config import path_config, message as msg_config, connect as con_config
 from library.utils.error import InputWarning, UnusableVault, ProjectNotExist, UnauthorizedError
 from library.utils.storage_provider import grdm
@@ -152,7 +151,7 @@ class CreateSubflowForm(BaseSubflowForm):
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
             self._err_output.update_error(message)
 
-    @TaskDirector.callback_form('デフォルトでガバナンスシートを作成する')
+    @BaseSubflowForm.callback_form('デフォルトでガバナンスシートを作成する')
     def callback_apply_button(self, event):
         """デフォルトのガバナンスシートで登録するメソッドです。
 

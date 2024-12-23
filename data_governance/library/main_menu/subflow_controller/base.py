@@ -13,20 +13,19 @@ import panel as pn
 
 from library.utils.config import path_config, message as msg_config
 from library.utils.error import InputWarning
-from library.utils.log.models import UserActivityLog
+from library.utils.log import TaskLog
 from library.utils.setting import ResearchFlowStatusOperater
 from library.utils.string import StringManager
 from library.utils.widgets import Button, MessageBox
 
 
-class BaseSubflowForm():
+class BaseSubflowForm(TaskLog):
     """サブフロー操作基底クラス
 
     Attributes:
         instance:
             abs_root(str):リサーチフローのルートディレクトリ
             reserch_flow_status_operater(ResearchFlowStatusOperater):リサーチフロー図を生成
-            log(UserActivityLog):UserActivityLogクラスのインスタンス
             _err_output(MessageBox):エラーの出力
             _sub_flow_type_selector(pn.widgets.Select):サブフロー種別(フェーズ)
             _sub_flow_name_selector(pn.widgets.Select):サブフロー名称
@@ -52,7 +51,7 @@ class BaseSubflowForm():
         )
 
         nb_working_file = os.path.join(self.abs_root, path_config.MAIN_MENU_PATH)
-        self.log = UserActivityLog(nb_working_file, path_config.MAIN_NOTEBOOK)
+        super().__init__(working_file, nb_working_file)
 
         # リサーチフローステータス管理情報の取得
         research_flow_status = self.reserch_flow_status_operater.load_research_flow_status()

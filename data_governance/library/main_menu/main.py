@@ -69,9 +69,7 @@ class MainMenu(TaskLog):
             project_id(str):プロジェクトID
             callback_type(str):呼び出すメソッドのタイプ
             subflow_form(CreateSubflowForm | RelinkSubflowForm | RenameSubflowForm | DeleteSubflowForm):サブフローのフォーム
-            govsheet_rf(dict):RFガバナンスシートの内容
             research_flow_dict(dict):存在するフェーズをkeyとし対応するサブフローIDとサブフロー名をvalueとした辞書
-            govsheet(dict):ガバナンスシートの内容
 
     NOTE:
     Called from data_governance/researchflow/main.ipynb
@@ -452,6 +450,7 @@ class MainMenu(TaskLog):
             self.input_button.visible = False
             self.research_flow_message.update_warning(str(e))
 
+    @TaskDirector.callback_form('入力されたパーソナルアクセストークン及びプロジェクトIDでガバナンスシートを適用する')
     def callback_input_button(self, event):
         """入力されたパーソナルアクセストークン及びプロジェクトIDでガバナンスシート適用をするメソッドです。
 
@@ -523,7 +522,7 @@ class MainMenu(TaskLog):
             self.research_flow_message.update_warning(message)
             self.log.warning(f'{message}\n{traceback.format_exc()}')
         except ProjectNotExist:
-            message = msg_config.get('form', 'project_id_not_exist').format(project_id)
+            message = msg_config.get('form', 'project_id_not_exist').format(self.project_id_input.value_input)
             self.research_flow_message.update_error(message)
             self.log.error(f'{message}\n{traceback.format_exc()}')
         except Exception:
@@ -535,15 +534,15 @@ class MainMenu(TaskLog):
         """ガバナンスシートを適用して必要なファイルを用意するメソッドです。"""
         self.research_flow_message.clear()
         self.input_button.visible = False
-        self.govsheet_rf = utils.get_govsheet_rf(self.abs_root)
         self.research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
+        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
 
         try:
-            self.govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
+            govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
         except FileNotFoundError:
-            self.govsheet = None
+            govsheet = None
         except json.JSONDecodeError:
-            self.govsheet = {}
+            govsheet = {}
         except UnauthorizedError:
             message = msg_config.get('form', 'token_unauthorized')
             self.research_flow_message.update_warning(message)
@@ -557,18 +556,18 @@ class MainMenu(TaskLog):
             self.research_flow_message.update_error(message)
             self.log.error(f'{message}\n{traceback.format_exc()}')
 
-        if not self.govsheet:
+        if not govsheet:
             self.float_panel.visible = True
             self.research_flow_widget_box.append(self.float_panel)
             return
 
-        if self.govsheet_rf == self.govsheet:
+        if govsheet_rf == govsheet:
             message = msg_config.get('main_menu', 'current_version_govsheet')
             self.research_flow_message.update_info(message)
             return
 
         utils.recreate_subflow(
-            self.abs_root, self.govsheet_rf_path, self.govsheet_rf, self.govsheet, self.research_flow_dict)
+            self.abs_root, self.govsheet_rf_path, govsheet_rf, govsheet, self.research_flow_dict)
         # GRDMと同期
         try:
             sync_path_list = utils.get_sync_path(self.abs_root)
@@ -591,6 +590,7 @@ class MainMenu(TaskLog):
             return
         self.research_flow_message.update_success(msg_config.get('main_menu', 'success_govsheet'))
 
+    @TaskDirector.callback_form('デフォルトでガバナンスシートを作成する')
     def callback_apply_button(self, event):
         """デフォルトのガバナンスシートで登録するメソッドです。
 
@@ -600,6 +600,7 @@ class MainMenu(TaskLog):
         self.research_flow_message.clear()
         self.apply_button.set_looks_processing()
         self.float_panel.visible = False
+        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
 
         # デフォルトでガバナンスシートを作成する
         govsheet_path = os.path.join(self.abs_root, self.remote_path)
@@ -629,7 +630,7 @@ class MainMenu(TaskLog):
 
         # サブフローを作り直す
         utils.recreate_subflow(
-            self.abs_root, self.govsheet_rf_path, self.govsheet_rf, self.govsheet, self.research_flow_dict)
+            self.abs_root, self.govsheet_rf_path, govsheet_rf, data, self.research_flow_dict)
         # GRDMと同期
         try:
             sync_path_list = utils.get_sync_path(self.abs_root)

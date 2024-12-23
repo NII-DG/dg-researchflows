@@ -10,6 +10,7 @@ from dg_drawer.research_flow import PhaseStatus
 import panel as pn
 from requests.exceptions import RequestException
 
+from library.task_director import TaskDirector
 from library.utils.config import path_config, message as msg_config, connect as con_config
 from library.utils.error import InputWarning, UnusableVault, ProjectNotExist, UnauthorizedError
 from library.utils.storage_provider import grdm
@@ -48,8 +49,6 @@ class CreateSubflowForm(BaseSubflowForm):
             _data_dir_name_form(TextInput):データディレクトリ名のフォーム
             token(str):パーソナルアクセストークン
             project_id(str):プロジェクトID
-            govsheet_rf(dict):RFガバナンスシートの内容
-            govsheet(dict):ガバナンスシートの内容
     """
 
     def __init__(self, abs_root: str, widget_box: pn.WidgetBox, message_box: MessageBox) -> None:
@@ -153,6 +152,7 @@ class CreateSubflowForm(BaseSubflowForm):
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
             self._err_output.update_error(message)
 
+    @TaskDirector.callback_form('デフォルトでガバナンスシートを作成する')
     def callback_apply_button(self, event):
         """デフォルトのガバナンスシートで登録するメソッドです。
 
@@ -160,6 +160,7 @@ class CreateSubflowForm(BaseSubflowForm):
             event: ボタンクリックイベント
         """
         self.float_panel.visible = False
+        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
 
         # デフォルトでガバナンスシートを作成する
         govsheet_path = os.path.join(self.abs_root, self.remote_path)
@@ -189,7 +190,7 @@ class CreateSubflowForm(BaseSubflowForm):
 
         # サブフローを作り直す
         utils.recreate_subflow(
-            self.abs_root, self.govsheet_rf_path, self.govsheet_rf, self.govsheet, self.research_flow_dict)
+            self.abs_root, self.govsheet_rf_path, govsheet_rf, data, self.research_flow_dict)
         # 新規作成する
         self.new_create_subflow(
             self._sub_flow_type_selector.value,
@@ -414,11 +415,11 @@ class CreateSubflowForm(BaseSubflowForm):
 
         # ガバナンスシート取得
         try:
-            self.govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
+            govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
         except FileNotFoundError:
-            self.govsheet = None
+            govsheet = None
         except json.JSONDecodeError:
-            self.govsheet = {}
+            govsheet = {}
         except UnauthorizedError:
             message = msg_config.get('form', 'token_unauthorized')
             self._err_output.update_warning(message)
@@ -430,16 +431,16 @@ class CreateSubflowForm(BaseSubflowForm):
             self._err_output.update_error(f'{message}\n{str(e)}')
 
         self.govsheet_path = os.path.join(self.abs_root, self.remote_path)
-        self.govsheet_rf = utils.get_govsheet_rf(self.abs_root)
+        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
 
-        if not self.govsheet_rf and not self.govsheet:
+        if not govsheet_rf and not govsheet:
             self.float_panel.visible = True
             self._sub_flow_widget_box.append(self.float_panel)
             return
 
         # 既存のサブフローを作り直す
         utils.recreate_subflow(
-            self.abs_root, self.govsheet_rf_path, self.govsheet_rf, self.govsheet, self.research_flow_dict)
+            self.abs_root, self.govsheet_rf_path, govsheet_rf, govsheet, self.research_flow_dict)
 
         if self.float_panel.visible:
             return

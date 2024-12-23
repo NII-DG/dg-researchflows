@@ -50,8 +50,8 @@ class RelinkSubflowForm(BaseSubflowForm):
             dict: フェーズ表示名を返す。
         """
         # サブフロー種別(フェーズ)オプション(表示名をKey、順序値をVauleとする)
-        phase_options = {}
-        phase_options['--'] = 0
+        pahse_options = {}
+        pahse_options['--'] = 0
         for phase_status in research_flow_status:
             # planには親が無い
             if phase_status._seq_number == 1:
@@ -61,9 +61,9 @@ class RelinkSubflowForm(BaseSubflowForm):
                 continue
             # サブフローのあるフェーズのみ
             if len(phase_status._sub_flow_data) > 0:
-                phase_options[msg_config.get(
+                pahse_options[msg_config.get(
                     'research_flow_phase_display_name', phase_status._name)] = phase_status._seq_number
-        return phase_options
+        return pahse_options
 
     def get_parent_type_and_ids(
         self, phase_seq_number: str, sub_flow_id: str,

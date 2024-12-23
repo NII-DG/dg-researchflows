@@ -119,7 +119,7 @@ class ResearchFlowStatusFile(JsonFile):
         """
         # research_flow_statusを基にリサーチフローステータス管理JSONを更新する。
         research_flow_status_data = {}
-        research_flow_status_data['research_flow_phase_data'] = []
+        research_flow_status_data['research_flow_pahse_data'] = []
 
         for phase_status in research_flow_status:
             phase_status_data = {}
@@ -135,7 +135,7 @@ class ResearchFlowStatusFile(JsonFile):
                 sub_flow_unit_data['parent_ids'] = sub_flow_unit._parent_ids
                 sub_flow_unit_data['create_datetime'] = sub_flow_unit._create_datetime
                 phase_status_data['sub_flow_data'].append(sub_flow_unit_data)
-            research_flow_status_data['research_flow_phase_data'].append(
+            research_flow_status_data['research_flow_pahse_data'].append(
                 phase_status_data)
         # リサーチフローステータス管理JSONをアップデート
         super().write(research_flow_status_data)

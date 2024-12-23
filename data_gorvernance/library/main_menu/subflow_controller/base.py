@@ -26,6 +26,7 @@ class BaseSubflowForm():
         instance:
             abs_root(str):リサーチフローのルートディレクトリ
             reserch_flow_status_operater(ResearchFlowStatusOperater):リサーチフロー図を生成
+            log(UserActivityLog):UserActivityLogクラスのインスタンス
             _err_output(MessageBox):エラーの出力
             _sub_flow_type_selector(pn.widgets.Select):サブフロー種別(フェーズ)
             _sub_flow_name_selector(pn.widgets.Select):サブフロー名称

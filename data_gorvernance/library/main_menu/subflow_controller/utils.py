@@ -1,24 +1,27 @@
+"""ガバナンスシート適用の操作モジュールです。
+
+このモジュールはガバナンスシートを適用するのに必要になる入力欄の設定、値の確認、
+ガバナンスシートを適用した後のファイル操作を行う関数があります。
+"""
+import datetime
 import json
 import os
 import shutil
-import datetime
 import zipfile
 from typing import Union, Optional
 
 import panel as pn
 
 from library.utils.config import path_config, message as msg_config, connect as con_config
-from library.utils.error import InputWarning
+from library.utils.error import InputWarning, UnusableVault
 from library.utils.nb_file import NbFile
-from library.utils.widgets import Button, MessageBox
-from library.utils import dg_web
-from library.utils.storage_provider import grdm
-from library.utils.vault import Vault
-from library.utils import file
-from library.utils.setting.research_flow_status import ResearchFlowStatusOperater
 from library.utils.setting.status import SubflowTask ,SubflowStatusFile
+from library.utils.storage_provider import grdm
 from library.utils.string import StringManager
-from library.utils.error import UnusableVault
+from library.utils import dg_web
+from library.utils import file
+from library.utils.vault import Vault
+from library.utils.widgets import Button
 
 
 def input_widget() -> Union[pn.widgets.PasswordInput, pn.widgets.TextInput]:
@@ -30,6 +33,7 @@ def input_widget() -> Union[pn.widgets.PasswordInput, pn.widgets.TextInput]:
     token_input = pn.widgets.PasswordInput(name=msg_config.get('main_menu', 'access_token_input'), visible=False)
     project_id_input = pn.widgets.TextInput(name=msg_config.get('main_menu', 'project_id_input'), visible=False)
     return token_input, project_id_input
+
 
 def create_float_panel() -> Union[pn.layout.FloatPanel, Button, Button]:
     """FloatPanelの設定をする関数です。
@@ -56,6 +60,7 @@ def create_float_panel() -> Union[pn.layout.FloatPanel, Button, Button]:
     )
     return float_panel, apply_button, cancel_button
 
+
 def get_project_id() -> Optional[str]:
     """プロジェクトIDを取得する関数です。
 
@@ -64,6 +69,7 @@ def get_project_id() -> Optional[str]:
     """
     grdm_connect = grdm.Grdm()
     return grdm_connect.get_project_id()
+
 
 def get_token() -> Optional[str]:
     """パーソナルアクセストークンを取得する関数です。
@@ -86,6 +92,7 @@ def get_token() -> Optional[str]:
         return None
     return token
 
+
 def get_govsheet_rf(abs_root: str) -> dict:
     """RFガバナンスシートを取得する関数です。
 
@@ -101,6 +108,7 @@ def get_govsheet_rf(abs_root: str) -> dict:
         with open(file_path, 'r') as f:
             govsheet_rf = json.load(f)
     return govsheet_rf
+
 
 def get_govsheet(token: str, base_url: str, project_id: str, remote_path: str) -> dict:
     """ガバナンスシートを取得する関数です。
@@ -120,6 +128,7 @@ def get_govsheet(token: str, base_url: str, project_id: str, remote_path: str) -
     )
     return govsheet
 
+
 def get_notebook_list(working_dir_path: str) -> list:
     """ディレクトリ配下のノートブックファイルを取得する関数です。
 
@@ -132,10 +141,11 @@ def get_notebook_list(working_dir_path: str) -> list:
     file_list = []
     for dirpath, dirname, filenames in os.walk(working_dir_path):
         for filename in filenames:
-            if filename.startswith('.ipynb'):
-                file_path = os.path.join(dirpath, dirname)
+            if filename.endswith('.ipynb'):
+                file_path = os.path.join(dirpath, filename)
                 file_list.append(file_path)
     return file_list
+
 
 def mapping_file(abs_root: str) -> dict:
     """jsonファイルを読み込みマッピングを行う処理を呼ぶ関数です。
@@ -157,6 +167,7 @@ def mapping_file(abs_root: str) -> dict:
         task_mapping = json.load(task)
     active_dict = task_map(task_mapping, govsheet_rf)
     return active_dict
+
 
 def task_map(mapping: dict, govsheet: dict) -> dict:
     """マッピングを行う関数です。
@@ -186,6 +197,7 @@ def task_map(mapping: dict, govsheet: dict) -> dict:
                 else:
                     new_dict[map_key] = map_value
     return new_dict
+
 
 def _copy_file_by_name(target_file: str, search_directory: str, destination_directory: str) -> None:
     """ 指定した名前のファイルを検索ディレクトリから目的のディレクトリにコピーする関数です。
@@ -218,6 +230,7 @@ def _copy_file_by_name(target_file: str, search_directory: str, destination_dire
             if not os.path.isdir(destination_images):
                 os.symlink(source_images, destination_images, target_is_directory=True)
 
+
 def update_status_file(abs_root: str, status_json_path: str):
     """RFガバナンスシートとtask_mapping.jsonのマッピング結果と依存タスクによってactiveフラグを切り替えるメソッドです。
 
@@ -237,6 +250,7 @@ def update_status_file(abs_root: str, status_json_path: str):
     update_dependent_task(dependent_id_list, sf_status.tasks)
     sf.write(sf_status)
 
+
 def update_flg(data: dict, tasks: list[SubflowTask]):
     """タスクの表示フラグを更新する関数です。
 
@@ -248,6 +262,7 @@ def update_flg(data: dict, tasks: list[SubflowTask]):
         for task in tasks:
             if task_id == task.id:
                 task.active = active_flg
+
 
 def get_dependent_id_list(tasks: list[SubflowTask]) -> list:
     """依存タスクが設定されているタスクのタスクIDを取得する関数です。
@@ -265,6 +280,7 @@ def get_dependent_id_list(tasks: list[SubflowTask]) -> list:
                 dependent_id_list.append(dependent_id)
     return dependent_id_list
 
+
 def update_dependent_task(dependent_list: list, tasks: list[SubflowTask]):
     """依存タスクのactiveフラグをTrueにする関数です。
 
@@ -276,6 +292,7 @@ def update_dependent_task(dependent_list: list, tasks: list[SubflowTask]):
         for dependent_id in dependent_list:
             if task.id == dependent_id:
                 task.active = True
+
 
 def check_grdm_access(base_url: str, token: str, project_id: str) -> bool:
     """アクセス権限のチェックを行う関数です。
@@ -291,6 +308,7 @@ def check_grdm_access(base_url: str, token: str, project_id: str) -> bool:
     grdm_connect = grdm.Grdm()
     return grdm_connect.check_permission(base_url, token, project_id)
 
+
 def check_grdm_token(base_url: str, token: str) -> bool:
     """パーソナルアクセストークンのアクセス権限をチェックを行う関数です。
 
@@ -304,6 +322,7 @@ def check_grdm_token(base_url: str, token: str) -> bool:
     grdm_connect = grdm.Grdm()
     return grdm_connect.check_authorization(base_url, token)
 
+
 def backup_zipfile(abs_root: str, research_flow_dict: dict, current_time: str):
     """サブフローのファイル群をzip化する関数です。
 
@@ -316,24 +335,24 @@ def backup_zipfile(abs_root: str, research_flow_dict: dict, current_time: str):
         abs_root, path_config.DG_IMAGES_FOLDER
     )
     for phase_name, subflow_data in research_flow_dict.items():
-        for sub_flow_id, sub_flow_name in subflow_data.items():
-            zip_file_path = get_zipfile_path(abs_root, phase_name, sub_flow_id, current_time)
-            working_path = get_working_path(abs_root, phase_name, sub_flow_id)
-            menu_notebook_path = os.path.join(abs_root, path_config.DATA_GOVERNANCE, path_config.get_sub_flow_menu_path(phase_name, sub_flow_id))
-            status_json_path = os.path.join(abs_root, path_config.get_sub_flow_status_file_path(phase_name, sub_flow_id))
-            os.makedirs(os.path.dirname(zip_file_path), exist_ok=True)
-            notebook_list = get_notebook_list(working_path)
+        zip_file_path = get_zipfile_path(abs_root, phase_name, subflow_data['id'], current_time)
+        working_path = get_working_path(abs_root, phase_name, subflow_data['id'])
+        menu_notebook_path = os.path.join(abs_root, path_config.DATA_GOVERNANCE, path_config.get_sub_flow_menu_path(phase_name, subflow_data['id']))
+        status_json_path = os.path.join(abs_root, path_config.get_sub_flow_status_file_path(phase_name, subflow_data['id']))
+        os.makedirs(os.path.dirname(zip_file_path), exist_ok=True)
+        notebook_list = get_notebook_list(working_path)
 
-            with zipfile.ZipFile(zip_file_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-                for file in os.listdir(image_folder):
-                    file_path = os.path.join(image_folder, file)
-                    if os.path.isfile(file_path):
-                        zip_path = os.path.join(path_config.IMAGES, file)
-                        zipf.write(file_path, zip_path)
-                zipf.write(menu_notebook_path, arcname=os.path.basename(menu_notebook_path))
-                zipf.write(status_json_path, arcname=os.path.basename(status_json_path))
-                for notebook in notebook_list:
-                    zipf.write(notebook, arcname=os.path.basename(notebook))
+        with zipfile.ZipFile(zip_file_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            for file in os.listdir(image_folder):
+                file_path = os.path.join(image_folder, file)
+                if os.path.isfile(file_path):
+                    zip_path = os.path.join(path_config.IMAGES, file)
+                    zipf.write(file_path, zip_path)
+            zipf.write(menu_notebook_path, arcname=os.path.basename(menu_notebook_path))
+            zipf.write(status_json_path, arcname=os.path.basename(status_json_path))
+            for notebook in notebook_list:
+                zipf.write(notebook, arcname=os.path.basename(notebook))
+
 
 def get_govsheet_rf_path(abs_root: str) -> str:
     """RFガバナンスシートのパスを取得する関数です。
@@ -349,6 +368,7 @@ def get_govsheet_rf_path(abs_root: str) -> str:
         path_config.DG_RESEARCHFLOW_FOLDER,
         '.gov-sheet-rf'
     )
+
 
 def get_zipfile_path(abs_root: str, phase_name: str, sub_flow_id: str, current_time: str) -> str:
     """サブフローファイル群のバックアップ先のパスを取得する関数です。
@@ -370,6 +390,7 @@ def get_zipfile_path(abs_root: str, phase_name: str, sub_flow_id: str, current_t
         f'{current_time}.zip'
     )
 
+
 def get_working_path(abs_root: str, phase_name: str, subflow_id: str) -> str:
     """workingファイルのパスを取得する関数です。
 
@@ -389,6 +410,7 @@ def get_working_path(abs_root: str, phase_name: str, subflow_id: str) -> str:
         path_config.TASK
     )
 
+
 def get_schema() -> dict:
     """スキーマを取得する関数です。
 
@@ -400,6 +422,7 @@ def get_schema() -> dict:
     dgwebapi = dg_web.Api()
     schema = dgwebapi.get_govsheet_schema(dg_web_url)
     return schema
+
 
 def get_default_govsheet(schema: dict) -> dict:
     """デフォルトのガバナンスシートを作成する関数です。
@@ -415,6 +438,7 @@ def get_default_govsheet(schema: dict) -> dict:
         schema_value = get_schema_value(value)
         default_govsheet[key] = schema_value
     return default_govsheet
+
 
 def get_schema_value(value: dict) -> dict:
     """各valueのdefaultの値を設定する関数です。
@@ -438,6 +462,7 @@ def get_schema_value(value: dict) -> dict:
             value_dict[key] = value['default']
     return value_dict
 
+
 def validate_input_token(input_value: str):
     """トークンの入力チェックをする関数です。
 
@@ -455,6 +480,7 @@ def validate_input_token(input_value: str):
         message = msg_config.get('main_menu', 'token_pattern_error')
         raise InputWarning(message)
 
+
 def validate_input_project_id(input_value: str):
     """プロジェクトIDの入力チェックをする関数です。
 
@@ -471,6 +497,7 @@ def validate_input_project_id(input_value: str):
     if not StringManager.is_half(input_value):
         message = msg_config.get('main_menu', 'project_id_pattern_error')
         raise InputWarning(message)
+
 
 def prepare_new_subflow_data(abs_root: str, phase_name: str, new_sub_flow_id: str, sub_flow_name: str, flg: bool):
     """新しいサブフローのデータを用意するメソッドです。
@@ -516,6 +543,7 @@ def prepare_new_subflow_data(abs_root: str, phase_name: str, new_sub_flow_id: st
         shutil.rmtree(dect_dir_path)
         raise
 
+
 def backup_govsheet_rf_file(abs_root :str, govsheet_rf_path: str, current_time: str):
     """RFガバナンスシートのバックアップを取る関数です。
 
@@ -533,6 +561,7 @@ def backup_govsheet_rf_file(abs_root :str, govsheet_rf_path: str, current_time: 
     )
     file.copy_file(govsheet_rf_path, backup_file_path)
 
+
 def preparation_notebook_file(abs_root: str, status_path_json: str, working_path: str):
     """status.jsonのactiveがTrueのタスクのnotebookファイルをコピーする関数です。
 
@@ -548,6 +577,7 @@ def preparation_notebook_file(abs_root: str, status_path_json: str, working_path
     for task in read_status_file.tasks:
         if task.active == True:
             _copy_file_by_name(task.name, task_dir, working_path)
+
 
 def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, govsheet: dict, research_flow_dict: dict):
     """サブフローを作り直す関数です。
@@ -584,6 +614,7 @@ def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, go
             prepare_new_subflow_data(abs_root, phase_name, subflow_id, subflow_name, True)
             update_status_file(abs_root, status_json_path)
             preparation_notebook_file(abs_root, status_json_path, working_path)
+
 
 def get_sync_path(abs_root: str) -> list:
     """data_governance/researchflow、data_governance/log以下のディレクトリ/ファイルのパスを取得する関数です。

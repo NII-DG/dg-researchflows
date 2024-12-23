@@ -4,7 +4,6 @@
 """
 import os
 import traceback
-import datetime
 import json
 
 from IPython.core.display import Javascript
@@ -12,14 +11,15 @@ from IPython.display import display
 import panel as pn
 from requests.exceptions import RequestException
 
+from library.task_director import TaskDirector
 from library.utils.config import path_config, message as msg_config, connect as con_config
-from library.utils.error import InputWarning, UnusableVault, ProjectNotExist, RepoPermissionError, UnauthorizedError
-from library.utils.string import StringManager
+from library.utils.error import InputWarning, UnusableVault, ProjectNotExist, UnauthorizedError
 from library.utils.html import button as html_button
-from library.utils import file
-from library.utils.storage_provider import grdm
+from library.utils.string import StringManager
 from library.utils.log import TaskLog
+from library.utils.storage_provider import grdm
 from library.utils.setting import ResearchFlowStatusOperater, SubflowStatusFile
+from library.utils import file
 from library.utils.vault import Vault
 from library.utils.widgets import MessageBox, Button
 from library.main_menu.subflow_controller import (
@@ -52,8 +52,26 @@ class MainMenu(TaskLog):
             _project_widget_box(pn.WidgetBox):サブフロー操作コントローラーウェジットボックス
             _sub_flow_menu(pn.widgets.Select):サブフローメニュー
             _sub_flow_widget_box(pn.WidgetBox):サブフロー操作コントローラーウェジットボックス
+            grdm(Grdm):grdmファイルのGrdmクラス
+            grdm_url(str):GRDMのクラス
+            remote_path(str):リモート先のパス
+            govsheet_rf_path(str):RFガバナンスシートのパス
+            research_flow_widget_box(pn.WidgetBox):ガバナンスシート適用ウィジェットボックス
+            research_flow_message(MessageBox):ガバナンスシート適用メッセージオブジェクト
+            apply_govsheet_button(Button):ガバナンスシート適用ボタン
+            token_input(pn.widgets.PasswordInput):パーソナルアクセストークンの入力欄
+            project_id_input(pn.widgets.TextInput):プロジェクトIDの入力欄
+            input_button(Button):確定ボタン
+            float_panel(pn.layout.FloatPanel):FloatPanel
+            apply_button(Button):適用するボタン
+            cancel_button(Button):適用しないボタン
+            token(str):パーソナルアクセストークン
+            project_id(str):プロジェクトID
             callback_type(str):呼び出すメソッドのタイプ
             subflow_form(CreateSubflowForm | RelinkSubflowForm | RenameSubflowForm | DeleteSubflowForm):サブフローのフォーム
+            govsheet_rf(dict):RFガバナンスシートの内容
+            research_flow_dict(dict):存在するフェーズをkeyとし対応するサブフローIDとサブフロー名をvalueとした辞書
+            govsheet(dict):ガバナンスシートの内容
 
     NOTE:
     Called from data_gorvernance/researchflow/main.ipynb
@@ -356,8 +374,9 @@ class MainMenu(TaskLog):
         )
         self.research_flow_widget_box.append(input_layout)
 
+    @TaskDirector.callback_form('ガバナンスシートを適用する')
     def apply_click(self, event):
-        """ガバナンスシート適用ボタンを押下してガバナンスシートを適用するメソッドです。
+        """ガバナンスシート適用ボタンを押下されたときにガバナンスシートを適用するメソッドです。
 
         Args:
             event: ボタンクリックイベント
@@ -393,10 +412,6 @@ class MainMenu(TaskLog):
                     self.project_id_input.visible = True
             self.display_input_box()
 
-        except UnusableVault:
-            message = msg_config.get('form', 'no_vault')
-            self.research_flow_message.update_error(message)
-            self.log.error(f'{message}\n{traceback.format_exc()}')
         except UnauthorizedError:
             message = msg_config.get('form', 'token_unauthorized')
             self.research_flow_message.update_warning(message)
@@ -436,22 +451,23 @@ class MainMenu(TaskLog):
         except InputWarning as e:
             self.input_button.visible = False
             self.research_flow_message.update_warning(str(e))
-            raise
 
     def callback_input_button(self, event):
-        """パーソナルアクセストークン及びプロジェクトIDを入力してガバナンスシート適用をするメソッドです。
+        """入力されたパーソナルアクセストークン及びプロジェクトIDでガバナンスシート適用をするメソッドです。
 
         Args:
             event: クリックイベント
         """
         self.input_button.set_looks_processing()
 
-        if not self.token_input.value_input:
-            self.research_flow_message.update_warning(msg_config.get('main_menu', 'not_input_token'))
-            return
-        if not self.project_id_input.value_input:
-            self.research_flow_message.update_warning(msg_config.get('main_menu', 'not_input_project_id'))
-            return
+        if self.token_input.visible:
+            if not self.token_input.value_input:
+                self.research_flow_message.update_warning(msg_config.get('main_menu', 'not_input_token'))
+                return
+        if self.project_id_input.visible:
+            if not self.project_id_input.value_input:
+                self.research_flow_message.update_warning(msg_config.get('main_menu', 'not_input_project_id'))
+                return
 
         try:
             vault = Vault()
@@ -502,6 +518,14 @@ class MainMenu(TaskLog):
             message = msg_config.get('form', 'no_vault')
             self.research_flow_message.update_error(message)
             self.log.error(f'{message}\n{traceback.format_exc()}')
+        except UnauthorizedError:
+            message = msg_config.get('form', 'token_unauthorized')
+            self.research_flow_message.update_warning(message)
+            self.log.warning(f'{message}\n{traceback.format_exc()}')
+        except ProjectNotExist:
+            message = msg_config.get('form', 'project_id_not_exist').format(project_id)
+            self.research_flow_message.update_error(message)
+            self.log.error(f'{message}\n{traceback.format_exc()}')
         except Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
             self.research_flow_message.update_error(message)
@@ -510,6 +534,7 @@ class MainMenu(TaskLog):
     def operation_file(self):
         """ガバナンスシートを適用して必要なファイルを用意するメソッドです。"""
         self.research_flow_message.clear()
+        self.input_button.visible = False
         self.govsheet_rf = utils.get_govsheet_rf(self.abs_root)
         self.research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
 

@@ -5,20 +5,19 @@
 import json
 import os
 import traceback
-import datetime
 
 from dg_drawer.research_flow import PhaseStatus
 import panel as pn
 from requests.exceptions import RequestException
 
-from library.utils import file
 from library.utils.config import path_config, message as msg_config, connect as con_config
-from library.utils.error import InputWarning, UnusableVault, ProjectNotExist, RepoPermissionError, UnauthorizedError
-from library.utils.string import StringManager
-from library.utils.widgets import MessageBox, Button
-from library.main_menu.subflow_controller import utils
+from library.utils.error import InputWarning, UnusableVault, ProjectNotExist, UnauthorizedError
 from library.utils.storage_provider import grdm
+from library.utils.string import StringManager
+from library.utils import file
 from library.utils.vault import Vault
+from library.utils.widgets import MessageBox
+from library.main_menu.subflow_controller import utils
 from .base import BaseSubflowForm
 
 
@@ -28,6 +27,17 @@ class CreateSubflowForm(BaseSubflowForm):
     Attributes:
         instance:
             abs_root (str): リサーチフローのルートディレクトリ
+            grdm(Grdm):grdmファイルのGrdmクラス
+            grdm_url(str):GRDMのURL
+            remote_path(str):リモート先のパス
+            _sub_flow_widget_box(pn.WidgetBox):サブフロー操作コントローラーウェジットボックス
+            govsheet_rf_path(str):RFガバナンスシートのパス
+            token_input(pn.widgets.PasswordInput):パーソナルアクセストークンの入力欄
+            project_id_input(pn.widgets.TextInput):プロジェクトIDの入力欄
+            float_panel(pn.layout.FloatPanel):FloatPanel
+            apply_button(Button):適用するボタン
+            cancel_button(Button):適用しないボタン
+            research_flow_dict(dict):存在するフェーズをkeyとし対応するサブフローIDとサブフロー名をvalueとした辞書
             submit_button(Button):ボタンの設定
             reserch_flow_status_operater(ResearchFlowStatusOperater):リサーチフロー図を生成
             _sub_flow_type_selector(pn.widgets.Select):サブフロー種別(フェーズ)
@@ -36,6 +46,10 @@ class CreateSubflowForm(BaseSubflowForm):
             _parent_sub_flow_selector(pn.widgets.Select):親サブフロー選択
             _sub_flow_name_form(TextInput):サブフロー名のフォーム
             _data_dir_name_form(TextInput):データディレクトリ名のフォーム
+            token(str):パーソナルアクセストークン
+            project_id(str):プロジェクトID
+            govsheet_rf(dict):RFガバナンスシートの内容
+            govsheet(dict):ガバナンスシートの内容
     """
 
     def __init__(self, abs_root: str, widget_box: pn.WidgetBox, message_box: MessageBox) -> None:
@@ -158,14 +172,17 @@ class CreateSubflowForm(BaseSubflowForm):
         except UnauthorizedError:
             message = msg_config.get('form', 'token_unauthorized')
             self._err_output.update_warning(message)
+            self.log.warning(f'{message}\n{traceback.format_exc()}')
             return
         except RequestException as e:
             message = msg_config.get('DEFAULT', 'connection_error')
             self._err_output.update_error(f'{message}\n{str(e)}')
+            self.log.error(f'{message}\n{traceback.format_exc()}')
             return
         except Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
             self._err_output.update_error(message)
+            self.log.error(message)
             return
         finally:
             govsheet_file.remove(missing_ok=True)

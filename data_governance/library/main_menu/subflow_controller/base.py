@@ -202,7 +202,7 @@ class BaseSubflowForm():
         pahse_options = {}
         pahse_options['--'] = 0
         if pahase_seq_number == 0:
-            return phase_options
+            return pahse_options
         else:
             for phase_status in research_flow_status:
                 if phase_status._seq_number < pahase_seq_number:

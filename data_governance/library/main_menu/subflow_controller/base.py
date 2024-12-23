@@ -150,16 +150,16 @@ class BaseSubflowForm():
             dict: フェーズ表示名を返す。
         """
         # サブフロー種別(フェーズ)オプション(表示名をKey、順序値をVauleとする)
-        pahse_options = {}
-        pahse_options['--'] = 0
+        phase_options = {}
+        phase_options['--'] = 0
         for phase_status in research_flow_status:
             # planは選択させない
             if phase_status._seq_number == 1:
                 continue
             # サブフローのあるフェーズのみ
             if len(phase_status._sub_flow_data) > 0:
-                pahse_options[msg_config.get('research_flow_phase_display_name', phase_status._name)] = phase_status._seq_number
-        return pahse_options
+                phase_options[msg_config.get('research_flow_phase_display_name', phase_status._name)] = phase_status._seq_number
+        return phase_options
 
     def generate_sub_flow_name_options(
         self, phase_seq_number: int, research_flow_status: list[PhaseStatus]
@@ -187,35 +187,35 @@ class BaseSubflowForm():
         return name_options
 
     def generate_parent_sub_flow_type_options(
-        self, pahase_seq_number: int, research_flow_status: list[PhaseStatus]
+        self, phase_seq_number: int, research_flow_status: list[PhaseStatus]
     ) -> dict[str, int]:
         """親サブフロー種別を表示するメソッドです。
 
         Args:
-            pahase_seq_number (int): 親サブフロー種別
+            phase_seq_number (int): 親サブフロー種別
             research_flow_status (list[PhaseStatus]): リサーチフローステータス管理情報
 
         Returns:
             dict: 親サブフロー種別の値
         """
         # 親サブフロー種別(フェーズ)オプション(表示名をKey、順序値をVauleとする)
-        pahse_options = {}
-        pahse_options['--'] = 0
-        if pahase_seq_number == 0:
-            return pahse_options
+        phase_options = {}
+        phase_options['--'] = 0
+        if phase_seq_number == 0:
+            return phase_options
         else:
             for phase_status in research_flow_status:
-                if phase_status._seq_number < pahase_seq_number:
-                    pahse_options[msg_config.get('research_flow_phase_display_name', phase_status._name)] = phase_status._seq_number
-        return pahse_options
+                if phase_status._seq_number < phase_seq_number:
+                    phase_options[msg_config.get('research_flow_phase_display_name', phase_status._name)] = phase_status._seq_number
+        return phase_options
 
     def generate_parent_sub_flow_options(
-        self, pahase_seq_number: int, research_flow_status: list[PhaseStatus]
+        self, phase_seq_number: int, research_flow_status: list[PhaseStatus]
     ) -> dict[str, str]:
         """親サブフロー選択オプションで選択した値を表示するメソッドです。
 
         Args:
-            pahase_seq_number (int): 親サブフロー選択オプション
+            phase_seq_number (int): 親サブフロー選択オプション
             research_flow_status (list[PhaseStatus]): リサーチフローステータス管理情報
 
         Returns:
@@ -223,15 +223,15 @@ class BaseSubflowForm():
         """
         # 親サブフロー選択オプション(表示名をKey、サブフローIDをVauleとする)
         # createとrelinkで用いる
-        pahse_options = {}
-        if pahase_seq_number == 0:
-            return pahse_options
+        phase_options = {}
+        if phase_seq_number == 0:
+            return phase_options
         else:
             for phase_status in research_flow_status:
-                if phase_status._seq_number == pahase_seq_number:
+                if phase_status._seq_number == phase_seq_number:
                     for sf in phase_status._sub_flow_data:
-                        pahse_options[sf._name] = sf._id
-        return pahse_options
+                        phase_options[sf._name] = sf._id
+        return phase_options
 
     def change_submit_button_init(self, name: str):
         """処理開始ボタンのメソッドです。

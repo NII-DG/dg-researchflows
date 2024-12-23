@@ -335,23 +335,24 @@ def backup_zipfile(abs_root: str, research_flow_dict: dict, current_time: str):
         abs_root, path_config.DG_IMAGES_FOLDER
     )
     for phase_name, subflow_data in research_flow_dict.items():
-        zip_file_path = get_zipfile_path(abs_root, phase_name, subflow_data['id'], current_time)
-        working_path = get_working_path(abs_root, phase_name, subflow_data['id'])
-        menu_notebook_path = os.path.join(abs_root, path_config.DATA_GOVERNANCE, path_config.get_sub_flow_menu_path(phase_name, subflow_data['id']))
-        status_json_path = os.path.join(abs_root, path_config.get_sub_flow_status_file_path(phase_name, subflow_data['id']))
-        os.makedirs(os.path.dirname(zip_file_path), exist_ok=True)
-        notebook_list = get_notebook_list(working_path)
+        for subflow_id in subflow_data:
+            zip_file_path = get_zipfile_path(abs_root, phase_name, subflow_id, current_time)
+            working_path = get_working_path(abs_root, phase_name, subflow_id)
+            menu_notebook_path = os.path.join(abs_root, path_config.DATA_GOVERNANCE, path_config.get_sub_flow_menu_path(phase_name, subflow_id))
+            status_json_path = os.path.join(abs_root, path_config.get_sub_flow_status_file_path(phase_name, subflow_id))
+            os.makedirs(os.path.dirname(zip_file_path), exist_ok=True)
+            notebook_list = get_notebook_list(working_path)
 
-        with zipfile.ZipFile(zip_file_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-            for file in os.listdir(image_folder):
-                file_path = os.path.join(image_folder, file)
-                if os.path.isfile(file_path):
-                    zip_path = os.path.join(path_config.IMAGES, file)
-                    zipf.write(file_path, zip_path)
-            zipf.write(menu_notebook_path, arcname=os.path.basename(menu_notebook_path))
-            zipf.write(status_json_path, arcname=os.path.basename(status_json_path))
-            for notebook in notebook_list:
-                zipf.write(notebook, arcname=os.path.basename(notebook))
+            with zipfile.ZipFile(zip_file_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+                for file in os.listdir(image_folder):
+                    file_path = os.path.join(image_folder, file)
+                    if os.path.isfile(file_path):
+                        zip_path = os.path.join(path_config.IMAGES, file)
+                        zipf.write(file_path, zip_path)
+                zipf.write(menu_notebook_path, arcname=os.path.basename(menu_notebook_path))
+                zipf.write(status_json_path, arcname=os.path.basename(status_json_path))
+                for notebook in notebook_list:
+                    zipf.write(notebook, arcname=os.path.basename(notebook))
 
 
 def get_govsheet_rf_path(abs_root: str) -> str:

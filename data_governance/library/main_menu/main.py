@@ -460,21 +460,24 @@ class MainMenu(TaskLog):
 
         if self.token_input.visible:
             if not self.token_input.value_input:
+                self.input_button.set_looks_init()
                 self.research_flow_message.update_warning(msg_config.get('main_menu', 'not_input_token'))
                 return
         if self.project_id_input.visible:
             if not self.project_id_input.value_input:
+                self.input_button.set_looks_init()
                 self.research_flow_message.update_warning(msg_config.get('main_menu', 'not_input_project_id'))
                 return
 
         try:
             vault = Vault()
             if self.token_input.value_input and self.project_id_input.value_input:
+                self.tmp_project_id = self.project_id_input.value_input
                 if utils.check_grdm_token(self.grdm_url, self.token_input.value_input):
                     vault.set_value('grdm_token', self.token_input.value_input)
-                    if utils.check_grdm_access(self.grdm_url, self.token_input.value_input, self.project_id_input.value_input):
+                    if utils.check_grdm_access(self.grdm_url, self.token_input.value_input, self.tmp_project_id):
                         self.token = self.token_input.value_input
-                        self.project_id = self.project_id_input.value_input
+                        self.project_id = self.tmp_project_id
                         self.token_input.visible = False
                         self.project_id_input.visible = False
                         self.operation_file()
@@ -489,8 +492,9 @@ class MainMenu(TaskLog):
             elif self.token_input.value_input:
                 if utils.check_grdm_token(self.grdm_url, self.token_input.value_input):
                     vault.set_value('grdm_token', self.token_input.value_input)
-                    if utils.check_grdm_access(self.grdm_url, self.token_input.value_input, self.project_id):
+                    if utils.check_grdm_access(self.grdm_url, self.token_input.value_input, self.tmp_project_id):
                         self.token = self.token_input.value_input
+                        self.project_id = self.tmp_project_id
                         self.token_input.visible = False
                         self.operation_file()
                     else:
@@ -502,8 +506,9 @@ class MainMenu(TaskLog):
                     self.display_input_box()
                     return
             else:
-                if not utils.check_grdm_access(self.grdm_url, self.token, self.project_id_input.value_input):
-                    self.project_id = self.project_id_input.value_input
+                self.tmp_project_id = self.project_id_input.value_input
+                if utils.check_grdm_access(self.grdm_url, self.token, self.tmp_project_id):
+                    self.project_id = self.tmp_project_id
                     self.token_input.visible = False
                     self.project_id_input.visible = False
                     self.operation_file()
@@ -521,7 +526,7 @@ class MainMenu(TaskLog):
             self.research_flow_message.update_warning(message)
             self.log.warning(f'{message}\n{traceback.format_exc()}')
         except ProjectNotExist:
-            message = msg_config.get('form', 'project_id_not_exist').format(self.project_id_input.value_input)
+            message = msg_config.get('form', 'project_id_not_exist').format(self.tmp_project_id)
             self.research_flow_message.update_error(message)
             self.log.error(f'{message}\n{traceback.format_exc()}')
         except Exception:
@@ -589,7 +594,7 @@ class MainMenu(TaskLog):
             return
         self.research_flow_message.update_success(msg_config.get('main_menu', 'success_govsheet'))
 
-    @TaskDirector.callback_form('デフォルトでガバナンスシートを作成する')
+    @TaskLog.callback_form('デフォルトでガバナンスシートを作成する')
     def callback_apply_button(self, event):
         """デフォルトのガバナンスシートで登録するメソッドです。
 

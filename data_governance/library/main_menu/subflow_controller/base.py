@@ -51,7 +51,7 @@ class BaseSubflowForm(TaskLog):
         )
 
         nb_working_file = os.path.join(self.abs_root, path_config.MAIN_MENU_PATH)
-        super().__init__(working_file, nb_working_file)
+        super().__init__(nb_working_file, path_config.MAIN_MENU_PATH)
 
         # リサーチフローステータス管理情報の取得
         research_flow_status = self.reserch_flow_status_operater.load_research_flow_status()

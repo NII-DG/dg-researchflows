@@ -1,0 +1,282 @@
+"""Vaultサーバーへの接続のモジュールです。
+
+このモジュールはVaultサーバーに接続するために必要な値の設定とチェックを行い、キーやポリシーを作成してサーバーを起動させ、接続確認を行うメソッドがあります。
+"""
+import os
+import subprocess
+import time
+from typing import Optional
+
+import hvac
+import requests
+
+from .error import UnusableVault
+
+
+VAULT_ADDR = 'http://127.0.0.1:8200'
+TOKEN_PATH = '/home/jovyan/.vault/token'
+UNSEAL_KEY_PATH = '/home/jovyan/.vault/unseal_key'
+DG_ENGINE_NAME = 'dg-kv'
+DG_POLICY_NAME = 'dg-policy'
+DG_POLICY = '''\
+path "dg-kv/*" {
+    capabilities = [ "create", "read", "update", "delete", "list" ]
+}
+'''
+TOKEN_TTL = '1m'
+MAX_RETRY_COUNT = 5
+
+
+class Vault():
+    """Vault Server操作クラスです。"""
+
+    def initialize(self):
+        """Vaultの初期化を行うメソッドです。"""
+        try:
+            self.__read_token()
+            # tokenが存在する（初期化済み）でサーバーが停止している場合は再起動
+            if not self.__is_vault_process_running():
+                self.__restart_server()
+            return
+        except UnusableVault:
+            pass
+
+        self.__start_server()
+
+        self.__create_dg_engine()
+        self.__create_dg_policy()
+
+    def set_value(self, key: str, value: str):
+        """値の設定をするメソッドです。
+
+        Args:
+            key(str): トークンをvaultで保存するときのキー
+            value(str): vaultに保存する値
+        """
+        client = self.__get_client()
+        client.secrets.kv.v1.create_or_update_secret(
+            path=key,
+            secret=dict(secret=value),
+            mount_point=DG_ENGINE_NAME,
+        )
+
+    def has_value(self, key: str) -> bool:
+        """値の存在チェックをするメソッドです。
+
+        Args:
+            key(str): トークンをvaultで保存するときのキー
+
+        Returns:
+            bool: 指定された値が存在する場合はTrueを返し、存在しない場合はFalseを返す。
+        """
+        client = self.__get_client()
+        try:
+            secrets = client.secrets.kv.v1.list_secrets(
+                path='',
+                mount_point=DG_ENGINE_NAME,
+            )
+        except hvac.exceptions.InvalidPath:
+            # キーが1つも存在しない場合
+            return False
+        return key in secrets['data']['keys']
+
+    def get_value(self, key: str) -> Optional[str]:
+        """値の取得をするメソッドです。
+
+        Args:
+            key(str): トークンをvaultで保存するときのキー
+
+        Returns:
+            Optional[str]: 取得した値を返す。値がない場合はNoneを返す。
+        """
+        if not self.has_value(key):
+            return None
+
+        client = self.__get_client()
+        read_res = client.secrets.kv.v1.read_secret(
+            path=key,
+            mount_point=DG_ENGINE_NAME,
+        )
+        return read_res['data']['secret']
+
+    def __launch_server(self):
+        """サーバーを起動するメソッドです。"""
+        config_path = os.path.join(
+            os.environ['HOME'], 'data_governance/library/data/vault-config.hcl')
+        dir_path = os.path.join(os.environ['HOME'], '.vault/log')
+        os.makedirs(dir_path, exist_ok=True)
+        with open(os.path.join(dir_path, 'vault.log'), 'w') as file:
+            subprocess.Popen(
+                ['setsid', 'vault', 'server', '-config', config_path],
+                stdout=file,
+                stderr=file
+            )
+
+    def __start_server(self):
+        """Vaultサーバーを起動するメソッドです。
+
+        Raises:
+            UnusableVault: vaultが利用できない場合のエラー
+
+        """
+        # vaultサーバー起動
+        self.__launch_server()
+        # 起動処理が終わるまで少し待機
+        time.sleep(1)
+
+        shares = 5
+        threshold = 3
+        client = hvac.Client(url=VAULT_ADDR)
+
+        # サーバー初期化
+        retry_count = 0
+        while True:
+            try:
+                result = client.sys.initialize(shares, threshold)
+                break
+            except requests.ConnectionError:
+                retry_count = retry_count + 1
+            if retry_count >= MAX_RETRY_COUNT:
+                # 規定回数以上失敗した場合はエラーとする
+                raise UnusableVault
+            # 起動がまだ完了していない可能性があるので少し待機
+            time.sleep(1)
+
+        # unseal
+        unseal_keys = result['keys']
+        for index in range(threshold):
+            client.sys.submit_unseal_key(unseal_keys[index])
+
+        # unsealキーを保存
+        self.__write_unseal_key(unseal_keys)
+
+        # root token保存
+        root_token = result['root_token']
+        self.__write_token(root_token)
+
+    def __restart_server(self):
+        """vaultサーバーを初期化せずに再起動するメソッドです。
+
+        Raises:
+            requests.exceptions.RequestException: vaultサーバーへのリクエスト中に発生したエラー
+
+        """
+        # vaultサーバー起動
+        self.__launch_server()
+        # 起動処理が終わるまで少し待機
+        time.sleep(1)
+
+        # unsealキーを取得
+        with open(UNSEAL_KEY_PATH, 'r') as f:
+            unseal_keys = [line.strip() for line in f.readlines()]
+
+        client = hvac.Client(url=VAULT_ADDR)
+        # unseal
+        retry_count = 0
+        while retry_count < MAX_RETRY_COUNT:
+            try:
+                for unseal_key in unseal_keys:
+                    client.sys.submit_unseal_key(unseal_key)
+                break
+
+            except requests.exceptions.RequestException:
+                retry_count += 1
+                time.sleep(1)
+        else:
+            raise requests.exceptions.RequestException
+
+    def __create_dg_engine(self):
+        """シークレットエンジン(kv)作成をするメソッドです。"""
+        token = self.__read_token()
+        client = hvac.Client(url=VAULT_ADDR, token=token)
+
+        secrets_engines = client.sys.list_mounted_secrets_engines()['data']
+        if f'{DG_ENGINE_NAME}/' not in secrets_engines:
+            client.sys.enable_secrets_engine(
+                backend_type='kv',
+                path=DG_ENGINE_NAME,
+                description='kv for data governance'
+            )
+
+    def __create_dg_policy(self):
+        """ポリシー作成をするメソッドです。"""
+        token = self.__read_token()
+        client = hvac.Client(url=VAULT_ADDR, token=token)
+
+        policies = client.sys.list_policies()['data']['policies']
+        if DG_POLICY_NAME not in policies:
+            client.sys.create_or_update_policy(
+                name=DG_POLICY_NAME,
+                policy=DG_POLICY,
+            )
+
+    def __write_token(self, token: str):
+        """ルートトークンを保存するメソッドです。
+
+        Args:
+            token(str):ルートトークン
+
+        """
+        with open(TOKEN_PATH, 'w') as f:
+            f.write(token)
+
+    def __write_unseal_key(self, unseal_keys: list):
+        """アンシールキーを保存するメソッドです。
+
+        Args:
+            unseal_keys(list): シール状態を解除するのに使用する鍵
+
+        """
+        with open(UNSEAL_KEY_PATH, 'w') as f:
+            for key in unseal_keys:
+                f.write(key + '\n')
+
+    def __read_token(self) -> str:
+        """ルートトークンを取得するメソッドです。
+
+        Raises:
+            UnusableVault:vaultが利用できないエラー
+
+        Returns:
+            str:ルートトークンの値を返す。
+        """
+        if not os.path.isfile(TOKEN_PATH):
+            raise UnusableVault
+
+        with open(TOKEN_PATH, 'r') as f:
+            root_token = f.read()
+
+        return root_token
+
+    def __is_vault_process_running(self) -> bool:
+        """vaultのプロセスが実行中であるかを確認するメソッドです。"""
+        try:
+            result = subprocess.run(
+                ['pgrep', '-f', 'vault'], check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+            # vaultのプロセスが実行中
+            return result.returncode == 0
+
+        except subprocess.CalledProcessError:
+            return False
+
+    def __get_client(self) -> hvac.Client:
+        """vaultに接続するためのクライアントを取得するメソッドです。
+
+        Returns:
+            hvac.Client: vaultサーバーのクライアント
+        """
+        root_token = self.__read_token()
+
+        if not self.__is_vault_process_running():
+            self.__restart_server()
+
+        client = hvac.Client(url=VAULT_ADDR, token=root_token)
+        token_res = client.auth.token.create(
+            policies=[DG_POLICY_NAME],
+            ttl=TOKEN_TTL,
+        )
+        token = token_res['auth']['client_token']
+        return hvac.Client(url=VAULT_ADDR, token=token)

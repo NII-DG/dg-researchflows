@@ -83,11 +83,11 @@ RUN pip install --no-cache nbclassic==0.4.8
 
 # install vcpsdk
 RUN wget https://s3-ap-northeast-1.amazonaws.com/vcp-jupyternotebook/23.11.0/jupyternotebook_vcpsdk-23.11.0.tgz
-RUN mkdir -p ~/data_gorvernance/library/vcp
-RUN tar zxvf jupyternotebook_vcpsdk-23.11.0.tgz -C ~/data_gorvernance/library/vcp/
+RUN mkdir -p ~/data_governance/library/vcp
+RUN tar zxvf jupyternotebook_vcpsdk-23.11.0.tgz -C ~/data_governance/library/vcp/
 RUN rm jupyternotebook_vcpsdk-23.11.0.tgz
 RUN pip install --no-cache vrplib==1.3.0
-ENV PYTHONPATH "${PYTHONPATH}:/home/jovyan/data_gorvernance/library/vcp/vcpsdk"
+ENV PYTHONPATH "${PYTHONPATH}:/home/jovyan/data_governance/library/vcp/vcpsdk"
 
 ARG NB_USER=jovyan
 ARG NB_UID=1000
@@ -95,7 +95,7 @@ ARG NB_UID=1000
 RUN rm -rf ${HOME}/work
 
 # library path
-ENV PYTHONPATH "${PYTHONPATH}:${HOME}/data_gorvernance"
+ENV PYTHONPATH "${PYTHONPATH}:${HOME}/data_governance"
 
 WORKDIR ${HOME}
 COPY . ${HOME}

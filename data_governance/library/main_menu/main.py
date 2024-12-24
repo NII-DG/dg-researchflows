@@ -14,10 +14,10 @@ from requests.exceptions import RequestException
 from library.utils.config import path_config, message as msg_config, connect as con_config
 from library.utils.error import InputWarning, UnusableVault, ProjectNotExist, UnauthorizedError
 from library.utils.html import button as html_button
-from library.utils.string import StringManager
 from library.utils.log import TaskLog
-from library.utils.storage_provider import grdm
 from library.utils.setting import ResearchFlowStatusOperater, SubflowStatusFile
+from library.utils.string import StringManager
+from library.utils.storage_provider import grdm
 from library.utils import file
 from library.utils.vault import Vault
 from library.utils.widgets import MessageBox, Button
@@ -66,6 +66,7 @@ class MainMenu(TaskLog):
             cancel_button(Button):適用しないボタン
             token(str):パーソナルアクセストークン
             project_id(str):プロジェクトID
+            tmp_project_id(str):一時的に保持するプロジェクトID
             callback_type(str):呼び出すメソッドのタイプ
             subflow_form(CreateSubflowForm | RelinkSubflowForm | RenameSubflowForm | DeleteSubflowForm):サブフローのフォーム
             research_flow_dict(dict):存在するフェーズをkeyとし対応するサブフローIDとサブフロー名をvalueとした辞書

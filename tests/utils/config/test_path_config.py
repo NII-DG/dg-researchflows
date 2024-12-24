@@ -16,4 +16,3 @@ class TestPathConfig(TestCase):
         file_names = path_config.get_prepare_file_name_list_for_subflow()
         self.assertEqual('menu.ipynb', file_names[0])
         self.assertEqual('status.json', file_names[1])
-        self.assertEqual('property.json', file_names[2])

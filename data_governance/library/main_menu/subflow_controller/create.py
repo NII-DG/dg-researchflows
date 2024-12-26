@@ -5,6 +5,7 @@
 import json
 import os
 import traceback
+from typing import Optional
 
 from dg_drawer.research_flow import PhaseStatus
 import panel as pn
@@ -434,7 +435,7 @@ class CreateSubflowForm(BaseSubflowForm):
         # GRDMと同期
         self.sync_grdm()
 
-    def get_govsheet(self) -> dict:
+    def get_govsheet(self) -> Optional[dict]:
         """ガバナンスシートを取得するメソッドです。
 
         Returns:

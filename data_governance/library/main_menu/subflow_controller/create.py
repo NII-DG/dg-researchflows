@@ -412,11 +412,10 @@ class CreateSubflowForm(BaseSubflowForm):
             message = msg_config.get('form', 'no_vault')
             self.change_submit_button_warning(message)
 
-        self.govsheet_path = os.path.join(self.abs_root, self.remote_path)
-        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
-
         # ガバナンスシート取得
         govsheet = self.get_govsheet()
+        self.govsheet_path = os.path.join(self.abs_root, self.remote_path)
+        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
 
         if not govsheet_rf and not govsheet:
             self.float_panel.visible = True
@@ -435,7 +434,7 @@ class CreateSubflowForm(BaseSubflowForm):
         # GRDMと同期
         self.sync_grdm()
 
-    def get_govsheet(self):
+    def get_govsheet(self) -> dict:
         """ガバナンスシートを取得するメソッドです。
 
         Returns:

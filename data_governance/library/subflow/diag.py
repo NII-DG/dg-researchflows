@@ -132,6 +132,10 @@ class DiagManager:
                         kwargs = self._set_task_status(current_dir, node_config, task)
                         self._add_node(left_group, task.id, node_config[task.id]['text'], prev_id, **kwargs)
                         prev_id = task.id
+                        break
+                else:
+                    # This is intentional: Raise an error to ensure developers are alerted
+                    raise Exception(f"The ID '{task_id}' is not defined in the tasks.")
 
     def create_right_subgraph(self, current_dir: str, tasks: list[SubflowTask], node_config: dict, order_whenever: list):
         """右側に配置されるいつ実行しても構わないタスクのノード群を作成するメソッドです。
@@ -153,6 +157,10 @@ class DiagManager:
                         kwargs = self._set_task_status(current_dir, node_config, task)
                         self._add_node(right_group, task.id, node_config[task.id]['text'], prev_id, **kwargs)
                         prev_id = task.id
+                        break
+                else:
+                    # This is intentional: Raise an error to ensure developers are alerted
+                    raise Exception(f"The ID '{task_id}' is not defined in the tasks.")
 
     def generate_diagram(self, current_dir: str, tasks: list[SubflowTask], node_config: dict, order:dict) -> str:
         """"ダイアグラムを生成するメソッドです。

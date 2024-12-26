@@ -376,7 +376,6 @@ class CreateSubflowForm(BaseSubflowForm):
             self.change_submit_button_warning(str(e))
             raise
 
-
         # 接続確認
         try:
             vault = Vault()

@@ -379,22 +379,10 @@ class CreateSubflowForm(BaseSubflowForm):
         govsheet_rf = utils.get_govsheet_rf(self.abs_root)
         self.govsheet_path = os.path.join(self.abs_root, self.remote_path)
 
-        # 入力が不要の場合
-        if not self.token_input.visible and not self.project_id_input.visible:
-            # ガバナンスシート取得
-            govsheet = self.get_govsheet()
-
-            utils.recreate_subflow(self.abs_root, self.govsheet_rf_path, govsheet_rf, govsheet, self.research_flow_dict)
-            # 新規作成する
-            self.new_create_subflow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
-            # GRDMと同期
-            self.sync_grdm()
-            return
-
         # 接続確認
         try:
             vault = Vault()
-            if token and project_id:
+            if self.token_input.visible and self.project_id_input.visible:
                 if utils.check_grdm_token(self.grdm_url, token):
                     vault.set_value('grdm_token', token)
                     if utils.check_grdm_access(self.grdm_url, token, project_id):
@@ -406,7 +394,7 @@ class CreateSubflowForm(BaseSubflowForm):
                 else:
                     self.change_submit_button_warning(msg_config.get('form', 'token_unauthorized'))
                     return
-            elif token:
+            elif self.token_input.visible:
                 if utils.check_grdm_token(self.grdm_url, token):
                     vault.set_value('grdm_token', token)
                     if utils.check_grdm_access(self.grdm_url, token, self.project_id):
@@ -417,7 +405,7 @@ class CreateSubflowForm(BaseSubflowForm):
                 else:
                     self.change_submit_button_warning(msg_config.get('form', 'token_unauthorized'))
                     return
-            else:
+            elif self.project_id_input.visible:
                 if utils.check_grdm_access(self.grdm_url, self.token, project_id):
                     self.project_id = project_id
                 else:

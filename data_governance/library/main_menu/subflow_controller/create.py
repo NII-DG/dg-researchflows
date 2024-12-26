@@ -376,8 +376,6 @@ class CreateSubflowForm(BaseSubflowForm):
             self.change_submit_button_warning(str(e))
             raise
 
-        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
-        self.govsheet_path = os.path.join(self.abs_root, self.remote_path)
 
         # 接続確認
         try:
@@ -414,6 +412,9 @@ class CreateSubflowForm(BaseSubflowForm):
         except UnusableVault:
             message = msg_config.get('form', 'no_vault')
             self.change_submit_button_warning(message)
+
+        self.govsheet_path = os.path.join(self.abs_root, self.remote_path)
+        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
 
         # ガバナンスシート取得
         govsheet = self.get_govsheet()

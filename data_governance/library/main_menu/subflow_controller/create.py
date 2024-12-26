@@ -376,6 +376,21 @@ class CreateSubflowForm(BaseSubflowForm):
             self.change_submit_button_warning(str(e))
             raise
 
+        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
+        self.govsheet_path = os.path.join(self.abs_root, self.remote_path)
+
+        # 入力が不要の場合
+        if not self.token_input.visible and not self.project_id_input.visible:
+            # ガバナンスシート取得
+            govsheet = self.get_govsheet()
+
+            utils.recreate_subflow(self.abs_root, self.govsheet_rf_path, govsheet_rf, govsheet, self.research_flow_dict)
+            # 新規作成する
+            self.new_create_subflow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
+            # GRDMと同期
+            self.sync_grdm()
+            return
+
         # 接続確認
         try:
             vault = Vault()
@@ -413,24 +428,7 @@ class CreateSubflowForm(BaseSubflowForm):
             self.change_submit_button_warning(message)
 
         # ガバナンスシート取得
-        try:
-            govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
-        except FileNotFoundError:
-            govsheet = None
-        except json.JSONDecodeError:
-            govsheet = {}
-        except UnauthorizedError:
-            message = msg_config.get('form', 'token_unauthorized')
-            self._err_output.update_warning(message)
-        except RequestException as e:
-            message = msg_config.get('dg_web', 'get_data_error')
-            self._err_output.update_error(f'{message}\n{str(e)}')
-        except Exception as e:
-            message = msg_config.get('dg_web', 'get_data_error')
-            self._err_output.update_error(f'{message}\n{str(e)}')
-
-        self.govsheet_path = os.path.join(self.abs_root, self.remote_path)
-        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
+        govsheet = self.get_govsheet()
 
         if not govsheet_rf and not govsheet:
             self.float_panel.visible = True
@@ -447,6 +445,33 @@ class CreateSubflowForm(BaseSubflowForm):
         # 新規作成する
         self.new_create_subflow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
         # GRDMと同期
+        self.sync_grdm()
+
+    def get_govsheet(self):
+        """ガバナンスシートを取得するメソッドです。
+
+        Returns:
+            dict: ガバナンスシートの内容
+        """
+        try:
+            govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
+        except FileNotFoundError:
+            govsheet = None
+        except json.JSONDecodeError:
+            govsheet = {}
+        except UnauthorizedError:
+            message = msg_config.get('form', 'token_unauthorized')
+            self._err_output.update_warning(message)
+        except RequestException as e:
+            message = msg_config.get('dg_web', 'get_data_error')
+            self._err_output.update_error(f'{message}\n{str(e)}')
+        except Exception as e:
+            message = msg_config.get('dg_web', 'get_data_error')
+            self._err_output.update_error(f'{message}\n{str(e)}')
+        return govsheet
+
+    def sync_grdm(self):
+        """GRDMと同期するメソッドです。"""
         try:
             sync_path_list = utils.get_sync_path(self.abs_root)
             for sync_path in sync_path_list:

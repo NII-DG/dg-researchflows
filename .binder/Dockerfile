@@ -49,7 +49,7 @@ RUN pip install --no-cache pandas==2.1.4
 RUN pip install --no-cache cookiecutter==2.5.0
 RUN pip install --no-cache hvac==2.1.0
 RUN pip install --no-cache gitpython==3.1.43
-RUN pip install --no-cache git+https://github.com/RCOSDP/rdmclient.git@b56fb29d40bfe2b9dfa903527dadfd569bd169b5
+RUN pip install --no-cache git+https://github.com/RCOSDP/rdmclient.git@d9d2b7926ecdf53aede026e6c70b271f0d7b41c7
 RUN pip install --no-cache git+https://github.com/NII-DG/nii-dg.git@230419_8c684da
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-packager.git@master
 RUN pip install --no-cache graphviz==0.20.1

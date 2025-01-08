@@ -1,4 +1,4 @@
-"""data_gorvernance.library.utils.configモジュールのテストを行うモジュールのパッケージです。
+"""data_governance.library.utils.configモジュールのテストを行うモジュールのパッケージです。
 
 ユニットテストフレームワークを用いてテストを行うモジュールを集めたパッケージとなっています。
 

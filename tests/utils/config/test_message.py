@@ -1,14 +1,14 @@
 """このモジュールはユニットテストフレームワークを用いてテストを行うモジュールです。
 
-data_gorvernance.library.utils.config.messageモジュールのメソッドのテストを行います。
+data_governance.library.utils.config.messageモジュールのメソッドのテストを行います。
 
 """
 from unittest import TestCase
 
-from data_gorvernance.library.utils.config import message
+from data_governance.library.utils.config import message
 
 class TestMessageConfig(TestCase):
-    """data_gorvernance.library.utils.config.messageモジュールのテストを行うクラスです。"""
+    """data_governance.library.utils.config.messageモジュールのテストを行うクラスです。"""
     # test exec : python -m unittest tests.utils.config.test_message
 
     def test_get(self):

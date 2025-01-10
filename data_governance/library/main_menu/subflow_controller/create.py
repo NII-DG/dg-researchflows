@@ -5,6 +5,7 @@
 import json
 import os
 import traceback
+from typing import Optional
 
 from IPython.core.display import display
 from dg_drawer.research_flow import PhaseStatus
@@ -404,7 +405,7 @@ class CreateSubflowForm(BaseSubflowForm):
         # 接続確認
         try:
             vault = Vault()
-            if token and project_id:
+            if self.token_input.visible and self.project_id_input.visible:
                 if utils.check_grdm_token(self.grdm_url, token):
                     vault.set_value('grdm_token', token)
                     if utils.check_grdm_access(self.grdm_url, token, project_id):
@@ -417,7 +418,7 @@ class CreateSubflowForm(BaseSubflowForm):
                 else:
                     self.change_submit_button_warning(msg_config.get('main_menu', 're_enter_token'))
                     return
-            elif token:
+            elif self.token_input.visible:
                 if utils.check_grdm_token(self.grdm_url, token):
                     vault.set_value('grdm_token', token)
                     if utils.check_grdm_access(self.grdm_url, token, self.project_id):
@@ -429,7 +430,7 @@ class CreateSubflowForm(BaseSubflowForm):
                 else:
                     self.change_submit_button_warning(msg_config.get('main_menu', 're_enter_token'))
                     return
-            else:
+            elif self.project_id_input.visible:
                 if utils.check_grdm_access(self.grdm_url, self.token, project_id):
                     self.project_id = project_id
                 else:

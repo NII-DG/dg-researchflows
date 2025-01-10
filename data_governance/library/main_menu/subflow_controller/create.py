@@ -172,7 +172,7 @@ class CreateSubflowForm(BaseSubflowForm):
         Args:
             event: ボタンクリックイベント
         """
-        self.float_panel.visible = False
+        self.disabled_form(True)
         govsheet_rf = utils.get_govsheet_rf(self.abs_root)
         mapping_file = utils.get_mapping_file(self.abs_root)
 
@@ -215,6 +215,7 @@ class CreateSubflowForm(BaseSubflowForm):
             govsheet_rf
         )
         # GRDMと同期
+        self.float_panel.visible = False
         self._err_output.update_info(msg_config.get('save', 'doing'))
         try:
             sync_path_list = utils.get_sync_path(self.abs_root)
@@ -235,6 +236,8 @@ class CreateSubflowForm(BaseSubflowForm):
             self._err_output.update_error(message)
             self.log.error(message)
             return
+
+        self.disabled_form(False)
         self._err_output.update_success(msg_config.get('save', 'success'))
         self._research_flow_image.object = self.reserch_flow_status_operater.get_svg_of_research_flow_status()
         display(Javascript('IPython.notebook.save_checkpoint();'))
@@ -441,6 +444,7 @@ class CreateSubflowForm(BaseSubflowForm):
             message = msg_config.get('form', 'no_vault')
             self.change_submit_button_warning(message)
             self.log.warning(f'{message}\n{traceback.format_exc()}')
+            return
         except ProjectNotExist:
             self.reset_form()
             message = msg_config.get('form', 'project_id_not_exist').format(project_id)
@@ -452,10 +456,8 @@ class CreateSubflowForm(BaseSubflowForm):
         govsheet = None
         try:
             govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
-        except FileNotFoundError:
+        except (FileNotFoundError, json.JSONDecodeError):
             govsheet = None
-        except json.JSONDecodeError:
-            govsheet = {}
         except UnauthorizedError:
             self.disabled_form(False)
             message = msg_config.get('main_menu', 're_enter_token')
@@ -491,7 +493,7 @@ class CreateSubflowForm(BaseSubflowForm):
                 )
 
         # 新規作成する
-        self.new_create_subflow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids, mapping_file, govsheet_rf)
+        self.new_create_subflow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids, mapping_file)
 
         # GRDMと同期
         self._err_output.update_info(msg_config.get('save', 'doing'))

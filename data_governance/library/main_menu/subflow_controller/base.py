@@ -105,7 +105,7 @@ class BaseSubflowForm(TaskLog):
         # 親サブフロー種別(フェーズ)オプション
         parent_sub_flow_type_options = self.generate_parent_sub_flow_type_options(
             sub_flow_type_options[msg_config.get('form', 'selector_default')],
-            research_flow_status,
+            research_flow_status
         )
         # 親サブフロー種別(フェーズ)（必須)：シングルセレクト
         self._parent_sub_flow_type_selector = pn.widgets.Select(

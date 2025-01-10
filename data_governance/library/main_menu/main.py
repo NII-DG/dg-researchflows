@@ -569,10 +569,8 @@ class MainMenu(TaskLog):
         govsheet = None
         try:
             govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
-        except FileNotFoundError:
+        except (FileNotFoundError, json.JSONDecodeError):
             govsheet = None
-        except json.JSONDecodeError:
-            govsheet = {}
         except UnauthorizedError:
             self.display_input_box()
             message = msg_config.get('main_menu', 're_enter_token')
@@ -608,12 +606,9 @@ class MainMenu(TaskLog):
             if govsheet_rf:
                 utils.backup_govsheet_rf_file(self.abs_root, self.govsheet_rf_path)
             file.JsonFile(self.govsheet_rf_path).write(govsheet)
-            self.update_research_flow_widget_box_init()
-            self.research_flow_message.update_success(msg_config.get('main_menu', 'success_govsheet'))
-            return
-
-        utils.recreate_subflow(
-            self.abs_root, self.govsheet_rf_path, govsheet_rf, govsheet, self.research_flow_dict, mapping_file)
+        else:
+            utils.recreate_subflow(
+                self.abs_root, self.govsheet_rf_path, govsheet_rf, govsheet, self.research_flow_dict, mapping_file)
 
         # GRDMと同期
         self.research_flow_widget_box.clear()

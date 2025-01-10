@@ -263,7 +263,7 @@ def update_status_file(abs_root: str, status_json_path: str, mapping_file: dict)
         status_json_path (str): status.jsonまでのパス
         mapping_file (dict): マッピングファイルの内容
     """
-    update_date = call_mapping(abs_root, mapping_file)
+    update_date = get_update_task_with_active_flg(abs_root, mapping_file)
     sf = SubflowStatusFile(status_json_path)
     sf_status = sf.read()
     update_flg(update_date, sf_status.tasks)
@@ -366,7 +366,6 @@ def backup_zipfile(abs_root: str, research_flow_dict: dict, current_time: str):
             status_json_path = os.path.join(abs_root, path_config.get_sub_flow_status_file_path(phase_name, subflow_id))
             os.makedirs(os.path.dirname(zip_file_path), exist_ok=True)
             notebook_list = get_notebook_list(working_path)
-
 
             with zipfile.ZipFile(zip_file_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
                 for file in os.listdir(image_folder):

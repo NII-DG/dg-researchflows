@@ -475,12 +475,13 @@ class CreateSubflowForm(BaseSubflowForm):
             self.log.error(message)
             return
 
+        # RFガバナンスシート取得
         self.govsheet_path = os.path.join(self.abs_root, self.remote_path)
         govsheet_rf = utils.get_govsheet_rf(self.abs_root)
-        mapping_file = utils.get_mapping_file(self.abs_root)
 
         if not govsheet_rf:
             if not govsheet:
+                # ガバナンスシートを作成させる
                 self._err_output.clear()
                 self.float_panel.visible = True
                 self.apply_button.set_looks_init(msg_config.get('main_menu', 'apply'))
@@ -488,6 +489,8 @@ class CreateSubflowForm(BaseSubflowForm):
                 self._sub_flow_widget_box.append(self.float_panel)
                 return
             else:
+                # サブフロー作り直し
+                mapping_file = utils.get_mapping_file(self.abs_root)
                 utils.recreate_subflow(
                     self.abs_root, self.govsheet_rf_path, govsheet_rf, govsheet, self.research_flow_dict, mapping_file
                 )
@@ -612,7 +615,6 @@ class CreateSubflowForm(BaseSubflowForm):
 
     def reset_form(self):
         """フォームの初期化を行うメソッドです。"""
-        # フォームの初期化
         self._sub_flow_type_selector.value = 0
         self._sub_flow_name_form.value = ''
         self._sub_flow_name_form.value_input = ''

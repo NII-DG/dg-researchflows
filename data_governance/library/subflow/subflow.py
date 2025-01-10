@@ -8,6 +8,7 @@ from nbformat import NO_CONVERT, read
 from library.utils import file
 from library.utils.config import path_config
 from library.utils.setting import SubflowStatusFile
+from library.main_menu.subflow_controller import utils
 from .diag import DiagManager
 
 
@@ -46,38 +47,8 @@ class SubFlowManager:
         """
         if os.path.isdir(souce_task_dir):
             for task in self.tasks:
-                self._copy_file_by_name(task.name, souce_task_dir, self.task_dir)
-
-    def _copy_file_by_name(self, target_file: str, search_directory: str, destination_directory: str) -> None:
-        """ 指定した名前のファイルを検索ディレクトリから目的のディレクトリにコピーするメソッドです。
-
-        Args:
-            target_file(str) : コピー元のファイルを設定します。
-            search_directory(str) : ファイルを検索するディレクトリを設定します。
-            destination_directory(str) : コピー先のディレクトリを設定します。
-
-        """
-        for root, dirs, files in os.walk(search_directory):
-            for filename in files:
-                if not filename.startswith(target_file):
-                    continue
-                # if filename.startswith(target_file) のとき
-                source_dir = root
-                relative_path = file.relative_path(root, search_directory)
-                destination_dir = os.path.join(destination_directory, relative_path)
-                # タスクノートブックのコピー
-                source_file = os.path.join(source_dir, filename)
-                destination_file = os.path.join(destination_dir, filename)
-                if not os.path.isfile(destination_file):
-                    file.copy_file(source_file, destination_file)
-                # imagesのシンボリックリンク
-                source_images = os.path.join(
-                    path_config.get_abs_root_form_working_dg_file_path(root),
-                    path_config.DG_IMAGES_FOLDER
-                )
-                destination_images = os.path.join(destination_dir, path_config.IMAGES)
-                if not os.path.isdir(destination_images):
-                    os.symlink(source_images, destination_images, target_is_directory=True)
+                if task.active == True:
+                    utils._copy_file_by_name(task.name, souce_task_dir, self.task_dir)
 
     def generate(self) -> str:
         """ ダイアグラムを生成するメソッドです。

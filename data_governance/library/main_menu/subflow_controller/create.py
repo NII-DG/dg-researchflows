@@ -6,6 +6,7 @@ import json
 import os
 import traceback
 
+from IPython.core.display import display
 from dg_drawer.research_flow import PhaseStatus
 import panel as pn
 from requests.exceptions import RequestException
@@ -32,6 +33,7 @@ class CreateSubflowForm(BaseSubflowForm):
             remote_path(str):リモート先のパス
             _sub_flow_widget_box(pn.WidgetBox):サブフロー操作コントローラーウェジットボックス
             govsheet_rf_path(str):RFガバナンスシートのパス
+            _research_flow_image(pn.pane.HTML): リサーチフロー図オブジェクトの定義
             token_input(pn.widgets.PasswordInput):パーソナルアクセストークンの入力欄
             project_id_input(pn.widgets.TextInput):プロジェクトIDの入力欄
             float_panel(pn.layout.FloatPanel):FloatPanel
@@ -50,13 +52,14 @@ class CreateSubflowForm(BaseSubflowForm):
             project_id(str):プロジェクトID
     """
 
-    def __init__(self, abs_root: str, widget_box: pn.WidgetBox, message_box: MessageBox) -> None:
+    def __init__(self, abs_root: str, widget_box: pn.WidgetBox, message_box: MessageBox, research_flow_image: pn.pane.HTML) -> None:
         """CreateSubflowForm コンストラクタのメソッドです。
 
         Args:
             abs_root (str): リサーチフローのルートディレクトリ
             widget_box (pn.WidgetBox): ウィジェットボックスを格納する。
             message_box (MessageBox): メッセージを格納する。
+            research_flow_image (pn.pane.HTML): リサーチフロー図オブジェクトを格納する。
         """
         super().__init__(abs_root, message_box)
         # 処理開始ボタン
@@ -67,6 +70,7 @@ class CreateSubflowForm(BaseSubflowForm):
         self.remote_path = con_config.get('DG_WEB', 'GOVSHEET_PATH')
         self._sub_flow_widget_box = widget_box
         self.govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
+        self._research_flow_image = research_flow_image
 
         # パーソナルアクセストークンとプロジェクトID入力欄
         self.token_input, self.project_id_input = utils.input_widget()
@@ -130,7 +134,7 @@ class CreateSubflowForm(BaseSubflowForm):
                         self.token = token
                         self.project_id = project_id
                     else:
-                        self._err_output.update_error(msg_config.get('form', 'project_id_not_exist'))
+                        self._err_output.update_error(msg_config.get('form', 'insufficient_permission'))
                         return
                 else:
                     self.token_input.visible = True
@@ -139,17 +143,26 @@ class CreateSubflowForm(BaseSubflowForm):
             message = msg_config.get('form', 'no_vault')
             self._err_output.update_error(message)
             self.log.error(f'{message}\n{traceback.format_exc()}')
+            return
         except UnauthorizedError:
             message = msg_config.get('form', 'token_unauthorized')
             self._err_output.update_warning(message)
             self.log.warning(f'{message}\n{traceback.format_exc()}')
+            return
         except ProjectNotExist:
             message = msg_config.get('form', 'project_id_not_exist').format(project_id)
             self._err_output.update_error(message)
             self.log.error(f'{message}\n{traceback.format_exc()}')
+            return
+        except RequestException as e:
+            message = msg_config.get('DEFAULT', 'connection_error')
+            self._err_output.update_error(f'{message}\n{str(e)}')
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+            return
         except Exception:
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
             self._err_output.update_error(message)
+            return
 
     @BaseSubflowForm.callback_form('デフォルトでガバナンスシートを作成する')
     def callback_apply_button(self, event):
@@ -160,6 +173,7 @@ class CreateSubflowForm(BaseSubflowForm):
         """
         self.float_panel.visible = False
         govsheet_rf = utils.get_govsheet_rf(self.abs_root)
+        mapping_file = utils.get_mapping_file(self.abs_root)
 
         # デフォルトでガバナンスシートを作成する
         govsheet_path = os.path.join(self.abs_root, self.remote_path)
@@ -189,15 +203,18 @@ class CreateSubflowForm(BaseSubflowForm):
 
         # サブフローを作り直す
         utils.recreate_subflow(
-            self.abs_root, self.govsheet_rf_path, govsheet_rf, data, self.research_flow_dict)
+            self.abs_root, self.govsheet_rf_path, govsheet_rf, data, self.research_flow_dict, mapping_file)
         # 新規作成する
         self.new_create_subflow(
             self._sub_flow_type_selector.value,
             self._sub_flow_name_form.value_input,
             self._data_dir_name_form.value_input,
-            self._parent_sub_flow_selector.value
+            self._parent_sub_flow_selector.value,
+            mapping_file,
+            govsheet_rf
         )
         # GRDMと同期
+        self._err_output.update_info(msg_config.get('save', 'doing'))
         try:
             sync_path_list = utils.get_sync_path(self.abs_root)
             for sync_path in sync_path_list:
@@ -217,6 +234,10 @@ class CreateSubflowForm(BaseSubflowForm):
             self._err_output.update_error(message)
             self.log.error(message)
             return
+        self._err_output.update_success(msg_config.get('save', 'success'))
+        self._research_flow_image.object = self.reserch_flow_status_operater.get_svg_of_research_flow_status()
+        display(Javascript('IPython.notebook.save_checkpoint();'))
+        display(self._research_flow_image)
 
     def callback_cancel_button(self, event):
         """適用しない押下後エラーメッセージを表示するメソッドです。
@@ -224,9 +245,10 @@ class CreateSubflowForm(BaseSubflowForm):
         Args:
             event: ボタンクリックイベント
         """
-        self._err_output.clear()
         self.cancel_button.set_looks_processing()
         self.float_panel.visible = False
+        # フォームの初期化
+        self.reset_form()
         msg = msg_config.get('main_menu', 'create_task_govsheet')
         self._err_output.update_warning(msg)
 
@@ -376,6 +398,9 @@ class CreateSubflowForm(BaseSubflowForm):
             self.change_submit_button_warning(str(e))
             raise
 
+        # 入力値のチェック後はユーザーが触れないように入力欄を無効にする
+        self.disabled_form(True)
+
         # 接続確認
         try:
             vault = Vault()
@@ -386,10 +411,11 @@ class CreateSubflowForm(BaseSubflowForm):
                         self.token = token
                         self.project_id = project_id
                     else:
-                        self.change_submit_button_error(msg_config.get('form', 'project_id_not_exist'))
+                        self.reset_form()
+                        self.change_submit_button_error(msg_config.get('form', 'insufficient_permission'))
                         return
                 else:
-                    self.change_submit_button_warning(msg_config.get('form', 'token_unauthorized'))
+                    self.change_submit_button_warning(msg_config.get('main_menu', 're_enter_token'))
                     return
             elif token:
                 if utils.check_grdm_token(self.grdm_url, token):
@@ -397,22 +423,32 @@ class CreateSubflowForm(BaseSubflowForm):
                     if utils.check_grdm_access(self.grdm_url, token, self.project_id):
                         self.token = token
                     else:
-                        self.change_submit_button_error(msg_config.get('form', 'project_id_not_exist'))
+                        self.reset_form()
+                        self.change_submit_button_error(msg_config.get('form', 'insufficient_permission'))
                         return
                 else:
-                    self.change_submit_button_warning(msg_config.get('form', 'token_unauthorized'))
+                    self.change_submit_button_warning(msg_config.get('main_menu', 're_enter_token'))
                     return
             else:
                 if utils.check_grdm_access(self.grdm_url, self.token, project_id):
                     self.project_id = project_id
                 else:
-                    self.change_submit_button_error(msg_config.get('form', 'project_id_not_exist'))
+                    self.reset_form()
+                    self.change_submit_button_error(msg_config.get('form', 'insufficient_permission'))
                     return
         except UnusableVault:
             message = msg_config.get('form', 'no_vault')
             self.change_submit_button_warning(message)
+            self.log.warning(f'{message}\n{traceback.format_exc()}')
+        except ProjectNotExist:
+            self.reset_form()
+            message = msg_config.get('form', 'project_id_not_exist').format(project_id)
+            self._err_output.update_error(message)
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+            return
 
         # ガバナンスシート取得
+        govsheet = None
         try:
             govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
         except FileNotFoundError:
@@ -420,33 +456,44 @@ class CreateSubflowForm(BaseSubflowForm):
         except json.JSONDecodeError:
             govsheet = {}
         except UnauthorizedError:
-            message = msg_config.get('form', 'token_unauthorized')
+            self.disabled_form(False)
+            message = msg_config.get('main_menu', 're_enter_token')
             self._err_output.update_warning(message)
+            self.log.warning(f'{message}\n{traceback.format_exc()}')
+            return
         except RequestException as e:
             message = msg_config.get('dg_web', 'get_data_error')
             self._err_output.update_error(f'{message}\n{str(e)}')
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+            return
         except Exception as e:
             message = msg_config.get('dg_web', 'get_data_error')
             self._err_output.update_error(f'{message}\n{str(e)}')
+            self.log.error(message)
+            return
 
         self.govsheet_path = os.path.join(self.abs_root, self.remote_path)
         govsheet_rf = utils.get_govsheet_rf(self.abs_root)
+        mapping_file = utils.get_mapping_file(self.abs_root)
 
-        if not govsheet_rf and not govsheet:
-            self.float_panel.visible = True
-            self._sub_flow_widget_box.append(self.float_panel)
-            return
-
-        # 既存のサブフローを作り直す
-        utils.recreate_subflow(
-            self.abs_root, self.govsheet_rf_path, govsheet_rf, govsheet, self.research_flow_dict)
-
-        if self.float_panel.visible:
-            return
+        if not govsheet_rf:
+            if not govsheet:
+                self._err_output.clear()
+                self.float_panel.visible = True
+                self.apply_button.set_looks_init(msg_config.get('main_menu', 'apply'))
+                self.cancel_button.set_looks_init(msg_config.get('main_menu', 'cancel'))
+                self._sub_flow_widget_box.append(self.float_panel)
+                return
+            else:
+                utils.recreate_subflow(
+                    self.abs_root, self.govsheet_rf_path, govsheet_rf, govsheet, self.research_flow_dict, mapping_file
+                )
 
         # 新規作成する
-        self.new_create_subflow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids)
+        self.new_create_subflow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids, mapping_file, govsheet_rf)
+
         # GRDMと同期
+        self._err_output.update_info(msg_config.get('save', 'doing'))
         try:
             sync_path_list = utils.get_sync_path(self.abs_root)
             for sync_path in sync_path_list:
@@ -466,13 +513,16 @@ class CreateSubflowForm(BaseSubflowForm):
             self._err_output.update_error(message)
             self.log.error(message)
             return
+        self.disabled_form(False)
+        self._err_output.update_success(msg_config.get('save', 'success'))
 
-    def update_new_status_and_preparation_notebook(self, phase_name: str, new_subflow_id: str):
+    def update_new_status_and_preparation_notebook(self, phase_name: str, new_subflow_id: str, mapping_file: dict):
         """新規サブフローのstatus.jsonを更新し、必要なタスクノートブックを用意するメソッドです。
 
         Args:
             new_phase_name (str): フェーズ名
             new_subflow_id (str): 新しいサブフローのID
+            mapping_file (dict): マッピングファイルの内容
         """
         new_status_file = os.path.join(
             self.abs_root,
@@ -485,7 +535,7 @@ class CreateSubflowForm(BaseSubflowForm):
             new_subflow_id,
             path_config.TASK
         )
-        utils.update_status_file(self.abs_root, new_status_file)
+        utils.update_status_file(self.abs_root, new_status_file, mapping_file)
         utils.preparation_notebook_file(self.abs_root, new_status_file, new_working_path)
 
     def create_data_dir(self, phase_name: str, data_dir_name: str) -> str:
@@ -507,7 +557,7 @@ class CreateSubflowForm(BaseSubflowForm):
         os.makedirs(path)
         return path
 
-    def new_create_subflow(self, phase_seq_number: int, sub_flow_name: str, data_dir_name: str, parent_sub_flow_ids: list[str]):
+    def new_create_subflow(self, phase_seq_number: int, sub_flow_name: str, data_dir_name: str, parent_sub_flow_ids: list[str], mapping_file: dict):
         """新規サブフローを作成するメソッドです。
 
         Args:
@@ -515,6 +565,7 @@ class CreateSubflowForm(BaseSubflowForm):
             sub_flow_name (str): 新規サブフロー名
             data_dir_name (str): 作成するディレクトリ
             parent_sub_flow_ids (str): 親サブフロー名
+            mapping_file (dict): マッピングファイルの内容
 
         Raises:
             InputWarning: 入力不備によるエラー
@@ -544,7 +595,7 @@ class CreateSubflowForm(BaseSubflowForm):
         # 新規サブフローデータの用意
         try:
             utils.prepare_new_subflow_data(self.abs_root, phase_name, new_sub_flow_id, sub_flow_name, False)
-            self.update_new_status_and_preparation_notebook(phase_name, new_sub_flow_id)
+            self.update_new_status_and_preparation_notebook(phase_name, new_sub_flow_id, mapping_file)
         except Exception:
             # 失敗した場合に/data/<phase_name>/<data_dir_name>の削除
             os.remove(data_dir_path)
@@ -554,6 +605,10 @@ class CreateSubflowForm(BaseSubflowForm):
             self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             raise
 
+        self.reset_form()
+
+    def reset_form(self):
+        """フォームの初期化を行うメソッドです。"""
         # フォームの初期化
         self._sub_flow_type_selector.value = 0
         self._sub_flow_name_form.value = ''
@@ -565,3 +620,18 @@ class CreateSubflowForm(BaseSubflowForm):
         self.token_input.value = ''
         self.token_input.value_input = ''
         self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
+
+    def disabled_form(self, disabled_flg: bool):
+        """フォームの入力欄の有効/無効を切り替えるメソッドです。
+
+        Args:
+            disabled_flg (bool): 入力欄の有効/無効フラグ(Trueなら無効、Falseなら有効)
+        """
+        self._sub_flow_type_selector.disabled = disabled_flg
+        self._sub_flow_name_selector.disabled = disabled_flg
+        self._sub_flow_name_form.disabled = disabled_flg
+        self._data_dir_name_form.disabled = disabled_flg
+        self._parent_sub_flow_type_selector.disabled = disabled_flg
+        self._parent_sub_flow_selector.disabled = disabled_flg
+        self.token_input.disabled = disabled_flg
+        self.project_id_input.disabled = disabled_flg

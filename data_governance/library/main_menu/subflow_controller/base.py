@@ -63,7 +63,8 @@ class BaseSubflowForm(TaskLog):
         self._sub_flow_type_selector = pn.widgets.Select(
             name=msg_config.get('main_menu', 'sub_flow_type'),
             options=sub_flow_type_options,
-            value=sub_flow_type_options[msg_config.get('form', 'selector_default')]
+            value=sub_flow_type_options[msg_config.get('form', 'selector_default')],
+            disabled=False
         )
         # サブフロー種別(フェーズ)のイベントリスナー
         self._sub_flow_type_selector.param.watch(
@@ -79,21 +80,24 @@ class BaseSubflowForm(TaskLog):
         self._sub_flow_name_selector = pn.widgets.Select(
             name=msg_config.get('main_menu', 'sub_flow_name_select'),
             options=sub_flow_name_options,
-            value=sub_flow_name_options[msg_config.get('form', 'selector_default')]
+            value=sub_flow_name_options[msg_config.get('form', 'selector_default')],
+            disabled=False
         )
         # サブフロー名称のイベントリスナー
         self._sub_flow_name_selector.param.watch(self.callback_sub_flow_name_selector, 'value')
 
         # サブフロー名称：テキストフォーム
         self._sub_flow_name_form = pn.widgets.TextInput(
-            name=msg_config.get('main_menu', 'sub_flow_name_input'), max_length=15
+            name=msg_config.get('main_menu', 'sub_flow_name_input'), max_length=15,
+            disabled=False
         )
         # サブフロー名称：テキストフォームのイベントリスナー
         self._sub_flow_name_form.param.watch(self.callback_menu_form, 'value')
 
         # データフォルダ名
         self._data_dir_name_form = pn.widgets.TextInput(
-            name=msg_config.get('main_menu', 'data_dir_name'), max_length=50
+            name=msg_config.get('main_menu', 'data_dir_name'), max_length=50,
+            disabled=False
         )
         # データフォルダ名：テキストフォームのイベントリスナー
         self._data_dir_name_form.param.watch(self.callback_menu_form, 'value')
@@ -101,13 +105,14 @@ class BaseSubflowForm(TaskLog):
         # 親サブフロー種別(フェーズ)オプション
         parent_sub_flow_type_options = self.generate_parent_sub_flow_type_options(
             sub_flow_type_options[msg_config.get('form', 'selector_default')],
-            research_flow_status
+            research_flow_status,
         )
         # 親サブフロー種別(フェーズ)（必須)：シングルセレクト
         self._parent_sub_flow_type_selector = pn.widgets.Select(
             name=msg_config.get('main_menu', 'parent_sub_flow_type'),
             options=parent_sub_flow_type_options,
             value=parent_sub_flow_type_options[msg_config.get('form', 'selector_default')],
+            disabled=False
         )
         # 親サブフロー種別(フェーズ)のイベントリスナー
         self._parent_sub_flow_type_selector.param.watch(
@@ -122,7 +127,8 @@ class BaseSubflowForm(TaskLog):
         # 親サブフロー選択 : マルチセレクト
         self._parent_sub_flow_selector = pn.widgets.MultiSelect(
             name=msg_config.get('main_menu', 'parent_sub_flow_name'),
-            options=parent_sub_flow_options
+            options=parent_sub_flow_options,
+            disabled=False
         )
         # 親サブフロー選択のイベントリスナー
         self._parent_sub_flow_selector.param.watch(self.callback_menu_form, 'value')

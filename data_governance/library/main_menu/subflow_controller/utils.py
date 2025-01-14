@@ -30,8 +30,16 @@ def input_widget() -> Union[pn.widgets.PasswordInput, pn.widgets.TextInput]:
     Returns:
         PasswordInput, TextInput: 入力欄を返す。
     """
-    token_input = pn.widgets.PasswordInput(name=msg_config.get('main_menu', 'access_token_input'), visible=False)
-    project_id_input = pn.widgets.TextInput(name=msg_config.get('main_menu', 'project_id_input'), visible=False)
+    token_input = pn.widgets.PasswordInput(
+        name=msg_config.get('main_menu', 'access_token_input'),
+        visible=False,
+        disabled=False
+    )
+    project_id_input = pn.widgets.TextInput(
+        name=msg_config.get('main_menu', 'project_id_input'),
+        visible=False,
+        disabled=False
+    )
     return token_input, project_id_input
 
 
@@ -104,9 +112,12 @@ def get_govsheet_rf(abs_root: str) -> dict:
     """
     govsheet_rf = {}
     file_path = get_govsheet_rf_path(abs_root)
-    if os.path.isfile(file_path):
-        with open(file_path, 'r') as f:
-            govsheet_rf = json.load(f)
+    try:
+        if os.path.isfile(file_path):
+            with open(file_path, 'r') as f:
+                govsheet_rf = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        govsheet_rf = {}
     return govsheet_rf
 
 
@@ -147,37 +158,50 @@ def get_notebook_list(working_dir_path: str) -> list:
     return file_list
 
 
-def mapping_file(abs_root: str) -> dict:
-    """jsonファイルを読み込みマッピングを行う処理を呼ぶ関数です。
+def get_mapping_file(abs_root: str) -> dict:
+    """task_mapping.jsonを取得する関数です。
 
     Args:
         abs_root (str): リサーチフローのルートディレクトリ
-        token (str): パーソナルアクセストークン
-        base_url (str): GRDMのURL
-        project_id (str): プロジェクトID
 
     Returns:
-        dict: マッピングされたIDとフラグの辞書を返す。
+        dict: マッピングファイルの内容
     """
-    task_mapping_path = os.path.join(
-        abs_root, path_config.DG_RESEARCHFLOW_FOLDER, 'task_mapping.json'
-    )
+    mapping_file_path = os.path.join(
+        abs_root, path_config.DG_RESEARCHFLOW_FOLDER, 'task_mapping.json')
+    mapping_file = {}
+    try:
+        if os.path.isfile(mapping_file_path):
+            with open(mapping_file_path, 'r') as mapping:
+                mapping_file = json.load(mapping)
+    except (FileNotFoundError, json.JSONDecodeError):
+        mapping_file = {}
+    return mapping_file
+
+
+def get_update_task_with_active_flg(abs_root: str, mapping_file: dict) -> dict:
+    """更新するタスクとそのフラグの辞書を取得する関数です。
+
+    Args:
+        abs_root (str): リサーチフローのルートディレクトリ
+        mapping_file (dict): マッピングファイルの内容
+
+    Returns:
+        dict: 更新するタスクとそのフラグの辞書を返す。
+    """
     govsheet_rf = get_govsheet_rf(abs_root)
-    with open(task_mapping_path, 'r') as task:
-        task_mapping = json.load(task)
-    active_dict = task_map(task_mapping, govsheet_rf)
-    return active_dict
+    return perform_mapping(mapping_file, govsheet_rf)
 
 
-def task_map(mapping: dict, govsheet: dict) -> dict:
-    """マッピングを行う関数です。
+def perform_mapping(mapping: dict, govsheet: dict) -> dict:
+    """マッピング処理を行う関数です。
 
     Args:
         mapping (dict): マッピングファイルの内容
         govsheet (dict): ガバナンスシートの内容
 
     Returns:
-        dict: マッピングされたIDとフラグの辞書を返す。
+        dict: 更新するタスクとそのフラグの辞書を返す。
     """
     new_dict = {}
     for key in mapping:
@@ -190,7 +214,7 @@ def task_map(mapping: dict, govsheet: dict) -> dict:
                     for display_id in map_dict["display"]:
                         new_dict[display_id] = True
         else:
-            value_dict = task_map(mapping[key], govsheet[key])
+            value_dict = perform_mapping(mapping[key], govsheet[key])
             for map_key, map_value in value_dict.items():
                 if map_key in new_dict:
                     new_dict[map_key] = new_dict[map_key] or map_value
@@ -231,17 +255,15 @@ def _copy_file_by_name(target_file: str, search_directory: str, destination_dire
                 os.symlink(source_images, destination_images, target_is_directory=True)
 
 
-def update_status_file(abs_root: str, status_json_path: str):
+def update_status_file(abs_root: str, status_json_path: str, mapping_file: dict):
     """RFガバナンスシートとtask_mapping.jsonのマッピング結果と依存タスクによってactiveフラグを切り替えるメソッドです。
 
     Args:
         abs_root (str): リサーチフローのルートディレクトリ
         status_json_path (str): status.jsonまでのパス
-        token (str): パーソナルアクセストークン
-        base_url (str): GRDMのURL
-        project_id (str): プロジェクトID
+        mapping_file (dict): マッピングファイルの内容
     """
-    update_date = mapping_file(abs_root)
+    update_date = get_update_task_with_active_flg(abs_root, mapping_file)
     sf = SubflowStatusFile(status_json_path)
     sf_status = sf.read()
     update_flg(update_date, sf_status.tasks)
@@ -275,6 +297,8 @@ def get_dependent_id_list(tasks: list[SubflowTask]) -> list:
     """
     dependent_id_list = []
     for task in tasks:
+        if task.active == False:
+            continue
         if len(task.dependent_task_ids) > 0:
             for dependent_id in task.dependent_task_ids:
                 dependent_id_list.append(dependent_id)
@@ -349,8 +373,10 @@ def backup_zipfile(abs_root: str, research_flow_dict: dict, current_time: str):
                     if os.path.isfile(file_path):
                         zip_path = os.path.join(path_config.IMAGES, file)
                         zipf.write(file_path, zip_path)
-                zipf.write(menu_notebook_path, arcname=os.path.basename(menu_notebook_path))
-                zipf.write(status_json_path, arcname=os.path.basename(status_json_path))
+                if os.path.exists(menu_notebook_path):
+                    zipf.write(menu_notebook_path, arcname=os.path.basename(menu_notebook_path))
+                if os.path.exists(status_json_path):
+                    zipf.write(status_json_path, arcname=os.path.basename(status_json_path))
                 for notebook in notebook_list:
                     zipf.write(notebook, arcname=os.path.basename(notebook))
 
@@ -553,6 +579,8 @@ def backup_govsheet_rf_file(abs_root :str, govsheet_rf_path: str, current_time: 
         govsheet_rf_path (str): RFガバナンスシートのパス
         current_time (str): 現在時刻
     """
+    govsheet_rf = get_govsheet_rf(abs_root)
+
     backup_file_path = os.path.join(
         abs_root,
         path_config.DATA_GOVERNANCE,
@@ -580,7 +608,7 @@ def preparation_notebook_file(abs_root: str, status_path_json: str, working_path
             _copy_file_by_name(task.name, task_dir, working_path)
 
 
-def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, govsheet: dict, research_flow_dict: dict):
+def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, govsheet: dict, research_flow_dict: dict, mapping_file: dict):
     """サブフローを作り直す関数です。
 
     Args:
@@ -589,6 +617,7 @@ def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, go
         govsheet_rf (dict): RFガバナンスシートの内容
         govsheet (dict): ガバナンスシートの内容
         research_flow_dict (dict): 存在するフェーズをkeyとし対応するサブフローIDとサブフロー名をvalueとした辞書
+        mapping_file (dict): マッピングファイルの内容
     """
     current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
 
@@ -609,11 +638,13 @@ def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, go
             shutil.rmtree(working_path)
             for delete_file_name in delete_files:
                 delete_file_path = os.path.join(researchflow_path, phase_name, subflow_id, delete_file_name)
+                if not os.path.exists(delete_file_path):
+                    continue
                 file.File(delete_file_path).remove()
 
             status_json_path = os.path.join(abs_root, path_config.get_sub_flow_status_file_path(phase_name, subflow_id))
             prepare_new_subflow_data(abs_root, phase_name, subflow_id, subflow_name, True)
-            update_status_file(abs_root, status_json_path)
+            update_status_file(abs_root, status_json_path, mapping_file)
             preparation_notebook_file(abs_root, status_json_path, working_path)
 
 

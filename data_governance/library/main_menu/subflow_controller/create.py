@@ -211,8 +211,7 @@ class CreateSubflowForm(BaseSubflowForm):
             self._sub_flow_name_form.value_input,
             self._data_dir_name_form.value_input,
             self._parent_sub_flow_selector.value,
-            mapping_file,
-            govsheet_rf
+            mapping_file
         )
         # GRDMと同期
         self.float_panel.visible = False
@@ -241,7 +240,6 @@ class CreateSubflowForm(BaseSubflowForm):
         self._err_output.update_success(msg_config.get('save', 'success'))
         self._research_flow_image.object = self.reserch_flow_status_operater.get_svg_of_research_flow_status()
         display(Javascript('IPython.notebook.save_checkpoint();'))
-        display(self._research_flow_image)
 
     def callback_cancel_button(self, event):
         """適用しない押下後エラーメッセージを表示するメソッドです。
@@ -472,12 +470,13 @@ class CreateSubflowForm(BaseSubflowForm):
         except Exception as e:
             message = msg_config.get('dg_web', 'get_data_error')
             self._err_output.update_error(f'{message}\n{str(e)}')
-            self.log.error(message)
+            self.log.error(f'{message}\n{traceback.format_exc()}')
             return
 
         # RFガバナンスシート取得
         self.govsheet_path = os.path.join(self.abs_root, self.remote_path)
         govsheet_rf = utils.get_govsheet_rf(self.abs_root)
+        mapping_file = utils.get_mapping_file(self.abs_root)
 
         if not govsheet_rf:
             if not govsheet:
@@ -490,7 +489,6 @@ class CreateSubflowForm(BaseSubflowForm):
                 return
             else:
                 # サブフロー作り直し
-                mapping_file = utils.get_mapping_file(self.abs_root)
                 utils.recreate_subflow(
                     self.abs_root, self.govsheet_rf_path, govsheet_rf, govsheet, self.research_flow_dict, mapping_file
                 )

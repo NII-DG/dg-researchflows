@@ -207,7 +207,7 @@ class MainMenu(TaskLog):
         self.token_input.param.watch(self.input, 'value_input')
         self.project_id_input.param.watch(self.input, 'value_input')
         # 確定ボタン
-        self.input_button = Button(disabled=True)
+        self.input_button = Button(disabled=True, align='end')
         self.input_button.set_looks_init()
         self.input_button.on_click(self.callback_input_button)
 

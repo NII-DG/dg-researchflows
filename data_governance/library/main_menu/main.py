@@ -592,6 +592,8 @@ class MainMenu(TaskLog):
 
         if not govsheet:
             self.research_flow_widget_box.clear()
+            self.apply_button.set_looks_init(msg_config.get('main_menu', 'apply'))
+            self.cancel_button.set_looks_init(msg_config.get('main_menu', 'cancel'))
             self.float_panel.visible = True
             self.research_flow_widget_box.append(self.float_panel)
             return
@@ -661,6 +663,7 @@ class MainMenu(TaskLog):
             self.log.warning(f'{message}\n{traceback.format_exc()}')
             return
         except RequestException as e:
+            self.update_research_flow_widget_box_init()
             message = msg_config.get('DEFAULT', 'connection_error')
             self.research_flow_message.update_error(f'{message}\n{str(e)}')
             self.log.error(f'{message}\n{traceback.format_exc()}')

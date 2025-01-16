@@ -51,7 +51,7 @@ class CreateSubflowForm(BaseSubflowForm):
             _data_dir_name_form(TextInput):データディレクトリ名のフォーム
             token(str):パーソナルアクセストークン
             project_id(str):プロジェクトID
-            tmp_propject_id(str):一時的に保持するプロジェクトID
+            tmp_project_id(str):一時的に保持するプロジェクトID
     """
 
     def __init__(self, abs_root: str, widget_box: pn.WidgetBox, message_box: MessageBox, research_flow_image: pn.pane.HTML) -> None:

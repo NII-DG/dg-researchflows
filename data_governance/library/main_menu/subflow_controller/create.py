@@ -457,6 +457,7 @@ class CreateSubflowForm(BaseSubflowForm):
             self.reset_form()
             message = msg_config.get('form', 'project_id_not_exist').format(self.tmp_project_id)
             self._err_output.update_error(message)
+            self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             self.log.error(f'{message}\n{traceback.format_exc()}')
             return
 

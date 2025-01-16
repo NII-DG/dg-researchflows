@@ -381,7 +381,7 @@ def backup_zipfile(abs_root: str, research_flow_dict: dict, current_time: str):
                 for notebook in notebook_list:
                     zipf.write(notebook, arcname=os.path.basename(notebook))
             with zipfile.ZipFile(zip_file_path, 'r') as zipf:
-                if not zipf.namelist:
+                if not zipf.namelist():
                     os.remove(zip_file_path)
 
 

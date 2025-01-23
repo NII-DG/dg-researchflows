@@ -17,6 +17,21 @@ TASK = 'task'
 ## researchflow直下
 PLAN = 'plan'
 
+# data/<phase>/<data_dir_name>直下のフォルダ
+ARGUMENT = "argument_data"
+REFERENCES = "references"
+DRAFT = "draft"
+PAPER = "paper"
+FIGURE = "figure"
+REPLY = "reply"
+PUBLIC = "public_data"
+## data/writing/<data_dir_name>直下のフォルダ
+WRITING_FOLDERS =[ARGUMENT, REFERENCES, DRAFT, PAPER, FIGURE]
+## data/review/<data_dir_name>直下のフォルダ
+REVIEW_FOLDERS = [ARGUMENT, PAPER, REPLY]
+## data/publication/<data_dir_name>直下のフォルダ
+PUBLICATION_FOLDERS = [PUBLIC]
+
 
 # Folder Path
 def get_abs_root_form_working_dg_file_path(working_dg_file_path: str) -> str:
@@ -66,6 +81,32 @@ def get_task_data_dir(abs_root: str, phase: str, data_dir_name: str) -> str:
     """
     return os.path.join(abs_root, DATA, phase, data_dir_name)
 
+def get_task_data_sub_dirs(data_dir_path: str, phase: str) -> list:
+    """ タスクデータディレクトリ直下の全ディレクトリパスを取得する関数です。
+
+    <root>/data/<phase>/<data_dir_name>/<sub_dir>の形式で取得します。
+
+    Args:
+        data_dir_path (str): <root>/data/<phase>/<data_dir_name>形式のパスです。
+        phase (str): サブフロー種別（フェーズ）を設定します。
+
+    Returns:
+        list(str): タスクデータディレクトリ直下のフォルダパスのリストを返す。
+
+    """
+    sub_dirs =[]
+    if phase == "writing":
+        sub_dirs = WRITING_FOLDERS
+    elif phase == "review":
+        sub_dirs = REVIEW_FOLDERS
+    elif phase == "publication":
+        sub_dirs = PUBLICATION_FOLDERS
+
+    sub_dir_path = []
+    for sub_dir in sub_dirs:
+        sub_dir_path.append(os.path.join(data_dir_path, sub_dir))
+
+    return sub_dir_path
 
 # File
 MAIN_NOTEBOOK = 'main.ipynb'

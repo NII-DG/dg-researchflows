@@ -1,17 +1,69 @@
 {
     "is_completed": false,
     "order": {
-        "sequence": ["RF004003"],
+        "sequence": ["RF004003", "RF004005", "RF004006", "RF004010", "RF004011"],
         "whenever":["RF009004", "RF009002", "RF009006", "RF009007", "RF009001", "RF009005"]
     },
     "tasks": [
         {
             "id": "RF004003",
             "name": "organize_argument_data",
-            "is_multiple": false,
+            "is_multiple": true,
             "is_required": false,
             "completed_count": 0,
             "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF004005",
+            "name": "create_draft",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [
+                "RF004003"
+            ],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF004006",
+            "name": "write_paper",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [
+                "RF004003"
+            ],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF004010",
+            "name": "register_paper_metadata",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [
+                "RF004006"
+            ],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF004011",
+            "name": "select_submission_destination",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [
+                "RF004006"
+            ],
             "status": "unexecuted",
             "execution_environments": [],
             "active": true

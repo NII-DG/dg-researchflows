@@ -23,6 +23,16 @@
       "seq_number": 3,
       "name": "writing",
       "sub_flow_data": []
+    },
+    {
+      "seq_number": 4,
+      "name": "review",
+      "sub_flow_data": []
+    },
+    {
+      "seq_number": 5,
+      "name": "publication",
+      "sub_flow_data": []
     }
   ]
 }

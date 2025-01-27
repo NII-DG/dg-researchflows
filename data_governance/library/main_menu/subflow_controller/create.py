@@ -494,6 +494,8 @@ class CreateSubflowForm(BaseSubflowForm):
                 )
 
         # 新規作成する
+        error_m = f"{phase_seq_number}+{sub_flow_name}+{data_dir_name}+{parent_sub_flow_ids}+{mapping_file}+{self.abs_root}"
+        self.log.error(error_m)
         self.new_create_subflow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids, mapping_file)
 
         # GRDMと同期
@@ -559,6 +561,13 @@ class CreateSubflowForm(BaseSubflowForm):
         if os.path.exists(path):
             raise Exception(f'{path} is already exist.')
         os.makedirs(path)
+
+        if phase_name == "writing" or "review" or "publication":
+            sub_dirs = path_config.get_task_data_sub_dirs(path, phase_name)
+
+            for sub_dir in sub_dirs:
+                os.makedirs(sub_dir)
+
         return path
 
     def new_create_subflow(self, phase_seq_number: int, sub_flow_name: str, data_dir_name: str, parent_sub_flow_ids: list[str], mapping_file: dict):

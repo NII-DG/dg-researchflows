@@ -43,6 +43,7 @@ RUN pip install --no-cache black==21.12b0
 RUN pip install --no-cache boto3
 RUN pip install --no-cache chardet==4.0.0
 RUN pip install --no-cache panel==1.3.0
+RUN pip install --no-cache pikepdf==1.3.0
 RUN pip install --no-cache python-magic==0.4.27
 RUN pip install --no-cache natsort==8.3.1
 RUN pip install --no-cache pandas==2.1.4
@@ -102,6 +103,26 @@ COPY . ${HOME}
 
 USER root
 RUN chown -R ${NB_UID} ${HOME}
+
+USER root
+
+# TeX Live (LaTeX)をインストール
+RUN apt-get update -y && apt-get install -y \
+    texlive \
+    texlive-latex-extra \
+    texlive-fonts-recommended \
+    texlive-fonts-extra \
+    texlive-xetex \
+    latexmk \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# pdflatex を使えるようにする
+RUN apt-get install -y \
+    texlive-latex-base \
+    && apt-get clean
+
+USER ${NB_USER}
 
 
 ##### User Custom Area [Start] ######

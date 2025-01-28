@@ -604,7 +604,7 @@ class MainMenu(TaskLog):
 
         # ガバナンスシートにカスタムガバナンスシートをマージする
         custom_govsheet = utils.get_custom_govsheet(self.abs_root)
-        govsheet.update(custom_govsheet)
+        utils.get_merge_govsheet(govsheet, custom_govsheet)
 
         if govsheet_rf == govsheet:
             self.update_research_flow_widget_box_init()
@@ -686,7 +686,7 @@ class MainMenu(TaskLog):
 
         # ガバナンスシートにカスタムガバナンスシートをマージする
         custom_govsheet = utils.get_custom_govsheet(self.abs_root)
-        data.update(custom_govsheet)
+        utils.get_merge_govsheet(data, custom_govsheet)
 
         # サブフローを作り直す
         utils.recreate_subflow(

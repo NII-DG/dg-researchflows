@@ -672,6 +672,18 @@ def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, go
             preparation_notebook_file(abs_root, status_json_path, working_path)
 
 
+def get_merge_govsheet(govsheet: dict, custom_govsheet: dict):
+    """ガバナンスシートにカスタムガバナンスシートをマージする関数です。
+
+    Args:
+        govsheet (dict): ガバナンスシートの内容
+        custom_govsheet (dict): カスタムガバナンスシートの内容
+    """
+    for custom_key, custom_value in custom_govsheet.items():
+        if custom_key not in govsheet:
+            govsheet[custom_key] = custom_value
+
+
 def get_sync_path(abs_root: str) -> list:
     """data_governance/researchflow、data_governance/log以下のディレクトリ/ファイルのパスを取得する関数です。
 

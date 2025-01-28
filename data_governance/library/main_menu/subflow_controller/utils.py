@@ -140,6 +140,25 @@ def get_govsheet(token: str, base_url: str, project_id: str, remote_path: str) -
     return govsheet
 
 
+def get_custom_govsheet(abs_root: str) -> dict:
+    """カスタムガバナンスシートを取得する関数です。
+
+    Args:
+        abs_root (str): リサーチフローのルートディレクトリ
+
+    Returns:
+        _type_: カスタムガバナンスシートの内容
+    """
+    custom_govsheet_path = os.path.join(
+        abs_root,
+        path_config.DG_RESEARCHFLOW_FOLDER,
+        'custom-gov-sheet.json'
+    )
+    with open(custom_govsheet_path, 'r') as f:
+        custom_govsheet = json.load(f)
+    return custom_govsheet
+
+
 def get_notebook_list(working_dir_path: str) -> list:
     """ディレクトリ配下のノートブックファイルを取得する関数です。
 

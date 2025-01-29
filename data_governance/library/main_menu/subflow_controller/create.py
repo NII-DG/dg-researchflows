@@ -7,6 +7,7 @@ import os
 import traceback
 from typing import Optional
 
+from IPython.core.display import Javascript
 from IPython.core.display import display
 from dg_drawer.research_flow import PhaseStatus
 import panel as pn
@@ -206,9 +207,13 @@ class CreateSubflowForm(BaseSubflowForm):
         finally:
             govsheet_file.remove(missing_ok=True)
 
+        # ガバナンスシートにカスタムガバナンスシートをマージする
+        custom_govsheet = utils.get_custom_govsheet(self.abs_root)
+        merge_govsheet = utils.get_merge_govsheet(data, custom_govsheet)
+
         # サブフローを作り直す
         utils.recreate_subflow(
-            self.abs_root, self.govsheet_rf_path, govsheet_rf, data, self.research_flow_dict, mapping_file)
+            self.abs_root, self.govsheet_rf_path, govsheet_rf, merge_govsheet, self.research_flow_dict, mapping_file)
         # 新規作成する
         self.new_create_subflow(
             self._sub_flow_type_selector.value,
@@ -500,9 +505,12 @@ class CreateSubflowForm(BaseSubflowForm):
                 self._sub_flow_widget_box.append(self.float_panel)
                 return
             else:
+                # ガバナンスシートにカスタムガバナンスシートをマージする
+                custom_govsheet = utils.get_custom_govsheet(self.abs_root)
+                merge_govsheet = utils.get_merge_govsheet(govsheet, custom_govsheet)
                 # サブフロー作り直し
                 utils.recreate_subflow(
-                    self.abs_root, self.govsheet_rf_path, govsheet_rf, govsheet, self.research_flow_dict, mapping_file
+                    self.abs_root, self.govsheet_rf_path, govsheet_rf, merge_govsheet, self.research_flow_dict, mapping_file
                 )
 
         # 新規作成する

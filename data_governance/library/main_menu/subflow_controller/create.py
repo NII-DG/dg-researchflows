@@ -209,11 +209,11 @@ class CreateSubflowForm(BaseSubflowForm):
 
         # ガバナンスシートにカスタムガバナンスシートをマージする
         custom_govsheet = utils.get_custom_govsheet(self.abs_root)
-        utils.get_merge_govsheet(data, custom_govsheet)
+        merge_govsheet = utils.get_merge_govsheet(data, custom_govsheet)
 
         # サブフローを作り直す
         utils.recreate_subflow(
-            self.abs_root, self.govsheet_rf_path, govsheet_rf, data, self.research_flow_dict, mapping_file)
+            self.abs_root, self.govsheet_rf_path, govsheet_rf, merge_govsheet, self.research_flow_dict, mapping_file)
         # 新規作成する
         self.new_create_subflow(
             self._sub_flow_type_selector.value,
@@ -507,10 +507,10 @@ class CreateSubflowForm(BaseSubflowForm):
             else:
                 # ガバナンスシートにカスタムガバナンスシートをマージする
                 custom_govsheet = utils.get_custom_govsheet(self.abs_root)
-                utils.get_merge_govsheet(govsheet, custom_govsheet)
+                merge_govsheet = utils.get_merge_govsheet(govsheet, custom_govsheet)
                 # サブフロー作り直し
                 utils.recreate_subflow(
-                    self.abs_root, self.govsheet_rf_path, govsheet_rf, govsheet, self.research_flow_dict, mapping_file
+                    self.abs_root, self.govsheet_rf_path, govsheet_rf, merge_govsheet, self.research_flow_dict, mapping_file
                 )
 
         # 新規作成する

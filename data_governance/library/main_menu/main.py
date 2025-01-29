@@ -604,9 +604,9 @@ class MainMenu(TaskLog):
 
         # ガバナンスシートにカスタムガバナンスシートをマージする
         custom_govsheet = utils.get_custom_govsheet(self.abs_root)
-        utils.get_merge_govsheet(govsheet, custom_govsheet)
+        merge_govsheet = utils.get_merge_govsheet(govsheet, custom_govsheet)
 
-        if govsheet_rf == govsheet:
+        if govsheet_rf == merge_govsheet:
             self.update_research_flow_widget_box_init()
             message = msg_config.get('main_menu', 'current_version_govsheet')
             self.research_flow_message.update_info(message)
@@ -615,10 +615,10 @@ class MainMenu(TaskLog):
         if not self.research_flow_dict:
             if govsheet_rf:
                 utils.backup_govsheet_rf_file(self.abs_root, self.govsheet_rf_path)
-            file.JsonFile(self.govsheet_rf_path).write(govsheet)
+            file.JsonFile(self.govsheet_rf_path).write(merge_govsheet)
         else:
             utils.recreate_subflow(
-                self.abs_root, self.govsheet_rf_path, govsheet_rf, govsheet, self.research_flow_dict, mapping_file)
+                self.abs_root, self.govsheet_rf_path, govsheet_rf, merge_govsheet, self.research_flow_dict, mapping_file)
 
         # GRDMと同期
         self.research_flow_widget_box.clear()
@@ -686,11 +686,11 @@ class MainMenu(TaskLog):
 
         # ガバナンスシートにカスタムガバナンスシートをマージする
         custom_govsheet = utils.get_custom_govsheet(self.abs_root)
-        utils.get_merge_govsheet(data, custom_govsheet)
+        merge_govsheet = utils.get_merge_govsheet(data, custom_govsheet)
 
         # サブフローを作り直す
         utils.recreate_subflow(
-            self.abs_root, self.govsheet_rf_path, govsheet_rf, data, self.research_flow_dict, mapping_file)
+            self.abs_root, self.govsheet_rf_path, govsheet_rf, merge_govsheet, self.research_flow_dict, mapping_file)
 
         # GRDMと同期
         self.float_panel.visible = False

@@ -672,16 +672,24 @@ def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, go
             preparation_notebook_file(abs_root, status_json_path, working_path)
 
 
-def get_merge_govsheet(govsheet: dict, custom_govsheet: dict):
+def get_merge_govsheet(govsheet: dict, custom_govsheet: dict) -> dict:
     """ガバナンスシートにカスタムガバナンスシートをマージする関数です。
 
     Args:
         govsheet (dict): ガバナンスシートの内容
         custom_govsheet (dict): カスタムガバナンスシートの内容
+
+    Returns:
+        dict: マージ後のガバナンスシート
     """
-    for custom_key, custom_value in custom_govsheet.items():
-        if custom_key not in govsheet:
-            govsheet[custom_key] = custom_value
+    if isinstance(govsheet, dict) and isinstance(custom_govsheet, dict):
+        for custom_key, custom_value in custom_govsheet.items():
+            if custom_key in govsheet:
+                if isinstance(govsheet[custom_key], dict) and isinstance(custom_value, dict):
+                    get_merge_govsheet(govsheet[custom_key], custom_value)
+            else:
+                govsheet[custom_key] = custom_value
+    return govsheet
 
 
 def get_sync_path(abs_root: str) -> list:

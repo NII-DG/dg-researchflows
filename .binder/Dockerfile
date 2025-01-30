@@ -104,6 +104,7 @@ COPY . ${HOME}
 USER root
 RUN chown -R ${NB_UID} ${HOME}
 
+# install texlive
 USER root
 RUN apt-get update && apt-get install -y \
     texlive-full \

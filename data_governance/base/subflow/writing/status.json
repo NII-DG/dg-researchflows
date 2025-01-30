@@ -25,7 +25,7 @@
             "dependent_task_ids": [
                 "RF004003"
             ],
-            "status": "unexecuted",
+            "status": "unfeasible",
             "execution_environments": [],
             "active": true
         },
@@ -38,7 +38,7 @@
             "dependent_task_ids": [
                 "RF004003"
             ],
-            "status": "unexecuted",
+            "status": "unfeasible",
             "execution_environments": [],
             "active": true
         },
@@ -51,7 +51,7 @@
             "dependent_task_ids": [
                 "RF004006"
             ],
-            "status": "unexecuted",
+            "status": "unfeasible",
             "execution_environments": [],
             "active": true
         },
@@ -64,7 +64,7 @@
             "dependent_task_ids": [
                 "RF004006"
             ],
-            "status": "unexecuted",
+            "status": "unfeasible",
             "execution_environments": [],
             "active": true
         },

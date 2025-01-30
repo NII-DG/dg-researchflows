@@ -266,6 +266,7 @@ class Grdm():
 
         Returns:
             str: 指定されたproject idのプロジェクトメンバー一覧画面のURL
+
         """
         parsed = parse.urlparse(base_url)
         return parse.urlunparse((parsed.scheme, parsed.netloc, project_id, '', '', ''))
@@ -279,6 +280,7 @@ class Grdm():
 
         Returns:
             str: 指定されたproject idのプロジェクトメンバー一覧画面のURL
+
         """
         parsed = parse.urlparse(base_url)
         endpoint = f'{project_id}/addons/'
@@ -299,8 +301,8 @@ class Grdm():
             UnauthorizedError: 認証が通らない
             ProjectNotExist: 指定されたプロジェクトIDが存在しない
             requests.exceptions.RequestException: その他の通信エラー
-        """
 
+        """
         response = self.external.get_project_children(base_url, token, project_id)
         data = response['data']
         return {

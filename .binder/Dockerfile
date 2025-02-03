@@ -32,6 +32,15 @@ RUN apt-get install -y ansible
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
+# 日本語環境のLaTexをインストール
+RUN apt-get update && apt-get install -y \
+    texlive-lang-japanese \
+    texlive-latex-base \
+    texlive-latex-recommended \
+    texlive-fonts-recommended \
+    texlive-fonts-extra
+
+
 USER ${NB_USER}
 
 # install the notebook package etc.
@@ -43,7 +52,7 @@ RUN pip install --no-cache black==21.12b0
 RUN pip install --no-cache boto3
 RUN pip install --no-cache chardet==4.0.0
 RUN pip install --no-cache panel==1.3.0
-RUN pip install --no-cache pikepdf
+RUN pip install --no-cache pikepdf==9.5.1
 RUN pip install --no-cache python-magic==0.4.27
 RUN pip install --no-cache natsort==8.3.1
 RUN pip install --no-cache pandas==2.1.4
@@ -103,12 +112,6 @@ COPY . ${HOME}
 
 USER root
 RUN chown -R ${NB_UID} ${HOME}
-
-# install texlive
-USER root
-RUN apt-get update && apt-get install -y \
-    texlive-full \
-    texlive-latex-extra
 
 
 ##### User Custom Area [Start] ######

@@ -224,6 +224,7 @@ class External:
                 raise ProjectNotExist(str(e)) from e
             raise
         return response.json()
+
     def get_project_children(self, base_url: str, token: str, project_id: str) -> dict:
         """ プロジェクトのコンポーネントの情報を取得する
 

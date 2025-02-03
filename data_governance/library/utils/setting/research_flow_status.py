@@ -554,3 +554,79 @@ class ResearchFlowStatusOperater(ResearchFlowStatusFile):
         for data in phase._sub_flow_data:
             id_name_dict[data._id] = data._name
         return id_name_dict
+
+    def get_parent_ids(self, phase_seq_number: int, id: str) -> list[str]:
+        """指定したサブフローデータの親サブフローIDを取得するメソッドです。
+
+        Args:
+            phase_seq_number (int):対象のフェーズシーケンス番号
+            id (str):対象のサブフローID
+
+        Returns:
+            list[str]:指定したサブフローデータの全親サブフローID
+
+        Raises:
+            NotFoundSubflowDataError:IDが一致するサブフローデータが存在しない
+
+        """
+        research_flow_status = self.load_research_flow_status()
+        for phase in research_flow_status:
+            if phase._seq_number != phase_seq_number:
+                continue
+            for sb in phase._sub_flow_data:
+                if sb._id == id:
+                    return sb._parent_ids
+        else:
+            raise NotFoundSubflowDataError(f'There Is No Data Directory Name. sub_flow_id : {id}')
+
+    def get_flow_name(self, phase_seq_number: int, id: str) -> str:
+        """指定したサブフローデータのサブフロー名を取得するメソッドです。
+
+        Args:
+            phase_seq_number (int):対象のフェーズシーケンス番号
+            id (str):対象のサブフローID
+
+        Returns:
+            str:サブフロー名
+
+        Raises:
+            NotFoundSubflowDataError:IDが一致するサブフローデータが存在しない
+
+        """
+        research_flow_status = self.load_research_flow_status()
+        for phase in research_flow_status:
+            if phase._seq_number != phase_seq_number:
+                continue
+            for sb in phase._sub_flow_data:
+                if sb._id == id:
+                    return sb._name
+        else:
+            raise NotFoundSubflowDataError(f'There Is No Data Directory Name. sub_flow_id : {id}')
+
+    def get_children_id_and_name(self, phase_seq_number: int, parent_id: str) -> dict:
+        """指定されたサブフローを親とする特定のフェーズのサブフローidと名前を取得するメソッドです。
+
+        Args:
+            phase_seq_number (int):対象のフェーズシーケンス番号
+            parent_id (str):対象の親サブフローID
+
+        Returns:
+            dict:対象の子サブフローidと名前の組み合わせ
+
+        Raises:
+            NotFoundSubflowDataError:IDが一致するサブフローデータが存在しない
+
+        """
+        children_subflow = {}
+        research_flow_status = self.load_research_flow_status()
+        for phase in research_flow_status:
+            if phase._seq_number != phase_seq_number:
+                continue
+            for sb in phase._sub_flow_data:
+                if parent_id in sb._parent_ids:
+                    children_subflow[sb._name] = sb._id
+
+        if children_subflow:
+            return children_subflow
+        else:
+            raise NotFoundSubflowDataError(f'There Is No Data Directory Name. sub_flow_id : {id}')

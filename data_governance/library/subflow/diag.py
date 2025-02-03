@@ -31,7 +31,7 @@ class DiagManager:
     rank_sep = '0.4'
     node_attr = {
         'shape': 'box',
-        'width': '2.5',
+        'width': '3.0',
         'height': '0.6',
         'fixedsize': 'true',
         'style': 'filled',

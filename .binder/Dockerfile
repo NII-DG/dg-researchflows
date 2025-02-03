@@ -29,9 +29,6 @@ RUN apt-get install -y software-properties-common
 RUN apt-add-repository -y -u ppa:ansible/ansible
 RUN apt-get install -y ansible
 
-RUN apt-get clean
-RUN rm -rf /var/lib/apt/lists/*
-
 # 日本語環境のLaTexをインストール
 RUN apt-get update && apt-get install -y \
     texlive-lang-japanese \
@@ -40,6 +37,8 @@ RUN apt-get update && apt-get install -y \
     texlive-fonts-recommended \
     texlive-fonts-extra
 
+RUN apt-get clean
+RUN rm -rf /var/lib/apt/lists/*
 
 USER ${NB_USER}
 

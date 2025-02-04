@@ -2,9 +2,10 @@
 
 このモジュールはメインメニューの画面やボタンを表示するメソッドやサブフローメニューの画面の表示、操作を行えるメソッドなどがあります。
 """
+import datetime
+import json
 import os
 import traceback
-import json
 
 from IPython.core.display import Javascript
 from IPython.display import display

@@ -631,14 +631,14 @@ def preparation_notebook_file(abs_root: str, status_path_json: str, working_path
             _copy_file_by_name(task.name, task_dir, working_path)
 
 
-def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, govsheet: dict, research_flow_dict: dict, mapping_file: dict):
+def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, merge_govsheet: dict, research_flow_dict: dict, mapping_file: dict):
     """サブフローを作り直す関数です。
 
     Args:
         abs_root (str): リサーチフローのルートディレクトリ
         govsheet_rf_path (str): RFガバナンスシートのパス
         govsheet_rf (dict): RFガバナンスシートの内容
-        govsheet (dict): ガバナンスシートの内容
+        merge_govsheet (dict): ガバナンスシートにカスタムガバナンスシートをマージした内容
         research_flow_dict (dict): 存在するフェーズをkeyとし対応するサブフローIDとサブフロー名をvalueとした辞書
         mapping_file (dict): マッピングファイルの内容
     """
@@ -647,7 +647,7 @@ def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, go
     if govsheet_rf:
         backup_govsheet_rf_file(abs_root, govsheet_rf_path, current_time)
     backup_zipfile(abs_root, research_flow_dict, current_time)
-    file.JsonFile(govsheet_rf_path).write(govsheet)
+    file.JsonFile(govsheet_rf_path).write(merge_govsheet)
 
     if not research_flow_dict:
         return

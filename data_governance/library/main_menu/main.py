@@ -568,6 +568,7 @@ class MainMenu(TaskLog):
         self.research_flow_message.clear()
         self.research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
         govsheet_rf = utils.get_govsheet_rf(self.abs_root)
+        current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
         mapping_file = utils.get_mapping_file(self.abs_root)
 
         govsheet = None
@@ -614,7 +615,7 @@ class MainMenu(TaskLog):
 
         if not self.research_flow_dict:
             if govsheet_rf:
-                utils.backup_govsheet_rf_file(self.abs_root, self.govsheet_rf_path)
+                utils.backup_govsheet_rf_file(self.abs_root, self.govsheet_rf_path, current_time)
             file.JsonFile(self.govsheet_rf_path).write(merge_govsheet)
         else:
             utils.recreate_subflow(

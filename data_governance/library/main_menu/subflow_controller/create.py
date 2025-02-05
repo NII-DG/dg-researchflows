@@ -505,7 +505,7 @@ class CreateSubflowForm(BaseSubflowForm):
                 self._sub_flow_widget_box.append(self.float_panel)
                 return
             else:
-                # カスタムガバナンスシート取得
+                # ガバナンスシートにカスタムガバナンスシートをマージする
                 custom_govsheet = utils.get_custom_govsheet(self.abs_root)
                 merge_govsheet = utils.get_merge_govsheet(govsheet, custom_govsheet)
                 # サブフロー作り直し

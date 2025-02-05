@@ -673,10 +673,10 @@ def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, me
 
 
 def get_merge_govsheet(govsheet: dict, custom_govsheet: dict) -> dict:
-    """RFガバナンスシートかガバナンスシートにカスタムガバナンスシートをマージする関数です。
+    """ガバナンスシートにカスタムガバナンスシートをマージする関数です。
 
     Args:
-        govsheet (dict): RFガバナンスシートかガバナンスシートの内容
+        govsheet (dict): ガバナンスシートの内容
         custom_govsheet (dict): カスタムガバナンスシートの内容
 
     Returns:

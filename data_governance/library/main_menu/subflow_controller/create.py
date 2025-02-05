@@ -495,24 +495,23 @@ class CreateSubflowForm(BaseSubflowForm):
         govsheet_rf = utils.get_govsheet_rf(self.abs_root)
         mapping_file = utils.get_mapping_file(self.abs_root)
 
-        if not govsheet_rf and not govsheet:
-            # ガバナンスシートを作成させる
-            self._err_output.clear()
-            self.float_panel.visible = True
-            self.apply_button.set_looks_init(msg_config.get('main_menu', 'apply'))
-            self.cancel_button.set_looks_init(msg_config.get('main_menu', 'cancel'))
-            self._sub_flow_widget_box.append(self.float_panel)
-            return
-
-        # ガバナンスシートにカスタムガバナンスシートをマージする
-        custom_govsheet = utils.get_custom_govsheet(self.abs_root)
-        merge_govsheet = utils.get_merge_govsheet(govsheet, custom_govsheet)
-
-        if govsheet_rf != merge_govsheet:
-            # サブフロー作り直し
-            utils.recreate_subflow(
-                self.abs_root, self.govsheet_rf_path, govsheet_rf, merge_govsheet, self.research_flow_dict, mapping_file
-            )
+        if not govsheet_rf:
+            if not govsheet:
+                # ガバナンスシートを作成させる
+                self._err_output.clear()
+                self.float_panel.visible = True
+                self.apply_button.set_looks_init(msg_config.get('main_menu', 'apply'))
+                self.cancel_button.set_looks_init(msg_config.get('main_menu', 'cancel'))
+                self._sub_flow_widget_box.append(self.float_panel)
+                return
+            else:
+                # ガバナンスシートにカスタムガバナンスシートをマージする
+                custom_govsheet = utils.get_custom_govsheet(self.abs_root)
+                merge_govsheet = utils.get_merge_govsheet(govsheet, custom_govsheet)
+                # サブフロー作り直し
+                utils.recreate_subflow(
+                    self.abs_root, self.govsheet_rf_path, govsheet_rf, merge_govsheet, self.research_flow_dict, mapping_file
+                )
 
         # 新規作成する
         self.new_create_subflow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids, mapping_file)

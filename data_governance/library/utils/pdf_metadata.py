@@ -4,6 +4,7 @@ PDFファイルのメタデータの取得や更新を行う機能を記載し�
 
 """
 import os
+import traceback
 
 import panel as pn
 import pikepdf
@@ -91,12 +92,18 @@ class PdfMetaData(TaskDirector):
         # pdfが選択されたときにメタデータを取得して入力欄に入れる
         pdf_path = self.pdf_select.value
         if pdf_path != 'default':
-            with pikepdf.open(pdf_path) as pdf:
-                metadata = pdf.docinfo
-                author = metadata.get('/Author', '')
-                title = metadata.get('/Title', '')
-                subject = metadata.get('/Subject', '')
-                keywords = metadata.get('/Keywords', '')
+            try:
+                with pikepdf.open(pdf_path) as pdf:
+                    metadata = pdf.docinfo
+                    author = metadata.get('/Author', '')
+                    title = metadata.get('/Title', '')
+                    subject = metadata.get('/Subject', '')
+                    keywords = metadata.get('/Keywords', '')
+
+            except Exception:
+                self.log.error(traceback.format_exc())
+                self.output_message.update_error(msg_config.get('register_paper_metadata','failed_load'))
+                return
 
             self.author_input.value = author
             self.title_input.value = title
@@ -122,16 +129,22 @@ class PdfMetaData(TaskDirector):
 
         pdf_path = self.pdf_select.value
         if pdf_path != 'default':
-            with pikepdf.open(pdf_path, allow_overwriting_input=True) as pdf:
-                # メタデータを更新
-                self.log.info(f"Updating metadata for {pdf_path}")
-                pdf.docinfo['/Author'] = author
-                pdf.docinfo['/Title'] = title
-                pdf.docinfo['/Subject'] = subject
-                pdf.docinfo['/Keywords'] = keywords
+            try:
+                with pikepdf.open(pdf_path, allow_overwriting_input=True) as pdf:
+                    # メタデータを更新
+                    self.log.info(f"Updating metadata for {pdf_path}")
+                    pdf.docinfo['/Author'] = author
+                    pdf.docinfo['/Title'] = title
+                    pdf.docinfo['/Subject'] = subject
+                    pdf.docinfo['/Keywords'] = keywords
 
-                # PDFを保存（元のファイルに上書き）
-                pdf.save(pdf_path)
+                    # PDFを保存（元のファイルに上書き）
+                    pdf.save(pdf_path)
+
+            except Exception:
+                self.log.error(traceback.format_exc())
+                self.output_message.update_error(msg_config.get('register_paper_metadata','failed_register'))
+                return
 
             self.output_message.update_success(msg_config.get('register_paper_metadata','complete'))
             self.form_section.append(self.output_message)

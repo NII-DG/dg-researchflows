@@ -306,6 +306,6 @@ class Grdm():
         response = self.external.get_project_children(base_url, token, project_id)
         data = response['data']
         return {
-            d['id']: d['attributes']['title']
+            d['attributes']['title']: d['id']
             for d in data
         }

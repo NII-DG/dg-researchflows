@@ -50,6 +50,7 @@ RUN pip install --no-cache -U nbformat==5.2.0
 RUN pip install --no-cache black==21.12b0
 RUN pip install --no-cache boto3
 RUN pip install --no-cache chardet==4.0.0
+RUN pip install --no-cache openpyxl==3.1.3
 RUN pip install --no-cache panel==1.3.0
 RUN pip install --no-cache pikepdf==9.5.1
 RUN pip install --no-cache python-magic==0.4.27

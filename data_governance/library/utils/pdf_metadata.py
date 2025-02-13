@@ -61,7 +61,7 @@ class PdfMetaData(TaskDirector):
         self.pdf_select.param.watch(self.on_select_change, 'value')
 
         # 登録ボタンの設定
-        registrate_button_title = msg_config.get('form', 'registrate')
+        registrate_button_title = msg_config.get('form', 'register')
         self.registrate_button = Button(width=500, disabled=True)
         self.registrate_button.set_looks_init(registrate_button_title)
         self.registrate_button.on_click(self.on_click_registrate)

@@ -64,9 +64,6 @@ RUN pip install --no-cache git+https://github.com/NII-DG/nii-dg.git@230419_8c684
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-packager.git@master
 RUN pip install --no-cache graphviz==0.20.1
 
-# ↓必要なければ消す
-RUN pip install --no-cache nest_asyncio==1.6.0
-
 # TODO: リリース時にブランチを最新のタグに変更する
 RUN pip install --no-cache git+https://github.com/NII-DG/dg-metadata-manager.git@3670dc0bacdb5e00501b88e126a10c52657e9355
 

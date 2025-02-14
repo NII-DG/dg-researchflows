@@ -10,7 +10,8 @@ from urllib import parse
 
 import aiofiles
 from osfclient.cli import OSF, split_storage
-from osfclient.utils import norm_remote_path, split_storage, is_path_matched
+from osfclient.models import File
+from osfclient.utils import norm_remote_path, split_storage, _is_path_matched
 from osfclient.exceptions import UnauthorizedException
 import requests
 from requests.exceptions import RequestException
@@ -352,15 +353,19 @@ class External:
             if not base_file_path.endswith('/'):
                 base_file_path = base_file_path + '/'
 
-                def path_filter(f): return is_path_matched(base_file_path, f)
+                def path_filter(f): return _is_path_matched(base_file_path, f)
         else:
             path_filter = None
 
         try:
             project = await osf.project(project_id)
             store = await project.storage(storage)
-            files = store.files if path_filter is None \
-                    else store.matched_files(path_filter)
+
+            if path_filter is None:
+                files = store._iter_children(store._files_url, 'file', File, recurse=('links', 'upload'))
+            else:
+                files = store.matched_files(path_filter)
+
             async for file_ in files:
                 if norm_remote_path(file_.path) == remote_path:
                     try:

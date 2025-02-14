@@ -358,7 +358,7 @@ class CreateSubflowForm(BaseSubflowForm):
             self.submit_button
         )
 
-    def main(self):
+    async def main(self):
         """サブフロー新規作成処理のメソッドです。
 
         入力情報を取得し、その値を検証してリサーチフローステータス管理JSONの更新、新規サブフローデータの用意を行う。
@@ -453,7 +453,7 @@ class CreateSubflowForm(BaseSubflowForm):
         # ガバナンスシート取得
         govsheet = None
         try:
-            govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
+            govsheet = await utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
         except (FileNotFoundError, json.JSONDecodeError):
             govsheet = None
         except UnauthorizedError:

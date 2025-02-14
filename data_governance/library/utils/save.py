@@ -109,7 +109,7 @@ class TaskSave(TaskLog):
             self.log.error(message)
         return token, project_id
 
-    async def define_save_form(self, source: Union[str, list[str]]) -> None:
+    def define_save_form(self, source: Union[str, list[str]]) -> None:
         """ GRDMに保存するフォームを作成するメソッドです。
 
         Args:

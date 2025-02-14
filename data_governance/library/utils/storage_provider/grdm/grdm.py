@@ -193,7 +193,7 @@ class Grdm():
             UnauthorizedError: 認証が通らない
             requests.exceptions.RequestException: その他の通信エラー
         """
-        content = await self.download_text_file(token, base_url, project_id, remote_path)
+        content =  await self.download_text_file(token, base_url, project_id, remote_path)
         return json.loads(content)
 
     def get_project_metadata(self, base_url: str, token: str, project_id: str) -> dict[str, list]:

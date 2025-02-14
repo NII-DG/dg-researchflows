@@ -11,7 +11,7 @@ from urllib import parse
 import aiofiles
 from osfclient.cli import OSF, split_storage
 from osfclient.models import File
-from osfclient.utils import norm_remote_path, split_storage, _is_path_matched
+from osfclient.utils import norm_remote_path, split_storage
 from osfclient.exceptions import UnauthorizedException
 import requests
 from requests.exceptions import RequestException
@@ -227,44 +227,6 @@ class External:
             raise
         return response.json()
 
-    def get_project_children(self, base_url: str, token: str, project_id: str) -> dict:
-        """ プロジェクトのコンポーネントの情報を取得する
-
-        https://rdm.nii.ac.jp/v2/nodes/{project_id}/children/
-
-        Args:
-            base_url (str): GRDMのURL (e.g.  https://rdm.nii.ac.jp)
-            token (str): パーソナルアクセストークン
-            project_id (str): プロジェクトID
-
-        Returns:
-            dict: プロジェクトのコンポーネントの情報
-
-        Raises:
-            UnauthorizedError: 認証が通らない
-            ProjectNotExist: 指定されたプロジェクトIDが存在しない
-            requests.exceptions.RequestException: その他の通信エラー
-        """
-        endpoint = f'/nodes/{project_id}/children/'
-        api_url = self.build_api_url(base_url, endpoint)
-        headers = {
-            'Authorization': f'Bearer {token}'
-        }
-        response = requests.get(url=api_url, headers=headers)
-        try:
-            response.raise_for_status()
-        except RequestException as e:
-            if response.status_code == HTTPStatus.UNAUTHORIZED:
-                raise UnauthorizedError(str(e)) from e
-            if response.status_code == HTTPStatus.NOT_FOUND:
-                # 存在しないプロジェクトID
-                raise ProjectNotExist(str(e)) from e
-            if response.status_code == HTTPStatus.GONE:
-                # プロジェクトが消された
-                raise ProjectNotExist(str(e)) from e
-            raise
-        return response.json()
-
     async def upload(
         self, token: str, base_url: str, project_id: str, source: str,
         destination: str, recursive: bool = False, force: bool = False
@@ -356,7 +318,6 @@ class External:
                 def path_filter(f): return _is_path_matched(base_file_path, f)
         else:
             path_filter = None
-
         try:
             project = await osf.project(project_id)
             store = await project.storage(storage)
@@ -369,13 +330,13 @@ class External:
             async for file_ in files:
                 if norm_remote_path(file_.path) == remote_path:
                     try:
-                        response = await file_._get(file_._download_url) #stream=Trueを削除
+                        response = await file_._get(file_._download_url)#stream=trueを削除
                     except UnauthorizedException:
                         response = await file_._get(file_._upload_url)
                     response.raise_for_status()
 
                     file_content = []
-                    async for chunk in response.aiter_bytes(chunk_size=8192):
+                    async for chunk in response.aiter_bytes():
                         file_content.append(chunk)
                     return b''.join(file_content)
         except UnauthorizedException as e:
@@ -384,3 +345,4 @@ class External:
             if response.status_code == HTTPStatus.UNAUTHORIZED:
                 raise UnauthorizedError(str(e)) from e
             raise
+

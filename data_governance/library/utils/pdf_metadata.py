@@ -87,22 +87,26 @@ class PdfMetaData(TaskDirector):
         pdf_files = [f for f in os.listdir(dir_path) if f.endswith('.pdf')]
         return {file: os.path.join(dir_path, file) for file in pdf_files}
 
+    @TaskDirector.callback_form('PDFのメタデータを読み込む')
     def on_select_change(self, event):
         """PDFが選択された際にメタデータを取得するメソッドです。"""
+        if self.output_message in self.form_section.objects:
+            self.form_section.remove(self.output_message)
         # pdfが選択されたときにメタデータを取得して入力欄に入れる
         pdf_path = self.pdf_select.value
         if pdf_path != 'default':
             try:
                 with pikepdf.open(pdf_path) as pdf:
                     metadata = pdf.docinfo
-                    author = metadata.get('/Author', '')
-                    title = metadata.get('/Title', '')
-                    subject = metadata.get('/Subject', '')
-                    keywords = metadata.get('/Keywords', '')
+                    author = str(metadata.get('/Author', ''))
+                    title = str(metadata.get('/Title', ''))
+                    subject = str(metadata.get('/Subject', ''))
+                    keywords = str(metadata.get('/Keywords', ''))
 
             except Exception:
                 self.log.error(traceback.format_exc())
                 self.output_message.update_error(msg_config.get('register_paper_metadata','failed_load'))
+                self.form_section.append(self.output_message)
                 return
 
             self.author_input.value = author
@@ -132,7 +136,6 @@ class PdfMetaData(TaskDirector):
             try:
                 with pikepdf.open(pdf_path, allow_overwriting_input=True) as pdf:
                     # メタデータを更新
-                    self.log.info(f"Updating metadata for {pdf_path}")
                     pdf.docinfo['/Author'] = author
                     pdf.docinfo['/Title'] = title
                     pdf.docinfo['/Subject'] = subject
@@ -144,6 +147,7 @@ class PdfMetaData(TaskDirector):
             except Exception:
                 self.log.error(traceback.format_exc())
                 self.output_message.update_error(msg_config.get('register_paper_metadata','failed_register'))
+                self.form_section.append(self.output_message)
                 return
 
             self.output_message.update_success(msg_config.get('register_paper_metadata','complete'))

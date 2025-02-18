@@ -219,7 +219,7 @@ class RelinkSubflowForm(BaseSubflowForm):
             self.submit_button
         )
 
-    def main(self):
+    async def main(self):
         """サブフロー間接続編集処理のメソッドです。"""
 
         # 新規作成ボタンを処理中ステータスに更新する

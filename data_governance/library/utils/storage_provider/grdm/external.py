@@ -11,7 +11,7 @@ from urllib import parse
 import aiofiles
 from osfclient.cli import OSF, split_storage
 from osfclient.models import File
-from osfclient.utils import norm_remote_path, split_storage
+from osfclient.utils import norm_remote_path, split_storage, _is_path_matched
 from osfclient.exceptions import UnauthorizedException
 import requests
 from requests.exceptions import RequestException
@@ -208,6 +208,44 @@ class External:
             requests.exceptions.RequestException: その他の通信エラー
         """
         endpoint = f'/nodes/{project_id}/contributors/'
+        api_url = self.build_api_url(base_url, endpoint)
+        headers = {
+            'Authorization': f'Bearer {token}'
+        }
+        response = requests.get(url=api_url, headers=headers)
+        try:
+            response.raise_for_status()
+        except RequestException as e:
+            if response.status_code == HTTPStatus.UNAUTHORIZED:
+                raise UnauthorizedError(str(e)) from e
+            if response.status_code == HTTPStatus.NOT_FOUND:
+                # 存在しないプロジェクトID
+                raise ProjectNotExist(str(e)) from e
+            if response.status_code == HTTPStatus.GONE:
+                # プロジェクトが消された
+                raise ProjectNotExist(str(e)) from e
+            raise
+        return response.json()
+
+    def get_project_children(self, base_url: str, token: str, project_id: str) -> dict:
+        """ プロジェクトのコンポーネントの情報を取得する
+
+        https://rdm.nii.ac.jp/v2/nodes/{project_id}/children/
+
+        Args:
+            base_url (str): GRDMのURL (e.g.  https://rdm.nii.ac.jp)
+            token (str): パーソナルアクセストークン
+            project_id (str): プロジェクトID
+
+        Returns:
+            dict: プロジェクトのコンポーネントの情報
+
+        Raises:
+            UnauthorizedError: 認証が通らない
+            ProjectNotExist: 指定されたプロジェクトIDが存在しない
+            requests.exceptions.RequestException: その他の通信エラー
+        """
+        endpoint = f'/nodes/{project_id}/children/'
         api_url = self.build_api_url(base_url, endpoint)
         headers = {
             'Authorization': f'Bearer {token}'

@@ -368,7 +368,7 @@ class CreateSubflowForm(BaseSubflowForm):
             self.submit_button
         )
 
-    def main(self):
+    async def main(self):
         """サブフロー新規作成処理のメソッドです。
 
         入力情報を取得し、その値を検証してリサーチフローステータス管理JSONの更新、新規サブフローデータの用意を行う。
@@ -469,7 +469,7 @@ class CreateSubflowForm(BaseSubflowForm):
         # ガバナンスシート取得
         govsheet = None
         try:
-            govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
+            govsheet = await utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
         except (FileNotFoundError, json.JSONDecodeError):
             govsheet = None
         except UnauthorizedError:
@@ -514,6 +514,8 @@ class CreateSubflowForm(BaseSubflowForm):
                 )
 
         # 新規作成する
+        error_m = f"{phase_seq_number}+{sub_flow_name}+{data_dir_name}+{parent_sub_flow_ids}+{mapping_file}+{self.abs_root}"
+        self.log.error(error_m)
         self.new_create_subflow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids, mapping_file)
 
         # GRDMと同期
@@ -580,6 +582,13 @@ class CreateSubflowForm(BaseSubflowForm):
         if os.path.exists(path):
             raise Exception(f'{path} is already exist.')
         os.makedirs(path)
+
+        if phase_name == "writing" or "review" or "publication":
+            sub_dirs = path_config.get_task_data_sub_dirs(path, phase_name)
+
+            for sub_dir in sub_dirs:
+                os.makedirs(sub_dir)
+
         return path
 
     def new_create_subflow(self, phase_seq_number: int, sub_flow_name: str, data_dir_name: str, parent_sub_flow_ids: list[str], mapping_file: dict):

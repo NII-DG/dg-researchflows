@@ -110,7 +110,7 @@ class Grdm():
         data = response['data']
         return {d['id']: d['attributes']['title'] for d in data}
 
-    def sync(self, token: str, base_url: str, project_id: str, abs_source: str, abs_root: str = "/home/jovyan") -> None:
+    async def sync(self, token: str, base_url: str, project_id: str, abs_source: str, abs_root: str = "/home/jovyan") -> None:
         """ GRDMにアップロードするメソッドです。
 
         abs_source は絶対パスでなければならない。
@@ -143,13 +143,13 @@ class Grdm():
 
         destination = os.path.relpath(abs_source, abs_root)
 
-        self.external.upload(
+        await self.external.upload(
             token=token, base_url=base_url, project_id=project_id,
             source=abs_source, destination=destination,
             recursive=recursive, force=True
         )
 
-    def download_text_file(self, token: str, base_url: str, project_id: str, remote_path: str, encoding = 'utf-8') -> str:
+    async def download_text_file(self, token: str, base_url: str, project_id: str, remote_path: str, encoding = 'utf-8') -> str:
         """ テキストファイルの中身を取得するメソッドです。
 
         Args:
@@ -167,7 +167,7 @@ class Grdm():
             UnauthorizedError: 認証が通らない
             requests.exceptions.RequestException: その他の通信エラー
         """
-        content = self.external.download(
+        content = await self.external.download(
             token=token, project_id=project_id, base_url=base_url,
             remote_path=remote_path
         )
@@ -175,7 +175,7 @@ class Grdm():
             raise FileNotFoundError(f'The specified file (path: {remote_path}) does not exist.')
         return content.decode(encoding)
 
-    def download_json_file(self, token: str, base_url: str, project_id: str, remote_path: str) -> Union[dict, list]:
+    async def download_json_file(self, token: str, base_url: str, project_id: str, remote_path: str) -> Union[dict, list]:
         """ jsonファイルの中身を取得するメソッドです。
 
         Args:
@@ -193,7 +193,7 @@ class Grdm():
             UnauthorizedError: 認証が通らない
             requests.exceptions.RequestException: その他の通信エラー
         """
-        content = self.download_text_file(token, base_url, project_id, remote_path)
+        content =  await self.download_text_file(token, base_url, project_id, remote_path)
         return json.loads(content)
 
     def get_project_metadata(self, base_url: str, token: str, project_id: str) -> dict[str, list]:
@@ -256,3 +256,56 @@ class Grdm():
         parsed = parse.urlparse(base_url)
         endpoint = f'{project_id}/contributors/'
         return parse.urlunparse((parsed.scheme, parsed.netloc, endpoint, '', '', ''))
+
+    def build_main_menu_url(self, base_url: str, project_id: str) -> str:
+        """ プロジェクトのメインメニューのURLを返すメソッドです。
+
+        Args:
+            base_url (str):GRDMのURL (e.g. https://rdm.nii.ac.jp)
+            project_id (str): プロジェクトID
+
+        Returns:
+            str: 指定されたproject idのプロジェクトメンバー一覧画面のURL
+
+        """
+        parsed = parse.urlparse(base_url)
+        return parse.urlunparse((parsed.scheme, parsed.netloc, project_id, '', '', ''))
+
+    def build_addon_menu_url(self, base_url: str, project_id: str) -> str:
+        """ プロジェクトのアドオンメニューのURLを返すメソッドです。
+
+        Args:
+            base_url (str):GRDMのURL (e.g. https://rdm.nii.ac.jp)
+            project_id (str): プロジェクトID
+
+        Returns:
+            str: 指定されたproject idのプロジェクトメンバー一覧画面のURL
+
+        """
+        parsed = parse.urlparse(base_url)
+        endpoint = f'{project_id}/addons/'
+        return parse.urlunparse((parsed.scheme, parsed.netloc, endpoint, '', '', ''))
+
+    def get_component_list(self, base_url: str, token: str, project_id: str) -> dict:
+        """ コンポーネントのidとタイトルを取得するメソッドです。
+
+        Args:
+            base_url (str):GRDMのURL (e.g. https://rdm.nii.ac.jp)
+            token (str): パーソナルアクセストークン
+            project_id (str): プロジェクトID
+
+        Returns:
+            dict(str): キーをコンポーネントid、値をタイトルに設定
+
+        Raises:
+            UnauthorizedError: 認証が通らない
+            ProjectNotExist: 指定されたプロジェクトIDが存在しない
+            requests.exceptions.RequestException: その他の通信エラー
+
+        """
+        response = self.external.get_project_children(base_url, token, project_id)
+        data = response['data']
+        return {
+            d['attributes']['title']: d['id']
+            for d in data
+        }

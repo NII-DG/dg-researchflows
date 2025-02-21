@@ -333,12 +333,12 @@ class MainMenu(TaskLog):
         # ボタンの無効化をする（最初の設定が反映されないため）
         self.subflow_form.submit_button.disabled = True
 
-    def callback_submit_button(self, event):
+    async def callback_submit_button(self, event):
         """サブフローのボタンを呼び戻すメソッドです。"""
         try:
             # start
             self.subflow_form.log.start(detail=self.callback_type)
-            self.subflow_form.main()
+            await self.subflow_form.main()
 
             # サブフロー関係図を更新
             self._research_flow_image.object = self.reserch_flow_status_operater.get_svg_of_research_flow_status()
@@ -382,7 +382,7 @@ class MainMenu(TaskLog):
         self.input_button.disabled = True
 
     @TaskLog.callback_form('ガバナンスシートを適用する')
-    def apply_click(self, event):
+    async def apply_click(self, event):
         """ガバナンスシート適用ボタンを押下されたときにガバナンスシートを適用するメソッドです。
 
         Args:
@@ -410,7 +410,7 @@ class MainMenu(TaskLog):
                     if utils.check_grdm_access(self.grdm_url, token, project_id):
                         self.token = token
                         self.project_id = project_id
-                        self.operation_file()
+                        await self.operation_file()
                         return
                     else:
                         self.research_flow_widget_box.clear()
@@ -474,7 +474,7 @@ class MainMenu(TaskLog):
             self.research_flow_message.update_warning(str(e))
 
     @TaskLog.callback_form('入力されたパーソナルアクセストークン及びプロジェクトIDでガバナンスシートを適用する')
-    def callback_input_button(self, event):
+    async def callback_input_button(self, event):
         """入力されたパーソナルアクセストークン及びプロジェクトIDでガバナンスシート適用をするメソッドです。
 
         Args:
@@ -504,7 +504,7 @@ class MainMenu(TaskLog):
                         self.project_id = self.tmp_project_id
                         self.token_input.visible = False
                         self.project_id_input.visible = False
-                        self.operation_file()
+                        await self.operation_file()
                     else:
                         self.research_flow_widget_box.clear()
                         self.research_flow_message.update_error(msg_config.get('form', 'insufficient_permission'))
@@ -519,7 +519,7 @@ class MainMenu(TaskLog):
                     if utils.check_grdm_access(self.grdm_url, self.token_input.value_input, self.tmp_project_id):
                         self.token = self.token_input.value_input
                         self.project_id = self.tmp_project_id
-                        self.operation_file()
+                        await self.operation_file()
                     else:
                         self.research_flow_widget_box.clear()
                         self.research_flow_message.update_error(msg_config.get('form', 'insufficient_permission'))
@@ -532,7 +532,7 @@ class MainMenu(TaskLog):
                 self.tmp_project_id = self.project_id_input.value_input
                 if utils.check_grdm_access(self.grdm_url, self.token, self.tmp_project_id):
                     self.project_id = self.tmp_project_id
-                    self.operation_file()
+                    await self.operation_file()
                 else:
                     self.research_flow_widget_box.clear()
                     self.research_flow_message.update_error(msg_config.get('form', 'insufficient_permission'))
@@ -564,7 +564,7 @@ class MainMenu(TaskLog):
             self.research_flow_message.update_error(message)
             self.log.error(message)
 
-    def operation_file(self):
+    async def operation_file(self):
         """ガバナンスシートを適用して必要なファイルを用意するメソッドです。"""
         self.research_flow_message.clear()
         self.research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
@@ -574,7 +574,7 @@ class MainMenu(TaskLog):
 
         govsheet = None
         try:
-            govsheet = utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
+            govsheet = await utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
         except (FileNotFoundError, json.JSONDecodeError):
             govsheet = None
         except UnauthorizedError:

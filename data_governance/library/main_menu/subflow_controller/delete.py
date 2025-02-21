@@ -116,7 +116,7 @@ class DeleteSubflowForm(BaseSubflowForm):
             self.submit_button
         )
 
-    def main(self):
+    async def main(self):
         """サブフロー削除処理のメソッドです。
 
         入力情報やパスを取得し、 削除したいデータを取得する。

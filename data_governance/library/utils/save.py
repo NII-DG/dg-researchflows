@@ -134,20 +134,23 @@ class TaskSave(TaskLog):
         # define form
         if not self.save_msg_output.has_message():
             self._save_submit_button.set_looks_init(msg_config.get('save', 'submit'))
-            self._save_submit_button.on_click(self._save_submit_callback)
+            self._save_submit_button.on_click(self._handle_click)
             self.save_form_box.append(self._save_submit_button)
 
-    @TaskLog.callback_form("input_token")
-    def _save_submit_callback(self, event: Any) -> None:
+    async def _handle_click(self, event):
+        await self._save_submit_callback(event)
+
+    @TaskLog.callback_form("GakuNin RDMに保存する")
+    async def _save_submit_callback(self, event: Any) -> None:
         """ ボタン押下時に保存するメソッドです。
 
         Args:
             event (Any): ボタンクリックイベントを設定します。
 
         """
-        self._save()
+        await self._save()
 
-    def _save(self) -> None:
+    async def _save(self) -> None:
         """ 保存を実行するメソッドです。"""
         size = len(self._source)
         timediff = TimeDiff()
@@ -161,7 +164,7 @@ class TaskSave(TaskLog):
         try:
             for i, path in enumerate(self._source):
                 self.save_msg_output.update_info(f'{msg} {i+1}/{size}')
-                grdm_connect.sync(
+                await grdm_connect.sync(
                     token=self.token,
                     base_url=self.grdm_url,
                     project_id=self.project_id,

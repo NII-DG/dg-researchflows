@@ -121,7 +121,7 @@ def get_govsheet_rf(abs_root: str) -> dict:
     return govsheet_rf
 
 
-def get_govsheet(token: str, base_url: str, project_id: str, remote_path: str) -> dict:
+async def get_govsheet(token: str, base_url: str, project_id: str, remote_path: str) -> dict:
     """ガバナンスシートを取得する関数です。
 
     Args:
@@ -134,11 +134,10 @@ def get_govsheet(token: str, base_url: str, project_id: str, remote_path: str) -
         dict: ガバナンスシートの内容(存在しない場合は{})を返す。
     """
     grdm_connect = grdm.Grdm()
-    govsheet = grdm_connect.download_json_file(
+    govsheet = await grdm_connect.download_json_file(
         token, base_url, project_id, remote_path
     )
     return govsheet
-
 
 def get_custom_govsheet(abs_root: str) -> dict:
     """カスタムガバナンスシートを取得する関数です。

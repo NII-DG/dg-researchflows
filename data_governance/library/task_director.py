@@ -136,8 +136,8 @@ class TaskDirector(TaskSave):
     ##########
 
     # override
-    def _save(self):
+    async def _save(self):
         """ファイルをストレージへ保存するメソッドです。"""
         # uploadしたときにタスク完了とするため
-        super()._save()
+        await super()._save()
         self.done_task()

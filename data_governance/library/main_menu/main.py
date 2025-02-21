@@ -2,9 +2,10 @@
 
 このモジュールはメインメニューの画面やボタンを表示するメソッドやサブフローメニューの画面の表示、操作を行えるメソッドなどがあります。
 """
+import datetime
+import json
 import os
 import traceback
-import json
 
 from IPython.core.display import Javascript
 from IPython.display import display
@@ -222,6 +223,10 @@ class MainMenu(TaskLog):
         """研究準備の実行ステータス確認をするメソッドです。"""
         sf = SubflowStatusFile(os.path.join(self.abs_root, path_config.PLAN_TASK_STATUS_FILE_PATH))
         plan_sub_flow_status = sf.read()
+        for plan_status in plan_sub_flow_status.tasks:
+            if plan_status.is_required and plan_status.completed_count < 1:
+                plan_sub_flow_status._is_completed = False
+        plan_sub_flow_status._is_completed = True
         # 研究準備サブフローの進行状況をチェックする。
         if plan_sub_flow_status.is_completed:
             # 必須タスクが全て完了している場合、何もしない。
@@ -564,6 +569,7 @@ class MainMenu(TaskLog):
         self.research_flow_message.clear()
         self.research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
         govsheet_rf = utils.get_govsheet_rf(self.abs_root)
+        current_time = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
         mapping_file = utils.get_mapping_file(self.abs_root)
 
         govsheet = None
@@ -592,11 +598,17 @@ class MainMenu(TaskLog):
 
         if not govsheet:
             self.research_flow_widget_box.clear()
+            self.apply_button.set_looks_init(msg_config.get('main_menu', 'apply'))
+            self.cancel_button.set_looks_init(msg_config.get('main_menu', 'cancel'))
             self.float_panel.visible = True
             self.research_flow_widget_box.append(self.float_panel)
             return
 
-        if govsheet_rf == govsheet:
+        # ガバナンスシートにカスタムガバナンスシートをマージする
+        custom_govsheet = utils.get_custom_govsheet(self.abs_root)
+        merge_govsheet = utils.get_merge_govsheet(govsheet, custom_govsheet)
+
+        if govsheet_rf == merge_govsheet:
             self.update_research_flow_widget_box_init()
             message = msg_config.get('main_menu', 'current_version_govsheet')
             self.research_flow_message.update_info(message)
@@ -604,11 +616,11 @@ class MainMenu(TaskLog):
 
         if not self.research_flow_dict:
             if govsheet_rf:
-                utils.backup_govsheet_rf_file(self.abs_root, self.govsheet_rf_path)
-            file.JsonFile(self.govsheet_rf_path).write(govsheet)
+                utils.backup_govsheet_rf_file(self.abs_root, self.govsheet_rf_path, current_time)
+            file.JsonFile(self.govsheet_rf_path).write(merge_govsheet)
         else:
             utils.recreate_subflow(
-                self.abs_root, self.govsheet_rf_path, govsheet_rf, govsheet, self.research_flow_dict, mapping_file)
+                self.abs_root, self.govsheet_rf_path, govsheet_rf, merge_govsheet, self.research_flow_dict, mapping_file)
 
         # GRDMと同期
         self.research_flow_widget_box.clear()
@@ -661,6 +673,7 @@ class MainMenu(TaskLog):
             self.log.warning(f'{message}\n{traceback.format_exc()}')
             return
         except RequestException as e:
+            self.update_research_flow_widget_box_init()
             message = msg_config.get('DEFAULT', 'connection_error')
             self.research_flow_message.update_error(f'{message}\n{str(e)}')
             self.log.error(f'{message}\n{traceback.format_exc()}')
@@ -673,9 +686,13 @@ class MainMenu(TaskLog):
         finally:
             govsheet_file.remove(missing_ok=True)
 
+        # ガバナンスシートにカスタムガバナンスシートをマージする
+        custom_govsheet = utils.get_custom_govsheet(self.abs_root)
+        merge_govsheet = utils.get_merge_govsheet(data, custom_govsheet)
+
         # サブフローを作り直す
         utils.recreate_subflow(
-            self.abs_root, self.govsheet_rf_path, govsheet_rf, data, self.research_flow_dict, mapping_file)
+            self.abs_root, self.govsheet_rf_path, govsheet_rf, merge_govsheet, self.research_flow_dict, mapping_file)
 
         # GRDMと同期
         self.float_panel.visible = False

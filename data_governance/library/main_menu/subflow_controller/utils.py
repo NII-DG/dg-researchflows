@@ -139,6 +139,25 @@ async def get_govsheet(token: str, base_url: str, project_id: str, remote_path: 
     )
     return govsheet
 
+def get_custom_govsheet(abs_root: str) -> dict:
+    """カスタムガバナンスシートを取得する関数です。
+
+    Args:
+        abs_root (str): リサーチフローのルートディレクトリ
+
+    Returns:
+        _type_: カスタムガバナンスシートの内容
+    """
+    custom_govsheet_path = os.path.join(
+        abs_root,
+        path_config.DG_RESEARCHFLOW_FOLDER,
+        'custom-gov-sheet.json'
+    )
+    with open(custom_govsheet_path, 'r') as f:
+        custom_govsheet = json.load(f)
+    return custom_govsheet
+
+
 def get_notebook_list(working_dir_path: str) -> list:
     """ディレクトリ配下のノートブックファイルを取得する関数です。
 
@@ -367,17 +386,21 @@ def backup_zipfile(abs_root: str, research_flow_dict: dict, current_time: str):
             notebook_list = get_notebook_list(working_path)
 
             with zipfile.ZipFile(zip_file_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-                for file in os.listdir(image_folder):
-                    file_path = os.path.join(image_folder, file)
-                    if os.path.isfile(file_path):
-                        zip_path = os.path.join(path_config.IMAGES, file)
-                        zipf.write(file_path, zip_path)
+                if notebook_list:
+                    for file in os.listdir(image_folder):
+                        file_path = os.path.join(image_folder, file)
+                        if os.path.isfile(file_path):
+                            zip_path = os.path.join(path_config.IMAGES, file)
+                            zipf.write(file_path, zip_path)
                 if os.path.exists(menu_notebook_path):
                     zipf.write(menu_notebook_path, arcname=os.path.basename(menu_notebook_path))
                 if os.path.exists(status_json_path):
                     zipf.write(status_json_path, arcname=os.path.basename(status_json_path))
                 for notebook in notebook_list:
                     zipf.write(notebook, arcname=os.path.basename(notebook))
+            with zipfile.ZipFile(zip_file_path, 'r') as zipf:
+                if not zipf.namelist():
+                    os.remove(zip_file_path)
 
 
 def get_govsheet_rf_path(abs_root: str) -> str:
@@ -607,14 +630,14 @@ def preparation_notebook_file(abs_root: str, status_path_json: str, working_path
             _copy_file_by_name(task.name, task_dir, working_path)
 
 
-def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, govsheet: dict, research_flow_dict: dict, mapping_file: dict):
+def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, merge_govsheet: dict, research_flow_dict: dict, mapping_file: dict):
     """サブフローを作り直す関数です。
 
     Args:
         abs_root (str): リサーチフローのルートディレクトリ
         govsheet_rf_path (str): RFガバナンスシートのパス
         govsheet_rf (dict): RFガバナンスシートの内容
-        govsheet (dict): ガバナンスシートの内容
+        merge_govsheet (dict): ガバナンスシートにカスタムガバナンスシートをマージした内容
         research_flow_dict (dict): 存在するフェーズをkeyとし対応するサブフローIDとサブフロー名をvalueとした辞書
         mapping_file (dict): マッピングファイルの内容
     """
@@ -623,7 +646,7 @@ def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, go
     if govsheet_rf:
         backup_govsheet_rf_file(abs_root, govsheet_rf_path, current_time)
     backup_zipfile(abs_root, research_flow_dict, current_time)
-    file.JsonFile(govsheet_rf_path).write(govsheet)
+    file.JsonFile(govsheet_rf_path).write(merge_govsheet)
 
     if not research_flow_dict:
         return
@@ -634,7 +657,8 @@ def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, go
     for phase_name, subflow_data in research_flow_dict.items():
         for subflow_id, subflow_name in subflow_data.items():
             working_path = get_working_path(abs_root, phase_name, subflow_id)
-            shutil.rmtree(working_path)
+            if os.path.exists(working_path):
+                shutil.rmtree(working_path)
             for delete_file_name in delete_files:
                 delete_file_path = os.path.join(researchflow_path, phase_name, subflow_id, delete_file_name)
                 if not os.path.exists(delete_file_path):
@@ -645,6 +669,26 @@ def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, go
             prepare_new_subflow_data(abs_root, phase_name, subflow_id, subflow_name, True)
             update_status_file(abs_root, status_json_path, mapping_file)
             preparation_notebook_file(abs_root, status_json_path, working_path)
+
+
+def get_merge_govsheet(govsheet: dict, custom_govsheet: dict) -> dict:
+    """ガバナンスシートにカスタムガバナンスシートをマージする関数です。
+
+    Args:
+        govsheet (dict): ガバナンスシートの内容
+        custom_govsheet (dict): カスタムガバナンスシートの内容
+
+    Returns:
+        dict: マージ後のガバナンスシート
+    """
+    if isinstance(govsheet, dict) and isinstance(custom_govsheet, dict):
+        for custom_key, custom_value in custom_govsheet.items():
+            if custom_key in govsheet:
+                if isinstance(govsheet[custom_key], dict) and isinstance(custom_value, dict):
+                    get_merge_govsheet(govsheet[custom_key], custom_value)
+            else:
+                govsheet[custom_key] = custom_value
+    return govsheet
 
 
 def get_sync_path(abs_root: str) -> list:

@@ -128,10 +128,11 @@ class DiagManager:
             prev_id = None
             for task_id in order_sequence:
                 for task in tasks:
-                    if task_id == task.id and task.active:
-                        kwargs = self._set_task_status(current_dir, node_config, task)
-                        self._add_node(left_group, task.id, node_config[task.id]['text'], prev_id, **kwargs)
-                        prev_id = task.id
+                    if task_id == task.id:
+                        if task.active:
+                            kwargs = self._set_task_status(current_dir, node_config, task)
+                            self._add_node(left_group, task.id, node_config[task.id]['text'], prev_id, **kwargs)
+                            prev_id = task.id
                         break
                 else:
                     # This is intentional: Raise an error to ensure developers are alerted
@@ -153,10 +154,11 @@ class DiagManager:
             prev_id = None
             for task_id in order_whenever:
                 for task in tasks:
-                    if task_id == task.id and task.active:
-                        kwargs = self._set_task_status(current_dir, node_config, task)
-                        self._add_node(right_group, task.id, node_config[task.id]['text'], prev_id, **kwargs)
-                        prev_id = task.id
+                    if task_id == task.id:
+                        if task.active:
+                            kwargs = self._set_task_status(current_dir, node_config, task)
+                            self._add_node(right_group, task.id, node_config[task.id]['text'], prev_id, **kwargs)
+                            prev_id = task.id
                         break
                 else:
                     # This is intentional: Raise an error to ensure developers are alerted

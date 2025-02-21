@@ -7,6 +7,7 @@ import os
 import traceback
 from typing import Optional
 
+from IPython.core.display import Javascript
 from IPython.core.display import display
 from dg_drawer.research_flow import PhaseStatus
 import panel as pn
@@ -51,6 +52,7 @@ class CreateSubflowForm(BaseSubflowForm):
             _data_dir_name_form(TextInput):データディレクトリ名のフォーム
             token(str):パーソナルアクセストークン
             project_id(str):プロジェクトID
+            tmp_project_id(str):一時的に保持するプロジェクトID
     """
 
     def __init__(self, abs_root: str, widget_box: pn.WidgetBox, message_box: MessageBox, research_flow_image: pn.pane.HTML) -> None:
@@ -128,12 +130,14 @@ class CreateSubflowForm(BaseSubflowForm):
                 self.token = token
             elif token is None:
                 self.token_input.visible = True
-                self.project_id = project_id
+                self.tmp_project_id = project_id
             else:
                 if utils.check_grdm_token(self.grdm_url, token):
                     if utils.check_grdm_access(self.grdm_url, token, project_id):
                         self.token = token
                         self.project_id = project_id
+                        self.token_input.visible = False
+                        self.project_id_input.visible = False
                     else:
                         self._err_output.update_error(msg_config.get('form', 'insufficient_permission'))
                         return
@@ -173,6 +177,7 @@ class CreateSubflowForm(BaseSubflowForm):
             event: ボタンクリックイベント
         """
         self.disabled_form(True)
+        self.apply_button.set_looks_processing()
         govsheet_rf = utils.get_govsheet_rf(self.abs_root)
         mapping_file = utils.get_mapping_file(self.abs_root)
 
@@ -202,9 +207,13 @@ class CreateSubflowForm(BaseSubflowForm):
         finally:
             govsheet_file.remove(missing_ok=True)
 
+        # ガバナンスシートにカスタムガバナンスシートをマージする
+        custom_govsheet = utils.get_custom_govsheet(self.abs_root)
+        merge_govsheet = utils.get_merge_govsheet(data, custom_govsheet)
+
         # サブフローを作り直す
         utils.recreate_subflow(
-            self.abs_root, self.govsheet_rf_path, govsheet_rf, data, self.research_flow_dict, mapping_file)
+            self.abs_root, self.govsheet_rf_path, govsheet_rf, merge_govsheet, self.research_flow_dict, mapping_file)
         # 新規作成する
         self.new_create_subflow(
             self._sub_flow_type_selector.value,
@@ -237,6 +246,7 @@ class CreateSubflowForm(BaseSubflowForm):
             return
 
         self.disabled_form(False)
+        self.is_display_widgets()
         self._err_output.update_success(msg_config.get('save', 'success'))
         self._research_flow_image.object = self.reserch_flow_status_operater.get_svg_of_research_flow_status()
         display(Javascript('IPython.notebook.save_checkpoint();'))
@@ -407,33 +417,38 @@ class CreateSubflowForm(BaseSubflowForm):
         try:
             vault = Vault()
             if self.token_input.visible and self.project_id_input.visible:
+                self.tmp_project_id = project_id
                 if utils.check_grdm_token(self.grdm_url, token):
                     vault.set_value('grdm_token', token)
-                    if utils.check_grdm_access(self.grdm_url, token, project_id):
+                    if utils.check_grdm_access(self.grdm_url, token, self.tmp_project_id):
                         self.token = token
-                        self.project_id = project_id
+                        self.project_id = self.tmp_project_id
                     else:
                         self.reset_form()
                         self.change_submit_button_error(msg_config.get('form', 'insufficient_permission'))
                         return
                 else:
+                    self.disabled_form(False)
                     self.change_submit_button_warning(msg_config.get('main_menu', 're_enter_token'))
                     return
             elif self.token_input.visible:
                 if utils.check_grdm_token(self.grdm_url, token):
                     vault.set_value('grdm_token', token)
-                    if utils.check_grdm_access(self.grdm_url, token, self.project_id):
+                    if utils.check_grdm_access(self.grdm_url, token, self.tmp_project_id):
                         self.token = token
+                        self.project_id = self.tmp_project_id
                     else:
                         self.reset_form()
                         self.change_submit_button_error(msg_config.get('form', 'insufficient_permission'))
                         return
                 else:
+                    self.disabled_form(False)
                     self.change_submit_button_warning(msg_config.get('main_menu', 're_enter_token'))
                     return
             elif self.project_id_input.visible:
-                if utils.check_grdm_access(self.grdm_url, self.token, project_id):
-                    self.project_id = project_id
+                self.tmp_project_id = project_id
+                if utils.check_grdm_access(self.grdm_url, self.token, self.tmp_project_id):
+                    self.project_id = self.tmp_project_id
                 else:
                     self.reset_form()
                     self.change_submit_button_error(msg_config.get('form', 'insufficient_permission'))
@@ -445,8 +460,9 @@ class CreateSubflowForm(BaseSubflowForm):
             return
         except ProjectNotExist:
             self.reset_form()
-            message = msg_config.get('form', 'project_id_not_exist').format(project_id)
+            message = msg_config.get('form', 'project_id_not_exist').format(self.tmp_project_id)
             self._err_output.update_error(message)
+            self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
             self.log.error(f'{message}\n{traceback.format_exc()}')
             return
 
@@ -458,6 +474,7 @@ class CreateSubflowForm(BaseSubflowForm):
             govsheet = None
         except UnauthorizedError:
             self.disabled_form(False)
+            self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
             message = msg_config.get('main_menu', 're_enter_token')
             self._err_output.update_warning(message)
             self.log.warning(f'{message}\n{traceback.format_exc()}')
@@ -488,9 +505,12 @@ class CreateSubflowForm(BaseSubflowForm):
                 self._sub_flow_widget_box.append(self.float_panel)
                 return
             else:
+                # ガバナンスシートにカスタムガバナンスシートをマージする
+                custom_govsheet = utils.get_custom_govsheet(self.abs_root)
+                merge_govsheet = utils.get_merge_govsheet(govsheet, custom_govsheet)
                 # サブフロー作り直し
                 utils.recreate_subflow(
-                    self.abs_root, self.govsheet_rf_path, govsheet_rf, govsheet, self.research_flow_dict, mapping_file
+                    self.abs_root, self.govsheet_rf_path, govsheet_rf, merge_govsheet, self.research_flow_dict, mapping_file
                 )
 
         # 新規作成する
@@ -520,6 +540,7 @@ class CreateSubflowForm(BaseSubflowForm):
             self.log.error(message)
             return
         self.disabled_form(False)
+        self.is_display_widgets()
         self._err_output.update_success(msg_config.get('save', 'success'))
 
     def update_new_status_and_preparation_notebook(self, phase_name: str, new_subflow_id: str, mapping_file: dict):

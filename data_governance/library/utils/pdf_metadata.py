@@ -62,7 +62,7 @@ class PdfMetaData(TaskDirector):
 
         # 登録ボタンの設定
         registrate_button_title = msg_config.get('form', 'register')
-        self.registrate_button = Button(width=500, disabled=True)
+        self.registrate_button = Button(width=500)
         self.registrate_button.set_looks_init(registrate_button_title)
         self.registrate_button.on_click(self.on_click_registrate)
 
@@ -71,6 +71,7 @@ class PdfMetaData(TaskDirector):
         self.form_section.append(self.pdf_select)
         self.form_section.append(form)
         self.form_section.append(self.registrate_button)
+        self.registrate_button.disabled = True
         display(self.form_section)
         display(Javascript('IPython.notebook.save_checkpoint();'))
 

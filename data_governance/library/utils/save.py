@@ -138,10 +138,9 @@ class TaskSave(TaskLog):
             self.save_form_box.append(self._save_submit_button)
 
     async def _handle_click(self, event):
-        self.log.info(f'実行されたhandle\n{traceback.format_exc()}')
         await self._save_submit_callback(event)
 
-    @TaskLog.callback_form("input_token")
+    @TaskLog.callback_form("GakuNin RDMに保存する")
     async def _save_submit_callback(self, event: Any) -> None:
         """ ボタン押下時に保存するメソッドです。
 

@@ -131,7 +131,7 @@ class RenameSubflowForm(BaseSubflowForm):
             self.submit_button
         )
 
-    def main(self):
+    async def main(self):
         """サブフロー名称変更処理のメソッドです。
 
         Raises:

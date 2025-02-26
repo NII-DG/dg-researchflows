@@ -200,7 +200,7 @@ class MainMenu(TaskLog):
 
         # ガバナンスシート適用ボタン
         self.apply_govsheet_button = Button(width=10)
-        self.apply_govsheet_button.on_click(self.apply_click)
+        self.apply_govsheet_button.on_click(self._handle_click)
 
         # パーソナルアクセストークンとプロジェクトID入力欄
         self.token_input, self.project_id_input = utils.input_widget()
@@ -375,6 +375,9 @@ class MainMenu(TaskLog):
         self.input_button.set_looks_init()
         self.research_flow_widget_box.append(input_layout)
         self.input_button.disabled = True
+
+    async def _handle_click(self, event):
+        await self.apply_click(event)
 
     @TaskLog.callback_form('ガバナンスシートを適用する')
     async def apply_click(self, event):

@@ -47,7 +47,7 @@ class SubFlowManager:
         """
         if os.path.isdir(souce_task_dir):
             for task in self.tasks:
-                if task.active == True:
+                if task.active:
                     utils._copy_file_by_name(task.name, souce_task_dir, self.task_dir)
 
     def generate(self) -> str:
@@ -60,11 +60,12 @@ class SubFlowManager:
         diag = DiagManager()
         node_config = {}
         for task in self.tasks:
-            title, nb_path = self.parse_headers(task.name)
-            node_config[task.id] = {
-                'path': nb_path,
-                'text': title
-            }
+            if task.active:
+                title, nb_path = self.parse_headers(task.name)
+                node_config[task.id] = {
+                    'path': nb_path,
+                    'text': title
+                }
         svg_data = diag.generate_diagram(self.current_dir, self.tasks, node_config, self.order)
 
         return svg_data

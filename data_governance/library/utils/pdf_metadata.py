@@ -56,8 +56,8 @@ class PdfMetaData(TaskDirector):
 
         # PDFのセレクトボックスの設定
         pdf_files = self.get_pdf_files(dir_path)
-        pdf_files[msg_config.get('paper_metadata_register', 'form_title')] = 'default'  # Default
-        self.pdf_select = pn.widgets.Select(name=msg_config.get('paper_metadata_register', 'form_name'), options=pdf_files, value="default")
+        pdf_files[msg_config.get('register_paper_property', 'form_title')] = 'default'  # Default
+        self.pdf_select = pn.widgets.Select(name=msg_config.get('register_paper_property', 'form_name'), options=pdf_files, value="default")
         self.pdf_select.param.watch(self.on_select_change, 'value')
 
         # 登録ボタンの設定
@@ -106,7 +106,7 @@ class PdfMetaData(TaskDirector):
 
             except Exception:
                 self.log.error(traceback.format_exc())
-                self.output_message.update_error(msg_config.get('paper_metadata_register','failed_load'))
+                self.output_message.update_error(msg_config.get('register_paper_property','failed_load'))
                 self.form_section.append(self.output_message)
                 return
 
@@ -147,9 +147,9 @@ class PdfMetaData(TaskDirector):
 
             except Exception:
                 self.log.error(traceback.format_exc())
-                self.output_message.update_error(msg_config.get('paper_metadata_register','failed_register'))
+                self.output_message.update_error(msg_config.get('register_paper_property','failed_register'))
                 self.form_section.append(self.output_message)
                 return
 
-            self.output_message.update_success(msg_config.get('paper_metadata_register','complete'))
+            self.output_message.update_success(msg_config.get('register_paper_property','complete'))
             self.form_section.append(self.output_message)

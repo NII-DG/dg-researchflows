@@ -44,7 +44,7 @@
         },
         {
             "id": "RF004010",
-            "name": "register_paper_metadata",
+            "name": "register_paper_property",
             "is_multiple": true,
             "is_required": false,
             "completed_count": 0,

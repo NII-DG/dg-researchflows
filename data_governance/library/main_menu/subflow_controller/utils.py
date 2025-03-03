@@ -658,7 +658,10 @@ def recreate_subflow(abs_root: str, govsheet_rf_path: str, govsheet_rf: dict, me
         for subflow_id, subflow_name in subflow_data.items():
             working_path = get_working_path(abs_root, phase_name, subflow_id)
             if os.path.exists(working_path):
-                shutil.rmtree(working_path)
+                for root, _, files in os.walk(working_path):
+                    for remove_file in files:
+                        remove_file_path = os.path.join(root, remove_file)
+                        os.remove(remove_file_path)
             for delete_file_name in delete_files:
                 delete_file_path = os.path.join(researchflow_path, phase_name, subflow_id, delete_file_name)
                 if not os.path.exists(delete_file_path):

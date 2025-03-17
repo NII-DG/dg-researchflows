@@ -631,7 +631,7 @@ class MainMenu(TaskLog):
         try:
             sync_path_list = utils.get_sync_path(self.abs_root)
             for sync_path in sync_path_list:
-                self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
+                await self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
         except UnauthorizedError:
             message = msg_config.get('form', 'token_unauthorized')
             self.research_flow_message.update_warning(message)
@@ -651,7 +651,7 @@ class MainMenu(TaskLog):
         self.research_flow_message.update_success(msg_config.get('main_menu', 'success_govsheet'))
 
     @TaskLog.callback_form('デフォルトでガバナンスシートを作成する')
-    def callback_apply_button(self, event):
+    async def callback_apply_button(self, event):
         """デフォルトのガバナンスシートで登録するメソッドです。
 
         Args:
@@ -703,7 +703,7 @@ class MainMenu(TaskLog):
         try:
             sync_path_list = utils.get_sync_path(self.abs_root)
             for sync_path in sync_path_list:
-                self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
+                await self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
         except UnauthorizedError:
             message = msg_config.get('form', 'token_unauthorized')
             self.research_flow_message.update_warning(message)

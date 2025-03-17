@@ -170,7 +170,7 @@ class CreateSubflowForm(BaseSubflowForm):
             return
 
     @BaseSubflowForm.callback_form('デフォルトでガバナンスシートを作成する')
-    def callback_apply_button(self, event):
+    async def callback_apply_button(self, event):
         """デフォルトのガバナンスシートで登録するメソッドです。
 
         Args:
@@ -228,7 +228,7 @@ class CreateSubflowForm(BaseSubflowForm):
         try:
             sync_path_list = utils.get_sync_path(self.abs_root)
             for sync_path in sync_path_list:
-                self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
+                await self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
         except UnauthorizedError:
             message = msg_config.get('form', 'token_unauthorized')
             self._err_output.update_warning(message)
@@ -523,7 +523,7 @@ class CreateSubflowForm(BaseSubflowForm):
         try:
             sync_path_list = utils.get_sync_path(self.abs_root)
             for sync_path in sync_path_list:
-                self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
+                await self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
         except UnauthorizedError:
             message = msg_config.get('form', 'token_unauthorized')
             self._err_output.update_warning(message)

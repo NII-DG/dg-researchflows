@@ -82,7 +82,7 @@ class CreateSubflowForm(BaseSubflowForm):
 
         # FloatPanelと適用する/しないボタン
         self.float_panel, self.apply_button, self.cancel_button = utils.create_float_panel()
-        self.apply_button.on_click(self.callback_apply_button)
+        self.apply_button.on_click(self._handle_click)
         self.cancel_button.on_click(self.callback_cancel_button)
 
         # 研究準備以外に存在しているフェーズとサブフローIDとサブフロー名の辞書
@@ -168,6 +168,10 @@ class CreateSubflowForm(BaseSubflowForm):
             message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
             self._err_output.update_error(message)
             return
+
+    async def _handle_click(self, event):
+        """非同期処理の実行のための仲介メソッドです"""
+        await self.callback_apply_button(event)
 
     @BaseSubflowForm.callback_form('デフォルトでガバナンスシートを作成する')
     async def callback_apply_button(self, event):

@@ -138,6 +138,7 @@ class TaskSave(TaskLog):
             self.save_form_box.append(self._save_submit_button)
 
     async def _handle_click(self, event):
+        """非同期処理を実行するための仲介メソッドです。"""
         await self._save_submit_callback(event)
 
     @TaskLog.callback_form("GakuNin RDMに保存する")

@@ -82,7 +82,7 @@ class CreateSubflowForm(BaseSubflowForm):
 
         # FloatPanelと適用する/しないボタン
         self.float_panel, self.apply_button, self.cancel_button = utils.create_float_panel()
-        self.apply_button.on_click(self.callback_apply_button)
+        self.apply_button.on_click(self._handle_click)
         self.cancel_button.on_click(self.callback_cancel_button)
 
         # 研究準備以外に存在しているフェーズとサブフローIDとサブフロー名の辞書
@@ -169,8 +169,12 @@ class CreateSubflowForm(BaseSubflowForm):
             self._err_output.update_error(message)
             return
 
+    async def _handle_click(self, event):
+        """非同期処理の実行のための仲介メソッドです"""
+        await self.callback_apply_button(event)
+
     @BaseSubflowForm.callback_form('デフォルトでガバナンスシートを作成する')
-    def callback_apply_button(self, event):
+    async def callback_apply_button(self, event):
         """デフォルトのガバナンスシートで登録するメソッドです。
 
         Args:
@@ -228,7 +232,7 @@ class CreateSubflowForm(BaseSubflowForm):
         try:
             sync_path_list = utils.get_sync_path(self.abs_root)
             for sync_path in sync_path_list:
-                self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
+                await self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
         except UnauthorizedError:
             message = msg_config.get('form', 'token_unauthorized')
             self._err_output.update_warning(message)
@@ -523,7 +527,7 @@ class CreateSubflowForm(BaseSubflowForm):
         try:
             sync_path_list = utils.get_sync_path(self.abs_root)
             for sync_path in sync_path_list:
-                self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
+                await self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
         except UnauthorizedError:
             message = msg_config.get('form', 'token_unauthorized')
             self._err_output.update_warning(message)

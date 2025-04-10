@@ -214,7 +214,7 @@ class MainMenu(TaskLog):
 
         # FloatPanel、デフォルトのガバナンスシートを作成する/しないボタン
         self.float_panel, self.apply_button, self.cancel_button = utils.create_float_panel()
-        self.apply_button.on_click(self.callback_apply_button)
+        self.apply_button.on_click(self._handle_default_click)
         self.cancel_button.on_click(self.callback_cancel_button)
 
         self.update_research_flow_widget_box_init()
@@ -382,6 +382,7 @@ class MainMenu(TaskLog):
         self.input_button.disabled = True
 
     async def _handle_click(self, event):
+        """非同期処理の実行のための仲介メソッドです"""
         await self.apply_click(event)
 
     @TaskLog.callback_form('ガバナンスシートを適用する')
@@ -631,7 +632,7 @@ class MainMenu(TaskLog):
         try:
             sync_path_list = utils.get_sync_path(self.abs_root)
             for sync_path in sync_path_list:
-                self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
+                await self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
         except UnauthorizedError:
             message = msg_config.get('form', 'token_unauthorized')
             self.research_flow_message.update_warning(message)
@@ -650,8 +651,12 @@ class MainMenu(TaskLog):
         self.update_research_flow_widget_box_init()
         self.research_flow_message.update_success(msg_config.get('main_menu', 'success_govsheet'))
 
+    async def _handle_default_click(self, event):
+        """非同期処理の実行のための仲介メソッドです"""
+        await self.callback_apply_button(event)
+
     @TaskLog.callback_form('デフォルトでガバナンスシートを作成する')
-    def callback_apply_button(self, event):
+    async def callback_apply_button(self, event):
         """デフォルトのガバナンスシートで登録するメソッドです。
 
         Args:
@@ -703,7 +708,7 @@ class MainMenu(TaskLog):
         try:
             sync_path_list = utils.get_sync_path(self.abs_root)
             for sync_path in sync_path_list:
-                self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
+                await self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
         except UnauthorizedError:
             message = msg_config.get('form', 'token_unauthorized')
             self.research_flow_message.update_warning(message)

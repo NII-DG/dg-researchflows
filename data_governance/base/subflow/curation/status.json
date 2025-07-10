@@ -1,0 +1,20 @@
+{
+    "is_completed": false,
+    "order": {
+        "sequence": [],
+        "whenever":[]
+    },
+    "tasks": [
+        {
+            "id": "dummy",
+            "name": "dummy",
+            "is_multiple": false,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        }
+    ]
+}

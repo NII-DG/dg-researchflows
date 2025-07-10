@@ -1,0 +1,296 @@
+{
+    "ui:order": [
+        "name",
+        "description",
+        "field",
+        "url",
+        "raid",
+        "dateStarted",
+        "researcher",
+        "dmp",
+        "funder",
+        "funding",
+        "licenseInformation",
+        "accessRightsInformation",
+        "projectItem",
+        "runCrate"
+    ],
+    "researcher": {
+        "items": {
+            "ui:order": [
+                "name",
+                "email",
+                "orcid",
+                "eradResearcherNumber",
+                "affiliation"
+            ],
+            "affiliation": {
+                "items": {
+                    "ui:order": [
+                        "name",
+                        "address",
+                        "ror"
+                    ]
+                }
+            }
+        }
+    },
+    "dmp": {
+        "items": {
+            "ui:order": [
+                "dataNumber",
+                "dataDescription",
+                "dataCreator",
+                "dataManager",
+                "hostingInstitution",
+                "dataLicenseInformation",
+                "dataAccessRightsInformation",
+                "approximateSize",
+                "contact",
+                "measurementTechnique",
+                "dataEncodingFormat",
+                "dmpFormat",
+                "dmpFormatProvider"
+            ],
+            "dataCreator": {
+                "items": {
+                    "ui:order": [
+                        "name",
+                        "email",
+                        "orcid",
+                        "eradResearcherNumber",
+                        "affiliation"
+                    ],
+                    "affiliation": {
+                        "items": {
+                            "ui:order": [
+                                "name",
+                                "address",
+                                "ror"
+                            ]
+                        }
+                    }
+                }
+            },
+            "dataManager": {
+                "items": {
+                    "ui:order": [
+                        "name",
+                        "email",
+                        "orcid",
+                        "eradResearcherNumber",
+                        "affiliation"
+                    ],
+                    "affiliation": {
+                        "items": {
+                            "ui:order": [
+                                "name",
+                                "address",
+                                "ror"
+                            ]
+                        }
+                    }
+                }
+            },
+            "hostingInstitution": {
+                "items": {
+                    "ui:order": [
+                        "name",
+                        "address",
+                        "ror"
+                    ]
+                }
+            },
+            "dataLicenseInformation": {
+                "ui:order": [
+                    "name",
+                    "url",
+                    "copyright"
+                ]
+            },
+            "dataAccessRightsInformation": {
+                "ui:order": [
+                    "conditionOfAccess",
+                    "dateAvailable",
+                    "dataAccessRequirements"
+                ]
+            },
+            "dmpFormatProvider": {
+                "items": {
+                    "ui:order": [
+                        "name",
+                        "address",
+                        "ror"
+                    ]
+                }
+            }
+        }
+    },
+    "funder": {
+        "items": {
+            "ui:order": [
+                "funderId",
+                "name",
+                "address",
+                "ror"
+            ]
+        }
+    },
+    "funding": {
+        "items": {
+            "ui:order": [
+                "name",
+                "description",
+                "japanGrantNumber",
+                "url",
+                "funder"
+            ],
+            "funder": {
+                "items": {
+                    "ui:order": [
+                        "funderId",
+                        "name",
+                        "address",
+                        "ror"
+                    ]
+                }
+            }
+        }
+    },
+    "licenseInformation": {
+        "ui:order": [
+            "name",
+            "url",
+            "copyright"
+        ]
+    },
+    "projectItem": {
+        "items": {
+            "ui:order": [
+                "name",
+                "description",
+                "field",
+                "dateCreated",
+                "dateModified",
+                "version",
+                "encodingFormat",
+                "sha256",
+                "size",
+                "creator",
+                "filePath",
+                "url",
+                "doi",
+                "dmp"
+            ],
+            "creator": {
+                "items": {
+                    "ui:order": [
+                        "name",
+                        "email",
+                        "orcid",
+                        "eradResearcherNumber",
+                        "affiliation"
+                    ],
+                    "affiliation": {
+                        "items": {
+                            "ui:order": [
+                                "name",
+                                "address",
+                                "ror"
+                            ]
+                        }
+                    }
+                }
+            },
+            "dmp": {
+                "ui:order": [
+                    "dataNumber",
+                    "dataDescription",
+                    "dataCreator",
+                    "dataManager",
+                    "hostingInstitution",
+                    "dataLicenseInformation",
+                    "dataAccessRightsInformation",
+                    "approximateSize",
+                    "contact",
+                    "measurementTechnique",
+                    "dataEncodingFormat",
+                    "dmpFormat",
+                    "dmpFormatProvider"
+                ],
+                "dataCreator": {
+                    "items": {
+                        "ui:order": [
+                            "name",
+                            "email",
+                            "orcid",
+                            "eradResearcherNumber",
+                            "affiliation"
+                        ],
+                        "affiliation": {
+                            "items": {
+                                "ui:order": [
+                                    "name",
+                                    "address",
+                                    "ror"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "dataManager": {
+                    "items": {
+                        "ui:order": [
+                            "name",
+                            "email",
+                            "orcid",
+                            "eradResearcherNumber",
+                            "affiliation"
+                        ],
+                        "affiliation": {
+                            "items": {
+                                "ui:order": [
+                                    "name",
+                                    "address",
+                                    "ror"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "hostingInstitution": {
+                    "items": {
+                        "ui:order": [
+                            "name",
+                            "address",
+                            "ror"
+                        ]
+                    }
+                },
+                "dataLicenseInformation": {
+                    "ui:order": [
+                        "name",
+                        "url",
+                        "copyright"
+                    ]
+                },
+                "dataAccessRightsInformation": {
+                    "ui:order": [
+                        "conditionOfAccess",
+                        "dateAvailable",
+                        "dataAccessRequirements"
+                    ]
+                },
+                "dmpFormatProvider": {
+                    "items": {
+                        "ui:order": [
+                            "name",
+                            "address",
+                            "ror"
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,674 @@
+"""サブフローの新規作成を行うモジュールです。
+
+このモジュールはサブフロー新規作成クラスを始め、新しいサブフローのデータを用意したり、データの検証を行うメソッドなどがあります。
+"""
+import json
+import os
+import traceback
+from typing import Optional
+
+from IPython.core.display import Javascript
+from IPython.core.display import display
+from dg_drawer.research_flow import PhaseStatus
+import panel as pn
+from requests.exceptions import RequestException
+
+from library.utils.config import path_config, message as msg_config, connect as con_config
+from library.utils.error import InputWarning, UnusableVault, ProjectNotExist, UnauthorizedError
+from library.utils.storage_provider import grdm
+from library.utils.string import StringManager
+from library.utils import file
+from library.utils.vault import Vault
+from library.utils.widgets import MessageBox
+from library.main_menu.subflow_controller import utils
+from .base import BaseSubflowForm
+
+
+class CreateSubflowForm(BaseSubflowForm):
+    """サブフロー新規作成クラスです。
+
+    Attributes:
+        instance:
+            abs_root (str): リサーチフローのルートディレクトリ
+            grdm(Grdm):grdmファイルのGrdmクラス
+            grdm_url(str):GRDMのURL
+            remote_path(str):リモート先のパス
+            _sub_flow_widget_box(pn.WidgetBox):サブフロー操作コントローラーウェジットボックス
+            govsheet_rf_path(str):RFガバナンスシートのパス
+            _research_flow_image(pn.pane.HTML): リサーチフロー図オブジェクトの定義
+            token_input(pn.widgets.PasswordInput):パーソナルアクセストークンの入力欄
+            project_id_input(pn.widgets.TextInput):プロジェクトIDの入力欄
+            float_panel(pn.layout.FloatPanel):FloatPanel
+            apply_button(Button):適用するボタン
+            cancel_button(Button):適用しないボタン
+            research_flow_dict(dict):存在するフェーズをkeyとし対応するサブフローIDとサブフロー名をvalueとした辞書
+            submit_button(Button):ボタンの設定
+            reserch_flow_status_operater(ResearchFlowStatusOperater):リサーチフロー図を生成
+            _sub_flow_type_selector(pn.widgets.Select):サブフロー種別(フェーズ)
+            _err_output(MessageBox):エラーの出力
+            _parent_sub_flow_type_selector(pn.widgets.Select): 親サブフロー種別(フェーズ)
+            _parent_sub_flow_selector(pn.widgets.Select):親サブフロー選択
+            _sub_flow_name_form(TextInput):サブフロー名のフォーム
+            _data_dir_name_form(TextInput):データディレクトリ名のフォーム
+            token(str):パーソナルアクセストークン
+            project_id(str):プロジェクトID
+            tmp_project_id(str):一時的に保持するプロジェクトID
+    """
+
+    def __init__(self, abs_root: str, widget_box: pn.WidgetBox, message_box: MessageBox, research_flow_image: pn.pane.HTML) -> None:
+        """CreateSubflowForm コンストラクタのメソッドです。
+
+        Args:
+            abs_root (str): リサーチフローのルートディレクトリ
+            widget_box (pn.WidgetBox): ウィジェットボックスを格納する。
+            message_box (MessageBox): メッセージを格納する。
+            research_flow_image (pn.pane.HTML): リサーチフロー図オブジェクトを格納する。
+        """
+        super().__init__(abs_root, message_box)
+        # 処理開始ボタン
+        self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
+
+        self.grdm = grdm.Grdm()
+        self.grdm_url = con_config.get('GRDM', 'BASE_URL')
+        self.remote_path = con_config.get('DG_WEB', 'GOVSHEET_PATH')
+        self._sub_flow_widget_box = widget_box
+        self.govsheet_rf_path = utils.get_govsheet_rf_path(self.abs_root)
+        self._research_flow_image = research_flow_image
+
+        # パーソナルアクセストークンとプロジェクトID入力欄
+        self.token_input, self.project_id_input = utils.input_widget()
+        self.token_input.param.watch(self.callback_menu_form, 'value_input')
+        self.project_id_input.param.watch(self.callback_menu_form, 'value_input')
+
+        # FloatPanelと適用する/しないボタン
+        self.float_panel, self.apply_button, self.cancel_button = utils.create_float_panel()
+        self.apply_button.on_click(self._handle_click)
+        self.cancel_button.on_click(self.callback_cancel_button)
+
+        # 研究準備以外に存在しているフェーズとサブフローIDとサブフロー名の辞書
+        self.research_flow_dict = self.reserch_flow_status_operater.get_phase_subflow_id_name()
+
+    def generate_sub_flow_type_options(self, research_flow_status: list[PhaseStatus]) -> dict[str, int]:
+        """サブフロー種別(フェーズ)を表示するメソッドです。
+
+        Args:
+            research_flow_status (list[PhaseStatus]): リサーチフローステータス管理情報
+
+        Returns:
+            dict: フェーズ表示名を返す。
+        """
+    # サブフロー種別(フェーズ)オプション(表示名をKey、順序値をVauleとする)
+        phase_options = {}
+        phase_options['--'] = 0
+        for phase_status in research_flow_status:
+            if phase_status._seq_number == 1:
+                continue
+            else:
+                # plan以外の全てのフェーズ
+                phase_options[msg_config.get('research_flow_phase_display_name', phase_status._name)] = phase_status._seq_number
+        return phase_options
+
+    def change_submit_button_init(self, name: str):
+        """ボタンの状態を初期化するメソッドです。
+
+        Args:
+            name (str): メッセージ
+        """
+        self.submit_button.set_looks_init(name)
+        self.submit_button.icon = 'plus'
+
+    def is_display_widgets(self):
+        """入力欄の表示切り替えを行うメソッドです。"""
+        try:
+            token = utils.get_token()
+            project_id = utils.get_project_id()
+            if token is None and project_id is None:
+                self.token_input.visible = True
+                self.project_id_input.visible = True
+            elif project_id is None:
+                self.project_id_input.visible = True
+                self.token = token
+            elif token is None:
+                self.token_input.visible = True
+                self.tmp_project_id = project_id
+            else:
+                if utils.check_grdm_token(self.grdm_url, token):
+                    if utils.check_grdm_access(self.grdm_url, token, project_id):
+                        self.token = token
+                        self.project_id = project_id
+                        self.token_input.visible = False
+                        self.project_id_input.visible = False
+                    else:
+                        self._err_output.update_error(msg_config.get('form', 'insufficient_permission'))
+                        return
+                else:
+                    self.token_input.visible = True
+                    self.project_id_input.visible = True
+        except UnusableVault:
+            message = msg_config.get('form', 'no_vault')
+            self._err_output.update_error(message)
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+            return
+        except UnauthorizedError:
+            message = msg_config.get('form', 'token_unauthorized')
+            self._err_output.update_warning(message)
+            self.log.warning(f'{message}\n{traceback.format_exc()}')
+            return
+        except ProjectNotExist:
+            message = msg_config.get('form', 'project_id_not_exist').format(project_id)
+            self._err_output.update_error(message)
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+            return
+        except RequestException as e:
+            message = msg_config.get('DEFAULT', 'connection_error')
+            self._err_output.update_error(f'{message}\n{str(e)}')
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+            return
+        except Exception:
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self._err_output.update_error(message)
+            return
+
+    async def _handle_click(self, event):
+        """非同期処理の実行のための仲介メソッドです"""
+        await self.callback_apply_button(event)
+
+    @BaseSubflowForm.callback_form('デフォルトでガバナンスシートを作成する')
+    async def callback_apply_button(self, event):
+        """デフォルトのガバナンスシートで登録するメソッドです。
+
+        Args:
+            event: ボタンクリックイベント
+        """
+        self.disabled_form(True)
+        self.apply_button.set_looks_processing()
+        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
+        mapping_file = utils.get_mapping_file(self.abs_root)
+
+        # デフォルトでガバナンスシートを作成する
+        govsheet_path = os.path.join(self.abs_root, self.remote_path)
+        govsheet_file = file.JsonFile(govsheet_path)
+        try:
+            schema = utils.get_schema()
+            data = utils.get_default_govsheet(schema)
+            govsheet_file.write(data)
+            self.grdm.sync(self.token, self.grdm_url, self.project_id, govsheet_path, self.abs_root)
+        except UnauthorizedError:
+            message = msg_config.get('form', 'token_unauthorized')
+            self._err_output.update_warning(message)
+            self.log.warning(f'{message}\n{traceback.format_exc()}')
+            return
+        except RequestException as e:
+            message = msg_config.get('DEFAULT', 'connection_error')
+            self._err_output.update_error(f'{message}\n{str(e)}')
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+            return
+        except Exception:
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self._err_output.update_error(message)
+            self.log.error(message)
+            return
+        finally:
+            govsheet_file.remove(missing_ok=True)
+
+        # ガバナンスシートにカスタムガバナンスシートをマージする
+        custom_govsheet = utils.get_custom_govsheet(self.abs_root)
+        merge_govsheet = utils.get_merge_govsheet(data, custom_govsheet)
+
+        # サブフローを作り直す
+        utils.recreate_subflow(
+            self.abs_root, self.govsheet_rf_path, govsheet_rf, merge_govsheet, self.research_flow_dict, mapping_file)
+        # 新規作成する
+        self.new_create_subflow(
+            self._sub_flow_type_selector.value,
+            self._sub_flow_name_form.value_input,
+            self._data_dir_name_form.value_input,
+            self._parent_sub_flow_selector.value,
+            mapping_file
+        )
+        # GRDMと同期
+        self.float_panel.visible = False
+        self._err_output.update_info(msg_config.get('save', 'doing'))
+        try:
+            sync_path_list = utils.get_sync_path(self.abs_root)
+            for sync_path in sync_path_list:
+                await self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
+        except UnauthorizedError:
+            message = msg_config.get('form', 'token_unauthorized')
+            self._err_output.update_warning(message)
+            self.log.warning(f'{message}\n{traceback.format_exc()}')
+            return
+        except RequestException as e:
+            message = msg_config.get('DEFAULT', 'connection_error')
+            self._err_output.update_error(f'{message}\n{str(e)}')
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+            return
+        except Exception:
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self._err_output.update_error(message)
+            self.log.error(message)
+            return
+
+        self.disabled_form(False)
+        self.is_display_widgets()
+        self._err_output.update_success(msg_config.get('save', 'success'))
+        self._research_flow_image.object = self.reserch_flow_status_operater.get_svg_of_research_flow_status()
+        display(Javascript('IPython.notebook.save_checkpoint();'))
+
+    def callback_cancel_button(self, event):
+        """適用しない押下後エラーメッセージを表示するメソッドです。
+
+        Args:
+            event: ボタンクリックイベント
+        """
+        self.cancel_button.set_looks_processing()
+        self.float_panel.visible = False
+        # フォームの初期化
+        self.reset_form()
+        msg = msg_config.get('main_menu', 'create_task_govsheet')
+        self._err_output.update_warning(msg)
+
+    # overwrite
+    def callback_sub_flow_type_selector(self, event):
+        """サブフロー種別(フェーズ)のボタンが操作できるように有効化するメソッドです。"""
+        # サブフロー種別(フェーズ):シングルセレクトコールバックファンクション
+        try:
+            # リサーチフローステータス管理情報の取得
+            research_flow_status = self.reserch_flow_status_operater.load_research_flow_status()
+
+            selected_value = self._sub_flow_type_selector.value
+            if selected_value is None:
+                raise Exception('Sub Flow Type Selector has None')
+            # 親サブフロー種別(フェーズ)（必須)：シングルセレクトの更新
+            parent_sub_flow_type_options = self.generate_parent_sub_flow_type_options(selected_value, research_flow_status)
+            self._parent_sub_flow_type_selector.options = parent_sub_flow_type_options
+            # 新規作成ボタンのボタンの有効化チェック
+            self.change_disable_submit_button()
+        except Exception:
+            self._err_output.update_error(f'## [INTERNAL ERROR] : {traceback.format_exc()}')
+
+    # overwrite
+    def change_disable_submit_button(self):
+        """サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化するメソッドです。"""
+        # サブフロー新規作成フォームの必須項目が選択・入力が満たしている場合、新規作成ボタンを有効化する
+        self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
+
+        value = self._sub_flow_type_selector.value
+        if value is None:
+            self.submit_button.disabled = True
+            return
+        elif int(value) == 0:
+            self.submit_button.disabled = True
+            return
+
+        value = self._sub_flow_name_form.value_input
+        if value is None:
+            self.submit_button.disabled = True
+            return
+        elif len(value) < 1:
+            self.submit_button.disabled = True
+            return
+
+        value = self._data_dir_name_form.value_input
+        if value is None:
+            self.submit_button.disabled = True
+            return
+        elif len(value) < 1:
+            self.submit_button.disabled = True
+            return
+
+        value = self._parent_sub_flow_type_selector.value
+        if value is None:
+            self.submit_button.disabled = True
+            return
+        elif int(value) == 0:
+            self.submit_button.disabled = True
+            return
+
+        value = self._parent_sub_flow_selector.value
+        if value is None:
+            self.submit_button.disabled = True
+            return
+        elif len(value) < 1:
+            self.submit_button.disabled = True
+            return
+
+        if self.project_id_input.visible:
+            value = self.project_id_input.value_input
+            if value is None:
+                self.submit_button.disabled = True
+                return
+            elif len(value) < 1:
+                self.submit_button.disabled = True
+                return
+
+        if self.token_input.visible:
+            value = self.token_input.value_input
+            if value is None:
+                self.submit_button.disabled = True
+                return
+            elif len(value) < 1:
+                self.submit_button.disabled = True
+                return
+
+        self.submit_button.disabled = False
+
+    def define_input_form(self) -> pn.Column:
+        """サブフロー新規作成フォームのメソッドです。
+
+        Returns:
+            pn.Column:サブフロー新規作成フォームに必要な値を返す。
+        """
+        self.is_display_widgets()
+        return pn.Column(
+            f'### {msg_config.get("main_menu", "create_sub_flow_title")}',
+            self._sub_flow_type_selector,
+            self._sub_flow_name_form,
+            self._data_dir_name_form,
+            self._parent_sub_flow_type_selector,
+            self._parent_sub_flow_selector,
+            self.token_input,
+            self.project_id_input,
+            self.submit_button
+        )
+
+    async def main(self):
+        """サブフロー新規作成処理のメソッドです。
+
+        入力情報を取得し、その値を検証してリサーチフローステータス管理JSONの更新、新規サブフローデータの用意を行う。
+
+        Raises:
+            InputWarning:入力値の不備によるエラー
+            Exception:データ取得、更新が失敗したエラー
+        """
+
+        # 新規作成ボタンを処理中ステータスに更新する
+        self.change_submit_button_processing(msg_config.get('main_menu', 'creating_sub_flow'))
+
+        # 入力情報を取得する。
+        phase_seq_number = self._sub_flow_type_selector.value
+        sub_flow_name = self._sub_flow_name_form.value_input
+        data_dir_name = self._data_dir_name_form.value_input
+        parent_sub_flow_ids = self._parent_sub_flow_selector.value
+        token = self.token_input.value_input
+        project_id = self.project_id_input.value_input
+
+        # 入力値の検証
+        try:
+            sub_flow_name = StringManager.strip(sub_flow_name)
+            self.validate_sub_flow_name(sub_flow_name)
+            self.is_unique_subflow_name(sub_flow_name, phase_seq_number)
+
+            data_dir_name = StringManager.strip(data_dir_name)
+            self.validate_data_dir_name(data_dir_name)
+            self.is_unique_data_dir(data_dir_name, phase_seq_number)
+
+            token = StringManager.strip(token)
+            project_id = StringManager.strip(project_id)
+
+            if self.token_input.visible:
+                utils.validate_input_token(token)
+            if self.project_id_input.visible:
+                utils.validate_input_project_id(project_id)
+        except InputWarning as e:
+            self.change_submit_button_warning(str(e))
+            raise
+
+        # 入力値のチェック後はユーザーが触れないように入力欄を無効にする
+        self.disabled_form(True)
+
+        # 接続確認
+        try:
+            vault = Vault()
+            if self.token_input.visible and self.project_id_input.visible:
+                self.tmp_project_id = project_id
+                if utils.check_grdm_token(self.grdm_url, token):
+                    vault.set_value('grdm_token', token)
+                    if utils.check_grdm_access(self.grdm_url, token, self.tmp_project_id):
+                        self.token = token
+                        self.project_id = self.tmp_project_id
+                    else:
+                        self.reset_form()
+                        self.change_submit_button_error(msg_config.get('form', 'insufficient_permission'))
+                        return
+                else:
+                    self.disabled_form(False)
+                    self.change_submit_button_warning(msg_config.get('main_menu', 're_enter_token'))
+                    return
+            elif self.token_input.visible:
+                if utils.check_grdm_token(self.grdm_url, token):
+                    vault.set_value('grdm_token', token)
+                    if utils.check_grdm_access(self.grdm_url, token, self.tmp_project_id):
+                        self.token = token
+                        self.project_id = self.tmp_project_id
+                    else:
+                        self.reset_form()
+                        self.change_submit_button_error(msg_config.get('form', 'insufficient_permission'))
+                        return
+                else:
+                    self.disabled_form(False)
+                    self.change_submit_button_warning(msg_config.get('main_menu', 're_enter_token'))
+                    return
+            elif self.project_id_input.visible:
+                self.tmp_project_id = project_id
+                if utils.check_grdm_access(self.grdm_url, self.token, self.tmp_project_id):
+                    self.project_id = self.tmp_project_id
+                else:
+                    self.reset_form()
+                    self.change_submit_button_error(msg_config.get('form', 'insufficient_permission'))
+                    return
+        except UnusableVault:
+            message = msg_config.get('form', 'no_vault')
+            self.change_submit_button_warning(message)
+            self.log.warning(f'{message}\n{traceback.format_exc()}')
+            return
+        except ProjectNotExist:
+            self.reset_form()
+            message = msg_config.get('form', 'project_id_not_exist').format(self.tmp_project_id)
+            self._err_output.update_error(message)
+            self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+            return
+
+        # ガバナンスシート取得
+        govsheet = None
+        try:
+            govsheet = await utils.get_govsheet(self.token, self.grdm_url, self.project_id, self.remote_path)
+        except (FileNotFoundError, json.JSONDecodeError):
+            govsheet = None
+        except UnauthorizedError:
+            self.disabled_form(False)
+            self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
+            message = msg_config.get('main_menu', 're_enter_token')
+            self._err_output.update_warning(message)
+            self.log.warning(f'{message}\n{traceback.format_exc()}')
+            return
+        except RequestException as e:
+            message = msg_config.get('dg_web', 'get_data_error')
+            self._err_output.update_error(f'{message}\n{str(e)}')
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+            return
+        except Exception as e:
+            message = msg_config.get('dg_web', 'get_data_error')
+            self._err_output.update_error(f'{message}\n{str(e)}')
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+            return
+
+        # RFガバナンスシート取得
+        self.govsheet_path = os.path.join(self.abs_root, self.remote_path)
+        govsheet_rf = utils.get_govsheet_rf(self.abs_root)
+        mapping_file = utils.get_mapping_file(self.abs_root)
+
+        if not govsheet_rf:
+            if not govsheet:
+                # ガバナンスシートを作成させる
+                self._err_output.clear()
+                self.float_panel.visible = True
+                self.apply_button.set_looks_init(msg_config.get('main_menu', 'apply'))
+                self.cancel_button.set_looks_init(msg_config.get('main_menu', 'cancel'))
+                self._sub_flow_widget_box.append(self.float_panel)
+                return
+            else:
+                # ガバナンスシートにカスタムガバナンスシートをマージする
+                custom_govsheet = utils.get_custom_govsheet(self.abs_root)
+                merge_govsheet = utils.get_merge_govsheet(govsheet, custom_govsheet)
+                # サブフロー作り直し
+                utils.recreate_subflow(
+                    self.abs_root, self.govsheet_rf_path, govsheet_rf, merge_govsheet, self.research_flow_dict, mapping_file
+                )
+
+        # 新規作成する
+        error_m = f"{phase_seq_number}+{sub_flow_name}+{data_dir_name}+{parent_sub_flow_ids}+{mapping_file}+{self.abs_root}"
+        self.log.error(error_m)
+        self.new_create_subflow(phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids, mapping_file)
+
+        # GRDMと同期
+        self._err_output.update_info(msg_config.get('save', 'doing'))
+        try:
+            sync_path_list = utils.get_sync_path(self.abs_root)
+            for sync_path in sync_path_list:
+                await self.grdm.sync(self.token, self.grdm_url, self.project_id, sync_path, self.abs_root)
+        except UnauthorizedError:
+            message = msg_config.get('form', 'token_unauthorized')
+            self._err_output.update_warning(message)
+            self.log.warning(f'{message}\n{traceback.format_exc()}')
+            return
+        except RequestException as e:
+            message = msg_config.get('DEFAULT', 'connection_error')
+            self._err_output.update_error(f'{message}\n{str(e)}')
+            self.log.error(f'{message}\n{traceback.format_exc()}')
+            return
+        except Exception:
+            message = f'## [INTERNAL ERROR] : {traceback.format_exc()}'
+            self._err_output.update_error(message)
+            self.log.error(message)
+            return
+        self.disabled_form(False)
+        self.is_display_widgets()
+        self._err_output.update_success(msg_config.get('save', 'success'))
+
+    def update_new_status_and_preparation_notebook(self, phase_name: str, new_subflow_id: str, mapping_file: dict):
+        """新規サブフローのstatus.jsonを更新し、必要なタスクノートブックを用意するメソッドです。
+
+        Args:
+            new_phase_name (str): フェーズ名
+            new_subflow_id (str): 新しいサブフローのID
+            mapping_file (dict): マッピングファイルの内容
+        """
+        new_status_file = os.path.join(
+            self.abs_root,
+            path_config.get_sub_flow_status_file_path(phase_name, new_subflow_id)
+        )
+        new_working_path = os.path.join(
+            self.abs_root,
+            path_config.DG_WORKING_RESEARCHFLOW_FOLDER,
+            phase_name,
+            new_subflow_id,
+            path_config.TASK
+        )
+        utils.update_status_file(self.abs_root, new_status_file, mapping_file)
+        utils.preparation_notebook_file(self.abs_root, new_status_file, new_working_path)
+
+    def create_data_dir(self, phase_name: str, data_dir_name: str) -> str:
+        """データディレクトリを作成するメソッドです。
+
+        Args:
+            phase_name (str): フェーズ名
+            data_dir_name (str): データディレクトリ名
+
+        Raises:
+            Exception: 既にファイルが存在しているエラー
+
+        Returns:
+            str: データディレクトリを作成するパスの値を返す。
+        """
+        path = path_config.get_task_data_dir(self.abs_root, phase_name, data_dir_name)
+        if os.path.exists(path):
+            raise Exception(f'{path} is already exist.')
+        os.makedirs(path)
+
+        if phase_name == "writing" or "review" or "publication":
+            sub_dirs = path_config.get_task_data_sub_dirs(path, phase_name)
+
+            for sub_dir in sub_dirs:
+                os.makedirs(sub_dir)
+
+        return path
+
+    def new_create_subflow(self, phase_seq_number: int, sub_flow_name: str, data_dir_name: str, parent_sub_flow_ids: list[str], mapping_file: dict):
+        """新規サブフローを作成するメソッドです。
+
+        Args:
+            phase_seq_number (int): サブフローを作成するフェーズのシーケンス番号
+            sub_flow_name (str): 新規サブフロー名
+            data_dir_name (str): 作成するディレクトリ
+            parent_sub_flow_ids (str): 親サブフロー名
+            mapping_file (dict): マッピングファイルの内容
+
+        Raises:
+            InputWarning: 入力不備によるエラー
+        """
+        # リサーチフローステータス管理JSONの更新
+        try:
+            phase_name, new_sub_flow_id = self.reserch_flow_status_operater.create_sub_flow(
+                phase_seq_number, sub_flow_name, data_dir_name, parent_sub_flow_ids
+            )
+        except Exception:
+            self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
+            raise
+
+        # /data/<phase_name>/<data_dir_name>の作成
+        data_dir_path = ""
+        try:
+            data_dir_path = self.create_data_dir(phase_name, data_dir_name)
+        except Exception as e:
+            # ディレクトリ名が存在した場合
+            # リサーチフローステータス管理JSONをロールバック
+            self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
+            # ユーザーに再入力を促す
+            message = msg_config.get('main_menu', 'data_directory_exist')
+            self.change_submit_button_warning(message)
+            raise InputWarning(message) from e
+
+        # 新規サブフローデータの用意
+        try:
+            utils.prepare_new_subflow_data(self.abs_root, phase_name, new_sub_flow_id, sub_flow_name, False)
+            self.update_new_status_and_preparation_notebook(phase_name, new_sub_flow_id, mapping_file)
+        except Exception:
+            # 失敗した場合に/data/<phase_name>/<data_dir_name>の削除
+            os.remove(data_dir_path)
+            # 失敗した場合は、リサーチフローステータス管理JSONをロールバック
+            self.reserch_flow_status_operater.del_sub_flow_data_by_sub_flow_id(new_sub_flow_id)
+            # 新規作成ボタンを作成失敗ステータスに更新する
+            self.change_submit_button_error(msg_config.get('main_menu', 'error_create_sub_flow'))
+            raise
+
+        self.reset_form()
+
+    def reset_form(self):
+        """フォームの初期化を行うメソッドです。"""
+        self._sub_flow_type_selector.value = 0
+        self._sub_flow_name_form.value = ''
+        self._sub_flow_name_form.value_input = ''
+        self._data_dir_name_form.value = ''
+        self._data_dir_name_form.value_input = ''
+        self.project_id_input.value = ''
+        self.project_id_input.value_input = ''
+        self.token_input.value = ''
+        self.token_input.value_input = ''
+        self.change_submit_button_init(msg_config.get('main_menu', 'create_sub_flow'))
+
+    def disabled_form(self, disabled_flg: bool):
+        """フォームの入力欄の有効/無効を切り替えるメソッドです。
+
+        Args:
+            disabled_flg (bool): 入力欄の有効/無効フラグ(Trueなら無効、Falseなら有効)
+        """
+        self._sub_flow_type_selector.disabled = disabled_flg
+        self._sub_flow_name_selector.disabled = disabled_flg
+        self._sub_flow_name_form.disabled = disabled_flg
+        self._data_dir_name_form.disabled = disabled_flg
+        self._parent_sub_flow_type_selector.disabled = disabled_flg
+        self._parent_sub_flow_selector.disabled = disabled_flg
+        self.token_input.disabled = disabled_flg
+        self.project_id_input.disabled = disabled_flg

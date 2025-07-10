@@ -1,0 +1,88 @@
+{
+    "is_completed": false,
+    "order": {
+        "sequence": ["RF009006", "RF002003"],
+        "whenever":["RF009004", "RF009002", "RF009007", "RF009001", "RF009005"]
+    },
+    "tasks": [
+        {
+            "id": "RF002003",
+            "name": "build_experiment_environment",
+            "is_multiple": false,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [
+                "RF009006"
+            ],
+            "status": "unfeasible",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF009001",
+            "name": "validate",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF009002",
+            "name": "manage_collaborators",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF009004",
+            "name": "backup",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF009005",
+            "name": "save_data",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF009006",
+            "name": "governance_sheet",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF009007",
+            "name": "metadata",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        }
+    ]
+}

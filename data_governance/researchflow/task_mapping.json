@@ -1,0 +1,30 @@
+{
+    "project": {
+        "rootProjectResearcher": [
+            {
+                "value": true,
+                "display":["RF009002"],
+                "hide":[]
+            },
+            {
+                "value": false,
+                "display":[],
+                "hide":["RF009002"]
+            }
+        ]
+    },
+    "publishData": {
+        "publishDataToReviewer": [
+            {
+                "value": true,
+                "display":["RF005001", "RF005014"],
+                "hide":[]
+            },
+            {
+                "value": false,
+                "display":[],
+                "hide":["RF005001", "RF005014"]
+            }
+        ]
+    }
+}

@@ -1,17 +1,25 @@
-from unittest import TestCase
-from data_gorvernance.library.utils.nb_file import NbFile
+"""ユニットテストフレームワークを用いてテストを行うモジュールです。
+
+data_governance.library.utils.nb_filモジュールのテストを行います。
+
+"""
 import os
-from pathlib import Path
-import uuid
 import shutil
+import uuid
+from pathlib import Path
+from unittest import TestCase
+
+from data_governance.library.utils.nb_file import NbFile
 
 abs_script_dir_path = os.path.dirname(os.path.abspath(__file__))
 
 
 class TestNbFile(TestCase):
+    """data_governance.library.utils.nb_filモジュールのテストを行うクラスです。"""
     # test exec : python -m unittest tests.utils.nb_file
 
     def test_embed_subflow_name_on_header(self):
+        """embed_subflow_name_on_headerメソッドをテストするメソッドです。"""
         path = Path(abs_script_dir_path)
         nb_file_path = path.joinpath('..', 'test_data/embed_subflow_name_on_header.ipynb').resolve()
 

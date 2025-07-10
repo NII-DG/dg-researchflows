@@ -1,0 +1,151 @@
+{
+    "is_completed": false,
+    "order": {
+        "sequence": ["RF005013", "RF005001", "RF005004", "RF005011", "RF005014", "RF005015"],
+        "whenever":["RF009004", "RF009002", "RF009006", "RF009007", "RF009001", "RF009005"]
+    },
+    "tasks": [
+        {
+            "id": "RF005013",
+            "name": "organize_paper_and_argument_data",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF005001",
+            "name": "publish_argument_data_to_reviewers",
+            "is_multiple": false,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [
+                "RF005013"
+            ],
+            "status": "unfeasible",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF005004",
+            "name": "submit_paper",
+            "is_multiple": false,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [
+                "RF005013"
+            ],
+            "status": "unfeasible",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF005011",
+            "name": "revise_paper",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [
+                "RF005004"
+            ],
+            "status": "unfeasible",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF005014",
+            "name": "update_published_argument_data",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [
+                "RF005004"
+            ],
+            "status": "unfeasible",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF005015",
+            "name": "complete_review",
+            "is_multiple": false,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [
+                "RF005004"
+            ],
+            "status": "unfeasible",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF009001",
+            "name": "validate",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF009002",
+            "name": "manage_collaborators",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF009004",
+            "name": "backup",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF009005",
+            "name": "save_data",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF009006",
+            "name": "governance_sheet",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF009007",
+            "name": "metadata",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        }
+    ]
+}

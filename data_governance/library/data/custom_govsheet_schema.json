@@ -1,0 +1,17 @@
+{
+    "type": "object",
+    "properties": {
+        "publishData": {
+            "type": "object",
+            "properties": {
+                "publishDataToReviewer": {
+                    "type": "boolean",
+                    "default": false,
+                    "title": "査読時に論拠データを査読者に公開する"
+                }
+            },
+            "title": "データ公開",
+            "description": "データ公開を想定しているものを選択してください"
+        }
+    }
+}

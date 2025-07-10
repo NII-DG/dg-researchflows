@@ -1,0 +1,230 @@
+"""リサーチフローで利用するパスを一括管理するモジュールです。"""
+import os
+
+# Folder
+DATA_GOVERNANCE = 'data_governance'
+DATA = 'data'
+OCS_TEMPLATES = 'ocs-templates'
+## data_governance直下
+BASE = 'base'
+LOG = 'log'
+IMAGES = 'images'
+RESEARCHFLOW = 'researchflow'
+WORKING = 'working' ## 同期非対称フォルダ
+## base直下
+SUB_FLOW = 'subflow'
+TASK = 'task'
+## researchflow直下
+PLAN = 'plan'
+
+# data/<phase>/<data_dir_name>直下のフォルダ
+ARGUMENT = "argument_data"
+REFERENCES = "references"
+DRAFT = "draft"
+PAPER = "paper"
+FIGURE = "figure"
+REPLY = "reply"
+PUBLIC = "public_data"
+## data/writing/<data_dir_name>直下のフォルダ
+WRITING_FOLDERS =[ARGUMENT, REFERENCES, DRAFT, PAPER, FIGURE]
+## data/review/<data_dir_name>直下のフォルダ
+REVIEW_FOLDERS = [ARGUMENT, PAPER, REPLY]
+## data/publication/<data_dir_name>直下のフォルダ
+PUBLICATION_FOLDERS = [PUBLIC]
+
+
+# Folder Path
+def get_abs_root_form_working_dg_file_path(working_dg_file_path: str) -> str:
+    """ 与えられたパスから絶対パスを取得する関数です。
+
+    Args:
+        working_dg_file_path (str): 作業中のデータガバナンスファイルのパス
+
+    Returns:
+        str: working_dg_file_pathからDATA_GOVERNANCEまでのパスを返す。
+
+    """
+    abs_root = working_dg_file_path[0:working_dg_file_path.rfind(
+        DATA_GOVERNANCE)-1]
+    return abs_root
+
+
+# サブフローベースデータのフォルダパス
+DG_SUB_FLOW_BASE_DATA_FOLDER = os.path.join(DATA_GOVERNANCE, BASE, SUB_FLOW)
+# タスクベースデータのフォルダパス
+DG_TASK_BASE_DATA_FOLDER = os.path.join(DATA_GOVERNANCE, BASE, TASK)
+# リサーチフローのフォルダパス
+DG_RESEARCHFLOW_FOLDER = os.path.join(DATA_GOVERNANCE, RESEARCHFLOW)
+# ログフォルダ
+DG_LOG_FOLDER = os.path.join(DATA_GOVERNANCE, LOG, RESEARCHFLOW)
+DG_SUBFLOW_LOG_FOLDER = os.path.join(DATA_GOVERNANCE, LOG, SUB_FLOW)
+# 画像フォルダ
+DG_IMAGES_FOLDER = os.path.join(DATA_GOVERNANCE, IMAGES)
+# 非同期フォルダパス
+DG_WORKING_FOLDER = os.path.join(DATA_GOVERNANCE, WORKING)
+DG_WORKING_RESEARCHFLOW_FOLDER = os.path.join(DG_WORKING_FOLDER, RESEARCHFLOW)
+
+
+def get_task_data_dir(abs_root: str, phase: str, data_dir_name: str) -> str:
+    """ タスクデータディレクトリのパスを取得する関数です。
+
+    <root>/data/<phase>/<data_dir_name>の形式で取得します。
+
+    Args:
+        abs_root (str): ホームディレクトリの絶対パスを設定します。
+        phase (str): サブフロー種別（フェーズ）を設定します。
+        data_dir_name (str): データディレクトリ名を設定します。
+
+    Returns:
+        str: タスクデータディレクトリのパスを返す。
+
+    """
+    return os.path.join(abs_root, DATA, phase, data_dir_name)
+
+def get_task_data_sub_dirs(data_dir_path: str, phase: str) -> list:
+    """ タスクデータディレクトリ直下の全ディレクトリパスを取得する関数です。
+
+    <root>/data/<phase>/<data_dir_name>/<sub_dir>の形式で取得します。
+
+    Args:
+        data_dir_path (str): <root>/data/<phase>/<data_dir_name>形式のパスです。
+        phase (str): サブフロー種別（フェーズ）を設定します。
+
+    Returns:
+        list(str): タスクデータディレクトリ直下のフォルダパスのリストを返す。
+
+    """
+    sub_dirs =[]
+    if phase == "writing":
+        sub_dirs = WRITING_FOLDERS
+    elif phase == "review":
+        sub_dirs = REVIEW_FOLDERS
+    elif phase == "publication":
+        sub_dirs = PUBLICATION_FOLDERS
+
+    sub_dir_path = []
+    for sub_dir in sub_dirs:
+        sub_dir_path.append(os.path.join(data_dir_path, sub_dir))
+
+    return sub_dir_path
+
+# File
+MAIN_NOTEBOOK = 'main.ipynb'
+## subflow
+MENU_NOTEBOOK = 'menu.ipynb'
+STATUS_JSON = 'status.json'
+PLAN_JSON = 'plan.json'
+FLOW_DIAG = 'flow.diag'
+## config file
+TOKEN = 'token.json'
+USER_INFO = 'user_info.json'
+DOT_GITIGNORE = '.gitignore'
+
+
+# File Path
+## main menu
+MAIN_MENU_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, MAIN_NOTEBOOK)
+SETUP_COMPLETED_TEXT_PATH = os.path.join(DG_WORKING_FOLDER, 'setup_completed.txt')
+## config file
+TOKEN_JSON_PAHT = os.path.join(DG_WORKING_FOLDER, TOKEN)
+USER_INFO_PATH = os.path.join(DG_WORKING_FOLDER, USER_INFO)
+## data_governance/researchflow/plan/status.json
+PLAN_TASK_STATUS_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, STATUS_JSON)
+PLAN_FILE_PATH = os.path.join(DG_RESEARCHFLOW_FOLDER, PLAN, PLAN_JSON)
+
+
+def get_research_flow_status_file_path(abs_root: str) -> str:
+    """ リサーチフローのステータスファイルのパスを取得する関数です。
+
+    Args:
+        abs_root (str): ホームディレクトリの絶対パスを設定します。
+
+    Returns:
+        str: リサーチフローのステータスファイルのパスを返す。
+
+    """
+    return os.path.join(abs_root, DG_RESEARCHFLOW_FOLDER, 'research_flow_status.json')
+
+
+def get_base_subflow_phase_status_file_path(phase: str) -> str:
+    """ baseディレクトリの指定されたサブフロー種別（フェーズ）のステータスファイルへのパスを取得する関数です。
+
+    Args:
+        phase (str): サブフロー種別（フェーズ）を設定します。
+
+    Returns:
+        str: サブフロー種別（フェーズ）のステータスファイルへのパスを返す。
+
+    """
+    # data_governance\base\subflow\<フェーズ>\status.jsonを更新する。
+    return os.path.join(DG_SUB_FLOW_BASE_DATA_FOLDER, phase, STATUS_JSON)
+
+
+def get_sub_flow_menu_path(phase: str, subflow_id: str = '') -> str:
+    """各サブフロー種別（フェーズ）のサブフローメニューNotebookへのパスを取得する関数です。
+
+    Args:
+        phase (str): サブフロー種別（フェーズ）を設定します。
+
+        subflow_id (str): サブフローIDを設定します。
+
+    Returns:
+        str : サブフローメニューNotebookへのパス
+
+        phase, subflow_idに意味ある値が与えられた場合、researchflow/{:phase}/{:subflow_id}/menu.ipynbを返却する
+
+        phaseのみに意味ある値が与えられた場合、researchflow/{:phase}/menu.ipynbを返却する
+
+    """
+    if len(subflow_id) > 0:
+        return os.path.join(RESEARCHFLOW, phase, subflow_id, MENU_NOTEBOOK)
+    else:
+        return os.path.join(RESEARCHFLOW, phase, MENU_NOTEBOOK)
+
+
+def get_sub_flow_status_file_path(phase: str, subflow_id: str = '') -> str:
+    """ researchflowディレクトリの指定されたサブフロー種別（フェーズ）のステータスファイルへのパスを取得する関数です。
+
+    Args:
+        phase (str): サブフロー種別（フェーズ）を設定します。
+        subflow_id (str): サブフローIDを設定します。
+
+    Returns:
+        str: サブフローのステータスファイルへのパスを返す。
+
+    """
+
+    if len(subflow_id) > 0:
+        return os.path.join(DG_RESEARCHFLOW_FOLDER, phase, subflow_id, STATUS_JSON)
+    else:
+        return os.path.join(DG_RESEARCHFLOW_FOLDER, phase, STATUS_JSON)
+
+
+def get_ocs_template_dir(subflow_id: str = ''):
+    """ ocs-templatesディレクトリのパスを取得する関数です。
+
+    Args:
+        subflow_id (str): サブフローIDを設定します。
+
+    Returns:
+        str: ocs-templatesディレクトリのパスを返す。
+
+    """
+
+    # working/researchflow/plan/task/plan/ocs-templates
+    if len(subflow_id) > 0:
+        return os.path.join('../../../../../../../', DG_WORKING_RESEARCHFLOW_FOLDER, PLAN, TASK, PLAN, OCS_TEMPLATES)
+    else:
+        return os.path.join('../../../../../../', DG_WORKING_RESEARCHFLOW_FOLDER, PLAN, TASK, PLAN, OCS_TEMPLATES)
+
+# other method
+
+
+def get_prepare_file_name_list_for_subflow() -> list[str]:
+    """ 新規サブフローデータ作成時にコピーするファイルのリストを取得する関数です。
+
+    Returns:
+        list[str]: 新規サブフローデータ作成時にコピーするファイルのリストを返す。
+
+    """
+    return [MENU_NOTEBOOK, STATUS_JSON]

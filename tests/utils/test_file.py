@@ -1,5 +1,16 @@
-from unittest import TestCase
-from data_gorvernance.library.utils.file import copy_file, relative_path, File, JsonFile
+"""このモジュールはユニットテストフレームワークを用いてテストを行うモジュールです。
 
-class Test_File_Static_Method(TestCase):
+data_governance.library.utils.fileモジュールの静的メソッドのテストを行います。
+
+"""
+from unittest import TestCase
+
+from data_governance.library.utils.file import copy_file, relative_path, File, JsonFile
+
+
+class TestFileStaticMethod(TestCase):
+    """data_governance.library.utils.fileモジュールの静的メソッドのテストを行うクラスです。
+
+    このクラスには関数やメソッドは実装されていません。
+    """
     pass

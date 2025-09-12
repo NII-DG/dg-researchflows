@@ -1,8 +1,8 @@
 {
     "is_completed": false,
     "order": {
-        "sequence": ["RF004003", "RF004005", "RF004006", "RF004010", "RF004011"],
-        "whenever":["RF009004", "RF009002", "RF009006", "RF009007", "RF009001", "RF009005"]
+        "sequence": ["RF004003", "RF004006", "RF004010", "RF004011"],
+        "whenever":["RF009004", "RF009002", "RF009006", "RF009007", "RF009001", "RF009005", "RF009008"]
     },
     "tasks": [
         {
@@ -13,19 +13,6 @@
             "completed_count": 0,
             "dependent_task_ids": [],
             "status": "unexecuted",
-            "execution_environments": [],
-            "active": true
-        },
-        {
-            "id": "RF004005",
-            "name": "create_draft",
-            "is_multiple": true,
-            "is_required": false,
-            "completed_count": 0,
-            "dependent_task_ids": [
-                "RF004003"
-            ],
-            "status": "unfeasible",
             "execution_environments": [],
             "active": true
         },
@@ -126,6 +113,17 @@
         {
             "id": "RF009007",
             "name": "metadata",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF009008",
+            "name": "edit_provenance",
             "is_multiple": true,
             "is_required": false,
             "completed_count": 0,

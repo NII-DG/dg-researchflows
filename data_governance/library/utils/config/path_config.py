@@ -20,13 +20,13 @@ PLAN = 'plan'
 # data/<phase>/<data_dir_name>直下のフォルダ
 ARGUMENT = "argument_data"
 REFERENCES = "references"
-DRAFT = "draft"
+# DRAFT = "draft"
 PAPER = "paper"
 FIGURE = "figure"
 REPLY = "reply"
 PUBLIC = "public_data"
 ## data/writing/<data_dir_name>直下のフォルダ
-WRITING_FOLDERS =[ARGUMENT, REFERENCES, DRAFT, PAPER, FIGURE]
+WRITING_FOLDERS =[ARGUMENT, REFERENCES, PAPER, FIGURE]
 ## data/review/<data_dir_name>直下のフォルダ
 REVIEW_FOLDERS = [ARGUMENT, PAPER, REPLY]
 ## data/publication/<data_dir_name>直下のフォルダ

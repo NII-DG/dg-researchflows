@@ -11,7 +11,7 @@ from urllib import parse
 
 from .external import External
 from .metadata import Metadata
-from library.utils.error import NotFoundContentsError, UnauthorizedError
+from data_governance.library.utils.error import NotFoundContentsError, UnauthorizedError
 
 
 NEED_TOKEN_SCOPE = ["osf.full_write"]

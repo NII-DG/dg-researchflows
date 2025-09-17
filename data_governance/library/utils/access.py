@@ -100,4 +100,39 @@ def open_data_file(working_file:str, file_path:str) -> pn.pane.HTML:
     )
     return pn.pane.HTML(obj)
 
+def list_files_recursively(base_path):
+    """
+    base_path以下の全ファイルをサブディレクトリ構造を保持した相対パスで返す
+    """
+    file_list = []
+    for root, dirs, files in os.walk(base_path):
+        for f in files:
+            full_path = os.path.join(root, f)
+            rel_path = os.path.relpath(full_path, base_path)
+            file_list.append(rel_path)
+    return file_list
 
+def create_copy_selector(working_file: str, folder_name: str = None):
+    """コピーするファイルを選択するためのウィジェットを作成します。"""
+
+    # homeからdataディレクトリまで
+    data_dir = get_data_dir(working_file)
+    working_dir = os.path.dirname(working_file)
+    relative_path = os.path.relpath(data_dir, start=working_dir)
+
+    files = list_files_recursively(relative_path)
+
+    # チェックボックスを格納する辞書とリストを初期化
+    checkbox_dict = {}
+    # チェックボックスの表示要素をリストに追加
+    checkbox_widgets = []
+
+    for file in files:
+        label = file
+        checkbox = pn.widgets.Checkbox(name=label, value=False)
+        checkbox_dict[label] = checkbox
+        checkbox_widgets.append(checkbox)
+
+            # チェックボックス群を縦に並べる
+    checkbox_column = pn.Column(*checkbox_widgets)
+    return checkbox_column, relative_path, checkbox_dict

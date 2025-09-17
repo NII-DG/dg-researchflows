@@ -1,23 +1,27 @@
 """来歴情報を管理するモジュールです。"""
 
-from datetime import datetime, timedelta, timezone
 import hashlib
 import os
 from pathlib import Path
 from urllib.parse import urljoin
-from library.utils.research_flow_provenance.output import OutputProvenance
-from library.utils.research_flow_provenance.rdf import RDFStore, ProvenanceSearcher
-from library.utils.research_flow_provenance.jsonld import generated_id
+from data_governance.library.utils.research_flow_provenance.output import OutputProvenance
+from data_governance.library.utils.research_flow_provenance.rdf import RDFStore, ProvenanceSearcher
+from data_governance.library.utils.research_flow_provenance.jsonld import generated_id
+from data_governance.library.utils.storage_provider.grdm.external import External
 
-from .jsonld import ProvenanceEditor, provenanceData
-from library.utils.config import connect as con_config
-from library.main_menu.subflow_controller import utils
-from library.utils.storage_provider.grdm.external import External
+from .jsonld import ProvenanceEditor
 
 
 def calculate_sha256(path: str) -> str:
-    # 絶対パスに変換
+    """ハッシュ値を計算する関数です。
 
+    Args:
+        path (str): ファイルのパス
+
+    Returns:
+        str: ハッシュ値
+
+    """
     # SHA-256 ハッシュを計算
     sha256_hash = hashlib.sha256()
     with open(path, "rb") as f:
@@ -27,12 +31,36 @@ def calculate_sha256(path: str) -> str:
     return sha256_hash.hexdigest()
 
 class ProvenanceManager:
-    """来歴情報を管理するためのクラス"""
+    """来歴情報を管理するためのクラスです。
 
-    # モジュールとか他で定義してもよい
+    Attributes:
+        class:
+            ACTIVITY_BASE(str): アクティビティのURIのベース部分
+            AGENT_BASE(str): エージェントのURIのベース部分
+            FILE_COPY_BASE(str): コピーアクティビティのベース部分
+            FILE_MODIFY_BASE(str): 編集アクティビティのベース部分
+            FILE_COMPILE_BASE(str): コンパイルアクティビティのベース部分
+            FILE_EXPORT_BASE(str): エクスポートアクティビティのベース部分
+            FILE_UPLOAD_BASE(str): アップロードアクティビティのベース部分
+            FILE_DELETE_BASE(str): 削除アクティビティのベース部分
+            COLLECTION_EDIT_BASE(str): コレクション編集アクティビティのベース部分
+            PROVENANCE_EDIT_BASE(str): プロビナンス編集アクティビティのベース部分
+
+        instances:
+            dispatch_map(dict):ディスパッチ用のマッピング情報
+            token(str): GRDMトークン
+            grdm_url(str): GRDMのベースURL
+            project_id(str): GRDMのプロジェクトID
+            rdf_store(str): RDFStoreクラスのインスタンス
+            searcher(str): ProvenanceSearcherクラスのインスタンス
+            output(str): OutputProvenanceクラスのインスタンス
+            editor(str): ProvenanceEditorクラスのインスタンス
+            external(str): Externalクラスのインスタンス
+            excution_user(str): 実行ユーザーのURI
+            grdm_file_info: GRDM上のファイル情報
+
+    """
     ACTIVITY_BASE = "urn:activity:"
-    COLLECTION_BASE = "urn:collection:"
-    ENTITY_BASE = "urn:entity:"
     AGENT_BASE = "urn:agent:"
 
     FILE_COPY_BASE = ACTIVITY_BASE + "copyActivity:"
@@ -44,9 +72,15 @@ class ProvenanceManager:
     COLLECTION_EDIT_BASE = ACTIVITY_BASE + "collectionEditActivity"
     PROVENANCE_EDIT_BASE = ACTIVITY_BASE + "provenanceEditActivity"
 
-    def __init__(self, token, grdm_url, project_id):
-        """クラスのインスタンスの初期化を行うメソッドです。"""
+    def __init__(self, token: str, grdm_url: str, project_id: str):
+        """クラスのインスタンスの初期化を行うメソッドです。
 
+        Args:
+            token (str): GRDMトークン
+            grdm_url (str): GRDMのベースURL
+            project_id (str): GRDMのプロジェクトID
+
+        """
         self.dispatch_map = {
             "File Copy": self._handle_file_copy,
             "File Modify": self._handle_file_modify,
@@ -84,19 +118,19 @@ class ProvenanceManager:
         if result:
             return result
         else:
-            agent_type=["prov:Agent", "prov:Person"],
+            agent_type=["prov:Agent", "prov:Person"]
             user_name = str(response['data']['attributes']['full_name'])
             agent_uri =self.editor.create_agent(agent_uri, agent_type, user_name)
             return agent_uri
 
     async def handle(self, activity_type: str, *args, **kwargs):
-        """各アクティビティのハンドル関数を称するための入り口となる関数です。
+        """各アクティビティのハンドル関数の入り口となる関数です。
 
         Args:
-            activity_type (str): 実行されたアクティビティの種類
+            activity_type (str): アクティビティのタイプ
 
-        Raises:
-            ValueError: 存在しないアクティビティが選択された。
+        Returns:
+            Any: ハンドラー関数を実行する
 
         """
         self.grdm_file_info = await self.external.list_(self.token, self.grdm_url, self.project_id, "osfstorage/data/")
@@ -106,8 +140,16 @@ class ProvenanceManager:
         return handler(activity_type, *args, **kwargs)
 
     def _handle_file_copy(self, activity_type: str, copied_files: dict):
-        """コピーアクティビティを処理するための関数"""
+        """コピーアクティビティを処理するための関数です。
 
+        Args:
+            activity_type (str): アクティビティタイプ（コピー）
+            copied_files (dict): コピー元、コピー先ファイル
+
+        Raises:
+            FileNotFoundError: 対処のファイルがGRDM上に存在しない場合のエラーです。
+
+        """
         base_id = self.FILE_COPY_BASE
         activity_id = generated_id(base_id)
 
@@ -124,7 +166,7 @@ class ProvenanceManager:
                     src_value = calculate_sha256(src_file)
                     src_uri = self.editor.create_entity(convert_path, src_link, src_value)
             else:
-                raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
+                raise FileNotFoundError(f"{convert_path}がGRDMに存在しません。")
             src_entities.append(src_uri)
 
             #　コピー先の処理
@@ -135,7 +177,7 @@ class ProvenanceManager:
                 self.editor.create_entity(convert_path, dst_link, dst_hash, activity_id, src_uri, self.excution_user)
                 updated_files.append(dst_link)
             else:
-                raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
+                raise FileNotFoundError(f"{convert_path}がGRDMに存在しません。")
 
         # アクティビティ作成
         self.editor.create_activity(activity_id, activity_type, src_entities, self.excution_user)
@@ -181,9 +223,7 @@ class ProvenanceManager:
 
         self.rdf_store.reload()
 
-        readme_link = self.output.write(updated_files)
-
-        return readme_link
+        self.output.write(updated_files)
 
     def _handle_file_compile(self, activity_type: str, dst_file: str, src_files: list, agent_info:list=None):
         """コンパイルアクティビティを処理するための関数"""
@@ -230,9 +270,7 @@ class ProvenanceManager:
 
         self.rdf_store.reload()
 
-        readme_link = self.output.write(updated_files)
-
-        return readme_link
+        self.output.write(updated_files)
 
     def _handle_file_export(self, activity_type: str, dst_file: str, src_files: list, agent_info:list=None):
         """エクスポートアクティビティを処理するための関数"""
@@ -279,9 +317,7 @@ class ProvenanceManager:
 
         self.rdf_store.reload()
 
-        readme_link = self.output.write(updated_files)
-
-        return readme_link
+        self.output.write(updated_files)
 
     def _handle_file_upload(self, activity_type: str, upload_files: dict):
         """アップロードアクティビティを処理するための関数"""
@@ -336,9 +372,7 @@ class ProvenanceManager:
 
         self.rdf_store.reload()
 
-        readme_link = self.output.write(updated_files)
-
-        return readme_link
+        self.output.write(updated_files)
 
     def _handle_collection_edit(self, activity_type: str, collection_info: list):
         """コレクション編集アクティビティを処理するための関数"""
@@ -347,7 +381,7 @@ class ProvenanceManager:
         updated_files = []
         for collection in collection_info:
             activity_id = generated_id(base_id)
-            self.editor._edit_collection(collection["collection_id"], activity_id, collection["new_member"])
+            self.editor.edit_collection(collection["collection_id"], activity_id, collection["new_member"])
             updated_files = list(set(updated_files + collection["old_member"] + collection["new_member"]))
             src_entities =[collection["collection_id"]]
 
@@ -356,9 +390,7 @@ class ProvenanceManager:
 
         self.rdf_store.reload()
 
-        readme_link = self.output.write(updated_files)
-
-        return readme_link
+        self.output.write(updated_files)
 
     def _handle_provenance_edit(self, activity_type: str, entity_id: str, old_provenance: list, new_provenance: list, comment: str=""):
         """来歴編集アクティビティを処理するための関数"""
@@ -372,9 +404,7 @@ class ProvenanceManager:
 
         self.rdf_store.reload()
         updated_files = list(set(old_provenance + new_provenance))
-        readme_link = self.output.write(updated_files)
-
-        return readme_link
+        self.output.write(updated_files)
 
     # def check_entity_exists(self, file_paths:list):
     #     """指定されたファイルパスのファイルのエンティティが存在するかを確認する関数。"""
@@ -435,5 +465,5 @@ class ProvenanceManager:
 
         return error_files
 
-    def chenge_file_path(self, id):
-        """ファイルパスを変更する関数です。"""
+    # def chenge_file_path(self, id):
+    #     """ファイルパスを変更する関数です。"""

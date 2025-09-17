@@ -28,7 +28,7 @@ def generated_id(base_id: str) -> str:
 class ProvenanceEditor:
     """来歴情報を編集するためのクラスです。
 
-    ｊSON-LDファイルに対する書き込みを行う処理をまとめています。
+    JSON-LDファイルに対する書き込みを行う処理をまとめています。
 
     Attributtes:
         class:
@@ -52,9 +52,9 @@ class ProvenanceEditor:
     PROV_AGENT = "agent.jsonld"
 
     # URIの先頭部分
-    ACTIVITY_BASE = "urn:activity:"
-    COLLECTION_BASE = "urn:collection:"
     ENTITY_BASE = "urn:entity:"
+    COLLECTION_BASE = "urn:collection:"
+    ACTIVITY_BASE = "urn:activity:"
     AGENT_BASE = "urn:agent:"
 
     TEMPLATE_JSONLD = "data_governance/library/utils/research_flow_provenance/template.jsonld"
@@ -276,7 +276,7 @@ class ProvenanceEditor:
         """エンティティを編集する関数です。
 
         Args:
-            entity_id (str): 編集するエンティティのURIです。
+            entity_id (str): 編集を行うエンティティのURI
             activity_id (str): 編集を行うアクティビティのURI
             new_entities (list): 新しく関連付けるエンティティのURI
 
@@ -316,8 +316,8 @@ class ProvenanceEditor:
         """コレクションを編集する関数です。
 
         Args:
-            entity_id (str): 編集するコレクションのURI
-            activity_id (str): 編集するアクティビティのURI
+            entity_id (str): 編集を行うコレクションのURI
+            activity_id (str): 編集を行うアクティビティのURI
             new_member (list): 新しく関連付けるエンティティのURI
 
         Raises:

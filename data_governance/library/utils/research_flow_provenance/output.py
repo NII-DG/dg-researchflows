@@ -30,7 +30,7 @@ class FileInfo:
     related_files: list[dict[str, str]]
 
 class OutputProvenance:
-    """来歴情報をREADME.mdにに出力するクラスです。
+    """来歴情報をREADME.mdに出力するクラスです。
 
     Attributes:
         class:
@@ -149,12 +149,12 @@ class OutputProvenance:
             final_text = readme_body + "\n\n" + "\n\n".join(sorted_sections) + "\n"
             readme_path.write_text(final_text, encoding="utf-8")
 
-    def set_file_info(self, results:Result, file: str) -> FileInfo:
+    def set_file_info(self, results:Result, location: str) -> FileInfo:
         """ファイルの来歴情報をセットする関数です。
 
         Args:
             results (Result): クエリの実行結果（エンティティ情報）
-            file (str): 更新対象のファイル
+            location (str): 更新対象のファイルリンク
 
         Returns:
             FileInfo: ファイルの来歴情報をFileInfoクラスにセットしたもの
@@ -191,7 +191,7 @@ class OutputProvenance:
         activity_predicates = {
             "copyActivity": (prov.wasDerivedFrom, "コピー元"),
             "modifyActivity": (prov.wasRevisionOf, "編集元"),
-            "compileActivity": (prov.wasDerivedFrom, "コンパイ元"),
+            "compileActivity": (prov.wasDerivedFrom, "コンパイル元"),
             "exportActivity": (prov.wasDerivedFrom, "出力元"),
             "uploadActivity": (prov.wasDerivedFrom, "アップロード元"),
             "deleteActivity": (prov.wasDerivedFrom, "削除済み")
@@ -203,7 +203,7 @@ class OutputProvenance:
             "compileActivity": (prov.hadDerivation, "コンパイル先"),
             "exportActivity": (prov.hadDerivation, "出力先"),
             "uploadActivity": (prov.hadDerivation, "アップロード先"),
-            "deleteActivity": (prov.wasDerivedFrom, "削除済み")
+            "deleteActivity": (prov.hadDerivedFrom, "削除済み")
         }
 
         graph = results.graph
@@ -216,8 +216,6 @@ class OutputProvenance:
 
         parts = label.split("/")
         subflow_name = "/".join(parts[2:4])
-
-        location = file
 
         related_files = []
         for subject in set(graph.subjects()):

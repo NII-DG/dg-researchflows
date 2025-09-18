@@ -18,7 +18,7 @@ from osfclient.exceptions import UnauthorizedException
 import requests
 from requests.exceptions import RequestException
 
-from data_governance.library.utils.error import UnauthorizedError, ProjectNotExist
+from library.utils.error import UnauthorizedError, ProjectNotExist
 
 
 class External:

@@ -9,7 +9,7 @@ from rdflib.query import Result
 from rdflib import Namespace, URIRef
 from .rdf import ProvenanceSearcher
 
-from data_governance.library.utils.config import path_config
+from library.utils.config import path_config
 # from rdflib.namespace import RDFS, Namespace
 
 @dataclass
@@ -178,12 +178,13 @@ class OutputProvenance:
             entity_subject = URIRef(entity_uri)
 
             label = entity_graph.value(subject=entity_subject, predicate=rdfs.label)
+            location = None
             for _, _, activity_uri in entity_graph.triples((entity_subject, prov.wasUsedBy, None)):
                 if "deleteActivity" in str(activity_uri):
                     location = "削除済み"
 
-                else:
-                    location = entity_graph.value(subject=entity_subject, predicate=prov.atLocation)
+            if not location:
+                location = entity_graph.value(subject=entity_subject, predicate=prov.atLocation)
 
             return label, location
 

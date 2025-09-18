@@ -122,17 +122,45 @@ def create_copy_selector(working_file: str, folder_name: str = None):
 
     files = list_files_recursively(relative_path)
 
-    # チェックボックスを格納する辞書とリストを初期化
     checkbox_dict = {}
-    # チェックボックスの表示要素をリストに追加
-    checkbox_widgets = []
 
-    for file in files:
-        label = file
-        checkbox = pn.widgets.Checkbox(name=label, value=False)
-        checkbox_dict[label] = checkbox
-        checkbox_widgets.append(checkbox)
+    # ツリー構造を作る
+    tree = {}
 
-            # チェックボックス群を縦に並べる
-    checkbox_column = pn.Column(*checkbox_widgets)
-    return checkbox_column, relative_path, checkbox_dict
+    for file_path in files:
+        parts = file_path.split(os.sep)
+        current = tree
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+
+        display_name = os.path.basename(file_path)  # ファイル名のみ表示
+        checkbox = pn.widgets.Checkbox(name=display_name, value=False, width=500)
+
+        checkbox_dict[file_path] = checkbox  # キーはフルパスのまま
+        current[parts[-1]] = checkbox
+
+    def build_panel(node):
+        """
+        再帰的にPanelオブジェクトを構築する関数
+        node: dict or Checkbox
+        """
+        if isinstance(node, pn.widgets.Checkbox):
+            node.width = 500  # チェックボックスの幅も固定
+            return node
+
+        items = []
+        for key, value in sorted(node.items()):
+            if isinstance(value, dict):
+                content = build_panel(value)
+                card = pn.Accordion((key, content), width=500)
+                card.active = []
+                items.append(card)
+            else:
+                value.width = 500
+                items.append(value)
+
+        return pn.Column(*items, width=500)
+
+    ui = build_panel(tree)
+
+    return ui, relative_path, checkbox_dict

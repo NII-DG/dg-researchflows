@@ -7,7 +7,7 @@ from rdflib import Graph
 from rdflib.query import Result
 from owlrl import DeductiveClosure, OWLRL_Semantics
 
-from data_governance.library.utils.config import path_config
+from library.utils.config import path_config
 
 class RDFStore:
     """来歴情報をRDFとして読み込むクラスです。
@@ -190,6 +190,48 @@ class ProvenanceSearcher:
             return str(row["entity"])
 
         return None
+
+    def get_file_entity_list(self, file_link: str) ->Optional[list]:
+        """指定されたリンクを持つ有効なエンティティを全て取得する。
+
+        Args:
+            file_link (str):エンティティのGRDMリンク
+
+        Returns:
+            Optional[list]: 該当するエンティティが見つかった場合にURIを返す
+
+        Raises:
+            RuntimeError: クエリの実行に失敗した
+
+        """
+        query = f"""
+        PREFIX prov: <http://www.w3.org/ns/prov#>
+
+        SELECT ?entity
+        WHERE {{
+            ?entity a prov:Entity ;
+                prov:atLocation <{file_link}> .
+
+            FILTER NOT EXISTS {{
+                ?entity prov:wasUsedBy ?activity .
+                FILTER CONTAINS(STR(?activity), "deleteActivity")
+            }}
+        }}
+        """
+        try:
+            result = self.rdf_store.query(query)
+
+        except Exception as e:
+            raise RuntimeError(f"RDFクエリの実行に失敗しました: {e}") from e
+
+        entities = []
+        for row in result:
+            entities.append(str(row["entity"]))
+
+        if entities:
+            return entities
+        else:
+            return None
 
     def get_entity_info(self, entity_uri: str) -> Result:
         """指定されたエンティティの情報を取得する。

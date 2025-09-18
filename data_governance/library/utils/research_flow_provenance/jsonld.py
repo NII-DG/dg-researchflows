@@ -12,7 +12,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
-from data_governance.library.utils.config import path_config
+from library.utils.config import path_config
 
 def generated_id(base_id: str) -> str:
     """UUIDを付与し、完全なURIを生成する関数です。

@@ -4,10 +4,10 @@ import hashlib
 import os
 from pathlib import Path
 from urllib.parse import urljoin
-from data_governance.library.utils.research_flow_provenance.output import OutputProvenance
-from data_governance.library.utils.research_flow_provenance.rdf import RDFStore, ProvenanceSearcher
-from data_governance.library.utils.research_flow_provenance.jsonld import generated_id
-from data_governance.library.utils.storage_provider.grdm.external import External
+from library.utils.research_flow_provenance.output import OutputProvenance
+from library.utils.research_flow_provenance.rdf import RDFStore, ProvenanceSearcher
+from library.utils.research_flow_provenance.jsonld import generated_id
+from library.utils.storage_provider.grdm.external import External
 
 from .jsonld import ProvenanceEditor
 
@@ -324,7 +324,6 @@ class ProvenanceManager:
         base_id = self.FILE_UPLOAD_BASE
         activity_id = generated_id(base_id)
 
-        # この部分は共通化する？
         updated_files = []
         src_list =[]
         for dst_path, src_link in upload_files.items():
@@ -336,43 +335,41 @@ class ProvenanceManager:
                 self.editor.create_entity(convert_path, dst_link, dst_hash, activity_id, src_link, self.excution_user)
                 updated_files.append(dst_link)
             else:
-                raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
+                raise FileNotFoundError(f"{convert_path}がGRDMに存在しません。")
 
             src_list.append(src_link)
 
         # アクティビティ作成
         self.editor.create_activity(activity_id, activity_type, src_list, self.excution_user)
-
+        #再読み込み
         self.rdf_store.reload()
 
         self.output.write(updated_files)
 
-    # ↓fileじゃなくてidが送られてくるかも
-    def _handle_file_delete(self, activity_type: str, deleted_file: str):
+    def _handle_file_delete(self, activity_type: str, deleted_files: list):
         """削除アクティビティを処理するための関数"""
         base_id = self.FILE_DELETE_BASE
         activity_id = generated_id(base_id)
 
         updated_files = []
         # 削除済みファイルの探索
-        convert_path = self.convert_grdm_path(deleted_file)
-        if convert_path in self.grdm_file_info:
-            delete_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
-            updated_files.append(delete_link)
-            delete_uri = self.searcher.get_file_entity(delete_link)
-            if not delete_uri :
-                raise FileNotFoundError(f"{convert_path}のEntityが存在しない")
-        else:
-            raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
+        for deleted_file in deleted_files:
+            convert_path = self.convert_grdm_path(deleted_file)
+            if convert_path in self.grdm_file_info:
+                delete_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
+                delete_uri = self.searcher.get_file_entity_list(delete_link)
+                if not delete_uri :
+                    raise FileNotFoundError(f"{convert_path}のEntityが存在しない")
+                updated_files.extend(delete_uri)
+            else:
+                raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
 
         # アクティビティ作成
-        src_entities = []
-        src_entities.append(delete_uri)
-        self.editor.create_activity(activity_id, activity_type, src_entities, self.excution_user)
+        self.editor.create_activity(activity_id, activity_type, updated_files, self.excution_user)
 
-        self.rdf_store.reload()
+        # self.rdf_store.reload()
 
-        self.output.write(updated_files)
+        # self.output.write(updated_files)
 
     def _handle_collection_edit(self, activity_type: str, collection_info: list):
         """コレクション編集アクティビティを処理するための関数"""
@@ -465,5 +462,3 @@ class ProvenanceManager:
 
         return error_files
 
-    # def chenge_file_path(self, id):
-    #     """ファイルパスを変更する関数です。"""

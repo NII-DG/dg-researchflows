@@ -2,14 +2,14 @@
 from pathlib import Path
 import pytest
 import os
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 import shutil
 import tempfile
 import types
 
 from rdflib import Graph, Literal, Namespace, URIRef
 
-from data_governance.library.utils.research_flow_provenance.output import OutputProvenance
+from data_governance.library.utils.research_flow_provenance.prov import ProvenanceManager
 from data_governance.library.utils.config import path_config
 
 @pytest.fixture
@@ -126,3 +126,79 @@ def mock_results_graph():
     graph.add((file_uri, prov.hadRevision, URIRef("http://example.org/entity1")))
 
     return graph
+
+@pytest.fixture
+def manager():
+    with patch("data_governance.library.utils.research_flow_provenance.prov.RDFStore") as mock_rdfstore_class, \
+        patch("data_governance.library.utils.research_flow_provenance.prov.ProvenanceSearcher") as mock_searcher_class, \
+        patch("data_governance.library.utils.research_flow_provenance.prov.OutputProvenance") as mock_output_class, \
+        patch("data_governance.library.utils.research_flow_provenance.prov.ProvenanceEditor") as mock_editor_class, \
+        patch("data_governance.library.utils.research_flow_provenance.prov.External") as mock_external_class, \
+        patch.object(ProvenanceManager, "_get_execution_user"):  # ← ここで __init__ 内の呼び出しを止める
+
+        # インスタンスを返すためのモック設定
+        mock_rdfstore = MagicMock()
+        mock_searcher = MagicMock()
+        mock_output = MagicMock()
+        mock_editor = MagicMock()
+        mock_external = MagicMock()
+
+        mock_rdfstore_class.return_value = mock_rdfstore
+        mock_searcher_class.return_value = mock_searcher
+        mock_output_class.return_value = mock_output
+        mock_editor_class.return_value = mock_editor
+        mock_external_class.return_value = mock_external
+
+        mgr = ProvenanceManager(token="test_token", grdm_url="http://test.url", project_id="project123")
+        # 属性を明示的に設定（__init__ による呼び出しが止まっているので）
+        mgr.searcher = mock_searcher
+        mgr.editor = mock_editor
+        mgr.external = mock_external
+        mgr.AGENT_BASE = "urn:agent:"
+
+        return mgr, mock_searcher, mock_editor, mock_external
+
+@pytest.fixture
+def async_manager():
+    with patch("data_governance.library.utils.research_flow_provenance.prov.RDFStore"), \
+        patch("data_governance.library.utils.research_flow_provenance.prov.ProvenanceSearcher"), \
+        patch("data_governance.library.utils.research_flow_provenance.prov.OutputProvenance"), \
+        patch("data_governance.library.utils.research_flow_provenance.prov.ProvenanceEditor"), \
+        patch("data_governance.library.utils.research_flow_provenance.prov.External") as mock_external_class, \
+        patch.object(ProvenanceManager, "_get_execution_user"):
+
+        mock_external = mock_external_class.return_value
+        mock_external.list_ = AsyncMock(return_value=[{"id": "file1"}, {"id": "file2"}])
+
+        mgr = ProvenanceManager(token="test_token", grdm_url="http://test.url", project_id="project123")
+        mgr.external = mock_external
+
+        return mgr, mock_external
+
+@pytest.fixture
+def prov_manager():
+    with patch("data_governance.library.utils.research_flow_provenance.prov.RDFStore"), \
+        patch("data_governance.library.utils.research_flow_provenance.prov.ProvenanceSearcher"), \
+        patch("data_governance.library.utils.research_flow_provenance.prov.OutputProvenance"), \
+        patch("data_governance.library.utils.research_flow_provenance.prov.ProvenanceEditor"), \
+        patch("data_governance.library.utils.research_flow_provenance.prov.External"):
+
+        mgr = ProvenanceManager("token", "url", "project")
+
+        # 共通のモック設定
+        mgr.grdm_file_info = {
+            "/path/src1.py": "link://src1",
+            "/path/src2.py": "link://src2",
+            "/path/dst_file.out": "link://dst"
+        }
+        mgr.convert_grdm_path = lambda x: x
+        mgr.convert_grdm_link = lambda x: x
+        mgr.searcher.get_file_entity = MagicMock(return_value=None)
+        mgr.editor.create_entity = MagicMock(side_effect=["entity1", "entity2", "entity_dst"])
+        mgr.editor.create_activity = MagicMock()
+        mgr.editor.create_agent = MagicMock()
+        mgr.rdf_store.reload = MagicMock()
+        mgr.output.write = MagicMock()
+        mgr.excution_user = "user_uri"
+
+        yield mgr

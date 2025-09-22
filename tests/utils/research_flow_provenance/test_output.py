@@ -32,8 +32,6 @@ class TestFileInfo:
         assert len(fi.related_files) == 2
         assert fi.related_files[0]["type"] == "コピー元"
         assert fi.related_files[1]["location"] == "削除済み"
-
-
 class TestOutputProvenance:
     """OutputProvenanceクラスのテストクラスです。"""
     def test_write_appends_new_section(self, tmp_readme_path, test_instance, patch_path_config):

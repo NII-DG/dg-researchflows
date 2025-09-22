@@ -119,7 +119,8 @@ def create_copy_selector(working_file: str, folder_name: str = None):
     data_dir = get_data_dir(working_file)
     working_dir = os.path.dirname(working_file)
     relative_path = os.path.relpath(data_dir, start=working_dir)
-
+    if folder_name:
+        relative_path = os.path.join(relative_path, folder_name)
     files = list_files_recursively(relative_path)
 
     checkbox_dict = {}
@@ -162,5 +163,73 @@ def create_copy_selector(working_file: str, folder_name: str = None):
         return pn.Column(*items, width=500)
 
     ui = build_panel(tree)
+
+    return ui, relative_path, checkbox_dict
+
+def create_single_file_selector(working_file: str, folder_name: str = None):
+    """コピーするファイルを選択するためのウィジェットを作成します。
+    ファイル選択はツリー構造のチェックボックスで、1つだけ選択可能に制御。"""
+
+    data_dir = get_data_dir(working_file)
+    working_dir = os.path.dirname(working_file)
+    relative_path = os.path.relpath(data_dir, start=working_dir)
+    if folder_name:
+        relative_path = os.path.join(relative_path, folder_name)
+    files = list_files_recursively(relative_path)
+
+    checkbox_dict = {}
+
+    # ツリー構造を作る
+    tree = {}
+
+    for file_path in files:
+        parts = file_path.split(os.sep)
+        current = tree
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+
+        display_name = os.path.basename(file_path)  # ファイル名のみ表示
+        checkbox = pn.widgets.Checkbox(name=display_name, value=False, width=500)
+        checkbox_dict[file_path] = checkbox
+        current[parts[-1]] = checkbox
+
+    # 一つだけ選択できるようにチェックボックスの相互排他制御をセット
+    def checkbox_callback(event):
+        # どれかがTrueになったら他をFalseにする
+        if event.new:
+            for path, cb in checkbox_dict.items():
+                if cb is not event.obj:
+                    cb.value = False
+
+    for cb in checkbox_dict.values():
+        cb.param.watch(checkbox_callback, 'value')
+
+    def build_panel(node):
+        """
+        再帰的にPanelオブジェクトを構築する関数
+        node: dict or Checkbox
+        """
+        if isinstance(node, pn.widgets.Checkbox):
+            node.width = 500
+            return node
+
+        items = []
+        for key, value in sorted(node.items()):
+            if isinstance(value, dict):
+                content = build_panel(value)
+                card = pn.Accordion((key, content), width=500)
+                card.active = []
+                items.append(card)
+            else:
+                value.width = 500
+                items.append(value)
+
+        return pn.Column(*items, width=500)
+
+    ui = pn.Column(
+    pn.pane.Markdown("### ファイルを選択してください", width=500),
+    build_panel(tree),
+    width=500
+    )
 
     return ui, relative_path, checkbox_dict

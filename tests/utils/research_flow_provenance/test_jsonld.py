@@ -1210,7 +1210,7 @@ class TestProvenanceEditor:
         assert "の書き込みに失敗しました" in str(excinfo.value)
 
     def test_create_agent_all_args(self):
-        """create_agentを前引数ありで実行した場合のテストケースです。"""
+        """create_agentを全引数ありで実行した場合のテストケースです。"""
         test_env = {
             'JUPYTERHUB_SERVER_NAME': 'test_env',
             'HOME': '/home/jovyan'

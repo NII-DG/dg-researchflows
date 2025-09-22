@@ -353,7 +353,7 @@ class ProvenanceSearcher:
             ?entity a prov:Entity ;
                     rdfs:label ?label .
 
-            FILTER (STR(?label) = "{dir_path}")
+            FILTER CONTAINS(STR(?label), "{dir_path}")
 
             FILTER NOT EXISTS {{
                 ?entity prov:wasUsedBy ?activity .

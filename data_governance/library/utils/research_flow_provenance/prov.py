@@ -444,9 +444,9 @@ class ProvenanceManager:
         path = "/".join([self.project_id, files, osfstorage, file_id])
         return urljoin(self.grdm_url + "/", path)
 
-    def check_file_exist(self, relative_path):
+    def check_file_exist(self, dir_path):
         """来歴情報を記述したファイルが存在するかを確認する関数です。"""
-        parts = Path(relative_path).parts
+        parts = Path(dir_path).parts
         data_index = parts.index('data')
         base_path = Path(*parts[:data_index])
         dir_path = Path(*parts[data_index:])
@@ -455,10 +455,13 @@ class ProvenanceManager:
 
         error_files = {}
         for label, ids in results.items():
-            file_path = os.path.join(base_path, label)
+            p = Path(label)
+            parts = p.parts[1:]
+            path = Path(*parts)
+            file_path = os.path.join(base_path, path)
 
             if not os.path.exists(file_path):
-                error_files[label] = ids
+                error_files[file_path] = ids
 
         return error_files
 

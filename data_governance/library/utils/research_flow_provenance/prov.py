@@ -225,16 +225,15 @@ class ProvenanceManager:
 
         self.output.write(updated_files)
 
-    def _handle_file_compile(self, activity_type: str, dst_file: str, src_files: list, agent_info:list=None):
+    def _handle_file_compile(self, activity_type: str, dst_file: str, tex_list:list=None, argument_list:list=None, figure_list:list=None, agent_info:list=None):
         """コンパイルアクティビティを処理するための関数"""
         base_id = self.FILE_COMPILE_BASE
         activity_id = generated_id(base_id)
 
-        # この部分は共通化する？
         updated_files = []
         src_entities =[]
-        for src_file in src_files:
-            # コンパイル元の処理
+        for src_file in tex_list:
+            # 草稿ファイルの処理
             convert_path = self.convert_grdm_path(src_file)
             if convert_path in self.grdm_file_info:
                 src_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
@@ -246,6 +245,40 @@ class ProvenanceManager:
             else:
                 raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
             src_entities.append(src_uri)
+
+        argument_entity = []
+        for src_file in argument_list:
+            # 論拠データの処理
+            convert_path = self.convert_grdm_path(src_file)
+            if convert_path in self.grdm_file_info:
+                src_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
+                updated_files.append(src_link)
+                src_uri = self.searcher.get_file_entity(src_link)
+                if not src_uri:
+                    src_value = calculate_sha256(src_file)
+                    src_uri = self.editor.create_entity(convert_path, src_link, src_value)
+            else:
+                raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
+            argument_entity.append(src_uri)
+        argument_collections = self.editor.create_collection(members=argument_entity, label="argument_data collection")
+        src_entities.append(argument_collections)
+
+        figure_entity = []
+        for src_file in figure_list:
+            # 論拠データの処理
+            convert_path = self.convert_grdm_path(src_file)
+            if convert_path in self.grdm_file_info:
+                src_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
+                updated_files.append(src_link)
+                src_uri = self.searcher.get_file_entity(src_link)
+                if not src_uri:
+                    src_value = calculate_sha256(src_file)
+                    src_uri = self.editor.create_entity(convert_path, src_link, src_value)
+            else:
+                raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
+            figure_entity.append(src_uri)
+        figure_collections = self.editor.create_collection(members=argument_entity, label="figure collection")
+        src_entities.append(figure_collections)
 
         if agent_info:
             agent_list = []

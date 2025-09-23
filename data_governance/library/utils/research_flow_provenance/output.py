@@ -229,9 +229,13 @@ class OutputProvenance:
                         related_file_info["type"] = type_name
                         entities = list(graph.objects(subject=subject, predicate=predicate))
                         for entity in entities:
-                            related_label, related_location = get_label_location(entity)
-                            related_file_info["label"] = related_label
-                            related_file_info["location"] = related_location
+                            if act_key == "uploadActivity":
+                                related_file_info["label"] = entity
+                                related_file_info["location"] = entity
+                            else:
+                                related_label, related_location = get_label_location(entity)
+                                related_file_info["label"] = related_label
+                                related_file_info["location"] = related_location
 
             was_used_activities = list(graph.objects(subject=subject, predicate=prov.wasUsedBy))
             for activity in was_used_activities:

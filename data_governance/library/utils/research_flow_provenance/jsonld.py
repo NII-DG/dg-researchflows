@@ -255,7 +255,7 @@ class ProvenanceEditor:
         new_collection = {
             "@id": entity_id,
             "@type": "prov:Collection",
-            "label": dst_path,
+            "label": label,
             "prov:hadMember": [{"@id": member} for member in members],
         }
         if location:

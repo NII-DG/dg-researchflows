@@ -260,7 +260,7 @@ class ProvenanceManager:
             else:
                 raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
             argument_entity.append(src_uri)
-        argument_collections = self.editor.create_collection(members=argument_entity, label="argument_data collection")
+        argument_collections = self.editor.create_collection(members=argument_entity, label="argument_data_collection")
         src_entities.append(argument_collections)
 
         figure_entity = []
@@ -277,7 +277,7 @@ class ProvenanceManager:
             else:
                 raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
             figure_entity.append(src_uri)
-        figure_collections = self.editor.create_collection(members=argument_entity, label="figure collection")
+        figure_collections = self.editor.create_collection(members=figure_entity, label="figure_collection")
         src_entities.append(figure_collections)
 
         agent_list = []
@@ -293,7 +293,7 @@ class ProvenanceManager:
         convert_path = self.convert_grdm_path(dst_file)
         if convert_path in self.grdm_file_info:
             dst_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
-            self.editor.create_entity(convert_path, dst_link, dst_hash, activity_id, src_uri, agent_list)
+            self.editor.create_entity(convert_path, dst_link, dst_hash, activity_id, src_entities, agent_list)
             updated_files.append(dst_link)
         else:
             raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
@@ -327,9 +327,9 @@ class ProvenanceManager:
                 raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
             src_entities.append(src_uri)
 
+        agent_list = []
+        agent_list.append(self.excution_user)
         if agent_info:
-            agent_list = []
-            agent_list.append(self.excution_user)
             for agent in agent_info:
                 agent_uri = self.AGENT_BASE + agent["agent_name"]
                 agent_list.append(agent_uri)
@@ -477,7 +477,7 @@ class ProvenanceManager:
         path = "/".join([self.project_id, files, osfstorage, file_id])
         return urljoin(self.grdm_url + "/", path)
 
-    def check_file_exist(self, dir_path):
+    def check_file_exist(self, dir_path: str):
         """来歴情報を記述したファイルが存在するかを確認する関数です。"""
         parts = Path(dir_path).parts
         data_index = parts.index('data')
@@ -498,3 +498,13 @@ class ProvenanceManager:
 
         return error_files
 
+    def get_file_info(self, path: str):
+        """指定されたエンティティの関連情報を取得する関数です。"""
+        src_files = None
+
+        results = self.searcher.get_all_entity_info(path)
+        if not len(results) == 0:
+            subflow, info = self.output.set_file_info(results, path)
+            src_files = info.rerelated_files
+
+        return src_files

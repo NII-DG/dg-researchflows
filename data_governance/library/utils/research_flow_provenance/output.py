@@ -220,35 +220,67 @@ class OutputProvenance:
 
         related_files = []
         for subject in set(graph.subjects()):
-            related_file_info ={}
 
-            activity = graph.value(subject=subject, predicate=prov.wasGeneratedBy)
-            if activity:
+            activities = list(graph.objects(subject=subject, predicate=prov.wasGeneratedBy))
+            for activity in activities:
                 for act_key, (predicate, type_name) in activity_predicates.items():
                     if act_key in activity:
-                        related_file_info["type"] = type_name
                         entities = list(graph.objects(subject=subject, predicate=predicate))
                         for entity in entities:
-                            if act_key == "uploadActivity":
+                            related_file_info ={}
+                            related_file_info["type"] = type_name
+                            if str(entity).startswith("urn:collection"):
+                                entity_results = self.searcher.get_entity_info(entity)
+                                entity_graph = entity_results.graph
+                                entity_subject = URIRef(entity)
+                                for member in entity_graph.objects(subject=entity_subject, predicate=prov.hadMember):
+                                    related_file_info ={}
+                                    related_label, related_location = get_label_location(member)
+                                    related_file_info["type"] = type_name
+                                    related_file_info["label"] = related_label
+                                    related_file_info["location"] = related_location
+                                    related_files.append(related_file_info)
+
+                            elif act_key == "uploadActivity":
                                 related_file_info["label"] = entity
                                 related_file_info["location"] = entity
+                                related_files.append(related_file_info)
                             else:
                                 related_label, related_location = get_label_location(entity)
                                 related_file_info["label"] = related_label
                                 related_file_info["location"] = related_location
+                                related_files.append(related_file_info)
 
             was_used_activities = list(graph.objects(subject=subject, predicate=prov.wasUsedBy))
             for activity in was_used_activities:
                 for act_key, (predicate, type_name) in used_activity_predicates.items():
                     if act_key in activity:
-                        related_file_info["type"] = type_name
                         entities = list(graph.objects(subject=subject, predicate=predicate))
                         for entity in entities:
+                            related_file_info ={}
+                            related_file_info["type"] = type_name
                             related_label, related_location = get_label_location(entity)
                             related_file_info["label"] = related_label
                             related_file_info["location"] = related_location
+                            related_files.append(related_file_info)
 
-            related_files.append(related_file_info)
+            was_member_collections = list(graph.objects(subject=subject, predicate=prov.wasMemberOf))
+            for collection in was_member_collections:
+                collection_results = self.searcher.get_entity_info(collection)
+                collection_graph = collection_results.graph
+                collection_subject = URIRef(collection)
+                collection_activities = list(collection_graph.objects(subject=collection_subject, predicate=prov.wasUsedBy))
+                for activity in collection_activities:
+                    for act_key, (predicate, type_name) in used_activity_predicates.items():
+                        if act_key in activity:
+                            entities = list(collection_graph.objects(subject=collection_subject, predicate=predicate))
+                            for entity in entities:
+                                related_file_info ={}
+                                related_file_info["type"] = type_name
+                                related_label, related_location = get_label_location(entity)
+                                related_file_info["label"] = related_label
+                                related_file_info["location"] = related_location
+                                related_files.append(related_file_info)
 
         return subflow_name, FileInfo(file_name=file_name, file_path=label, link=location,
                                             related_files=related_files)

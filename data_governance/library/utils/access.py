@@ -190,6 +190,7 @@ def create_single_file_selector(working_file: str, folder_name: str = None):
 
         display_name = os.path.basename(file_path)  # ファイル名のみ表示
         checkbox = pn.widgets.Checkbox(name=display_name, value=False, width=500)
+        checkbox.file_path = os.path.abspath(file_path)
         checkbox_dict[file_path] = checkbox
         current[parts[-1]] = checkbox
 

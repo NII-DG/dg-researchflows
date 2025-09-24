@@ -280,9 +280,9 @@ class ProvenanceManager:
         figure_collections = self.editor.create_collection(members=argument_entity, label="figure collection")
         src_entities.append(figure_collections)
 
+        agent_list = []
+        agent_list.append(self.excution_user)
         if agent_info:
-            agent_list = []
-            agent_list.append(self.excution_user)
             for agent in agent_info:
                 agent_uri = self.AGENT_BASE + agent["agent_name"]
                 agent_list.append(agent_uri)

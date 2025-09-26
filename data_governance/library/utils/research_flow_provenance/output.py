@@ -228,6 +228,7 @@ class OutputProvenance:
                         entities = list(graph.objects(subject=subject, predicate=predicate))
                         for entity in entities:
                             related_file_info ={}
+                            related_file_info["activity"] = activity
                             related_file_info["type"] = type_name
                             if str(entity).startswith("urn:collection"):
                                 entity_results = self.searcher.get_entity_info(entity)
@@ -236,6 +237,7 @@ class OutputProvenance:
                                 for member in entity_graph.objects(subject=entity_subject, predicate=prov.hadMember):
                                     related_file_info ={}
                                     related_label, related_location = get_label_location(member)
+                                    related_file_info["activity"] = activity
                                     related_file_info["type"] = type_name
                                     related_file_info["label"] = related_label
                                     related_file_info["location"] = related_location
@@ -258,6 +260,7 @@ class OutputProvenance:
                         entities = list(graph.objects(subject=subject, predicate=predicate))
                         for entity in entities:
                             related_file_info ={}
+                            related_file_info["activity"] = activity
                             related_file_info["type"] = type_name
                             related_label, related_location = get_label_location(entity)
                             related_file_info["label"] = related_label
@@ -276,6 +279,7 @@ class OutputProvenance:
                             entities = list(collection_graph.objects(subject=collection_subject, predicate=predicate))
                             for entity in entities:
                                 related_file_info ={}
+                                related_file_info["activity"] = activity
                                 related_file_info["type"] = type_name
                                 related_label, related_location = get_label_location(entity)
                                 related_file_info["label"] = related_label

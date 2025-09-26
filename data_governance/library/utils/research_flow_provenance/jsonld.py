@@ -272,7 +272,7 @@ class ProvenanceEditor:
 
         return entity_id
 
-    def edit_entity(self, entity_id: str, activity_id: str, new_entities: list):
+    def edit_entity(self, entity_id: str, activity_id: str=None, new_entities: list=None):
         """エンティティを編集する関数です。
 
         Args:
@@ -295,22 +295,35 @@ class ProvenanceEditor:
 
         entity = next((item for item in graph if item.get("@id") == entity_id), None)
 
-        if entity is None:
+        if not entity:
             raise ValueError(f"指定されたエンティティIDが存在しません: {entity_id}")
 
-        if "prov:wasRevisionOf" in entity:
-            entity["prov:wasRevisionOf"] = [{"@id": _id} for _id in new_entities]
+        old_provenance = []
+        derived_from = entity["prov:wasDerivedFrom"]
+        if not new_entities:
+
+            old_provenance = [item["@id"] for item in derived_from if "@id" in item]
+            # キーごと削除
+            del entity["prov:wasDerivedFrom"]
 
         else:
-            entity["prov:wasDerivedFrom"] = [{"@id": _id} for _id in new_entities]
 
-        entity.setdefault("prov:wasInfluencedBy", []).extend([{"@id": activity_id}])
+            if "prov:wasRevisionOf" in entity:
+                entity["prov:wasRevisionOf"] = [{"@id": _id} for _id in new_entities]
+
+            else:
+                old_provenance = [item["@id"] for item in derived_from if "@id" in item]
+                entity["prov:wasDerivedFrom"] = [{"@id": _id} for _id in new_entities]
+
+            entity.setdefault("prov:wasInfluencedBy", []).extend([{"@id": activity_id}])
 
         try:
             with open(self.entity_file, "w", encoding="utf-8") as f:
                 json.dump(entity_data, f, indent=2, ensure_ascii=False)
         except IOError as e:
             raise RuntimeError(f"{self.entity_file}の書き込みに失敗しました: {e}") from e
+
+        return old_provenance
 
     def edit_collection(self, entity_id: str, activity_id: str, new_member: list):
         """コレクションを編集する関数です。
@@ -396,3 +409,47 @@ class ProvenanceEditor:
 
         """
         return datetime.now(timezone(timedelta(hours=9))).isoformat()
+
+    def delete_activity(self, activity_uri:str):
+        """アクティビティを削除する関数です。"""
+        try:
+            with open(self.activity_file, "r", encoding="utf-8") as f:
+                activity_data = json.load(f)
+        except (json.JSONDecodeError, IOError) as e:
+            raise RuntimeError(f"{self.activity_file}の読み込みに失敗しました: {e}") from e
+
+        graph = activity_data.get("@graph", [])
+
+        # 対象のactivity_uriを除外して新しいグラフを作成
+        new_graph = [entry for entry in graph if entry.get("@id") != activity_uri]
+
+        # グラフを更新
+        activity_data["@graph"] = new_graph
+
+        try:
+            with open(self.activity_file, "w", encoding="utf-8") as f:
+                json.dump(activity_data, f, indent=2, ensure_ascii=False)
+        except IOError as e:
+            raise RuntimeError(f"{self.activity_file}の書き込みに失敗しました: {e}") from e
+
+    def delete_entity(self, entity_uri:str):
+        """エンティティの削除関数です。"""
+        try:
+            with open(self.entity_file, "r", encoding="utf-8") as f:
+                entity_data = json.load(f)
+        except (json.JSONDecodeError, IOError) as e:
+            raise RuntimeError(f"{self.activity_file}の読み込みに失敗しました: {e}") from e
+
+        graph = entity_data.get("@graph", [])
+
+        # 対象のactivity_uriを除外して新しいグラフを作成
+        new_graph = [entry for entry in graph if entry.get("@id") != entity_uri]
+
+        # グラフを更新
+        entity_data["@graph"] = new_graph
+
+        try:
+            with open(self.activity_file, "w", encoding="utf-8") as f:
+                json.dump(entity_data, f, indent=2, ensure_ascii=False)
+        except IOError as e:
+            raise RuntimeError(f"{self.activity_file}の書き込みに失敗しました: {e}") from e

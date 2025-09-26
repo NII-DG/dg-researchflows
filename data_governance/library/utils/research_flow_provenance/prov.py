@@ -4,6 +4,8 @@ import hashlib
 import os
 from pathlib import Path
 from urllib.parse import urljoin
+
+from rdflib import Namespace, URIRef
 from library.utils.research_flow_provenance.output import OutputProvenance
 from library.utils.research_flow_provenance.rdf import RDFStore, ProvenanceSearcher
 from library.utils.research_flow_provenance.jsonld import generated_id
@@ -89,7 +91,8 @@ class ProvenanceManager:
             "File Upload": self._handle_file_upload,
             "File Delete": self._handle_file_delete,
             "Collection Edit": self._handle_collection_edit,
-            "Provenance Edit": self._handle_provenance_edit
+            "Provenance Edit": self._handle_provenance_edit,
+            "Delete Activity": self._handle_delete_activity
         }
 
         self.token =token
@@ -436,6 +439,34 @@ class ProvenanceManager:
         updated_files = list(set(old_provenance + new_provenance))
         self.output.write(updated_files)
 
+    def _handle_delete_activity(self, activity_type:str, activity_uri: str, update_files: list):
+        """アクティビティを削除する際の関数です。"""
+
+        results = self.searcher.get_activity_info(activity_uri)
+        prov = Namespace("http://www.w3.org/ns/prov#")
+        activity_graph = results.graph
+        activity_subject = URIRef(activity_uri)
+        generated_entity = activity_graph.value(subject=activity_subject, predicate=prov.generated)
+
+        self.editor.delete_activity(activity_uri)
+
+        src_entities = self.editor.edit_entity(str(generated_entity))
+
+        for entity in src_entities:
+            if str(entity).startswith("urn:collection"):
+                self.editor.delete_entity(entity)
+
+        #再読み込み
+        self.rdf_store.reload()
+        file_links = []
+        for file in update_files:
+            convert_path = self.convert_grdm_path(file)
+            if convert_path in self.grdm_file_info:
+                file_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
+                file_links.append(file_link)
+
+        self.output.write(file_links)
+
     # def check_entity_exists(self, file_paths:list):
     #     """指定されたファイルパスのファイルのエンティティが存在するかを確認する関数。"""
 
@@ -479,32 +510,48 @@ class ProvenanceManager:
 
     def check_file_exist(self, dir_path: str):
         """来歴情報を記述したファイルが存在するかを確認する関数です。"""
-        parts = Path(dir_path).parts
-        data_index = parts.index('data')
-        base_path = Path(*parts[:data_index])
-        dir_path = Path(*parts[data_index:])
 
-        results = self.searcher.get_all_entities(dir_path)
+        base_path = "/home/jovyan"
+        osfstorage = "osfstorage"
 
+        base_trimmed = os.path.relpath(dir_path, base_path)
+        results = self.searcher.get_all_entities(os.path.join(osfstorage, base_trimmed))
+
+        all_files = {}
         error_files = {}
         for label, ids in results.items():
-            p = Path(label)
-            parts = p.parts[1:]
-            path = Path(*parts)
-            file_path = os.path.join(base_path, path)
+            osf_trimmed = os.path.relpath(label, osfstorage)
+            file_path = os.path.join(base_path, osf_trimmed)
 
+            all_files[file_path] = ids
             if not os.path.exists(file_path):
                 error_files[file_path] = ids
 
-        return error_files
+        return all_files, error_files
 
-    def get_file_info(self, path: str):
+    def get_activity_info(self, uri_list: list):
         """指定されたエンティティの関連情報を取得する関数です。"""
-        src_files = None
 
-        results = self.searcher.get_all_entity_info(path)
-        if not len(results) == 0:
-            subflow, info = self.output.set_file_info(results, path)
-            src_files = info.rerelated_files
+        prov = Namespace("http://www.w3.org/ns/prov#")
+        rdfs = Namespace("http://www.w3.org/2000/01/rdf-schema#")
+
+        src_files = {}
+        for uri in uri_list:
+            results = self.searcher.get_entity_info(uri)
+
+            if len(results) > 0:
+                prov = Namespace("http://www.w3.org/ns/prov#")
+                entity_graph = results.graph
+                entity_subject = URIRef(uri)
+                location = entity_graph.value(subject=entity_subject, predicate=prov.atLocation)
+                subflow, info = self.output.set_file_info(results, location)
+
+                for info in info.related_files:
+                    activity_key = str(info["activity"])
+                    activity_dict = src_files.setdefault(activity_key, {})
+                    if not activity_dict:
+                        activity_dict["type"] = info["type"]
+
+                    activity_dict.setdefault("label", []).append(str(info["label"]))
 
         return src_files

@@ -347,17 +347,16 @@ class ProvenanceSearcher:
         PREFIX prov: <http://www.w3.org/ns/prov#>
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 
-
         SELECT ?entity ?label
         WHERE {{
             ?entity a prov:Entity ;
-                    rdfs:label ?label .
+                rdfs:label ?label .
 
-            FILTER CONTAINS(STR(?label), "{dir_path}")
+            FILTER(CONTAINS(STR(?label), "{dir_path}"))
 
             FILTER NOT EXISTS {{
                 ?entity prov:wasUsedBy ?activity .
-                FILTER CONTAINS(STR(?activity), "deleteActivity")
+                FILTER(CONTAINS(STR(?activity), "deleteActivity"))
             }}
         }}
         """

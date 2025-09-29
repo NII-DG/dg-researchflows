@@ -189,7 +189,7 @@ class ProvenanceManager:
 
         self.output.write(updated_files)
 
-    def _handle_file_modify(self, activity_type: str, src_file:str, dst_file:str):
+    def _handle_file_modify(self, activity_type: str, modify_files: dict):
         """修正アクティビティを処理するための関数"""
         base_id = self.FILE_MODIFY_BASE
         activity_id = generated_id(base_id)
@@ -198,28 +198,29 @@ class ProvenanceManager:
         updated_files = []
         src_entities =[]
 
-        # 修正元の処理
-        convert_path = self.convert_grdm_path(src_file)
-        if convert_path in self.grdm_file_info:
-            src_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
-            updated_files.append(src_link)
-            src_uri = self.searcher.get_file_entity(src_link)
-            if not src_uri:
-                src_value = calculate_sha256(src_file)
-                src_uri = self.editor.create_entity(convert_path, src_link, src_value)
-        else:
-            raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
-        src_entities.append(src_uri)
+        for dst_file, src_file in modify_files.items(): 
+            # 修正元の処理
+            convert_path = self.convert_grdm_path(src_file)
+            if convert_path in self.grdm_file_info:
+                src_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
+                updated_files.append(src_link)
+                src_uri = self.searcher.get_file_entity(src_link)
+                if not src_uri:
+                    src_value = calculate_sha256(src_file)
+                    src_uri = self.editor.create_entity(convert_path, src_link, src_value)
+            else:
+                raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
+            src_entities.append(src_uri)
 
-        #　修正先の処理
-        dst_hash = calculate_sha256(dst_file)
-        convert_path = self.convert_grdm_path(dst_file)
-        if convert_path in self.grdm_file_info:
-            dst_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
-            self.editor.create_entity(convert_path, dst_link, dst_hash, activity_id, src_uri, self.excution_user)
-            updated_files.append(dst_link)
-        else:
-            raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
+            #　修正先の処理
+            dst_hash = calculate_sha256(dst_file)
+            convert_path = self.convert_grdm_path(dst_file)
+            if convert_path in self.grdm_file_info:
+                dst_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
+                self.editor.create_entity(convert_path, dst_link, dst_hash, activity_id, src_uri, self.excution_user)
+                updated_files.append(dst_link)
+            else:
+                raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
 
         # アクティビティ作成
         self.editor.create_activity(activity_id, activity_type, src_entities, self.excution_user)
@@ -425,18 +426,21 @@ class ProvenanceManager:
 
         self.output.write(updated_files)
 
-    def _handle_provenance_edit(self, activity_type: str, entity_id: str, old_provenance: list, new_provenance: list, comment: str=""):
+    def _handle_provenance_edit(self, new_path: str, ids: list):
         """来歴編集アクティビティを処理するための関数"""
-        base_id = self.COLLECTION_EDIT_BASE
 
-        activity_id = generated_id(base_id)
-        self.editor.edit_entity(entity_id, activity_id, new_provenance)
-
-        # アクティビティ作成
-        self.editor.create_activity(activity_id, activity_type, entity_id, self.excution_user, old_provenance)
+        updated_files = []
+        convert_path = self.convert_grdm_path(new_path)
+        if convert_path in self.grdm_file_info:
+            file_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
+            updated_files.append(file_link)
+        else:
+            raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
+    
+        for entity in ids:
+            self.editor.change_entity_label(entity, convert_path)
 
         self.rdf_store.reload()
-        updated_files = list(set(old_provenance + new_provenance))
         self.output.write(updated_files)
 
     def _handle_delete_activity(self, activity_type:str, activity_uri: str, update_files: list):
@@ -466,28 +470,6 @@ class ProvenanceManager:
                 file_links.append(file_link)
 
         self.output.write(file_links)
-
-    # def check_entity_exists(self, file_paths:list):
-    #     """指定されたファイルパスのファイルのエンティティが存在するかを確認する関数。"""
-
-    #     results = []
-    #     for file in file_paths:
-    #         result = self.searcher.get_file_entity(file)
-    #         if result:
-    #             results.append(result)
-    #         else:
-    #             editor = ProvenanceEditor()
-    #             hash_value = calculate_sha256(file)
-    #             path = file.split("data", 1)[1]
-    #             path = os.path.join("osfstorage/data", path)
-    #             if path in self.grdm_file_info:
-    #                 value = self.grdm_file_info[path]
-    #             else:
-    #                 raise Exception("ファイルなし")
-    #             location = os.path.join(self.grdm_url, self.project_id, "files/osfstorage", value)
-    #             results.append(editor.create_entity(path, location, hash_value))
-
-    #     return results
 
     def convert_grdm_path(self, path):
         """GRDM用のパスに変換する関数です。"""

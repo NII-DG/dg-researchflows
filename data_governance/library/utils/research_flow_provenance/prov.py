@@ -388,7 +388,7 @@ class ProvenanceManager:
 
         self.output.write(updated_files)
 
-    def _handle_file_upload(self, activity_type: str, upload_files: dict):
+    def _handle_file_upload(self, activity_type: str, upload_files: dict, comment: str=""):
         """アップロードアクティビティを処理するための関数です。
 
         Args:
@@ -398,8 +398,8 @@ class ProvenanceManager:
         Raises:
             FileNotFoundError: 対処のファイルがGRDM上に存在しない場合のエラーです。
 
-        """        
-      
+        """
+
         base_id = self.FILE_UPLOAD_BASE
         activity_id = generated_id(base_id)
 
@@ -415,11 +415,11 @@ class ProvenanceManager:
                 updated_files.append(dst_link)
             else:
                 raise FileNotFoundError(f"{convert_path}がGRDMに存在しません。")
-            
+
             src_list.append(src_link)
 
         # アクティビティ作成
-        self.editor.create_activity(activity_id, activity_type, src_list, self.excution_user)
+        self.editor.create_activity(activity_id, activity_type, src_list, self.excution_user, comment)
         #再読み込み
         self.rdf_store.reload()
 

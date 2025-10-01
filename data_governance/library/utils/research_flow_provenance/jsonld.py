@@ -487,4 +487,10 @@ class ProvenanceEditor:
         except IOError as e:
             raise RuntimeError(f"{self.entity_file}の書き込みに失敗しました: {e}") from e
 
+    def get_file_list(self) -> list:
+        """来歴ファイルのリストを返すメソッドです。
 
+        Returns:
+            list: 来歴ファイルのリスト
+        """
+        return [self.entity_file, self.activity_file, self.agent_file]

@@ -5,11 +5,11 @@ import json
 import os
 from pathlib import Path
 import uuid
+
+import unittest.mock as mock
 import pytest
 from unittest import mock
 from data_governance.library.utils.research_flow_provenance.jsonld import generated_id, ProvenanceEditor
-
-
 
 def test_generated_id():
     """test_generated_idの正常系テスト"""
@@ -20,11 +20,10 @@ def test_generated_id():
 
     assert result == "base_id-12345678-1234-5678-1234-567812345678"
 
-
 class TestProvenanceEditor:
     """ProvenanceEditorクラスをテストするクラスです。"""
 
-    def test___init__1(self):
+    def test__constructor_1(self):
         """コンストラクタの正常系テスト（すべてのファイルが存在する場合）"""
         test_env = {
             'JUPYTERHUB_SERVER_NAME': 'test_env',
@@ -39,7 +38,7 @@ class TestProvenanceEditor:
         assert editor.activity_file == "/home/jovyan/data_governance/researchflow/test_env/activity.jsonld"
         assert editor.agent_file == "/home/jovyan/data_governance/researchflow/test_env/agent.jsonld"
 
-    def test___init__2(self):
+    def test__constructor_2(self):
         """entity.jsonld が存在しない場合、テンプレートからコピーされるか"""
         test_env = {
             'JUPYTERHUB_SERVER_NAME': 'test_env',
@@ -57,7 +56,7 @@ class TestProvenanceEditor:
                             "/home/jovyan/data_governance/researchflow/test_env/entity.jsonld"
                         )
 
-    def test___init__3(self):
+    def test__constructor_3(self):
         """activity.jsonld が存在しない場合、テンプレートからコピーされるか"""
         test_env = {
             'JUPYTERHUB_SERVER_NAME': 'test_env',
@@ -74,7 +73,7 @@ class TestProvenanceEditor:
                             "/home/jovyan/data_governance/researchflow/test_env/activity.jsonld"
                         )
 
-    def test___init__4(self):
+    def test__constructor_4(self):
         """agent.jsonld が存在しない場合、テンプレートからコピーされるか"""
         test_env = {
             'JUPYTERHUB_SERVER_NAME': 'test_env',
@@ -130,10 +129,6 @@ class TestProvenanceEditor:
                     args, kwargs = mock_json_dump.call_args
                     dumped_data = args[0]  # json.dumpの第一引数が書き込むデータ
 
-                    print("=== dumpされたactivity_data ===")
-                    print(json.dumps(dumped_data, indent=2, ensure_ascii=False))
-                    print("===============================")
-
                     # @graph に新しいactivityが追加されているはず
                     new_activity = dumped_data["@graph"][-1]
 
@@ -150,6 +145,7 @@ class TestProvenanceEditor:
                         assert usage["@type"] == "prov:Usage"
                         assert usage["label"] == "old provenance"
                         assert usage["prov:entity"] == old_id
+                    print(f"kekka{ProvenanceEditor.__module__}")
 
     def test_create_activity_without_comment(self):
         """create_activityをコメント引数なしで実行するテストケースです"""
@@ -185,10 +181,6 @@ class TestProvenanceEditor:
                     args, _ = mock_json_dump.call_args
                     dumped_data = args[0]
                     new_activity = dumped_data["@graph"][-1]
-
-                    print("=== dumpされたactivity_data ===")
-                    print(json.dumps(dumped_data, indent=2, ensure_ascii=False))
-                    print("===============================")
 
                     assert new_activity["@id"] == activity_id
                     assert new_activity["label"] == activity_type
@@ -237,10 +229,6 @@ class TestProvenanceEditor:
                     dumped_data = args[0]
                     new_activity = dumped_data["@graph"][-1]
 
-                    print("=== dumpされたactivity_data ===")
-                    print(json.dumps(dumped_data, indent=2, ensure_ascii=False))
-                    print("===============================")
-
                     assert new_activity["@id"] == activity_id
                     assert new_activity["label"] == activity_type
                     assert new_activity["prov:used"] == [{"@id": e} for e in used_entities]
@@ -285,10 +273,6 @@ class TestProvenanceEditor:
                     args, _ = mock_json_dump.call_args
                     dumped_data = args[0]
                     new_activity = dumped_data["@graph"][-1]
-
-                    print("=== dumpされたactivity_data ===")
-                    print(json.dumps(dumped_data, indent=2, ensure_ascii=False))
-                    print("===============================")
 
                     assert new_activity["@id"] == activity_id
                     assert new_activity["label"] == activity_type
@@ -392,10 +376,6 @@ class TestProvenanceEditor:
                         dumped_data = args[0]
                         new_entity = dumped_data["@graph"][-1]
 
-                        print("=== dumpされたactivity_data ===")
-                        print(json.dumps(dumped_data, indent=2, ensure_ascii=False))
-                        print("===============================")
-
                         # id, type, label の基本情報チェック
                         assert new_entity["@id"] == fake_entity_id
                         assert new_entity["@type"] == "prov:Entity"
@@ -455,10 +435,6 @@ class TestProvenanceEditor:
                         args, _ = mock_json_dump.call_args
                         dumped_data = args[0]
                         new_entity = dumped_data["@graph"][-1]
-
-                        print("=== dumpされたactivity_data ===")
-                        print(json.dumps(dumped_data, indent=2, ensure_ascii=False))
-                        print("===============================")
 
                         # id, type, label の基本情報チェック
                         assert new_entity["@id"] == fake_entity_id
@@ -524,10 +500,6 @@ class TestProvenanceEditor:
                         args, _ = mock_json_dump.call_args
                         dumped_data = args[0]
                         new_entity = dumped_data["@graph"][-1]
-
-                        print("=== dumpされたactivity_data ===")
-                        print(json.dumps(dumped_data, indent=2, ensure_ascii=False))
-                        print("===============================")
 
                         # id, type, label の基本情報チェック
                         assert new_entity["@id"] == fake_entity_id
@@ -595,10 +567,6 @@ class TestProvenanceEditor:
                         dumped_data = args[0]
                         new_entity = dumped_data["@graph"][-1]
 
-                        print("=== dumpされたactivity_data ===")
-                        print(json.dumps(dumped_data, indent=2, ensure_ascii=False))
-                        print("===============================")
-
                         # id, type, label の基本情報チェック
                         assert new_entity["@id"] == fake_entity_id
                         assert new_entity["@type"] == "prov:Entity"
@@ -664,10 +632,6 @@ class TestProvenanceEditor:
                         args, _ = mock_json_dump.call_args
                         dumped_data = args[0]
                         new_entity = dumped_data["@graph"][-1]
-
-                        print("=== dumpされたactivity_data ===")
-                        print(json.dumps(dumped_data, indent=2, ensure_ascii=False))
-                        print("===============================")
 
                         # id, type, label の基本情報チェック
                         assert new_entity["@id"] == fake_entity_id
@@ -781,10 +745,6 @@ class TestProvenanceEditor:
                         assert result_id == fake_id
                         dumped_data = mock_json_dump.call_args[0][0]
                         collection = dumped_data["@graph"][-1]
-
-                        print("=== dumpされたactivity_data ===")
-                        print(json.dumps(dumped_data, indent=2, ensure_ascii=False))
-                        print("===============================")
 
                         assert collection["@id"] == fake_id
                         assert collection["@type"] == "prov:Collection"
@@ -921,22 +881,21 @@ class TestProvenanceEditor:
                         assert "の書き込みに失敗しました" in str(excinfo.value)
 
     def test_edit_entity_with_was_revision_of(self):
-        """edit_entityでwasRevisionOfを更新するテストケースです。"""
+        """edit_entityでprov:wasRevisionOfを更新する通常の成功ケース。"""
         test_env = {
             'JUPYTERHUB_SERVER_NAME': 'test_env',
             'HOME': '/home/jovyan'
         }
 
-        # 1. 環境変数とファイルパスモック
         with mock.patch.dict("os.environ", test_env):
             with mock.patch("os.path.exists", return_value=True):
                 editor = ProvenanceEditor()
 
-        # 2. テストデータ準備
         entity_id = "urn:entity:test123"
         activity_id = "urn:activity:edit456"
         new_entities = ["urn:entity:src1", "urn:entity:src2"]
 
+        # 元データには prov:wasRevisionOf が存在しているパターン
         mock_entity_data = {
             "@graph": [
                 {
@@ -944,85 +903,38 @@ class TestProvenanceEditor:
                     "label": "test123.txt",
                     "prov:wasRevisionOf": [{"@id": "urn:entity:old1"}],
                     "prov:wasInfluencedBy": [{"@id": "urn:activity:old"}],
-                }
-            ]
-        }
-
-        # 3. open + json.load + json.dump をモック
-        with mock.patch("builtins.open", mock.mock_open(read_data=json.dumps(mock_entity_data))):
-            with mock.patch("json.load", return_value=mock_entity_data):
-                with mock.patch("json.dump") as mock_json_dump:
-                    # 4. 関数実行
-                    editor.edit_entity(entity_id, activity_id, new_entities)
-
-                    # 5. dump 呼び出しデータを確認
-                    dumped_data = mock_json_dump.call_args[0][0]
-                    updated_entity = dumped_data["@graph"][0]
-
-                    print("=== dumpされたactivity_data ===")
-                    print(json.dumps(dumped_data, indent=2, ensure_ascii=False))
-                    print("===============================")
-
-                    # 6. 検証
-                    assert updated_entity["@id"] == entity_id
-                    assert updated_entity["prov:wasRevisionOf"] == [
-                        {"@id": "urn:entity:src1"},
-                        {"@id": "urn:entity:src2"}
-                    ]
-                    # prov:wasInfluencedBy はリストとして追加されているか
-                    assert {"@id": activity_id} in updated_entity["prov:wasInfluencedBy"]
-
-    def test_edit_entity_with_was_derived_from(self):
-        """edit_entityでwasDerivedFromを更新するテストケースです。"""
-        test_env = {
-            'JUPYTERHUB_SERVER_NAME': 'test_env',
-            'HOME': '/home/jovyan'
-        }
-
-        # 1. 環境変数とファイルパスモック
-        with mock.patch.dict("os.environ", test_env):
-            with mock.patch("os.path.exists", return_value=True):
-                editor = ProvenanceEditor()
-
-        # 2. テストデータ準備
-        entity_id = "urn:entity:no_revision"
-        activity_id = "urn:activity:update789"
-        new_entities = ["urn:entity:sourceA", "urn:entity:sourceB"]
-
-        mock_entity_data = {
-            "@graph": [
-                {
-                    "@id": entity_id,
-                    "label": "sample.txt",
                     "prov:wasDerivedFrom": [{"@id": "urn:entity:old1"}]
                 }
             ]
         }
 
-        # 3. open + json.load + json.dump をモック
-        with mock.patch("builtins.open", mock.mock_open(read_data=json.dumps(mock_entity_data))):
+        with mock.patch("builtins.open", mock.mock_open(read_data=json.dumps(mock_entity_data))) as m:
             with mock.patch("json.load", return_value=mock_entity_data):
                 with mock.patch("json.dump") as mock_json_dump:
-                    # 4. 関数実行
-                    editor.edit_entity(entity_id, activity_id, new_entities)
+                    # 関数実行
+                    old_provenance = editor.edit_entity(entity_id, activity_id, new_entities)
 
-                    # 5. 結果確認
+                    # 書き出されたデータを取得
                     dumped_data = mock_json_dump.call_args[0][0]
                     updated_entity = dumped_data["@graph"][0]
 
-                    print("=== dumpされたactivity_data ===")
-                    print(json.dumps(dumped_data, indent=2, ensure_ascii=False))
-                    print("===============================")
-
+                    # アサーション
                     assert updated_entity["@id"] == entity_id
-                    assert updated_entity["prov:wasDerivedFrom"] == [
-                        {"@id": "urn:entity:sourceA"},
-                        {"@id": "urn:entity:sourceB"}
+
+                    # prov:wasRevisionOf が新しい new_entities に置き換えられていること
+                    assert updated_entity["prov:wasRevisionOf"] == [
+                        {"@id": "urn:entity:src1"},
+                        {"@id": "urn:entity:src2"}
                     ]
+
+                    # prov:wasInfluencedBy に activity_id が追加されていること
                     assert {"@id": activity_id} in updated_entity["prov:wasInfluencedBy"]
 
-    def test_edit_entity_not_found(self):
-        """edit_entityを存在しないentity_idで実行した場合のテストケースです。"""
+                    # prov:wasRevisionOf があるときは、old_provenance は空
+                    assert old_provenance == []
+
+    def test_edit_entity_with_new_entities_none(self):
+        """edit_entityでnew_entitiesがNoneの場合のテストケース"""
         test_env = {
             'JUPYTERHUB_SERVER_NAME': 'test_env',
             'HOME': '/home/jovyan'
@@ -1032,28 +944,35 @@ class TestProvenanceEditor:
             with mock.patch("os.path.exists", return_value=True):
                 editor = ProvenanceEditor()
 
-        # 存在しない entity_id を指定
-        entity_id = "urn:entity:not_exist"
-        activity_id = "urn:activity:dummy"
-        new_entities = ["urn:entity:x"]
+        entity_id = "urn:entity:test456"
 
-        # @graph 内に一致する @id が存在しない
+        # prov:wasDerivedFrom 付きのエンティティデータ
         mock_entity_data = {
             "@graph": [
-                {"@id": "urn:entity:other"}
+                {
+                    "@id": entity_id,
+                    "label": "test456.txt",
+                    "prov:wasDerivedFrom": [{"@id": "urn:entity:old_src1"}, {"@id": "urn:entity:old_src2"}]
+                }
             ]
         }
 
         with mock.patch("builtins.open", mock.mock_open(read_data=json.dumps(mock_entity_data))):
             with mock.patch("json.load", return_value=mock_entity_data):
-                # 例外が発生するか検証
-                with pytest.raises(ValueError) as excinfo:
-                    editor.edit_entity(entity_id, activity_id, new_entities)
+                with mock.patch("json.dump") as mock_json_dump:
+                    # 関数実行
+                    old_provenance = editor.edit_entity(entity_id, None, None)
 
-                assert f"指定されたエンティティIDが存在しません" in str(excinfo.value)
+                    dumped_data = mock_json_dump.call_args[0][0]
+                    updated_entity = dumped_data["@graph"][0]
 
-    def test_edit_entity_file_read_error(self):
-        """ファイルの読み込みに失敗する場合のテストケースです。"""
+                    # 検証
+                    assert updated_entity["@id"] == entity_id
+                    assert "prov:wasDerivedFrom" not in updated_entity  # 削除されていること
+                    assert old_provenance == ["urn:entity:old_src1", "urn:entity:old_src2"]
+    
+    def test_edit_entity_with_derived_from_update(self):
+        """edit_entityでprov:wasRevisionOfが存在しない場合にprov:wasDerivedFromが更新されるテスト"""
         test_env = {
             'JUPYTERHUB_SERVER_NAME': 'test_env',
             'HOME': '/home/jovyan'
@@ -1063,50 +982,141 @@ class TestProvenanceEditor:
             with mock.patch("os.path.exists", return_value=True):
                 editor = ProvenanceEditor()
 
-        entity_id = "urn:entity:any"
-        activity_id = "urn:activity:any"
-        new_entities = ["urn:entity:x"]
+        entity_id = "urn:entity:test789"
+        activity_id = "urn:activity:edit999"
+        new_entities = ["urn:entity:new1"]
 
-        # open() が IOError を発生させるようにする
-        with mock.patch("builtins.open", side_effect=IOError("読み込み失敗")):
-            with pytest.raises(RuntimeError) as excinfo:
-                editor.edit_entity(entity_id, activity_id, new_entities)
+        mock_entity_data = {
+            "@graph": [
+                {
+                    "@id": entity_id,
+                    "label": "test789.txt",
+                    "prov:wasDerivedFrom": [{"@id": "urn:entity:old_src"}]
+                    # Note: prov:wasRevisionOf がないパターン
+                }
+            ]
+        }
+
+        with mock.patch("builtins.open", mock.mock_open(read_data=json.dumps(mock_entity_data))):
+            with mock.patch("json.load", return_value=mock_entity_data):
+                with mock.patch("json.dump") as mock_json_dump:
+                    # 関数実行
+                    editor.edit_entity(entity_id, activity_id, new_entities)
+
+                    dumped_data = mock_json_dump.call_args[0][0]
+                    updated_entity = dumped_data["@graph"][0]
+
+                    # 検証
+                    assert updated_entity["@id"] == entity_id
+                    assert updated_entity["prov:wasDerivedFrom"] == [{"@id": "urn:entity:new1"}]
+                    assert {"@id": activity_id} in updated_entity["prov:wasInfluencedBy"]
+
+    def test_edit_entity_entity_not_found(self):
+        """エンティティが見つからなに場合のテストケースです。"""
+        test_env = {
+            'JUPYTERHUB_SERVER_NAME': 'test_env',
+            'HOME': '/home/jovyan'
+        }
+
+        with mock.patch.dict("os.environ", test_env):
+            with mock.patch("os.path.exists", return_value=True):
+                editor = ProvenanceEditor()
+
+        mock_data = {
+            "@graph": [
+                {
+                    "@id": "urn:entity:other",
+                    "label": "not_target.txt"
+                }
+            ]
+        }
+
+        with mock.patch("builtins.open", mock.mock_open(read_data=json.dumps(mock_data))):
+            with mock.patch("json.load", return_value=mock_data):
+                with pytest.raises(ValueError) as e:
+                    editor.edit_entity("urn:entity:not_found")
+                assert "指定されたエンティティIDが存在しません" in str(e.value)
+
+    def test_edit_entity_json_load_error(self):
+        """ファイル読み込みに失敗する場合のテストケースです。"""
+        test_env = {
+            'JUPYTERHUB_SERVER_NAME': 'test_env',
+            'HOME': '/home/jovyan'
+        }
+
+        with mock.patch.dict("os.environ", test_env):
+            with mock.patch("os.path.exists", return_value=True):
+                editor = ProvenanceEditor()
+
+        with mock.patch("builtins.open", mock.mock_open()):
+            with mock.patch("json.load", side_effect=json.JSONDecodeError("Expecting value", "doc", 0)):
+                with pytest.raises(RuntimeError) as e:
+                    editor.edit_entity("urn:entity:any")
+                assert "の読み込みに失敗しました" in str(e.value)
+
+        def test_edit_collection_file_read_fail(self):
+            """ファイルの読み込みに失敗する場合のテストケース"""
+            test_env = {
+                'JUPYTERHUB_SERVER_NAME': 'test_env',
+                'HOME': '/home/jovyan'
+            }
+
+            with mock.patch.dict("os.environ", test_env):
+                with mock.patch("os.path.exists", return_value=True):
+                    editor = ProvenanceEditor()
+
+            entity_id = "urn:collection:test-collection"
+            activity_id = "urn:activity:test-activity"
+            new_member = ["urn:entity:member1"]
+
+            # openやjson.loadで読み込み時にIOErrorを発生させる
+            with mock.patch("builtins.open", mock.mock_open()) as mock_open:
+                mock_open.side_effect = IOError("ファイル読み込み失敗")
+                with pytest.raises(RuntimeError) as excinfo:
+                    editor.edit_collection(entity_id, activity_id, new_member)
 
             assert "の読み込みに失敗しました" in str(excinfo.value)
 
-    def test_edit_entity_file_write_fail(self):
+    def test_edit_entity_file_write_error(self):
         """ファイルの書き込みに失敗する場合のテストケースです。"""
         test_env = {
             'JUPYTERHUB_SERVER_NAME': 'test_env',
             'HOME': '/home/jovyan'
         }
 
-        with mock.patch.dict("os.environ", test_env):
-            with mock.patch("os.path.exists", return_value=True):
-                editor = ProvenanceEditor()
+        with mock.patch.dict("os.environ", test_env), \
+            mock.patch("os.path.exists", return_value=True):
+            editor = ProvenanceEditor()
 
-        entity_id = "urn:entity:test-entity"
-        activity_id = "urn:activity:test-activity"
-        new_entities = ["urn:entity:new-1"]
+        entity_id = "urn:entity:test"
+        activity_id = "urn:activity:edit"
+        new_entities = ["urn:entity:new1"]
 
-        mock_entity_data = {
+        mock_data = {
             "@graph": [
                 {
                     "@id": entity_id,
-                    "label": "file.txt",
-                    "prov:wasRevisionOf": [{"@id": "urn:entity:old"}],
+                    "prov:wasDerivedFrom": [{"@id": "old"}]
                 }
             ]
         }
 
-        with mock.patch("builtins.open", mock.mock_open(read_data=json.dumps(mock_entity_data))):
-            with mock.patch("json.load", return_value=mock_entity_data):
-                # 書き込みで IOError を発生
-                with mock.patch("json.dump", side_effect=IOError("書き込み失敗")):
-                    with pytest.raises(RuntimeError) as excinfo:
-                        editor.edit_entity(entity_id, activity_id, new_entities)
+        # 読み込み用 open は正常
+        m_open_read = mock.mock_open(read_data=json.dumps(mock_data))
 
-                    assert "の書き込みに失敗しました" in str(excinfo.value)
+        # 書き込み用 open だけ IOError を発生させる
+        def open_side_effect(file, mode='r', *args, **kwargs):
+            if mode.startswith('w'):
+                raise IOError("write error")
+            return m_open_read.return_value
+
+        with mock.patch("builtins.open", side_effect=open_side_effect), \
+            mock.patch("json.load", return_value=mock_data):
+
+            with pytest.raises(RuntimeError) as e:
+                editor.edit_entity(entity_id, activity_id, new_entities)
+
+            assert "の書き込みに失敗しました" in str(e.value)
 
     def test_edit_collection_full_args(self):
         """_edit_collectionを全引数ありで実行した場合のテストケースです。"""
@@ -1142,9 +1152,6 @@ class TestProvenanceEditor:
                     # json.dump が呼ばれた際の実際のデータを確認
                     args, kwargs = mock_json_dump.call_args
                     updated_data = args[0]
-                    print("=== dumpされたactivity_data ===")
-                    print(json.dumps(updated_data, indent=2, ensure_ascii=False))
-                    print("===============================")
 
                     # prov:hadMemberがnew_memberに更新されているか
                     collection = next(item for item in updated_data["@graph"] if item["@id"] == entity_id)
@@ -1153,7 +1160,7 @@ class TestProvenanceEditor:
                     # prov:wasInfluencedByにactivity_idが追加されているか
                     influenced = collection.get("prov:wasInfluencedBy", [])
                     assert {"@id": activity_id} in influenced
-
+    
     def test_edit_collection_file_read_fail(self):
         """ファイルの読み込みに失敗する場合のテストケース"""
         test_env = {
@@ -1176,6 +1183,8 @@ class TestProvenanceEditor:
                 editor.edit_collection(entity_id, activity_id, new_member)
 
         assert "の読み込みに失敗しました" in str(excinfo.value)
+
+
 
     def test_edit_collection_file_write_fail(self):
         """ファイルの書き込みに失敗する場合のテストケースです。"""
@@ -1239,10 +1248,6 @@ class TestProvenanceEditor:
         mock_json_dump.assert_called_once()
         dumped_data = mock_json_dump.call_args[0][0]
 
-        print("=== dumpされたactivity_data ===")
-        print(json.dumps(dumped_data, indent=2, ensure_ascii=False))
-        print("===============================")
-
         # 新しいエージェントが追加されているか確認
         added_agent = dumped_data["@graph"][-1]
         assert added_agent["@id"] == agent_id
@@ -1279,10 +1284,6 @@ class TestProvenanceEditor:
         # json.dumpが呼ばれているか確認
         mock_json_dump.assert_called_once()
         dumped_data = mock_json_dump.call_args[0][0]
-
-        print("=== dumpされたactivity_data ===")
-        print(json.dumps(dumped_data, indent=2, ensure_ascii=False))
-        print("===============================")
 
         # 新しいエージェントが正しく追加されたか確認
         added_agent = dumped_data["@graph"][-1]
@@ -1370,3 +1371,368 @@ class TestProvenanceEditor:
             result = editor._generated_end_timestamp()
 
             assert result == iso_time
+
+    def test_delete_activity_success(self):
+        """正常にアクティビティを削除できるケース"""
+        test_env = {
+            'JUPYTERHUB_SERVER_NAME': 'test_env',
+            'HOME': '/home/jovyan'
+        }
+
+        with mock.patch.dict("os.environ", test_env), \
+             mock.patch("os.path.exists", return_value=True):
+            editor = ProvenanceEditor()
+
+        target_uri = "urn:activity:target"
+        mock_data = {
+            "@graph": [
+                {"@id": "urn:activity:target", "label": "target"},
+                {"@id": "urn:activity:keep", "label": "keep"}
+            ]
+        }
+
+        m_open_read = mock.mock_open(read_data=json.dumps(mock_data))
+
+        with mock.patch("builtins.open", side_effect=lambda file, mode='r', *args, **kwargs:
+                        m_open_read.return_value if mode.startswith('r') else mock.mock_open().return_value), \
+             mock.patch("json.load", return_value=mock_data), \
+             mock.patch("json.dump") as mock_json_dump:
+
+            editor.delete_activity(target_uri)
+
+            written_data = mock_json_dump.call_args[0][0]
+            updated_graph = written_data["@graph"]
+
+            assert all(entry["@id"] != target_uri for entry in updated_graph)
+            assert any(entry["@id"] == "urn:activity:keep" for entry in updated_graph)
+
+    def test_delete_activity_not_found(self):
+        """削除対象のアクティビティが存在しないケース"""
+        test_env = {
+            'JUPYTERHUB_SERVER_NAME': 'test_env',
+            'HOME': '/home/jovyan'
+        }
+
+        with mock.patch.dict("os.environ", test_env), \
+             mock.patch("os.path.exists", return_value=True):
+            editor = ProvenanceEditor()
+
+        mock_data = {
+            "@graph": [
+                {"@id": "urn:activity:other", "label": "other"}
+            ]
+        }
+
+        m_open_read = mock.mock_open(read_data=json.dumps(mock_data))
+
+        with mock.patch("builtins.open", side_effect=lambda file, mode='r', *args, **kwargs:
+                        m_open_read.return_value if mode.startswith('r') else mock.mock_open().return_value), \
+             mock.patch("json.load", return_value=mock_data), \
+             mock.patch("json.dump") as mock_json_dump:
+
+            editor.delete_activity("urn:activity:not_found")
+
+            written_data = mock_json_dump.call_args[0][0]
+            assert written_data["@graph"] == mock_data["@graph"]
+
+    def test_delete_activity_read_error(self):
+        """読み込みエラー（IOError）が発生するケース"""
+        test_env = {
+            'JUPYTERHUB_SERVER_NAME': 'test_env',
+            'HOME': '/home/jovyan'
+        }
+
+        with mock.patch.dict("os.environ", test_env), \
+             mock.patch("os.path.exists", return_value=True):
+            editor = ProvenanceEditor()
+
+        with mock.patch("builtins.open", side_effect=IOError("read error")):
+            with pytest.raises(RuntimeError) as e:
+                editor.delete_activity("urn:activity:target")
+
+            assert "の読み込みに失敗しました" in str(e.value)
+
+    def test_delete_activity_write_error(self):
+        """書き込みエラー（IOError）が発生するケース"""
+        test_env = {
+            'JUPYTERHUB_SERVER_NAME': 'test_env',
+            'HOME': '/home/jovyan'
+        }
+
+        with mock.patch.dict("os.environ", test_env), \
+             mock.patch("os.path.exists", return_value=True):
+            editor = ProvenanceEditor()
+
+        mock_data = {
+            "@graph": [
+                {"@id": "urn:activity:target", "label": "target"},
+                {"@id": "urn:activity:keep", "label": "keep"}
+            ]
+        }
+
+        m_open_read = mock.mock_open(read_data=json.dumps(mock_data))
+
+        def open_side_effect(file, mode='r', *args, **kwargs):
+            if mode.startswith("w"):
+                raise IOError("write error")
+            return m_open_read.return_value
+
+        with mock.patch("builtins.open", side_effect=open_side_effect), \
+             mock.patch("json.load", return_value=mock_data):
+
+            with pytest.raises(RuntimeError) as e:
+                editor.delete_activity("urn:activity:target")
+
+            assert "の書き込みに失敗しました" in str(e.value)
+
+    def test_delete_entity_success(self):
+        """正常にエンティティを削除できるケース"""
+        test_env = {
+            'JUPYTERHUB_SERVER_NAME': 'test_env',
+            'HOME': '/home/jovyan'
+        }
+
+        with mock.patch.dict("os.environ", test_env), \
+             mock.patch("os.path.exists", return_value=True):
+            editor = ProvenanceEditor()
+
+        target_uri = "urn:entity:target"
+        mock_data = {
+            "@graph": [
+                {"@id": target_uri, "label": "target"},
+                {"@id": "urn:entity:keep", "label": "keep"}
+            ]
+        }
+
+        m_open_read = mock.mock_open(read_data=json.dumps(mock_data))
+
+        with mock.patch("builtins.open", side_effect=lambda file, mode='r', *args, **kwargs:
+                        m_open_read.return_value if mode.startswith('r') else mock.mock_open().return_value), \
+             mock.patch("json.load", return_value=mock_data), \
+             mock.patch("json.dump") as mock_json_dump:
+
+            editor.delete_entity(target_uri)
+
+            written_data = mock_json_dump.call_args[0][0]
+            updated_graph = written_data["@graph"]
+
+            assert all(entry["@id"] != target_uri for entry in updated_graph)
+            assert any(entry["@id"] == "urn:entity:keep" for entry in updated_graph)
+
+    def test_delete_entity_not_found(self):
+        """削除対象のエンティティが存在しない場合でも例外が発生しないケース"""
+        test_env = {
+            'JUPYTERHUB_SERVER_NAME': 'test_env',
+            'HOME': '/home/jovyan'
+        }
+
+        with mock.patch.dict("os.environ", test_env), \
+             mock.patch("os.path.exists", return_value=True):
+            editor = ProvenanceEditor()
+
+        mock_data = {
+            "@graph": [
+                {"@id": "urn:entity:other", "label": "other"}
+            ]
+        }
+
+        m_open_read = mock.mock_open(read_data=json.dumps(mock_data))
+
+        with mock.patch("builtins.open", side_effect=lambda file, mode='r', *args, **kwargs:
+                        m_open_read.return_value if mode.startswith('r') else mock.mock_open().return_value), \
+             mock.patch("json.load", return_value=mock_data), \
+             mock.patch("json.dump") as mock_json_dump:
+
+            editor.delete_entity("urn:entity:not_found")
+
+            written_data = mock_json_dump.call_args[0][0]
+            assert written_data["@graph"] == mock_data["@graph"]
+
+    def test_delete_entity_read_error(self):
+        """読み込みエラー（IOError）が発生するケース"""
+        test_env = {
+            'JUPYTERHUB_SERVER_NAME': 'test_env',
+            'HOME': '/home/jovyan'
+        }
+
+        with mock.patch.dict("os.environ", test_env), \
+             mock.patch("os.path.exists", return_value=True):
+            editor = ProvenanceEditor()
+
+        with mock.patch("builtins.open", side_effect=IOError("read error")):
+            with pytest.raises(RuntimeError) as e:
+                editor.delete_entity("urn:entity:target")
+
+            assert "の読み込みに失敗しました" in str(e.value)
+
+    def test_delete_entity_write_error(self):
+        """書き込みエラー（IOError）が発生するケース"""
+        test_env = {
+            'JUPYTERHUB_SERVER_NAME': 'test_env',
+            'HOME': '/home/jovyan'
+        }
+
+        with mock.patch.dict("os.environ", test_env), \
+             mock.patch("os.path.exists", return_value=True):
+            editor = ProvenanceEditor()
+
+        mock_data = {
+            "@graph": [
+                {"@id": "urn:entity:target", "label": "target"},
+                {"@id": "urn:entity:keep", "label": "keep"}
+            ]
+        }
+
+        m_open_read = mock.mock_open(read_data=json.dumps(mock_data))
+
+        def open_side_effect(file, mode='r', *args, **kwargs):
+            if mode.startswith("w"):
+                raise IOError("write error")
+            return m_open_read.return_value
+
+        with mock.patch("builtins.open", side_effect=open_side_effect), \
+             mock.patch("json.load", return_value=mock_data):
+
+            with pytest.raises(RuntimeError) as e:
+                editor.delete_entity("urn:entity:target")
+
+            assert "の書き込みに失敗しました" in str(e.value)
+
+    def test_change_entity_label_success(self):
+        """正常にエンティティのラベルを変更できるケース"""
+        test_env = {
+            'JUPYTERHUB_SERVER_NAME': 'test_env',
+            'HOME': '/home/jovyan'
+        }
+
+        with mock.patch.dict("os.environ", test_env), \
+             mock.patch("os.path.exists", return_value=True):
+            editor = ProvenanceEditor()
+
+        entity_id = "urn:entity:test123"
+        new_label = "New Label"
+
+        mock_data = {
+            "@graph": [
+                {"@id": entity_id, "label": "Old Label"},
+                {"@id": "urn:entity:other", "label": "Other Label"}
+            ]
+        }
+
+        m_open_read = mock.mock_open(read_data=json.dumps(mock_data))
+
+        with mock.patch("builtins.open", side_effect=lambda file, mode='r', *args, **kwargs:
+                        m_open_read.return_value if mode.startswith('r') else mock.mock_open().return_value), \
+             mock.patch("json.load", return_value=mock_data), \
+             mock.patch("json.dump") as mock_json_dump:
+
+            editor.change_entity_label(entity_id, new_label)
+
+            dumped_data = mock_json_dump.call_args[0][0]
+            updated_entity = next(item for item in dumped_data["@graph"] if item["@id"] == entity_id)
+
+            assert updated_entity["label"] == new_label
+
+    def test_change_entity_label_entity_not_found(self):
+        """指定エンティティが存在しない場合にValueErrorが発生するケース"""
+        test_env = {
+            'JUPYTERHUB_SERVER_NAME': 'test_env',
+            'HOME': '/home/jovyan'
+        }
+
+        with mock.patch.dict("os.environ", test_env), \
+             mock.patch("os.path.exists", return_value=True):
+            editor = ProvenanceEditor()
+
+        mock_data = {
+            "@graph": [
+                {"@id": "urn:entity:other", "label": "Other Label"}
+            ]
+        }
+
+        with mock.patch("builtins.open", mock.mock_open(read_data=json.dumps(mock_data))), \
+             mock.patch("json.load", return_value=mock_data):
+
+            with pytest.raises(ValueError) as e:
+                editor.change_entity_label("urn:entity:notfound", "New Label")
+
+            assert "指定されたエンティティIDが存在しません" in str(e.value)
+
+    def test_change_entity_label_read_error(self):
+        """ファイル読み込みエラーが発生するケース"""
+        test_env = {
+            'JUPYTERHUB_SERVER_NAME': 'test_env',
+            'HOME': '/home/jovyan'
+        }
+
+        with mock.patch.dict("os.environ", test_env), \
+             mock.patch("os.path.exists", return_value=True):
+            editor = ProvenanceEditor()
+
+        with mock.patch("builtins.open", side_effect=IOError("read error")):
+            with pytest.raises(RuntimeError) as e:
+                editor.change_entity_label("urn:entity:test", "New Label")
+
+            assert "の読み込みに失敗しました" in str(e.value)
+
+    def test_change_entity_label_write_error(self):
+        """ファイル書き込みエラーが発生するケース"""
+        test_env = {
+            'JUPYTERHUB_SERVER_NAME': 'test_env',
+            'HOME': '/home/jovyan'
+        }
+
+        with mock.patch.dict("os.environ", test_env), \
+             mock.patch("os.path.exists", return_value=True):
+            editor = ProvenanceEditor()
+
+        mock_data = {
+            "@graph": [
+                {"@id": "urn:entity:test", "label": "Old Label"}
+            ]
+        }
+
+        m_open_read = mock.mock_open(read_data=json.dumps(mock_data))
+
+        def open_side_effect(file, mode='r', *args, **kwargs):
+            if mode.startswith("w"):
+                raise IOError("write error")
+            return m_open_read.return_value
+
+        with mock.patch("builtins.open", side_effect=open_side_effect), \
+             mock.patch("json.load", return_value=mock_data):
+
+            with pytest.raises(RuntimeError) as e:
+                editor.change_entity_label("urn:entity:test", "New Label")
+
+            assert "の書き込みに失敗しました" in str(e.value)
+    
+    def test_get_file_list(self):
+        """正常系テストケースです。"""
+        test_env = {
+            'JUPYTERHUB_SERVER_NAME': 'test_env',
+            'HOME': '/home/jovyan'
+        }
+
+        with mock.patch.dict(os.environ, test_env), \
+            mock.patch("os.path.exists", return_value=True), \
+            mock.patch("data_governance.library.utils.config.path_config.DG_RESEARCHFLOW_FOLDER", "data_governance/researchflow"):
+
+            editor = ProvenanceEditor()
+
+            file_list = editor.get_file_list()
+
+            base_path = os.path.join(test_env['HOME'], "data_governance/researchflow", test_env['JUPYTERHUB_SERVER_NAME'])
+            expected_list = [
+                os.path.join(base_path, editor.PROV_ENTITY),
+                os.path.join(base_path, editor.PROV_ACTIVITY),
+                os.path.join(base_path, editor.PROV_AGENT),
+            ]
+
+            assert file_list == expected_list
+
+
+    
+
+
+    

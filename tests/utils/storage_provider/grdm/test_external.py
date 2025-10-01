@@ -1,7 +1,7 @@
 import pytest
 from unittest.mock import AsyncMock, MagicMock
 
-from requests import patch
+from unittest.mock import patch
 from data_governance.library.utils.storage_provider.grdm.external import External
 
 class TestExternal:

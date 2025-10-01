@@ -453,6 +453,39 @@ class ProvenanceEditor:
                 json.dump(entity_data, f, indent=2, ensure_ascii=False)
         except IOError as e:
             raise RuntimeError(f"{self.activity_file}の書き込みに失敗しました: {e}") from e
+        
+    def change_entity_label(self, entity_id: str, new_label: str):
+        """エンティティのラベルを編集する関数です。
+
+        Args:
+            entity_id (str): 編集を行うエンティティのURI
+            new_label (str): 新しく関連付けるエンティティのラベル
+
+        Raises:
+            RuntimeError: 来歴情報ファイルの読み込み/書き込みに失敗した。
+            ValueError: 指定されたエンティティURIが存在しない。
+
+        """
+        try:
+            with open(self.entity_file, "r", encoding="utf-8") as f:
+                entity_data = json.load(f)
+        except (json.JSONDecodeError, IOError) as e:
+            raise RuntimeError(f"{self.entity_file}の読み込みに失敗しました: {e}") from e
+
+        graph = entity_data.get("@graph", [])
+
+        entity = next((item for item in graph if item.get("@id") == entity_id), None)
+
+        if not entity:
+            raise ValueError(f"指定されたエンティティIDが存在しません: {entity_id}")
+
+        entity["label"] = new_label
+
+        try:
+            with open(self.entity_file, "w", encoding="utf-8") as f:
+                json.dump(entity_data, f, indent=2, ensure_ascii=False)
+        except IOError as e:
+            raise RuntimeError(f"{self.entity_file}の書き込みに失敗しました: {e}") from e
 
     def get_file_list(self) -> list:
         """来歴ファイルのリストを返すメソッドです。

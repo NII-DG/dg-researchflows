@@ -25,13 +25,16 @@ def test_jsonld_files():
 
 @pytest.fixture
 def tmp_readme_path(tmp_path):
-    readme_dir = tmp_path / "writing" / "ronnbunn"
-    readme_dir.mkdir(parents=True)
+    # path_config.DATA の値に応じてディレクトリを作る
+    data_folder = getattr(path_config, "DATA", "data")  # デフォルトは "data"
+
+    readme_dir = tmp_path / data_folder / "writing" / "ronnbunn"
+    readme_dir.mkdir(parents=True, exist_ok=True)
 
     readme_path = readme_dir / "README.md"
     source_path = Path("tests/test_data/provenance/README.md")
 
-    # ファイルの中身をコピー（重要）
+    # README.md の中身をコピー
     readme_path.write_text(source_path.read_text(encoding="utf-8"), encoding="utf-8")
 
     return readme_path
@@ -53,7 +56,7 @@ def dummy_file_info():
     return file_info
 
 @pytest.fixture
-def test_instance(dummy_file_info):
+def test_instance(dummy_file_info, tmp_path):
     """
     OutputProvenanceのインスタンスを返すfixture。
     検索と情報設定部分をモック。
@@ -65,20 +68,20 @@ def test_instance(dummy_file_info):
 
     instance = OutputProvenance(mock_searcher)
 
-    # set_file_info をモックしてサブフロー名とinfoを返す
     instance.set_file_info = MagicMock(return_value=("writing/ronnbunn", dummy_file_info))
 
-    # テンプレートは使われないので、何をセットしてもよい（念のためセット）
-    instance.TEMPLATE_README = "not_used"
+    # 存在するテンプレートファイルを用意
+    template_file = tmp_path / "base_readme.md"
+    template_file.write_text("# 来歴情報確認用README\n\n## サブフロー：", encoding="utf-8")
+
+    instance.TEMPLATE_README = str(template_file)
 
     return instance
 
 @pytest.fixture
 def patch_path_config(monkeypatch, tmp_path):
-    # tmp_path: /tmp/pytest-...
-    monkeypatch.setattr(path_config, "DATA", "")  # base_path = /tmp/pytest-...
-    monkeypatch.setenv("HOME", str(tmp_path))     # /home/fakeuser → /tmp/pytest-...
-
+    monkeypatch.setattr(path_config, "DATA", "")
+    monkeypatch.setenv("HOME", str(tmp_path))
     return tmp_path
 
 prov = Namespace("http://www.w3.org/ns/prov#")
@@ -175,30 +178,6 @@ def async_manager():
 
         return mgr, mock_external
 
-@pytest.fixture
-def prov_manager():
-    with patch("data_governance.library.utils.research_flow_provenance.prov.RDFStore"), \
-        patch("data_governance.library.utils.research_flow_provenance.prov.ProvenanceSearcher"), \
-        patch("data_governance.library.utils.research_flow_provenance.prov.OutputProvenance"), \
-        patch("data_governance.library.utils.research_flow_provenance.prov.ProvenanceEditor"), \
-        patch("data_governance.library.utils.research_flow_provenance.prov.External"):
 
-        mgr = ProvenanceManager("token", "url", "project")
 
-        # 共通のモック設定
-        mgr.grdm_file_info = {
-            "/path/src1.py": "link://src1",
-            "/path/src2.py": "link://src2",
-            "/path/dst_file.out": "link://dst"
-        }
-        mgr.convert_grdm_path = lambda x: x
-        mgr.convert_grdm_link = lambda x: x
-        mgr.searcher.get_file_entity = MagicMock(return_value=None)
-        mgr.editor.create_entity = MagicMock(side_effect=["entity1", "entity2", "entity_dst"])
-        mgr.editor.create_activity = MagicMock()
-        mgr.editor.create_agent = MagicMock()
-        mgr.rdf_store.reload = MagicMock()
-        mgr.output.write = MagicMock()
-        mgr.excution_user = "user_uri"
-
-        yield mgr
+    

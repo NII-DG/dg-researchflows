@@ -90,7 +90,6 @@ class ProvenanceManager:
             "File Export": self._handle_file_export,
             "File Upload": self._handle_file_upload,
             "File Delete": self._handle_file_delete,
-            "Collection Edit": self._handle_collection_edit,
             "Provenance Edit": self._handle_provenance_edit,
             "Delete Activity": self._handle_delete_activity
         }
@@ -190,11 +189,19 @@ class ProvenanceManager:
         self.output.write(updated_files)
 
     def _handle_file_modify(self, activity_type: str, modify_files: dict):
-        """修正アクティビティを処理するための関数"""
+        """修正アクティビティを処理するための関数です。
+
+        Args:
+            activity_type (str): アクティビティタイプ
+            modify_files (dict): 修正元、修正先ファイル
+
+        Raises:
+            FileNotFoundError: 対処のファイルがGRDM上に存在しない場合のエラーです。
+
+        """
         base_id = self.FILE_MODIFY_BASE
         activity_id = generated_id(base_id)
 
-        # この部分は共通化する？
         updated_files = []
         src_entities =[]
 
@@ -229,8 +236,23 @@ class ProvenanceManager:
 
         self.output.write(updated_files)
 
-    def _handle_file_compile(self, activity_type: str, dst_file: str, tex_list:list=None, argument_list:list=None, figure_list:list=None, agent_info:list=None):
-        """コンパイルアクティビティを処理するための関数"""
+    def _handle_file_compile(self, activity_type: str, dst_file: str, 
+                             tex_list:list=None, argument_list:list=None, 
+                             figure_list:list=None, agent_info:list=None):
+        """コンパイルアクティビティを処理するための関数です。
+
+        Args:
+            activity_type (str): アクティビティタイプ
+            dst_file (str): 出力ファイルパス
+            tex_list (list, optional): 草稿ファイルリスト
+            argument_list (list, optional): 論拠データリスト
+            figure_list (list, optional): 図表リスト.
+            agent_info (list, optional): エージェントリスト
+
+        Raises:
+            FileNotFoundError: 対処のファイルがGRDM上に存在しない場合のエラーです。
+
+        """
         base_id = self.FILE_COMPILE_BASE
         activity_id = generated_id(base_id)
 
@@ -310,11 +332,21 @@ class ProvenanceManager:
         self.output.write(updated_files)
 
     def _handle_file_export(self, activity_type: str, dst_file: str, src_files: list, agent_info:list=None):
-        """エクスポートアクティビティを処理するための関数"""
+        """エクスポートアクティビティを処理するための関数です。
+
+        Args:
+            activity_type (str): アクティビティタイプ
+            dst_file (str): 出力先ファイルパス
+            src_files (list): ソースファイルパス
+            agent_info (list, optional): エージェントリスト
+
+        Raises:
+            FileNotFoundError: 対処のファイルがGRDM上に存在しない場合のエラーです。
+
+        """        
         base_id = self.FILE_EXPORT_BASE
         activity_id = generated_id(base_id)
 
-        # この部分は共通化する？
         updated_files = []
         src_entities =[]
         for src_file in src_files:
@@ -357,7 +389,17 @@ class ProvenanceManager:
         self.output.write(updated_files)
 
     def _handle_file_upload(self, activity_type: str, upload_files: dict):
-        """アップロードアクティビティを処理するための関数"""
+        """アップロードアクティビティを処理するための関数です。
+
+        Args:
+            activity_type (str): アクティビティタイプ
+            upload_files (dict): アップロードしたファイルの情報
+
+        Raises:
+            FileNotFoundError: 対処のファイルがGRDM上に存在しない場合のエラーです。
+
+        """        
+      
         base_id = self.FILE_UPLOAD_BASE
         activity_id = generated_id(base_id)
 
@@ -373,7 +415,7 @@ class ProvenanceManager:
                 updated_files.append(dst_link)
             else:
                 raise FileNotFoundError(f"{convert_path}がGRDMに存在しません。")
-
+            
             src_list.append(src_link)
 
         # アクティビティ作成
@@ -384,7 +426,16 @@ class ProvenanceManager:
         self.output.write(updated_files)
 
     def _handle_file_delete(self, activity_type: str, deleted_files: list):
-        """削除アクティビティを処理するための関数"""
+        """削除アクティビティを処理するための関数です。
+
+        Args:
+            activity_type (str): アクティビティタイプ
+            deleted_files (list): 削除したファイルリスト
+
+        Raises:
+            FileNotFoundError: 対処のファイルがGRDM上に存在しない場合のエラーです。
+        """        
+
         base_id = self.FILE_DELETE_BASE
         activity_id = generated_id(base_id)
 
@@ -404,31 +455,39 @@ class ProvenanceManager:
         # アクティビティ作成
         self.editor.create_activity(activity_id, activity_type, updated_files, self.excution_user)
 
-        # self.rdf_store.reload()
-
-        # self.output.write(updated_files)
-
-    def _handle_collection_edit(self, activity_type: str, collection_info: list):
-        """コレクション編集アクティビティを処理するための関数"""
-        base_id = self.COLLECTION_EDIT_BASE
-
-        updated_files = []
-        for collection in collection_info:
-            activity_id = generated_id(base_id)
-            self.editor.edit_collection(collection["collection_id"], activity_id, collection["new_member"])
-            updated_files = list(set(updated_files + collection["old_member"] + collection["new_member"]))
-            src_entities =[collection["collection_id"]]
-
-            # アクティビティ作成
-            self.editor.create_activity(activity_id, activity_type, src_entities, self.excution_user, old_provenances=collection["old_member"])
-
         self.rdf_store.reload()
 
         self.output.write(updated_files)
 
-    def _handle_provenance_edit(self, new_path: str, ids: list):
-        """来歴編集アクティビティを処理するための関数"""
+    # def _handle_collection_edit(self, activity_type: str, collection_info: list):
+    #     """コレクション編集アクティビティを処理するための関数"""
+    #     base_id = self.COLLECTION_EDIT_BASE
 
+    #     updated_files = []
+    #     for collection in collection_info:
+    #         activity_id = generated_id(base_id)
+    #         self.editor.edit_collection(collection["collection_id"], activity_id, collection["new_member"])
+    #         updated_files = list(set(updated_files + collection["old_member"] + collection["new_member"]))
+    #         src_entities =[collection["collection_id"]]
+
+    #         # アクティビティ作成
+    #         self.editor.create_activity(activity_id, activity_type, src_entities, self.excution_user, old_provenances=collection["old_member"])
+
+    #     self.rdf_store.reload()
+
+    #     self.output.write(updated_files)
+
+    def _handle_provenance_edit(self, new_path: str, ids: list):
+        """来歴編集アクティビティを処理するための関数です。
+
+        Args:
+            new_path (str): 新しく関連付けるパス
+            ids (list): 編集対象のエンティティ
+
+        Raises:
+            FileNotFoundError: 対処のファイルがGRDM上に存在しない場合のエラーです。
+
+        """        
         updated_files = []
         convert_path = self.convert_grdm_path(new_path)
         if convert_path in self.grdm_file_info:
@@ -444,8 +503,14 @@ class ProvenanceManager:
         self.output.write(updated_files)
 
     def _handle_delete_activity(self, activity_type:str, activity_uri: str, update_files: list):
-        """アクティビティを削除する際の関数です。"""
+        """アクティビティを削除する際の関数です。
 
+        Args:
+            activity_type (str): アクティビティタイプ
+            activity_uri (str): 削除するアクティビティ
+            update_files (list): 更新対象のエンティティ
+
+        """        
         results = self.searcher.get_activity_info(activity_uri)
         prov = Namespace("http://www.w3.org/ns/prov#")
         activity_graph = results.graph
@@ -471,9 +536,16 @@ class ProvenanceManager:
 
         self.output.write(file_links)
 
-    def convert_grdm_path(self, path):
-        """GRDM用のパスに変換する関数です。"""
-        # これpath_configとかにいれる？
+    def convert_grdm_path(self, path: str):
+        """GRDM用のパスに変換する関数です。
+
+        Args:
+            path (str): ファイルパス
+
+        Returns:
+            _type_: 変換したファイルパス
+
+        """        
         base_path = "/home/jovyan"
         osfstorage = "osfstorage"
 
@@ -481,9 +553,16 @@ class ProvenanceManager:
 
         return os.path.join(osfstorage, trimmed)
 
-    def convert_grdm_link(self, file_id):
-        """GRDMのファイル閲覧ページ用のlinkを作成する。"""
-        # これpath_configとかにいれる？
+    def convert_grdm_link(self, file_id: str):
+        """GRDMのファイル閲覧ページ用のlinkを作成する。
+
+        Args:
+            file_id (str): GRDMにおけるファイルID
+
+        Returns:
+            _type_: GRDMリンク
+
+        """        
         files = "files"
         osfstorage = "osfstorage"
 
@@ -491,8 +570,16 @@ class ProvenanceManager:
         return urljoin(self.grdm_url + "/", path)
 
     def check_file_exist(self, dir_path: str):
-        """来歴情報を記述したファイルが存在するかを確認する関数です。"""
+        """来歴情報を記述したファイルが存在するかを確認する関数です。
 
+        Args:
+            dir_path (str): 対象のディレクトリパス
+
+        Returns:
+            all_files(dict): 対象のディレクトリに含まれるファイルの全エンティティ
+            error_files(dict)： エンティティが存在するがファイルが存在しないエンティティ
+
+        """        
         base_path = "/home/jovyan"
         osfstorage = "osfstorage"
 
@@ -512,8 +599,15 @@ class ProvenanceManager:
         return all_files, error_files
 
     def get_activity_info(self, uri_list: list):
-        """指定されたエンティティの関連情報を取得する関数です。"""
+        """指定されたエンティティの関連情報を取得する関数です。
 
+        Args:
+            uri_list (list): エンティティのURI
+
+        Returns:
+            src_files(dict): ファイルに関する情報
+
+        """        
         prov = Namespace("http://www.w3.org/ns/prov#")
         rdfs = Namespace("http://www.w3.org/2000/01/rdf-schema#")
 

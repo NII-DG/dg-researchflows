@@ -459,8 +459,7 @@ class ProvenanceEditor:
 
         Args:
             entity_id (str): 編集を行うエンティティのURI
-            activity_id (str): 編集を行うアクティビティのURI
-            new_entities (list): 新しく関連付けるエンティティのURI
+            new_label (str): 新しく関連付けるエンティティのラベル
 
         Raises:
             RuntimeError: 来歴情報ファイルの読み込み/書き込みに失敗した。

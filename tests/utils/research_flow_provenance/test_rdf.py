@@ -250,6 +250,47 @@ class TestProvenanceSearcher:
 
         assert "RDFクエリの実行に失敗しました" in str(excinfo.value)
 
+    def test_get_file_entity_list_success(self):
+        """正常に複数のエンティティURIが返る場合のテスト"""
+        mock_store = mock.Mock()
+        mock_result = [
+            {"entity": "urn:entity:file1"},
+            {"entity": "urn:entity:file2"},
+        ]
+        mock_store.query.return_value = mock_result
+
+        searcher = ProvenanceSearcher(rdf_store=mock_store)
+        file_link = "http://example.com/file"
+
+        result = searcher.get_file_entity_list(file_link)
+
+        assert result == ["urn:entity:file1", "urn:entity:file2"]
+        mock_store.query.assert_called_once()
+
+    def test_get_file_entity_list_none(self):
+        """該当エンティティなしでNoneが返る場合のテスト"""
+        mock_store = mock.Mock()
+        mock_store.query.return_value = []
+
+        searcher = ProvenanceSearcher(rdf_store=mock_store)
+        file_link = "http://example.com/file"
+
+        result = searcher.get_file_entity_list(file_link)
+
+        assert result is None
+        mock_store.query.assert_called_once()
+
+    def test_get_file_entity_list_query_error(self):
+        """RDFクエリ実行時に例外が発生する場合のテスト"""
+        mock_store = mock.Mock()
+        mock_store.query.side_effect = Exception("Query failed")
+
+        searcher = ProvenanceSearcher(rdf_store=mock_store)
+        file_link = "http://example.com/file"
+
+        with pytest.raises(RuntimeError, match="RDFクエリの実行に失敗しました: Query failed"):
+            searcher.get_file_entity_list(file_link)
+
     def test_get_entity_info_success(self):
         """get_entity_infoで情報が取得できるテストケースです。"""
         mock_store = mock.Mock()

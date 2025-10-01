@@ -16,6 +16,7 @@ def test_generated_id():
     fake_uuid = uuid.UUID("12345678-1234-5678-1234-567812345678")
 
     with mock.patch("data_governance.library.utils.research_flow_provenance.jsonld.uuid.uuid4", return_value=fake_uuid):
+        print("generated_id from:", generated_id.__code__.co_filename)
         result = generated_id("base_id")
 
     assert result == "base_id-12345678-1234-5678-1234-567812345678"

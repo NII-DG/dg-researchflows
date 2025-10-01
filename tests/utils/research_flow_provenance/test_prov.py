@@ -813,43 +813,65 @@ class TestProvenanceManager:
         self.mgr.output.write.assert_called_once_with(["link://file1"])
 
     def test_convert_grdm_path(self):
-        """convert_grdm_path が正しい GRDM パスに変換するかをテスト"""
+        pm = ProvenanceManager.__new__(ProvenanceManager)  # __init__を呼ばずにインスタンス作成
+        test_path = "/home/jovyan/project/data/file.txt"
+        expected = os.path.join("osfstorage", "project/data/file.txt")
 
-        class Dummy:
-            def convert_grdm_path(self, path: str):
-                import os
-                base_path = "/home/jovyan"
-                osfstorage = "osfstorage"
-                trimmed = os.path.relpath(path, base_path)
-                return os.path.join(osfstorage, trimmed)
-
-        mgr = Dummy()
-
-        input_path = "/home/jovyan/work/data.txt"
-        expected = "osfstorage/work/data.txt"
-        assert mgr.convert_grdm_path(input_path) == expected
-
-        input_path2 = "/home/jovyan/data.csv"
-        expected2 = "osfstorage/data.csv"
-        assert mgr.convert_grdm_path(input_path2) == expected2
+        result = pm.convert_grdm_path(test_path)
+        assert result == expected
 
     def test_convert_grdm_link(self):
-        class Dummy:
-            def __init__(self):
-                self.project_id = "abc123"
-                self.grdm_url = "https://grdm.example.com"
+        pm = ProvenanceManager.__new__(ProvenanceManager)  # __init__は呼ばれない
+        pm.project_id = "test_project"
+        pm.grdm_url = "https://grdm.example.com"
 
-            def convert_grdm_link(self, file_id: str):
-                files = "files"
-                osfstorage = "osfstorage"
-                path = "/".join([self.project_id, files, osfstorage, file_id])
-                return urljoin(self.grdm_url + "/", path)
+        file_id = "file123"
+        expected = "https://grdm.example.com/test_project/files/osfstorage/file123"
 
-        mgr = Dummy()
-        file_id = "path/to/file.txt"
-        expected = "https://grdm.example.com/abc123/files/osfstorage/path/to/file.txt"
+        result = pm.convert_grdm_link(file_id)
+        assert result == expected
 
-        assert mgr.convert_grdm_link(file_id) == expected
+    def test_check_file_exist(self):
+        """正常系テストケースです。"""
+        # テスト対象のdir_path
+        dir_path = "/home/jovyan/project/data"
+
+        # モックで返すsearcher.get_all_entitiesの戻り値
+        # {label: ids}
+        mock_results = {
+            "osfstorage/project/data/file1.txt": ["id1", "id2"],
+            "osfstorage/project/data/file2.txt": ["id3"],
+        }
+
+        # self.mgr.searcher.get_all_entitiesをモック設定
+        self.mgr.searcher.get_all_entities = MagicMock(return_value=mock_results)
+
+        def mock_exists(path):
+            if path.endswith("file1.txt"):
+                return True
+            elif path.endswith("file2.txt"):
+                return False
+            return False
+
+        with patch("os.path.exists", side_effect=mock_exists):
+            all_files, error_files = self.mgr.check_file_exist(dir_path)
+
+        # 期待されるall_filesのキーと値
+        expected_all_files = {
+            "/home/jovyan/project/data/file1.txt": ["id1", "id2"],
+            "/home/jovyan/project/data/file2.txt": ["id3"],
+        }
+        # 存在しないファイルだけerror_filesに入る
+        expected_error_files = {
+            "/home/jovyan/project/data/file2.txt": ["id3"],
+        }
+
+        # 結果の検証
+        assert all_files == expected_all_files
+        assert error_files == expected_error_files
+
+        # get_all_entitiesが期待のパスで呼ばれているかも検証可能
+        self.mgr.searcher.get_all_entities.assert_called_once_with("osfstorage/project/data")
 
     def test_get_activity_info_success(self):
         """正常系のテストケースです。"""
@@ -917,3 +939,4 @@ class TestProvenanceManager:
 
         result = self.mgr.get_activity_info(uri_list)
         assert result == {}
+

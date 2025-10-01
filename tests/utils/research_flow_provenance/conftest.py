@@ -178,32 +178,6 @@ def async_manager():
 
         return mgr, mock_external
 
-# @pytest.fixture
-# def prov_manager():
-#     with patch("data_governance.library.utils.research_flow_provenance.prov.RDFStore"), \
-#         patch("data_governance.library.utils.research_flow_provenance.prov.ProvenanceSearcher"), \
-#         patch("data_governance.library.utils.research_flow_provenance.prov.OutputProvenance"), \
-#         patch("data_governance.library.utils.research_flow_provenance.prov.ProvenanceEditor"), \
-#         patch("data_governance.library.utils.research_flow_provenance.prov.External"):
 
-#         mgr = ProvenanceManager("token", "url", "project")
-
-#         # 共通のモック設定
-#         mgr.grdm_file_info = {
-#             "/path/src1.py": "link://src1",
-#             "/path/src2.py": "link://src2",
-#             "/path/dst_file.out": "link://dst"
-#         }
-#         mgr.convert_grdm_path = lambda x: x
-#         mgr.convert_grdm_link = lambda x: x
-#         mgr.searcher.get_file_entity = MagicMock(return_value=None)
-#         mgr.editor.create_entity = MagicMock(side_effect=["entity1", "entity2", "entity_dst"])
-#         mgr.editor.create_activity = MagicMock()
-#         mgr.editor.create_agent = MagicMock()
-#         mgr.rdf_store.reload = MagicMock()
-#         mgr.output.write = MagicMock()
-#         mgr.excution_user = "user_uri"
-
-#         yield mgr
 
     

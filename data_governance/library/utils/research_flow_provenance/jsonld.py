@@ -438,21 +438,21 @@ class ProvenanceEditor:
             with open(self.entity_file, "r", encoding="utf-8") as f:
                 entity_data = json.load(f)
         except (json.JSONDecodeError, IOError) as e:
-            raise RuntimeError(f"{self.activity_file}の読み込みに失敗しました: {e}") from e
+            raise RuntimeError(f"{self.entity_file}の読み込みに失敗しました: {e}") from e
 
         graph = entity_data.get("@graph", [])
 
-        # 対象のactivity_uriを除外して新しいグラフを作成
+        # 対象のentity_uriを除外して新しいグラフを作成
         new_graph = [entry for entry in graph if entry.get("@id") != entity_uri]
 
         # グラフを更新
         entity_data["@graph"] = new_graph
 
         try:
-            with open(self.activity_file, "w", encoding="utf-8") as f:
+            with open(self.entity_file, "w", encoding="utf-8") as f:
                 json.dump(entity_data, f, indent=2, ensure_ascii=False)
         except IOError as e:
-            raise RuntimeError(f"{self.activity_file}の書き込みに失敗しました: {e}") from e
+            raise RuntimeError(f"{self.entity_file}の書き込みに失敗しました: {e}") from e
         
     def change_entity_label(self, entity_id: str, new_label: str):
         """エンティティのラベルを編集する関数です。

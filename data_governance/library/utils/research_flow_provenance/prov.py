@@ -189,11 +189,11 @@ class ProvenanceManager:
         self.output.write(updated_files)
 
     def _handle_file_modify(self, activity_type: str, modify_files: dict):
-        """修正アクティビティを処理するための関数です。
+        """編集アクティビティを処理するための関数です。
 
         Args:
             activity_type (str): アクティビティタイプ
-            modify_files (dict): 修正元、修正先ファイル
+            modify_files (dict): 編集元、編集先ファイル
 
         Raises:
             FileNotFoundError: 対処のファイルがGRDM上に存在しない場合のエラーです。
@@ -206,7 +206,7 @@ class ProvenanceManager:
         src_entities =[]
 
         for dst_file, src_file in modify_files.items(): 
-            # 修正元の処理
+            # 編集元の処理
             convert_path = self.convert_grdm_path(src_file)
             if convert_path in self.grdm_file_info:
                 src_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
@@ -219,7 +219,7 @@ class ProvenanceManager:
                 raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
             src_entities.append(src_uri)
 
-            #　修正先の処理
+            #　編集先の処理
             dst_hash = calculate_sha256(dst_file)
             convert_path = self.convert_grdm_path(dst_file)
             if convert_path in self.grdm_file_info:

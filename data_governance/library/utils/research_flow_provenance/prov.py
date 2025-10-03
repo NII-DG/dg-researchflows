@@ -440,20 +440,22 @@ class ProvenanceManager:
         activity_id = generated_id(base_id)
 
         updated_files = []
+        delete_files = []
         # 削除済みファイルの探索
         for deleted_file in deleted_files:
             convert_path = self.convert_grdm_path(deleted_file)
             if convert_path in self.grdm_file_info:
                 delete_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
+                updated_files.append(delete_link)
                 delete_uri = self.searcher.get_file_entity_list(delete_link)
                 if not delete_uri :
                     raise FileNotFoundError(f"{convert_path}のEntityが存在しない")
-                updated_files.extend(delete_uri)
+                delete_files.extend(delete_uri)
             else:
                 raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
 
         # アクティビティ作成
-        self.editor.create_activity(activity_id, activity_type, updated_files, self.excution_user)
+        self.editor.create_activity(activity_id, activity_type, delete_files, self.excution_user)
 
         self.rdf_store.reload()
 

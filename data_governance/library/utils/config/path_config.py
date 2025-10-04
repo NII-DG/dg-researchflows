@@ -28,7 +28,7 @@ PUBLIC = "public_data"
 ## data/writing/<data_dir_name>直下のフォルダ
 WRITING_FOLDERS =[ARGUMENT, REFERENCES, PAPER, FIGURE]
 ## data/review/<data_dir_name>直下のフォルダ
-REVIEW_FOLDERS = [ARGUMENT, PAPER, REPLY]
+REVIEW_FOLDERS = [ARGUMENT, PAPER, REPLY, FIGURE]
 ## data/publication/<data_dir_name>直下のフォルダ
 PUBLICATION_FOLDERS = [PUBLIC]
 

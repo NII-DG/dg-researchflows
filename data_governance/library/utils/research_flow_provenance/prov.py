@@ -434,11 +434,8 @@ class ProvenanceManager:
 
         Raises:
             FileNotFoundError: 対処のファイルがGRDM上に存在しない場合のエラーです。
+
         """        
-
-        base_id = self.FILE_DELETE_BASE
-        activity_id = generated_id(base_id)
-
         updated_files = []
         delete_files = []
         # 削除済みファイルの探索
@@ -449,17 +446,20 @@ class ProvenanceManager:
                 updated_files.append(delete_link)
                 delete_uri = self.searcher.get_file_entity_list(delete_link)
                 if not delete_uri :
-                    raise FileNotFoundError(f"{convert_path}のEntityが存在しない")
+                    continue
                 delete_files.extend(delete_uri)
             else:
                 raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
 
-        # アクティビティ作成
-        self.editor.create_activity(activity_id, activity_type, delete_files, self.excution_user)
+        if delete_files:
+            # アクティビティ作成
+            base_id = self.FILE_DELETE_BASE
+            activity_id = generated_id(base_id)
+            self.editor.create_activity(activity_id, activity_type, delete_files, self.excution_user)
 
-        self.rdf_store.reload()
+            self.rdf_store.reload()
 
-        self.output.write(updated_files)
+            self.output.write(updated_files)
 
     # def _handle_collection_edit(self, activity_type: str, collection_info: list):
     #     """コレクション編集アクティビティを処理するための関数"""

@@ -10,7 +10,7 @@ from rdflib import Namespace, URIRef
 from .rdf import ProvenanceSearcher
 
 from library.utils.config import path_config
-# from rdflib.namespace import RDFS, Namespace
+
 
 @dataclass
 class FileInfo:
@@ -115,13 +115,18 @@ class OutputProvenance:
             link_to_path = {}
 
             for file_info in info_list:
-                header = f"## [{file_info.file_name}（{file_info.file_path}）]({file_info.link})"
                 related_lines = [
                     f'{rel["type"]}：[{"{0}".format(rel["label"])}]({rel["location"]})'
                     for rel in file_info.related_files
                 ]
 
+                # 1. related_lines が空ならこのセクションはスキップ
+                if not related_lines:
+                    continue
+
+                header = f"## [{file_info.file_name}（{file_info.file_path}）]({file_info.link})"
                 new_section = "\n".join([header] + related_lines) + "\n"
+                
                 new_sections[file_info.link] = new_section
                 link_to_path[file_info.link] = file_info.file_path
 
@@ -221,17 +226,22 @@ class OutputProvenance:
             for activity in was_used_activities:
                 for act_key, (predicate, type_name) in used_activity_predicates.items():
                     if act_key in activity:
+                        activity_result = self.searcher.get_activity_info(activity)
+                        activity_graph = activity_result.graph
+                        activitiy_subject = URIRef(activity)
+                        generated_entities = list(activity_graph.objects(subject=activitiy_subject, predicate=prov.generated))
                         entities = list(graph.objects(subject=subject, predicate=predicate))
                         for entity in entities:
-                            related_file_info ={}
-                            related_file_info["activity"] = activity
-                            related_file_info["type"] = type_name
-                            related_label, related_location = get_label_location(entity)
-                            if related_location == "削除済み":
-                                continue
-                            related_file_info["label"] = related_label
-                            related_file_info["location"] = related_location
-                            related_files.append(related_file_info)
+                            if entity in generated_entities:
+                                related_file_info ={}
+                                related_file_info["activity"] = activity
+                                related_file_info["type"] = type_name
+                                related_label, related_location = get_label_location(entity)
+                                if related_location == "削除済み":
+                                    continue
+                                related_file_info["label"] = related_label
+                                related_file_info["location"] = related_location
+                                related_files.append(related_file_info)
 
             was_member_collections = list(graph.objects(subject=subject, predicate=prov.wasMemberOf))
             for collection in was_member_collections:
@@ -242,17 +252,22 @@ class OutputProvenance:
                 for activity in collection_activities:
                     for act_key, (predicate, type_name) in used_activity_predicates.items():
                         if act_key in activity:
+                            activity_result = self.searcher.get_activity_info(activity)
+                            activity_graph = activity_result.graph
+                            activitiy_subject = URIRef(activity)
+                            generated_entities = list(activity_graph.objects(subject=activitiy_subject, predicate=prov.generated))
                             entities = list(collection_graph.objects(subject=collection_subject, predicate=predicate))
                             for entity in entities:
-                                related_file_info ={}
-                                related_file_info["activity"] = activity
-                                related_file_info["type"] = type_name
-                                related_label, related_location = get_label_location(entity)
-                                if related_location == "削除済み":
-                                    continue
-                                related_file_info["label"] = related_label
-                                related_file_info["location"] = related_location
-                                related_files.append(related_file_info)
+                                if entity in generated_entities:
+                                    related_file_info ={}
+                                    related_file_info["activity"] = activity
+                                    related_file_info["type"] = type_name
+                                    related_label, related_location = get_label_location(entity)
+                                    if related_location == "削除済み":
+                                        continue
+                                    related_file_info["label"] = related_label
+                                    related_file_info["location"] = related_location
+                                    related_files.append(related_file_info)
 
             activities = list(graph.objects(subject=subject, predicate=prov.wasGeneratedBy))
             for activity in activities:

@@ -376,7 +376,7 @@ class ProvenanceManager:
         convert_path = self.convert_grdm_path(dst_file)
         if convert_path in self.grdm_file_info:
             dst_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
-            self.editor.create_entity(convert_path, dst_link, dst_hash, activity_id, src_uri, agent_list)
+            self.editor.create_entity(convert_path, dst_link, dst_hash, activity_id, src_entities, agent_list)
             updated_files.append(dst_link)
         else:
             raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
@@ -548,7 +548,7 @@ class ProvenanceManager:
             _type_: 変換したファイルパス
 
         """        
-        base_path = "/home/jovyan"
+        base_path = os.environ['HOME']
         osfstorage = "osfstorage"
 
         trimmed = os.path.relpath(path, base_path)
@@ -582,7 +582,7 @@ class ProvenanceManager:
             error_files(dict)： エンティティが存在するがファイルが存在しないエンティティ
 
         """        
-        base_path = "/home/jovyan"
+        base_path = os.environ['HOME']
         osfstorage = "osfstorage"
 
         base_trimmed = os.path.relpath(dir_path, base_path)

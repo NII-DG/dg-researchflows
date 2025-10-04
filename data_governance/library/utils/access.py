@@ -36,7 +36,7 @@ def open_main_menu(working_file: str) -> None:
     display(Javascript('IPython.notebook.save_checkpoint();'))
 
 
-def open_data_folder(working_file: str, folder_name:str = None) -> pn.pane.HTML:
+def open_data_folder(working_file: str, folder_name:str = None, button_name=None) -> pn.pane.HTML:
     """ 別タブでデータフォルダを開くボタンを表示する関数です。
 
     Args:
@@ -61,11 +61,14 @@ def open_data_folder(working_file: str, folder_name:str = None) -> pn.pane.HTML:
     if folder_name:
         url = os.path.join(url, folder_name)
 
+    if not button_name:
+        button_name = msg_config.get('task', 'access_data_dir')
+
     button_width = 500
     obj = create_button(
         url=url,
         target='_blank',
-        msg=msg_config.get('task', 'access_data_dir'),
+        msg=button_name,
         button_width=f'{button_width}px'
     )
     return pn.pane.HTML(obj)

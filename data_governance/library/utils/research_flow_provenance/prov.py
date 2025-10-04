@@ -45,7 +45,6 @@ class ProvenanceManager:
             FILE_EXPORT_BASE(str): エクスポートアクティビティのベース部分
             FILE_UPLOAD_BASE(str): アップロードアクティビティのベース部分
             FILE_DELETE_BASE(str): 削除アクティビティのベース部分
-            COLLECTION_EDIT_BASE(str): コレクション編集アクティビティのベース部分
             PROVENANCE_EDIT_BASE(str): プロビナンス編集アクティビティのベース部分
 
         instances:
@@ -71,7 +70,6 @@ class ProvenanceManager:
     FILE_EXPORT_BASE = ACTIVITY_BASE + "exportActivity:"
     FILE_UPLOAD_BASE = ACTIVITY_BASE + "uploadActivity:"
     FILE_DELETE_BASE = ACTIVITY_BASE + "deleteActivity:"
-    COLLECTION_EDIT_BASE = ACTIVITY_BASE + "collectionEditActivity"
     PROVENANCE_EDIT_BASE = ACTIVITY_BASE + "provenanceEditActivity"
 
     def __init__(self, token: str, grdm_url: str, project_id: str):
@@ -461,24 +459,6 @@ class ProvenanceManager:
 
             self.output.write(updated_files)
 
-    # def _handle_collection_edit(self, activity_type: str, collection_info: list):
-    #     """コレクション編集アクティビティを処理するための関数"""
-    #     base_id = self.COLLECTION_EDIT_BASE
-
-    #     updated_files = []
-    #     for collection in collection_info:
-    #         activity_id = generated_id(base_id)
-    #         self.editor.edit_collection(collection["collection_id"], activity_id, collection["new_member"])
-    #         updated_files = list(set(updated_files + collection["old_member"] + collection["new_member"]))
-    #         src_entities =[collection["collection_id"]]
-
-    #         # アクティビティ作成
-    #         self.editor.create_activity(activity_id, activity_type, src_entities, self.excution_user, old_provenances=collection["old_member"])
-
-    #     self.rdf_store.reload()
-
-    #     self.output.write(updated_files)
-
     def _handle_provenance_edit(self, new_path: str, ids: list):
         """来歴編集アクティビティを処理するための関数です。
 
@@ -610,9 +590,6 @@ class ProvenanceManager:
             src_files(dict): ファイルに関する情報
 
         """        
-        prov = Namespace("http://www.w3.org/ns/prov#")
-        rdfs = Namespace("http://www.w3.org/2000/01/rdf-schema#")
-
         src_files = {}
         for uri in uri_list:
             results = self.searcher.get_entity_info(uri)

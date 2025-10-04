@@ -420,11 +420,15 @@ class ProvenanceEditor:
 
         graph = activity_data.get("@graph", [])
 
-        # 対象のactivity_uriを除外して新しいグラフを作成
-        new_graph = [entry for entry in graph if entry.get("@id") != activity_uri]
+        # 一致したら除外（≒一致しないものだけ残す）
+        filtered_graph = []
+        for entry in graph:
+            if entry.get("@id") == activity_uri:
+                continue  # 一致 → 除外
+            filtered_graph.append(entry)
 
         # グラフを更新
-        activity_data["@graph"] = new_graph
+        activity_data["@graph"] = filtered_graph
 
         try:
             with open(self.activity_file, "w", encoding="utf-8") as f:
@@ -442,11 +446,15 @@ class ProvenanceEditor:
 
         graph = entity_data.get("@graph", [])
 
-        # 対象のentity_uriを除外して新しいグラフを作成
-        new_graph = [entry for entry in graph if entry.get("@id") != entity_uri]
+        # 一致したら除外（≒一致しないものだけ残す）
+        filtered_graph = []
+        for entry in graph:
+            if entry.get("@id") == entity_uri:
+                continue  # 一致 → 除外
+            filtered_graph.append(entry)
 
         # グラフを更新
-        entity_data["@graph"] = new_graph
+        entity_data["@graph"] = filtered_graph
 
         try:
             with open(self.entity_file, "w", encoding="utf-8") as f:

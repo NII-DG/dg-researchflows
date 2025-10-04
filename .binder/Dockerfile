@@ -19,7 +19,9 @@ RUN apt-get update -y
 RUN apt-get install -y gpg wget lsb-release
 RUN wget -O- https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
 RUN gpg --no-default-keyring --keyring /usr/share/keyrings/hashicorp-archive-keyring.gpg --fingerprint
-RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/hashicorp.list
+RUN lsb_release -cs
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com jammy main" | tee /etc/apt/sources.list.d/hashicorp.list
+RUN echo "force cache bust" > /dev/null
 RUN apt-get update -y
 RUN apt-get install -y vault
 RUN setcap -r /usr/bin/vault
@@ -51,10 +53,12 @@ RUN pip install --no-cache black==21.12b0
 RUN pip install --no-cache boto3
 RUN pip install --no-cache chardet==4.0.0
 RUN pip install --no-cache openpyxl==3.1.3
+RUN pip install --no-cache owlrl==7.1.2
 RUN pip install --no-cache pandas==2.1.4
 RUN pip install --no-cache panel==1.3.0
 RUN pip install --no-cache pikepdf==9.5.1
 RUN pip install --no-cache python-magic==0.4.27
+RUN pip install --no-cache rdflib==7.1.4
 RUN pip install --no-cache natsort==8.3.1
 RUN pip install --no-cache cookiecutter==2.5.0
 RUN pip install --no-cache hvac==2.1.0

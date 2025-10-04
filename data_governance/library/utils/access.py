@@ -36,7 +36,7 @@ def open_main_menu(working_file: str) -> None:
     display(Javascript('IPython.notebook.save_checkpoint();'))
 
 
-def open_data_folder(working_file: str, folder_name:str = None) -> pn.pane.HTML:
+def open_data_folder(working_file: str, folder_name:str = None, button_name=None) -> pn.pane.HTML:
     """ 別タブでデータフォルダを開くボタンを表示する関数です。
 
     Args:
@@ -61,11 +61,14 @@ def open_data_folder(working_file: str, folder_name:str = None) -> pn.pane.HTML:
     if folder_name:
         url = os.path.join(url, folder_name)
 
+    if not button_name:
+        button_name = msg_config.get('task', 'access_data_dir')
+
     button_width = 500
     obj = create_button(
         url=url,
         target='_blank',
-        msg=msg_config.get('task', 'access_data_dir'),
+        msg=button_name,
         button_width=f'{button_width}px'
     )
     return pn.pane.HTML(obj)
@@ -100,4 +103,137 @@ def open_data_file(working_file:str, file_path:str) -> pn.pane.HTML:
     )
     return pn.pane.HTML(obj)
 
+def list_files_recursively(base_path):
+    """
+    base_path以下の全ファイルをサブディレクトリ構造を保持した相対パスで返す
+    """
+    file_list = []
+    for root, dirs, files in os.walk(base_path):
+        for f in files:
+            full_path = os.path.join(root, f)
+            rel_path = os.path.relpath(full_path, base_path)
+            file_list.append(rel_path)
+    return file_list
 
+def create_copy_selector(working_file: str, folder_name: str = None):
+    """コピーするファイルを選択するためのウィジェットを作成します。"""
+
+    # homeからdataディレクトリまで
+    data_dir = get_data_dir(working_file)
+    working_dir = os.path.dirname(working_file)
+    relative_path = os.path.relpath(data_dir, start=working_dir)
+    if folder_name:
+        relative_path = os.path.join(relative_path, folder_name)
+    files = list_files_recursively(relative_path)
+
+    checkbox_dict = {}
+
+    # ツリー構造を作る
+    tree = {}
+
+    for file_path in files:
+        parts = file_path.split(os.sep)
+        current = tree
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+
+        display_name = os.path.basename(file_path)  # ファイル名のみ表示
+        checkbox = pn.widgets.Checkbox(name=display_name, value=False, width=500)
+
+        checkbox_dict[file_path] = checkbox  # キーはフルパスのまま
+        current[parts[-1]] = checkbox
+
+    def build_panel(node):
+        """
+        再帰的にPanelオブジェクトを構築する関数
+        node: dict or Checkbox
+        """
+        if isinstance(node, pn.widgets.Checkbox):
+            node.width = 500  # チェックボックスの幅も固定
+            return node
+
+        items = []
+        for key, value in sorted(node.items()):
+            if isinstance(value, dict):
+                content = build_panel(value)
+                card = pn.Accordion((key, content), width=500)
+                card.active = []
+                items.append(card)
+            else:
+                value.width = 500
+                items.append(value)
+
+        return pn.Column(*items, width=500)
+
+    ui = build_panel(tree)
+
+    return ui, relative_path, checkbox_dict
+
+def create_single_file_selector(working_file: str, folder_name: str = None):
+    """コピーするファイルを選択するためのウィジェットを作成します。
+    ファイル選択はツリー構造のチェックボックスで、1つだけ選択可能に制御。"""
+
+    data_dir = get_data_dir(working_file)
+    working_dir = os.path.dirname(working_file)
+    relative_path = os.path.relpath(data_dir, start=working_dir)
+    if folder_name:
+        relative_path = os.path.join(relative_path, folder_name)
+    files = list_files_recursively(relative_path)
+
+    checkbox_dict = {}
+
+    # ツリー構造を作る
+    tree = {}
+
+    for file_path in files:
+        parts = file_path.split(os.sep)
+        current = tree
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+
+        display_name = os.path.basename(file_path)  # ファイル名のみ表示
+        checkbox = pn.widgets.Checkbox(name=display_name, value=False, width=500)
+        checkbox.file_path = os.path.abspath(os.path.join(relative_path, file_path))
+        checkbox_dict[file_path] = checkbox
+        current[parts[-1]] = checkbox
+
+    # 一つだけ選択できるようにチェックボックスの相互排他制御をセット
+    def checkbox_callback(event):
+        # どれかがTrueになったら他をFalseにする
+        if event.new:
+            for path, cb in checkbox_dict.items():
+                if cb is not event.obj:
+                    cb.value = False
+
+    for cb in checkbox_dict.values():
+        cb.param.watch(checkbox_callback, 'value')
+
+    def build_panel(node):
+        """
+        再帰的にPanelオブジェクトを構築する関数
+        node: dict or Checkbox
+        """
+        if isinstance(node, pn.widgets.Checkbox):
+            node.width = 500
+            return node
+
+        items = []
+        for key, value in sorted(node.items()):
+            if isinstance(value, dict):
+                content = build_panel(value)
+                card = pn.Accordion((key, content), width=500)
+                card.active = []
+                items.append(card)
+            else:
+                value.width = 500
+                items.append(value)
+
+        return pn.Column(*items, width=500)
+
+    ui = pn.Column(
+    pn.pane.Markdown("### ファイルを選択してください", width=500),
+    build_panel(tree),
+    width=500
+    )
+
+    return ui, relative_path, checkbox_dict

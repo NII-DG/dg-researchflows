@@ -294,8 +294,9 @@ class OutputProvenance:
                                     related_files.append(related_file_info)
 
                             elif act_key == "uploadActivity":
-                                related_file_info["label"] = entity
-                                related_file_info["location"] = entity
+                                link = str(entity)[len("urn:source:"):]
+                                related_file_info["label"] = link
+                                related_file_info["location"] = link
                                 related_files.append(related_file_info)
                             else:
                                 related_label, related_location = get_label_location(entity)

@@ -166,7 +166,7 @@ class ProvenanceManager:
                     src_value = calculate_sha256(src_file)
                     src_uri = self.editor.create_entity(convert_path, src_link, src_value)
             else:
-                raise FileNotFoundError(f"{convert_path}がGRDMに存在しません。")
+                raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
             src_entities.append(src_uri)
 
             #　コピー先の処理
@@ -177,7 +177,7 @@ class ProvenanceManager:
                 self.editor.create_entity(convert_path, dst_link, dst_hash, activity_id, src_uri, self.excution_user)
                 updated_files.append(dst_link)
             else:
-                raise FileNotFoundError(f"{convert_path}がGRDMに存在しません。")
+                raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
 
         # アクティビティ作成
         self.editor.create_activity(activity_id, activity_type, src_entities, self.excution_user)
@@ -409,10 +409,11 @@ class ProvenanceManager:
             convert_path = self.convert_grdm_path(dst_path)
             if convert_path in self.grdm_file_info:
                 dst_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
+                src_link = "urn:source:" + src_link
                 self.editor.create_entity(convert_path, dst_link, dst_hash, activity_id, src_link, self.excution_user)
                 updated_files.append(dst_link)
             else:
-                raise FileNotFoundError(f"{convert_path}がGRDMに存在しません。")
+                raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
 
             src_list.append(src_link)
 
@@ -459,7 +460,7 @@ class ProvenanceManager:
 
             self.output.write(updated_files)
 
-    def _handle_provenance_edit(self, new_path: str, ids: list):
+    def _handle_provenance_edit(self, activity_type: str, new_path: str, ids: list):
         """来歴編集アクティビティを処理するための関数です。
 
         Args:
@@ -479,7 +480,7 @@ class ProvenanceManager:
             raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
     
         for entity in ids:
-            self.editor.change_entity_label(entity, convert_path)
+            self.editor.change_entity_label(entity, convert_path, file_link)
 
         self.rdf_store.reload()
         self.output.write(updated_files)

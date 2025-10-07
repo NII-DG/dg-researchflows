@@ -126,7 +126,7 @@ class OutputProvenance:
 
                 header = f"## [{file_info.file_name}（{file_info.file_path}）]({file_info.link})"
                 new_section = "\n".join([header] + related_lines) + "\n"
-                
+
                 new_sections[file_info.link] = new_section
                 link_to_path[file_info.link] = file_info.file_path
 

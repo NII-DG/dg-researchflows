@@ -10,7 +10,7 @@ from rdflib import Namespace, URIRef
 from .rdf import ProvenanceSearcher
 
 from library.utils.config import path_config
-# from rdflib.namespace import RDFS, Namespace
+
 
 @dataclass
 class FileInfo:
@@ -78,7 +78,7 @@ class OutputProvenance:
             readme_text = readme_path.read_text(encoding="utf-8")
 
             # セクション抽出 (全文, file_path, link)
-            section_pattern = r"(##\s+\[.+?（(.+?)）\]\((https?://[^\)]+)\)[\s\S]*?)(?=\n## |\Z)"
+            section_pattern = r"(##\s+\[.+?（(.+?)）\]\((https?://[^\)]+)\)(?:\n(?!## ).*)*)"
             matched_sections = re.findall(section_pattern, readme_text)
 
             def remove_sections(text: str, sections: list) ->str:
@@ -95,7 +95,7 @@ class OutputProvenance:
                     text = text.replace(sec, "")
                 return text
 
-            all_sections_text = [sec for sec, _, _ in matched_sections]
+            all_sections_text = [sec[0] for sec in matched_sections]
             readme_body = remove_sections(readme_text, all_sections_text).strip()
 
             # リンクごとにセクションをまとめる
@@ -115,17 +115,18 @@ class OutputProvenance:
             link_to_path = {}
 
             for file_info in info_list:
-                header = f"## [{file_info.file_name}（{file_info.file_path}）]({file_info.link})"
                 related_lines = [
-                    (
-                        f'{rel["type"]}：{rel["label"]}（削除済み）'
-                        if rel["location"] == "削除済み"
-                        else f'{rel["type"]}：[{"{0}".format(rel["label"])}]({rel["location"]})'
-                    )
+                    f'{rel["type"]}：[{"{0}".format(rel["label"])}]({rel["location"]})'
                     for rel in file_info.related_files
                 ]
 
+                # 1. related_lines が空ならこのセクションはスキップ
+                if not related_lines:
+                    continue
+
+                header = f"## [{file_info.file_name}（{file_info.file_path}）]({file_info.link})"
                 new_section = "\n".join([header] + related_lines) + "\n"
+                
                 new_sections[file_info.link] = new_section
                 link_to_path[file_info.link] = file_info.file_path
 
@@ -182,7 +183,6 @@ class OutputProvenance:
             for _, _, activity_uri in entity_graph.triples((entity_subject, prov.wasUsedBy, None)):
                 if "deleteActivity" in str(activity_uri):
                     location = "削除済み"
-
             if not location:
                 location = entity_graph.value(subject=entity_subject, predicate=prov.atLocation)
 
@@ -194,8 +194,7 @@ class OutputProvenance:
             "modifyActivity": (prov.wasRevisionOf, "編集元"),
             "compileActivity": (prov.wasDerivedFrom, "コンパイル元"),
             "exportActivity": (prov.wasDerivedFrom, "出力元"),
-            "uploadActivity": (prov.wasDerivedFrom, "アップロード元"),
-            "deleteActivity": (prov.wasDerivedFrom, "削除済み")
+            "uploadActivity": (prov.wasDerivedFrom, "アップロード元")
         }
         # wasUsedBy側
         used_activity_predicates = {
@@ -203,8 +202,7 @@ class OutputProvenance:
             "modifyActivity": (prov.hadRevision, "編集先"),
             "compileActivity": (prov.hadDerivation, "コンパイル先"),
             "exportActivity": (prov.hadDerivation, "出力先"),
-            "uploadActivity": (prov.hadDerivation, "アップロード先"),
-            "deleteActivity": (prov.hadDerivedFrom, "削除済み")
+            "uploadActivity": (prov.hadDerivation, "アップロード先")
         }
 
         graph = results.graph
@@ -220,6 +218,56 @@ class OutputProvenance:
 
         related_files = []
         for subject in set(graph.subjects()):
+
+            was_used_activities = list(graph.objects(subject=subject, predicate=prov.wasUsedBy))
+            # "deleteActivity" を含む activity があればループを抜ける
+            if any("deleteActivity" in str(activity) for activity in was_used_activities):
+                continue
+            for activity in was_used_activities:
+                for act_key, (predicate, type_name) in used_activity_predicates.items():
+                    if act_key in activity:
+                        activity_result = self.searcher.get_activity_info(activity)
+                        activity_graph = activity_result.graph
+                        activitiy_subject = URIRef(activity)
+                        generated_entities = list(activity_graph.objects(subject=activitiy_subject, predicate=prov.generated))
+                        entities = list(graph.objects(subject=subject, predicate=predicate))
+                        for entity in entities:
+                            if entity in generated_entities:
+                                related_file_info ={}
+                                related_file_info["activity"] = activity
+                                related_file_info["type"] = type_name
+                                related_label, related_location = get_label_location(entity)
+                                if related_location == "削除済み":
+                                    continue
+                                related_file_info["label"] = related_label
+                                related_file_info["location"] = related_location
+                                related_files.append(related_file_info)
+
+            was_member_collections = list(graph.objects(subject=subject, predicate=prov.wasMemberOf))
+            for collection in was_member_collections:
+                collection_results = self.searcher.get_entity_info(collection)
+                collection_graph = collection_results.graph
+                collection_subject = URIRef(collection)
+                collection_activities = list(collection_graph.objects(subject=collection_subject, predicate=prov.wasUsedBy))
+                for activity in collection_activities:
+                    for act_key, (predicate, type_name) in used_activity_predicates.items():
+                        if act_key in activity:
+                            activity_result = self.searcher.get_activity_info(activity)
+                            activity_graph = activity_result.graph
+                            activitiy_subject = URIRef(activity)
+                            generated_entities = list(activity_graph.objects(subject=activitiy_subject, predicate=prov.generated))
+                            entities = list(collection_graph.objects(subject=collection_subject, predicate=predicate))
+                            for entity in entities:
+                                if entity in generated_entities:
+                                    related_file_info ={}
+                                    related_file_info["activity"] = activity
+                                    related_file_info["type"] = type_name
+                                    related_label, related_location = get_label_location(entity)
+                                    if related_location == "削除済み":
+                                        continue
+                                    related_file_info["label"] = related_label
+                                    related_file_info["location"] = related_location
+                                    related_files.append(related_file_info)
 
             activities = list(graph.objects(subject=subject, predicate=prov.wasGeneratedBy))
             for activity in activities:
@@ -237,6 +285,8 @@ class OutputProvenance:
                                 for member in entity_graph.objects(subject=entity_subject, predicate=prov.hadMember):
                                     related_file_info ={}
                                     related_label, related_location = get_label_location(member)
+                                    if related_location == "削除済み":
+                                        continue
                                     related_file_info["activity"] = activity
                                     related_file_info["type"] = type_name
                                     related_file_info["label"] = related_label
@@ -244,44 +294,14 @@ class OutputProvenance:
                                     related_files.append(related_file_info)
 
                             elif act_key == "uploadActivity":
-                                related_file_info["label"] = entity
-                                related_file_info["location"] = entity
+                                link = str(entity)[len("urn:source:"):]
+                                related_file_info["label"] = link
+                                related_file_info["location"] = link
                                 related_files.append(related_file_info)
                             else:
                                 related_label, related_location = get_label_location(entity)
-                                related_file_info["label"] = related_label
-                                related_file_info["location"] = related_location
-                                related_files.append(related_file_info)
-
-            was_used_activities = list(graph.objects(subject=subject, predicate=prov.wasUsedBy))
-            for activity in was_used_activities:
-                for act_key, (predicate, type_name) in used_activity_predicates.items():
-                    if act_key in activity:
-                        entities = list(graph.objects(subject=subject, predicate=predicate))
-                        for entity in entities:
-                            related_file_info ={}
-                            related_file_info["activity"] = activity
-                            related_file_info["type"] = type_name
-                            related_label, related_location = get_label_location(entity)
-                            related_file_info["label"] = related_label
-                            related_file_info["location"] = related_location
-                            related_files.append(related_file_info)
-
-            was_member_collections = list(graph.objects(subject=subject, predicate=prov.wasMemberOf))
-            for collection in was_member_collections:
-                collection_results = self.searcher.get_entity_info(collection)
-                collection_graph = collection_results.graph
-                collection_subject = URIRef(collection)
-                collection_activities = list(collection_graph.objects(subject=collection_subject, predicate=prov.wasUsedBy))
-                for activity in collection_activities:
-                    for act_key, (predicate, type_name) in used_activity_predicates.items():
-                        if act_key in activity:
-                            entities = list(collection_graph.objects(subject=collection_subject, predicate=predicate))
-                            for entity in entities:
-                                related_file_info ={}
-                                related_file_info["activity"] = activity
-                                related_file_info["type"] = type_name
-                                related_label, related_location = get_label_location(entity)
+                                if related_location == "削除済み":
+                                    continue
                                 related_file_info["label"] = related_label
                                 related_file_info["location"] = related_location
                                 related_files.append(related_file_info)

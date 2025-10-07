@@ -420,11 +420,15 @@ class ProvenanceEditor:
 
         graph = activity_data.get("@graph", [])
 
-        # 対象のactivity_uriを除外して新しいグラフを作成
-        new_graph = [entry for entry in graph if entry.get("@id") != activity_uri]
+        # 一致したら除外（≒一致しないものだけ残す）
+        filtered_graph = []
+        for entry in graph:
+            if entry.get("@id") == activity_uri:
+                continue  # 一致 → 除外
+            filtered_graph.append(entry)
 
         # グラフを更新
-        activity_data["@graph"] = new_graph
+        activity_data["@graph"] = filtered_graph
 
         try:
             with open(self.activity_file, "w", encoding="utf-8") as f:
@@ -442,11 +446,15 @@ class ProvenanceEditor:
 
         graph = entity_data.get("@graph", [])
 
-        # 対象のentity_uriを除外して新しいグラフを作成
-        new_graph = [entry for entry in graph if entry.get("@id") != entity_uri]
+        # 一致したら除外（≒一致しないものだけ残す）
+        filtered_graph = []
+        for entry in graph:
+            if entry.get("@id") == entity_uri:
+                continue  # 一致 → 除外
+            filtered_graph.append(entry)
 
         # グラフを更新
-        entity_data["@graph"] = new_graph
+        entity_data["@graph"] = filtered_graph
 
         try:
             with open(self.entity_file, "w", encoding="utf-8") as f:
@@ -454,7 +462,7 @@ class ProvenanceEditor:
         except IOError as e:
             raise RuntimeError(f"{self.entity_file}の書き込みに失敗しました: {e}") from e
         
-    def change_entity_label(self, entity_id: str, new_label: str):
+    def change_entity_label(self, entity_id: str, new_label: str, new_location: str):
         """エンティティのラベルを編集する関数です。
 
         Args:
@@ -480,6 +488,7 @@ class ProvenanceEditor:
             raise ValueError(f"指定されたエンティティIDが存在しません: {entity_id}")
 
         entity["label"] = new_label
+        entity["prov:atLocation"] = {"@id": new_location}
 
         try:
             with open(self.entity_file, "w", encoding="utf-8") as f:

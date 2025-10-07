@@ -45,7 +45,6 @@ class ProvenanceManager:
             FILE_EXPORT_BASE(str): エクスポートアクティビティのベース部分
             FILE_UPLOAD_BASE(str): アップロードアクティビティのベース部分
             FILE_DELETE_BASE(str): 削除アクティビティのベース部分
-            COLLECTION_EDIT_BASE(str): コレクション編集アクティビティのベース部分
             PROVENANCE_EDIT_BASE(str): プロビナンス編集アクティビティのベース部分
 
         instances:
@@ -71,7 +70,6 @@ class ProvenanceManager:
     FILE_EXPORT_BASE = ACTIVITY_BASE + "exportActivity:"
     FILE_UPLOAD_BASE = ACTIVITY_BASE + "uploadActivity:"
     FILE_DELETE_BASE = ACTIVITY_BASE + "deleteActivity:"
-    COLLECTION_EDIT_BASE = ACTIVITY_BASE + "collectionEditActivity"
     PROVENANCE_EDIT_BASE = ACTIVITY_BASE + "provenanceEditActivity"
 
     def __init__(self, token: str, grdm_url: str, project_id: str):
@@ -168,7 +166,7 @@ class ProvenanceManager:
                     src_value = calculate_sha256(src_file)
                     src_uri = self.editor.create_entity(convert_path, src_link, src_value)
             else:
-                raise FileNotFoundError(f"{convert_path}がGRDMに存在しません。")
+                raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
             src_entities.append(src_uri)
 
             #　コピー先の処理
@@ -179,7 +177,7 @@ class ProvenanceManager:
                 self.editor.create_entity(convert_path, dst_link, dst_hash, activity_id, src_uri, self.excution_user)
                 updated_files.append(dst_link)
             else:
-                raise FileNotFoundError(f"{convert_path}がGRDMに存在しません。")
+                raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
 
         # アクティビティ作成
         self.editor.create_activity(activity_id, activity_type, src_entities, self.excution_user)
@@ -376,7 +374,7 @@ class ProvenanceManager:
         convert_path = self.convert_grdm_path(dst_file)
         if convert_path in self.grdm_file_info:
             dst_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
-            self.editor.create_entity(convert_path, dst_link, dst_hash, activity_id, src_uri, agent_list)
+            self.editor.create_entity(convert_path, dst_link, dst_hash, activity_id, src_entities, agent_list)
             updated_files.append(dst_link)
         else:
             raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
@@ -411,10 +409,11 @@ class ProvenanceManager:
             convert_path = self.convert_grdm_path(dst_path)
             if convert_path in self.grdm_file_info:
                 dst_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
+                src_link = "urn:source:" + src_link
                 self.editor.create_entity(convert_path, dst_link, dst_hash, activity_id, src_link, self.excution_user)
                 updated_files.append(dst_link)
             else:
-                raise FileNotFoundError(f"{convert_path}がGRDMに存在しません。")
+                raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
 
             src_list.append(src_link)
 
@@ -434,50 +433,34 @@ class ProvenanceManager:
 
         Raises:
             FileNotFoundError: 対処のファイルがGRDM上に存在しない場合のエラーです。
+
         """        
-
-        base_id = self.FILE_DELETE_BASE
-        activity_id = generated_id(base_id)
-
         updated_files = []
+        delete_files = []
         # 削除済みファイルの探索
         for deleted_file in deleted_files:
             convert_path = self.convert_grdm_path(deleted_file)
             if convert_path in self.grdm_file_info:
                 delete_link = self.convert_grdm_link(self.grdm_file_info[convert_path])
+                updated_files.append(delete_link)
                 delete_uri = self.searcher.get_file_entity_list(delete_link)
                 if not delete_uri :
-                    raise FileNotFoundError(f"{convert_path}のEntityが存在しない")
-                updated_files.extend(delete_uri)
+                    continue
+                delete_files.extend(delete_uri)
             else:
                 raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
 
-        # アクティビティ作成
-        self.editor.create_activity(activity_id, activity_type, updated_files, self.excution_user)
+        if delete_files:
+            # アクティビティ作成
+            base_id = self.FILE_DELETE_BASE
+            activity_id = generated_id(base_id)
+            self.editor.create_activity(activity_id, activity_type, delete_files, self.excution_user)
 
-        self.rdf_store.reload()
+            self.rdf_store.reload()
 
-        self.output.write(updated_files)
+            self.output.write(updated_files)
 
-    # def _handle_collection_edit(self, activity_type: str, collection_info: list):
-    #     """コレクション編集アクティビティを処理するための関数"""
-    #     base_id = self.COLLECTION_EDIT_BASE
-
-    #     updated_files = []
-    #     for collection in collection_info:
-    #         activity_id = generated_id(base_id)
-    #         self.editor.edit_collection(collection["collection_id"], activity_id, collection["new_member"])
-    #         updated_files = list(set(updated_files + collection["old_member"] + collection["new_member"]))
-    #         src_entities =[collection["collection_id"]]
-
-    #         # アクティビティ作成
-    #         self.editor.create_activity(activity_id, activity_type, src_entities, self.excution_user, old_provenances=collection["old_member"])
-
-    #     self.rdf_store.reload()
-
-    #     self.output.write(updated_files)
-
-    def _handle_provenance_edit(self, new_path: str, ids: list):
+    def _handle_provenance_edit(self, activity_type: str, new_path: str, ids: list):
         """来歴編集アクティビティを処理するための関数です。
 
         Args:
@@ -497,7 +480,7 @@ class ProvenanceManager:
             raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
     
         for entity in ids:
-            self.editor.change_entity_label(entity, convert_path)
+            self.editor.change_entity_label(entity, convert_path, file_link)
 
         self.rdf_store.reload()
         self.output.write(updated_files)
@@ -546,7 +529,7 @@ class ProvenanceManager:
             _type_: 変換したファイルパス
 
         """        
-        base_path = "/home/jovyan"
+        base_path = os.environ['HOME']
         osfstorage = "osfstorage"
 
         trimmed = os.path.relpath(path, base_path)
@@ -580,7 +563,7 @@ class ProvenanceManager:
             error_files(dict)： エンティティが存在するがファイルが存在しないエンティティ
 
         """        
-        base_path = "/home/jovyan"
+        base_path = os.environ['HOME']
         osfstorage = "osfstorage"
 
         base_trimmed = os.path.relpath(dir_path, base_path)
@@ -608,9 +591,6 @@ class ProvenanceManager:
             src_files(dict): ファイルに関する情報
 
         """        
-        prov = Namespace("http://www.w3.org/ns/prov#")
-        rdfs = Namespace("http://www.w3.org/2000/01/rdf-schema#")
-
         src_files = {}
         for uri in uri_list:
             results = self.searcher.get_entity_info(uri)

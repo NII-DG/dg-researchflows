@@ -1,0 +1,77 @@
+{
+    "@context": [
+        "./vocab.jsonld"
+    ],
+    "@graph":[
+        {
+            "@id": "urn:entity:論拠データ１.csv-cdef1234-5678-90ab-cdef-1234567890ab",
+            "@type": "prov:Entity",
+            "label": "論拠データ1.csv",
+            "prov:atLocation": {
+                "@id": "grdm:data/experiment/実験１/argument_data/論拠データ１.csv"
+            },
+            "dcat:checksum": {
+                "@type": "spdx:Checksum",
+                "spdx:algorithm": "SHA-256",
+                "spdx:checksumValue": "b94d27b9934..."
+            }
+        },
+        {
+            "@id": "urn:entity:論拠データ２.csv-6f5e4d3c-2b1a-0c9d-8e7f-6a5b4c3d2e1f",
+            "@type": "prov:Entity",
+            "label": "論拠データ2.csv",
+            "prov:atLocation": {
+                "@id": "grdm:data/experiment/実験１/argument_data/論拠データ２.csv"
+            },
+            "dcat:checksum": {
+                "@type": "spdx:Checksum",
+                "spdx:algorithm": "SHA-256",
+                "spdx:checksumValue": "asw234fr542..."
+            }
+        },
+        {
+            "@id": "urn:entity:論拠データ１.csv-3f1d3b3a-2224-49e0-8412-ae37fcb9f514",
+            "@type": "prov:Entity",
+            "label": "論拠データ1.csv",
+            "prov:atLocation": {
+                "@id": "grdm:data/writing/論文執筆１/argument_data/論拠データ１.csv"
+            },
+            "dcat:checksum": {
+                "@type": "spdx:Checksum",
+                "spdx:algorithm": "SHA-256",
+                "spdx:checksumValue": "b94d27b9934..."
+            },
+            "prov:wasGeneratedBy": {
+                "@id":"urn:activity:copyActivity-9b2d8d1e-1c5f-4e3a-9a2b-5f6d7e8c9b0a"
+            },
+            "prov:wasDerivedFrom": [
+                {"@id": "urn:entity:論拠データ１.csv-cdef1234-5678-90ab-cdef-1234567890ab"}
+            ],
+            "prov:wasAttributedTo": [
+                {"@id": "urn:agent:ase4f2-8a7b6c5d-4e3f-2a1b-0c9d-87654321abcd"}
+            ]
+        },
+        {
+            "@id": "urn:entity:論拠データ２.csv-f47ac10b-58cc-4372-a567-0e02b2c3d479",
+            "@type": "prov:Entity",
+            "label": "論拠データ2.csv",
+            "prov:atLocation": {
+                "@id": "grdm:data/writing/論文執筆１/argument_data/論拠データ２.csv"
+            },
+            "dcat:checksum": {
+                "@type": "spdx:Checksum",
+                "spdx:algorithm": "SHA-256",
+                "spdx:checksumValue": "asw234fr542..."
+            },
+            "prov:wasGeneratedBy": {
+                "@id":"urn:activity:copyActivity-9b2d8d1e-1c5f-4e3a-9a2b-5f6d7e8c9b0a"
+            },
+            "prov:wasDerivedFrom": [
+                {"@id": "urn:entity:論拠データ２.csv-6f5e4d3c-2b1a-0c9d-8e7f-6a5b4c3d2e1f"}
+            ],
+            "prov:wasAttributedTo": [
+                {"@id": "urn:agent:ase4f2-8a7b6c5d-4e3f-2a1b-0c9d-87654321abcd"}
+            ]
+        }
+    ]
+}

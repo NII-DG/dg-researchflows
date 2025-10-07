@@ -2,7 +2,7 @@
     "is_completed": false,
     "order": {
         "sequence": ["RF005013", "RF005001", "RF005004", "RF005011", "RF005014", "RF005015"],
-        "whenever":["RF009004", "RF009002", "RF009006", "RF009007", "RF009001", "RF009005"]
+        "whenever":["RF009004", "RF009002", "RF009006", "RF009007", "RF009001", "RF009005", "RF009008"]
     },
     "tasks": [
         {
@@ -139,6 +139,17 @@
         {
             "id": "RF009007",
             "name": "metadata",
+            "is_multiple": true,
+            "is_required": false,
+            "completed_count": 0,
+            "dependent_task_ids": [],
+            "status": "unexecuted",
+            "execution_environments": [],
+            "active": true
+        },
+        {
+            "id": "RF009008",
+            "name": "edit_provenance",
             "is_multiple": true,
             "is_required": false,
             "completed_count": 0,

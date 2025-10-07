@@ -1,0 +1,23 @@
+{
+    "@context": [
+        "./vocab.jsonld"
+    ],
+    "@graph":[
+        {
+            "@id":"urn:activity:copyActivity-9b2d8d1e-1c5f-4e3a-9a2b-5f6d7e8c9b0a",
+            "@type": "prov:Activity",
+            "label": "File copy",
+            "prov:endedAtTime": {
+                "@value": "2025-07-04T13:24:14+09:00",
+                "@type": "xsd:dateTime"
+            },
+            "prov:used": [
+                {"@id": "urn:entity:論拠データ１.csv-cdef1234-5678-90ab-cdef-1234567890ab"},
+                {"@id": "urn:entity:論拠データ２.csv-6f5e4d3c-2b1a-0c9d-8e7f-6a5b4c3d2e1f"}
+            ],
+            "prov:wasAssociatedWith": [
+                {"@id": "urn:agent:ase4f2-8a7b6c5d-4e3f-2a1b-0c9d-87654321abcd"}
+            ]
+        }
+    ]
+}

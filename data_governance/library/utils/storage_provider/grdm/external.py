@@ -7,11 +7,13 @@ from http import HTTPStatus
 import os
 from typing import Optional
 from urllib import parse
+from tzlocal import get_localzone
 
 import aiofiles
+import dateutil
 from osfclient.cli import OSF, split_storage
 from osfclient.models import File
-from osfclient.utils import norm_remote_path, split_storage, _is_path_matched
+from osfclient.utils import norm_remote_path, split_storage, _is_path_matched, filter_by_path_pattern, is_folder
 from osfclient.exceptions import UnauthorizedException
 import requests
 from requests.exceptions import RequestException
@@ -384,3 +386,69 @@ class External:
                 raise UnauthorizedError(str(e)) from e
             raise
 
+    async def list_(self, token: str, base_url: str, project_id: str, base_path: Optional[str]=None, long_format: bool=False) -> dict:
+        """指定したパス配下のファイルのパスとIDをGRDMから取得する関数です。
+
+        Args:
+            token (str): GRDMトークン
+            base_url (str): GRDMのベースURLli
+            project_id (str): プロジェクトURL
+            base_path (str): ディレクトリを指定する
+                                デフォルトはNone
+            long_format (bool): フォーマット処理のフラグ
+                                デフォルトはNone
+
+        Raises:
+            KeyError: トークンによる認証に失敗した
+
+        Returns:
+            dict: ファイルのパスとIDの辞書型データ
+
+        """
+        api_url_grdm = self.build_api_url(base_url,'')
+
+        osf = OSF(token=token, base_url=api_url_grdm)
+        if not osf.has_auth:
+            raise KeyError('To upload a file you need to provide a username and password or token.')
+
+        project = await osf.project( project_id)
+        base_file_path = None
+        base_provider = None
+        if base_path is not None:
+            if base_path.startswith('/'):
+                base_path = base_path[1:]
+            base_file_path = base_path[base_path.index('/'):]
+            if not base_file_path.endswith('/'):
+                base_file_path = base_file_path + '/'
+            base_provider = base_path.split('/')[0]
+
+        file_paths ={}
+        async for store in project.storages:
+            prefix = store.name
+            if base_provider is not None and base_provider != prefix:
+                continue
+            files = filter_by_path_pattern(store, base_file_path)
+            async for file_ in files:
+                if is_folder(file_):
+                    continue
+                path = file_.path
+                if path.startswith('/'):
+                    path = path[1:]
+                full_path = os.path.join(prefix, path)
+                if long_format:
+                    if file_.date_modified is not None:
+                        modified = dateutil.parser.parse(file_.date_modified)
+                        modified = modified.astimezone(get_localzone())
+                        smodified = modified.strftime('%Y-%m-%d %H:%M:%S')
+                    else:
+                        smodified = '- -'
+                    if file_.size is not None:
+                        sfsize = str(file_.size)
+                    else:
+                        sfsize = '-'
+                    print('%s %s %s' % (smodified, sfsize, full_path))
+                else:
+                    file_paths[full_path] = file_.osf_path
+
+        await osf.aclose()
+        return file_paths

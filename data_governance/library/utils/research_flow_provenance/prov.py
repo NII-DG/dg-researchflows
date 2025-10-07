@@ -2,10 +2,10 @@
 
 import hashlib
 import os
-from pathlib import Path
 from urllib.parse import urljoin
 
 from rdflib import Namespace, URIRef
+
 from library.utils.research_flow_provenance.output import OutputProvenance
 from library.utils.research_flow_provenance.rdf import RDFStore, ProvenanceSearcher
 from library.utils.research_flow_provenance.jsonld import generated_id
@@ -235,8 +235,8 @@ class ProvenanceManager:
         self.output.write(updated_files)
 
     def _handle_file_compile(self, activity_type: str, dst_file: str,
-                             tex_list:list=None, argument_list:list=None,
-                             figure_list:list=None, agent_info:list=None):
+                             tex_list:list=[], argument_list:list=[],
+                             figure_list:list=[], agent_info:list=[]):
         """コンパイルアクティビティを処理するための関数です。
 
         Args:
@@ -329,7 +329,7 @@ class ProvenanceManager:
 
         self.output.write(updated_files)
 
-    def _handle_file_export(self, activity_type: str, dst_file: str, src_files: list, agent_info:list=None):
+    def _handle_file_export(self, activity_type: str, dst_file: str, src_files: list, agent_info:list=[]):
         """エクスポートアクティビティを処理するための関数です。
 
         Args:
@@ -486,7 +486,7 @@ class ProvenanceManager:
         self.rdf_store.reload()
         self.output.write(updated_files)
 
-    def _handle_delete_activity(self, activity_type:str, activity_uri: str, update_files: list):
+    def _handle_delete_activity(self, activity_type: str, activity_uri: str, update_files: list):
         """アクティビティを削除する際の関数です。
 
         Args:

@@ -410,8 +410,16 @@ class ProvenanceEditor:
         """
         return datetime.now(timezone(timedelta(hours=9))).isoformat()
 
-    def delete_activity(self, activity_uri:str):
-        """アクティビティを削除する関数です。"""
+    def delete_activity(self, activity_uri: str):
+        """アクティビティを削除する関数です。
+
+        Args:
+            activity_uri (str): 削除するアクティビティのURI
+
+        Raises:
+            RuntimeError: RuntimeError: 来歴情報ファイルの読み込み/書き込みに失敗した
+
+        """
         try:
             with open(self.activity_file, "r", encoding="utf-8") as f:
                 activity_data = json.load(f)
@@ -461,13 +469,14 @@ class ProvenanceEditor:
                 json.dump(entity_data, f, indent=2, ensure_ascii=False)
         except IOError as e:
             raise RuntimeError(f"{self.entity_file}の書き込みに失敗しました: {e}") from e
-        
+
     def change_entity_label(self, entity_id: str, new_label: str, new_location: str):
         """エンティティのラベルを編集する関数です。
 
         Args:
             entity_id (str): 編集を行うエンティティのURI
             new_label (str): 新しく関連付けるエンティティのラベル
+            new_location(str): 新しく関連付けるエンティティのロケーション
 
         Raises:
             RuntimeError: 来歴情報ファイルの読み込み/書き込みに失敗した。

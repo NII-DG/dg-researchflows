@@ -203,7 +203,7 @@ class ProvenanceManager:
         updated_files = []
         src_entities =[]
 
-        for dst_file, src_file in modify_files.items(): 
+        for dst_file, src_file in modify_files.items():
             # 編集元の処理
             convert_path = self.convert_grdm_path(src_file)
             if convert_path in self.grdm_file_info:
@@ -234,8 +234,8 @@ class ProvenanceManager:
 
         self.output.write(updated_files)
 
-    def _handle_file_compile(self, activity_type: str, dst_file: str, 
-                             tex_list:list=None, argument_list:list=None, 
+    def _handle_file_compile(self, activity_type: str, dst_file: str,
+                             tex_list:list=None, argument_list:list=None,
                              figure_list:list=None, agent_info:list=None):
         """コンパイルアクティビティを処理するための関数です。
 
@@ -341,7 +341,7 @@ class ProvenanceManager:
         Raises:
             FileNotFoundError: 対処のファイルがGRDM上に存在しない場合のエラーです。
 
-        """        
+        """
         base_id = self.FILE_EXPORT_BASE
         activity_id = generated_id(base_id)
 
@@ -392,6 +392,7 @@ class ProvenanceManager:
         Args:
             activity_type (str): アクティビティタイプ
             upload_files (dict): アップロードしたファイルの情報
+            comment(str): アクティビティに付与するコメント。デフォルトは空文字
 
         Raises:
             FileNotFoundError: 対処のファイルがGRDM上に存在しない場合のエラーです。
@@ -434,7 +435,7 @@ class ProvenanceManager:
         Raises:
             FileNotFoundError: 対処のファイルがGRDM上に存在しない場合のエラーです。
 
-        """        
+        """
         updated_files = []
         delete_files = []
         # 削除済みファイルの探索
@@ -470,7 +471,7 @@ class ProvenanceManager:
         Raises:
             FileNotFoundError: 対処のファイルがGRDM上に存在しない場合のエラーです。
 
-        """        
+        """
         updated_files = []
         convert_path = self.convert_grdm_path(new_path)
         if convert_path in self.grdm_file_info:
@@ -478,7 +479,7 @@ class ProvenanceManager:
             updated_files.append(file_link)
         else:
             raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
-    
+
         for entity in ids:
             self.editor.change_entity_label(entity, convert_path, file_link)
 
@@ -493,7 +494,7 @@ class ProvenanceManager:
             activity_uri (str): 削除するアクティビティ
             update_files (list): 更新対象のエンティティ
 
-        """        
+        """
         results = self.searcher.get_activity_info(activity_uri)
         prov = Namespace("http://www.w3.org/ns/prov#")
         activity_graph = results.graph
@@ -526,9 +527,9 @@ class ProvenanceManager:
             path (str): ファイルパス
 
         Returns:
-            _type_: 変換したファイルパス
+            str: 変換したファイルパス
 
-        """        
+        """
         base_path = os.environ['HOME']
         osfstorage = "osfstorage"
 
@@ -543,9 +544,9 @@ class ProvenanceManager:
             file_id (str): GRDMにおけるファイルID
 
         Returns:
-            _type_: GRDMリンク
+            str: GRDMリンク
 
-        """        
+        """
         files = "files"
         osfstorage = "osfstorage"
 
@@ -562,7 +563,7 @@ class ProvenanceManager:
             all_files(dict): 対象のディレクトリに含まれるファイルの全エンティティ
             error_files(dict)： エンティティが存在するがファイルが存在しないエンティティ
 
-        """        
+        """
         base_path = os.environ['HOME']
         osfstorage = "osfstorage"
 
@@ -590,7 +591,7 @@ class ProvenanceManager:
         Returns:
             src_files(dict): ファイルに関する情報
 
-        """        
+        """
         src_files = {}
         for uri in uri_list:
             results = self.searcher.get_entity_info(uri)

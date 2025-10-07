@@ -462,7 +462,7 @@ class ProvenanceEditor:
         except IOError as e:
             raise RuntimeError(f"{self.entity_file}の書き込みに失敗しました: {e}") from e
         
-    def change_entity_label(self, entity_id: str, new_label: str):
+    def change_entity_label(self, entity_id: str, new_label: str, new_location: str):
         """エンティティのラベルを編集する関数です。
 
         Args:
@@ -488,6 +488,7 @@ class ProvenanceEditor:
             raise ValueError(f"指定されたエンティティIDが存在しません: {entity_id}")
 
         entity["label"] = new_label
+        entity["prov:atLocation"] = {"@id": new_location}
 
         try:
             with open(self.entity_file, "w", encoding="utf-8") as f:

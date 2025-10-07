@@ -249,7 +249,7 @@ class TestProvenanceManager:
     def test_handle_file_modify_src_not_found(self):
         """編集元ファイルがGRDM上に存在しない場合。"""
         modified_files = {"/path/dst_file.txt": "/path/unknown_src.txt"}
-        
+
         with pytest.raises(FileNotFoundError, match="がGRDMに存在しない"):
             self.mgr._handle_file_modify("File Modify", modified_files)
 

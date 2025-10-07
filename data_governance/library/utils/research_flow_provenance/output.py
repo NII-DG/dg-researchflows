@@ -7,9 +7,9 @@ import re
 
 from rdflib.query import Result
 from rdflib import Namespace, URIRef
-from .rdf import ProvenanceSearcher
 
 from library.utils.config import path_config
+from .rdf import ProvenanceSearcher
 
 
 @dataclass
@@ -150,7 +150,7 @@ class OutputProvenance:
             final_text = readme_body + "\n\n" + "\n\n".join(sorted_sections) + "\n"
             readme_path.write_text(final_text, encoding="utf-8")
 
-    def set_file_info(self, results:Result, location: str) -> FileInfo:
+    def set_file_info(self, results:Result, location: str) -> tuple[str, FileInfo]:
         """ファイルの来歴情報をセットする関数です。
 
         Args:

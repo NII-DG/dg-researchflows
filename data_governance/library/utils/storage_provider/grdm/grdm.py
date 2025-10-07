@@ -175,7 +175,7 @@ class Grdm():
             raise FileNotFoundError(f'The specified file (path: {remote_path}) does not exist.')
         return content.decode(encoding)
 
-    async def download_json_file(self, token: str, base_url: str, project_id: str, remote_path: str) -> Union[dict, list]:
+    async def download_json_file(self, token: str, base_url: str, project_id: str, remote_path: str) -> dict:
         """ jsonファイルの中身を取得するメソッドです。
 
         Args:

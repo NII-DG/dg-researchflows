@@ -448,6 +448,15 @@ class ProvenanceManager:
                 if not delete_uri :
                     continue
                 delete_files.extend(delete_uri)
+                #関連するファイルを更新対象に加える
+                results = self.searcher.get_all_entity_info(delete_link)
+                _, infomation = self.output.set_file_info(results, delete_link)
+                for info in infomation.related_files:
+                    activity_key = str(info["activity"])
+                    if "uploadActivity" in activity_key:
+                        continue
+                    location = str(info["location"])
+                    updated_files.append(location)
             else:
                 raise FileNotFoundError(f"{convert_path}がGRDMに存在しない")
 
@@ -484,6 +493,18 @@ class ProvenanceManager:
             self.editor.change_entity_label(entity, convert_path, file_link)
 
         self.rdf_store.reload()
+
+        #関連するファイルを更新対象に加える
+        updated_files.append(file_link)
+        results = self.searcher.get_all_entity_info(file_link)
+        _, infomation = self.output.set_file_info(results, file_link)
+        for info in infomation.related_files:
+            activity_key = str(info["activity"])
+            if "uploadActivity" in activity_key:
+                continue
+            location = str(info["location"])
+            updated_files.append(location)
+
         self.output.write(updated_files)
 
     def _handle_delete_activity(self, activity_type:str, activity_uri: str, update_files: list):

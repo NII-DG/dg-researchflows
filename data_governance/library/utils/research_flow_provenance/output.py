@@ -210,6 +210,8 @@ class OutputProvenance:
         for s, p, o in graph.triples((None, rdfs.label, None)):
             label = str(o)
             break
+        else:
+            raise ValueError("label not found. location: {location}")
 
         file_path = Path(label)
         file_name = file_path.name

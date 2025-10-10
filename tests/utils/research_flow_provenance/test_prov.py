@@ -891,6 +891,7 @@ class TestProvenanceManager:
         self.mgr.output.write.assert_called_once_with(["link://file1"])
 
     def test_convert_grdm_path(self, monkeypatch):
+        """正常系のテストケースです。"""
         pm = ProvenanceManager.__new__(ProvenanceManager)  # __init__を呼ばずにインスタンス作成
         test_path = "/home/jovyan/project/data/file.txt"
 
@@ -903,6 +904,7 @@ class TestProvenanceManager:
         assert result == expected
 
     def test_convert_grdm_link(self):
+        """正常系のテストケースです。"""
         pm = ProvenanceManager.__new__(ProvenanceManager)  # __init__は呼ばれない
         pm.project_id = "test_project"
         pm.grdm_url = "https://grdm.example.com"
@@ -1016,4 +1018,3 @@ class TestProvenanceManager:
 
         result = self.mgr.get_activity_info(uri_list)
         assert result == {}
-

@@ -970,7 +970,7 @@ class TestProvenanceEditor:
                     assert updated_entity["@id"] == entity_id
                     assert "prov:wasDerivedFrom" not in updated_entity  # 削除されていること
                     assert old_provenance == ["urn:entity:old_src1", "urn:entity:old_src2"]
-    
+
     def test_edit_entity_with_derived_from_update(self):
         """edit_entityでprov:wasRevisionOfが存在しない場合にprov:wasDerivedFromが更新されるテスト"""
         test_env = {
@@ -1054,28 +1054,28 @@ class TestProvenanceEditor:
                     editor.edit_entity("urn:entity:any")
                 assert "の読み込みに失敗しました" in str(e.value)
 
-        def test_edit_collection_file_read_fail(self):
-            """ファイルの読み込みに失敗する場合のテストケース"""
-            test_env = {
-                'JUPYTERHUB_SERVER_NAME': 'test_env',
-                'HOME': '/home/jovyan'
-            }
+    def test_edit_collection_file_read_fail(self):
+        """ファイルの読み込みに失敗する場合のテストケース"""
+        test_env = {
+            'JUPYTERHUB_SERVER_NAME': 'test_env',
+            'HOME': '/home/jovyan'
+        }
 
-            with mock.patch.dict("os.environ", test_env):
-                with mock.patch("os.path.exists", return_value=True):
-                    editor = ProvenanceEditor()
+        with mock.patch.dict("os.environ", test_env):
+            with mock.patch("os.path.exists", return_value=True):
+                editor = ProvenanceEditor()
 
-            entity_id = "urn:collection:test-collection"
-            activity_id = "urn:activity:test-activity"
-            new_member = ["urn:entity:member1"]
+        entity_id = "urn:collection:test-collection"
+        activity_id = "urn:activity:test-activity"
+        new_member = ["urn:entity:member1"]
 
-            # openやjson.loadで読み込み時にIOErrorを発生させる
-            with mock.patch("builtins.open", mock.mock_open()) as mock_open:
-                mock_open.side_effect = IOError("ファイル読み込み失敗")
-                with pytest.raises(RuntimeError) as excinfo:
-                    editor.edit_collection(entity_id, activity_id, new_member)
+        # openやjson.loadで読み込み時にIOErrorを発生させる
+        with mock.patch("builtins.open", mock.mock_open()) as mock_open:
+            mock_open.side_effect = IOError("ファイル読み込み失敗")
+            with pytest.raises(RuntimeError) as excinfo:
+                editor.edit_collection(entity_id, activity_id, new_member)
 
-            assert "の読み込みに失敗しました" in str(excinfo.value)
+        assert "の読み込みに失敗しました" in str(excinfo.value)
 
     def test_edit_entity_file_write_error(self):
         """ファイルの書き込みに失敗する場合のテストケースです。"""
@@ -1160,7 +1160,7 @@ class TestProvenanceEditor:
                     # prov:wasInfluencedByにactivity_idが追加されているか
                     influenced = collection.get("prov:wasInfluencedBy", [])
                     assert {"@id": activity_id} in influenced
-    
+
     def test_edit_collection_file_read_fail(self):
         """ファイルの読み込みに失敗する場合のテストケース"""
         test_env = {
@@ -1742,9 +1742,3 @@ class TestProvenanceEditor:
             ]
 
             assert file_list == expected_list
-
-
-    
-
-
-    

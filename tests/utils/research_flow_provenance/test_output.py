@@ -400,6 +400,7 @@ class TestOutputProvenance:
         assert "label_for_member2" in related_labels
 
     def test_set_file_info_with_wasUsedBy_activities(self, mock_searcher):
+        """UsedByActivityが存在する場合のテストケース"""
         prov = Namespace("http://www.w3.org/ns/prov#")
         rdfs = Namespace("http://www.w3.org/2000/01/rdf-schema#")
 
@@ -444,6 +445,7 @@ class TestOutputProvenance:
         assert any(str(f["label"]) == "entity_mod_label" for f in file_info.related_files)
 
     def test_set_file_info_with_wasMemberOf_collections(self, mock_searcher):
+        """コレクションのwasMemberOfに含まれている場合のテストケースです。"""
         prov = Namespace("http://www.w3.org/ns/prov#")
         rdfs = Namespace("http://www.w3.org/2000/01/rdf-schema#")
 
@@ -492,11 +494,7 @@ class TestOutputProvenance:
         assert any(str(f["label"]) == "entity_collection_label" for f in file_info.related_files)
 
     def test_set_file_info_deleteEntityLocation_and_skip_subject_and_skip_related(self, mock_searcher):
-        """
-        以下を同時にテストする:
-        - get_label_location で deleteActivity を検知して location="削除済み"
-        - subject の wasUsedBy に deleteActivity が含まれている場合に skip される (top-level continue)
-        """
+        """削除済みのエンティティが存在る場合のテストケースです。"""
         prov = Namespace("http://www.w3.org/ns/prov#")
         rdfs = Namespace("http://www.w3.org/2000/01/rdf-schema#")
 
@@ -545,10 +543,7 @@ class TestOutputProvenance:
         assert subflow == "subflow/sample"
 
     def test_set_file_info_related_location_delete_skip(self, mock_searcher):
-        """
-        get_label_location で deleteActivity 検知 → location="削除済み" →
-        その entity は related_files に追加されない（continue の各分岐を通す）
-        """
+        """削除アクティビティが存在することで関連情報に追加されない場合のテストケースです。"""
         prov = Namespace("http://www.w3.org/ns/prov#")
         rdfs = Namespace("http://www.w3.org/2000/01/rdf-schema#")
 

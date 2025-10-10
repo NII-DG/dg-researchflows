@@ -206,6 +206,7 @@ class OutputProvenance:
         }
 
         graph = results.graph
+        label = ""
         for s, p, o in graph.triples((None, rdfs.label, None)):
             label = str(o)
             break

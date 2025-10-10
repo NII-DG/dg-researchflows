@@ -4,6 +4,7 @@ from pathlib import Path
 import re
 import pytest
 from unittest import mock
+from unittest.mock import MagicMock
 
 from rdflib import Graph, Literal, Namespace, URIRef
 from data_governance.library.utils.config import path_config
@@ -92,7 +93,7 @@ class TestOutputProvenance:
 
         updated_text = readme_path.read_text(encoding="utf-8")
         assert updated_text.count("osfstorage/data/writing/ronnbunn/argument_data/Test Folder/dummy_file.csv") == 1
-    
+
     def test_write_handles_deleted_related_file(self, test_instance, monkeypatch, tmp_path):
         """関連情報に削除済みファイルの情報が存在する場合のテストケース"""
         from data_governance.library.utils.research_flow_provenance.output import FileInfo
@@ -130,6 +131,83 @@ class TestOutputProvenance:
         updated_text = readme_path.read_text(encoding="utf-8")
         assert "削除済み" in updated_text
         assert "deleted.csv" in updated_text
+
+    def test_write_removes_existing_matching_link_section(self, test_instance, monkeypatch, tmp_path):
+        """同じリンクを持つ既存セクションが存在し、それが削除されることを検証する"""
+
+        from data_governance.library.utils.research_flow_provenance.output import FileInfo
+
+        monkeypatch.setenv("HOME", str(tmp_path))
+        monkeypatch.setattr(path_config, "DATA", "data")
+
+        # 既存READMEに同じリンクを持つセクションが含まれている
+        readme_dir = tmp_path / "data" / "ronnbunn"
+        readme_dir.mkdir(parents=True, exist_ok=True)
+        readme_path = readme_dir / "README.md"
+
+        existing_link = "http://example.com/file1"
+        existing_section = f"""## [file1.csv（some/path/file1.csv）]({existing_link})
+    編集先：[old_label](http://example.com/old_loc)
+    """
+        readme_path.write_text(existing_section, encoding="utf-8")
+
+        # mock set_file_info: 同じリンクを持つ FileInfo を返す
+        file_info_mock = FileInfo(
+            file_name="file1.csv",
+            file_path="some/path/file1.csv",
+            link=existing_link,
+            related_files=[
+                {"type": "編集先", "label": "new_label", "location": "http://example.com/new_loc"}
+            ]
+        )
+
+        def mock_set_file_info(results, location):
+            return ("ronnbunn", file_info_mock)
+
+        test_instance.set_file_info = mock_set_file_info
+        test_instance.searcher.get_all_entity_info.return_value = None
+
+        test_instance.write([existing_link])
+
+        result = readme_path.read_text(encoding="utf-8")
+
+        # セクションが置き換わっている（古い "old_label" が存在しない）
+        assert "old_label" not in result
+        assert "new_label" in result
+
+    def test_write_skips_empty_related_files(self, test_instance, monkeypatch, tmp_path):
+        """related_files が空のファイルはREADMEに記述されない"""
+
+        from data_governance.library.utils.research_flow_provenance.output import FileInfo
+
+        monkeypatch.setenv("HOME", str(tmp_path))
+        monkeypatch.setattr(path_config, "DATA", "data")
+
+        readme_dir = tmp_path / "data" / "ronnbunn"
+        readme_dir.mkdir(parents=True, exist_ok=True)
+        readme_path = readme_dir / "README.md"
+        readme_path.write_text("## サブフロー：ronnbunn\n", encoding="utf-8")
+
+        file_info_mock = FileInfo(
+            file_name="skipped.csv",
+            file_path="some/path/skipped.csv",
+            link="http://example.com/skipped",
+            related_files=[]  # ← 空
+        )
+
+        def mock_set_file_info(results, location):
+            return ("ronnbunn", file_info_mock)
+
+        test_instance.set_file_info = mock_set_file_info
+        test_instance.searcher.get_all_entity_info.return_value = None
+
+        test_instance.write(["http://example.com/skipped"])
+
+        content = readme_path.read_text(encoding="utf-8")
+
+        # ファイル名もリンクも書かれていない（セクションスキップ）
+        assert "skipped.csv" not in content
+        assert "http://example.com/skipped" not in content
 
     def test_set_file_info_returns_expected_data(self, mock_searcher, mock_results_graph):
         """正常系のテストケースです。"""
@@ -412,3 +490,111 @@ class TestOutputProvenance:
         related_types = [str(f["type"]) for f in file_info.related_files]
         assert "コピー先" in related_types or "編集先" in related_types or "コンパイル先" in related_types or "出力先" in related_types or "アップロード先" in related_types
         assert any(str(f["label"]) == "entity_collection_label" for f in file_info.related_files)
+
+    def test_set_file_info_deleteEntityLocation_and_skip_subject_and_skip_related(self, mock_searcher):
+        """
+        以下を同時にテストする:
+        - get_label_location で deleteActivity を検知して location="削除済み"
+        - subject の wasUsedBy に deleteActivity が含まれている場合に skip される (top-level continue)
+        """
+        prov = Namespace("http://www.w3.org/ns/prov#")
+        rdfs = Namespace("http://www.w3.org/2000/01/rdf-schema#")
+
+        subject = URIRef("http://example.org/subject")
+        delete_activity = URIRef("http://example.org/deleteActivity123")
+        entity = URIRef("http://example.org/entity_deleted")
+
+        # results.graph
+        graph = Graph()
+        graph.add((subject, rdfs.label, Literal("root/project/subflow/sample/file1.txt")))
+        graph.add((subject, prov.wasUsedBy, delete_activity))
+        graph.add((subject, prov.wasGeneratedBy, delete_activity))
+        graph.add((subject, prov.wasRevisionOf, entity))
+
+        # get_entity_info のモック： entity に deleteActivity を持たせる
+        entity_graph = Graph()
+        entity_graph.add((entity, rdfs.label, Literal("deleted_entity")))
+        entity_graph.add((entity, prov.wasUsedBy, delete_activity))
+
+        def mock_get_entity_info(uri):
+            mock_res = mock.MagicMock()
+            if uri == entity:
+                mock_res.graph = entity_graph
+            else:
+                mock_res.graph = Graph()
+            return mock_res
+
+        mock_searcher.get_entity_info.side_effect = mock_get_entity_info
+
+        # モック get_activity_info 出力
+        act_graph = Graph()
+        act_graph.add((delete_activity, prov.generated, entity))
+        mock_act = mock.MagicMock()
+        mock_act.graph = act_graph
+        mock_searcher.get_activity_info.return_value = mock_act
+
+        results = mock.MagicMock()
+        results.graph = graph
+        inst = OutputProvenance(searcher=mock_searcher)
+
+        subflow, file_info = inst.set_file_info(results, "link1")
+
+        # subject が skip されているなら related_files は空
+        assert file_info.related_files == []
+        assert file_info.file_name == "file1.txt"
+        assert subflow == "subflow/sample"
+
+    def test_set_file_info_related_location_delete_skip(self, mock_searcher):
+        """
+        get_label_location で deleteActivity 検知 → location="削除済み" →
+        その entity は related_files に追加されない（continue の各分岐を通す）
+        """
+        prov = Namespace("http://www.w3.org/ns/prov#")
+        rdfs = Namespace("http://www.w3.org/2000/01/rdf-schema#")
+
+        subject = URIRef("http://example.org/subject")
+        modify_activity = URIRef("http://example.org/modifyActivityX")
+        delete_activity = URIRef("http://example.org/deleteActivityY")
+        entity = URIRef("http://example.org/entityA")
+
+        # results.graph
+        graph = Graph()
+        graph.add((subject, rdfs.label, Literal("root/project/subflow/sample/file2.txt")))
+        graph.add((subject, prov.wasUsedBy, modify_activity))
+        graph.add((subject, prov.hadRevision, entity))
+        graph.add((subject, prov.wasGeneratedBy, modify_activity))
+        graph.add((subject, prov.wasRevisionOf, entity))
+
+        # entity_graph has both modifyActivity and deleteActivity
+        entity_graph = Graph()
+        entity_graph.add((entity, rdfs.label, Literal("labelA")))
+        entity_graph.add((entity, prov.wasUsedBy, delete_activity))
+        entity_graph.add((entity, prov.wasUsedBy, modify_activity))
+
+        def mock_get_entity_info(uri):
+            mock_res = mock.MagicMock()
+            if uri == entity:
+                mock_res.graph = entity_graph
+            else:
+                mock_res.graph = Graph()
+            return mock_res
+
+        mock_searcher.get_entity_info.side_effect = mock_get_entity_info
+
+        # activity_info for modify_activity
+        act_graph = Graph()
+        act_graph.add((modify_activity, prov.generated, entity))
+        mock_act = mock.MagicMock()
+        mock_act.graph = act_graph
+        mock_searcher.get_activity_info.return_value = mock_act
+
+        results = mock.MagicMock()
+        results.graph = graph
+        inst = OutputProvenance(searcher=mock_searcher)
+
+        subflow, file_info = inst.set_file_info(results, "link2")
+
+        # Because deleteActivity present, that entity should be skipped
+        assert file_info.related_files == []
+        assert file_info.file_name == "file2.txt"
+        assert subflow == "subflow/sample"

@@ -176,7 +176,12 @@ class ProvenanceEditor:
 
         graph = entity_data.get("@graph", [])
 
-        base_id = self.ENTITY_BASE + Path(dst_path).name
+        file_name = Path(dst_path).name
+        # 予約文字やスペースをURIから除外する
+        reserved_chars = ":/?#[]@!$&'()*+,;= \u3000"
+        trimed_name = file_name.translate(str.maketrans('', '', reserved_chars))
+
+        base_id = self.ENTITY_BASE + trimed_name
 
         entity_id = generated_id(base_id)
 
@@ -247,7 +252,9 @@ class ProvenanceEditor:
         graph = entity_data.get("@graph", [])
 
         if label is None:
-            label = Path(dst_path).name
+            file_name = Path(dst_path).name
+            reserved_chars = ":/?#[]@!$&'()*+,;= \u3000"
+            label = file_name.translate(str.maketrans('', '', reserved_chars))
         base_id = self.COLLECTION_BASE + label
 
         entity_id = generated_id(base_id)

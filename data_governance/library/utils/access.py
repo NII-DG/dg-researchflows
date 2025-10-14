@@ -36,12 +36,13 @@ def open_main_menu(working_file: str) -> None:
     display(Javascript('IPython.notebook.save_checkpoint();'))
 
 
-def open_data_folder(working_file: str, folder_name:str = None, button_name=None) -> pn.pane.HTML:
+def open_data_folder(working_file: str, folder_name: str = "", button_name:str = "") -> pn.pane.HTML:
     """ 別タブでデータフォルダを開くボタンを表示する関数です。
 
     Args:
         working_file(str): 移動元のファイルパスを設定します。
         folder_name(str): 開くフォルダの名前
+        button_name(str): ボタンに表示するテキスト
 
     Return:
         pn.pane.HTML: 作成したボタンオブジェクト
@@ -115,8 +116,18 @@ def list_files_recursively(base_path):
             file_list.append(rel_path)
     return file_list
 
-def create_copy_selector(working_file: str, folder_name: str = None):
-    """コピーするファイルを選択するためのウィジェットを作成します。"""
+def create_copy_selector(working_file: str, folder_name: str = "") -> tuple[pn.Column, str, dict]:
+    """コピーするファイルを選択するためのウィジェットを作成します。
+
+    Args:
+        working_file (str): コピー元のワーキングディレクトリ
+        folder_name (str): コピー元のデータディレクトリのフォルダ名. Defaults to "".
+
+    Returns:
+        pn.Column: ファイル選択のフォーム
+        str: コピー元サブフローのワーキングディレクトリからコピー元サブフローのデータディレクトリまでの相対パス
+        dict: ファイルパスとチェックボックスの辞書
+    """
 
     # homeからdataディレクトリまで
     data_dir = get_data_dir(working_file)
@@ -169,9 +180,19 @@ def create_copy_selector(working_file: str, folder_name: str = None):
 
     return ui, relative_path, checkbox_dict
 
-def create_single_file_selector(working_file: str, folder_name: str = None):
+def create_single_file_selector(working_file: str, folder_name: str = "") -> tuple[pn.Column, str, dict]:
     """コピーするファイルを選択するためのウィジェットを作成します。
-    ファイル選択はツリー構造のチェックボックスで、1つだけ選択可能に制御。"""
+    ファイル選択はツリー構造のチェックボックスで、1つだけ選択可能に制御。
+
+    Args:
+        working_file (str): コピー元のワーキングディレクトリ
+        folder_name (str): コピー元のデータディレクトリのフォルダ名. Defaults to "".
+
+    Returns:
+        pn.Column: ファイル選択のフォーム
+        str: コピー元サブフローのワーキングディレクトリからコピー元サブフローのデータディレクトリまでの相対パス
+        dict: ファイルパスとチェックボックスの辞書
+    """
 
     data_dir = get_data_dir(working_file)
     working_dir = os.path.dirname(working_file)
@@ -231,9 +252,9 @@ def create_single_file_selector(working_file: str, folder_name: str = None):
         return pn.Column(*items, width=500)
 
     ui = pn.Column(
-    pn.pane.Markdown("### ファイルを選択してください", width=500),
-    build_panel(tree),
-    width=500
+        pn.pane.Markdown("### ファイルを選択してください", width=500),
+        build_panel(tree),
+        width=500
     )
 
     return ui, relative_path, checkbox_dict

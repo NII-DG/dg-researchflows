@@ -177,7 +177,3 @@ def async_manager():
         mgr.external = mock_external
 
         return mgr, mock_external
-
-
-
-    

@@ -386,7 +386,7 @@ class External:
                 raise UnauthorizedError(str(e)) from e
             raise
 
-    async def list_(self, token: str, base_url: str, project_id: str, base_path: str=None, long_format: bool=False) ->dict:
+    async def list_(self, token: str, base_url: str, project_id: str, base_path: Optional[str]=None, long_format: bool=False) -> dict:
         """指定したパス配下のファイルのパスとIDをGRDMから取得する関数です。
 
         Args:

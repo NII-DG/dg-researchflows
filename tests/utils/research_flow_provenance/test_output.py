@@ -417,8 +417,6 @@ class TestOutputProvenance:
         # entity の get_entity_info で返すグラフ
         entity_graph = Graph()
         entity_graph.add((entity, rdfs.label, Literal("entity_mod_label")))
-        # 削除済みのactivityは含めない（今回のテストは編集先の存在確認が目的）
-        # entity_graph.add((entity, prov.wasUsedBy, URIRef("http://example.org/deleteActivity123")))  # 不要
 
         mock_entity_result = mock.MagicMock()
         mock_entity_result.graph = entity_graph
@@ -494,7 +492,7 @@ class TestOutputProvenance:
         assert any(str(f["label"]) == "entity_collection_label" for f in file_info.related_files)
 
     def test_set_file_info_deleteEntityLocation_and_skip_subject_and_skip_related(self, mock_searcher):
-        """削除済みのエンティティが存在る場合のテストケースです。"""
+        """削除済みのエンティティが存在する場合のテストケースです。"""
         prov = Namespace("http://www.w3.org/ns/prov#")
         rdfs = Namespace("http://www.w3.org/2000/01/rdf-schema#")
 

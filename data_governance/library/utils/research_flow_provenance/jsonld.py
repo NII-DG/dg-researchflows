@@ -252,10 +252,13 @@ class ProvenanceEditor:
         graph = entity_data.get("@graph", [])
 
         if label is None:
+            label = dst_path
             file_name = Path(dst_path).name
             reserved_chars = ":/?#[]@!$&'()*+,;= \u3000"
-            label = file_name.translate(str.maketrans('', '', reserved_chars))
-        base_id = self.COLLECTION_BASE + label
+            trimed_name = file_name.translate(str.maketrans('', '', reserved_chars))
+            base_id = self.COLLECTION_BASE + trimed_name
+        else:
+            base_id = self.COLLECTION_BASE + label
 
         entity_id = generated_id(base_id)
 

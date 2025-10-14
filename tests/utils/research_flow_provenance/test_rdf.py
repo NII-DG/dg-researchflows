@@ -424,30 +424,8 @@ class TestProvenanceSearcher:
 
         assert "RDFクエリの実行に失敗しました" in str(excinfo.value)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def test_query_agent(self, test_jsonld_files):
+        """クエリでエージェントを探索するテストケースです。"""
         with mock.patch("data_governance.library.utils.research_flow_provenance.rdf.RDFStore.__init__", lambda self: None):
             rdf_store = RDFStore()
 
@@ -481,6 +459,7 @@ class TestProvenanceSearcher:
             print(str(row["agent"]))
 
     def test_query_entity(self, test_jsonld_files):
+        """クエリでエンティティを探索するテストケースです。"""
         with mock.patch("data_governance.library.utils.research_flow_provenance.rdf.RDFStore.__init__", lambda self: None):
             rdf_store = RDFStore()
 
@@ -519,6 +498,7 @@ class TestProvenanceSearcher:
             print(str(row["entity"]))
 
     def test_query_entity2(self, test_jsonld_files):
+        """クエリでエンティティを探索するテストケースです。"""
         with mock.patch("data_governance.library.utils.research_flow_provenance.rdf.RDFStore.__init__", lambda self: None):
             rdf_store = RDFStore()
 

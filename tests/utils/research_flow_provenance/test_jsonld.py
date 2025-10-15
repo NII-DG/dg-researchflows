@@ -737,8 +737,6 @@ class TestProvenanceEditor:
                     with mock.patch("json.dump") as mock_json_dump:
                         result_id = editor.create_collection(
                             members=["urn:entity:1", "urn:entity:2"],
-                            dst_path="/some/path/test_folder",
-                            location="/some/path/test_folder",
                             label="explicit-label"
                         )
 
@@ -750,84 +748,6 @@ class TestProvenanceEditor:
                         assert collection["@type"] == "prov:Collection"
                         assert collection["label"] == "explicit-label"
                         assert collection["prov:hadMember"] == [{"@id": "urn:entity:1"}, {"@id": "urn:entity:2"}]
-                        assert collection["prov:atLocation"] == {"@id": "/some/path/test_folder"}
-
-    def test_create_collection_without_label(self):
-        """create_collectionをlabel引数無しで実行するテストケースです"""
-        test_env = {
-            'JUPYTERHUB_SERVER_NAME': 'test_env',
-            'HOME': '/home/jovyan'
-        }
-
-        with mock.patch.dict("os.environ", test_env):
-            with mock.patch("os.path.exists", return_value=True):
-                editor = ProvenanceEditor()
-
-        mock_entity_data = {"@graph": []}
-
-        dst_path = "/some/path/auto_label_folder"
-        auto_label = Path(dst_path).name
-        expected_id = f"urn:collection:{auto_label}"
-
-        with mock.patch("builtins.open", mock.mock_open(read_data=json.dumps(mock_entity_data))):
-            with mock.patch("json.load", return_value=mock_entity_data):
-                with mock.patch("data_governance.library.utils.research_flow_provenance.jsonld.generated_id", return_value=expected_id):
-                    with mock.patch("json.dump") as mock_json_dump:
-                        result_id = editor.create_collection(
-                            members=["urn:entity:1", "urn:entity:2"],
-                            dst_path=dst_path,
-                            location=dst_path,
-                            label=None
-                        )
-
-                        assert result_id == expected_id
-
-                        dumped_data = mock_json_dump.call_args[0][0]
-                        collection = dumped_data["@graph"][-1]
-
-                        assert collection["@id"] == expected_id
-                        assert collection["@type"] == "prov:Collection"
-                        assert collection["label"] == auto_label
-                        assert collection["prov:hadMember"] == [{"@id": "urn:entity:1"}, {"@id": "urn:entity:2"}]
-                        assert collection["prov:atLocation"] == {"@id": dst_path}
-
-    def test_create_collection_without_dst_path(self):
-        """create_collectionをdst_path引数無しで実行するテストケースです"""
-        test_env = {
-            'JUPYTERHUB_SERVER_NAME': 'test_env',
-            'HOME': '/home/jovyan'
-        }
-
-        with mock.patch.dict("os.environ", test_env):
-            with mock.patch("os.path.exists", return_value=True):
-                editor = ProvenanceEditor()
-
-        mock_entity_data = {"@graph": []}
-
-        label = "explicit-label"
-        expected_id = f"urn:collection:{label}"
-
-        with mock.patch("builtins.open", mock.mock_open(read_data=json.dumps(mock_entity_data))):
-            with mock.patch("json.load", return_value=mock_entity_data):
-                with mock.patch("data_governance.library.utils.research_flow_provenance.jsonld.generated_id", return_value=expected_id):
-                    with mock.patch("json.dump") as mock_json_dump:
-                        result_id = editor.create_collection(
-                            members=["urn:entity:1"],
-                            dst_path=None,
-                            location=None,
-                            label=label
-                        )
-
-                        assert result_id == expected_id
-
-                        dumped_data = mock_json_dump.call_args[0][0]
-                        collection = dumped_data["@graph"][-1]
-
-                        assert collection["@id"] == expected_id
-                        assert collection["@type"] == "prov:Collection"
-                        assert collection["label"] == label
-                        assert collection["prov:hadMember"] == [{"@id": "urn:entity:1"}]
-                        assert "prov:atLocation" not in collection
 
     def test_create_collection_file_read_fail(self):
         """ファイルの読み込みに失敗する場合のテストケースです。"""
@@ -847,8 +767,7 @@ class TestProvenanceEditor:
                 with pytest.raises(RuntimeError) as excinfo:
                     editor.create_collection(
                         members=["urn:entity:1"],
-                        dst_path="/some/path",
-                        location="/some/path"
+                        label="explicit-label"
                     )
 
                 assert "の読み込みに失敗しました" in str(excinfo.value)

@@ -176,7 +176,12 @@ class ProvenanceEditor:
 
         graph = entity_data.get("@graph", [])
 
-        base_id = self.ENTITY_BASE + Path(dst_path).name
+        file_name = Path(dst_path).name
+        # 予約文字やスペースをURIから除外する
+        reserved_chars = ":/?#[]@!$&'()*+,;= \u3000"
+        trimed_name = file_name.translate(str.maketrans('', '', reserved_chars))
+
+        base_id = self.ENTITY_BASE + trimed_name
 
         entity_id = generated_id(base_id)
 
@@ -218,18 +223,13 @@ class ProvenanceEditor:
         return entity_id
 
     def create_collection(
-            self, members: list, dst_path: str="",
-            location: str="", label: Optional[str]=None) -> str:
+            self, members: list, label: str) -> str:
         """コレクションを作成する関数です。
 
         Args:
             members (list): コレクションのメンバー
-            dst_path (str): コレクションのフォルダパス
-                            デフォルトはNone
-            location (str): コレクションのGRDMリンク
-                            デフォルトはNone
-            label (str|None): コレクションが実体を持たないときに渡される固定の文字列
-                            デフォルトはNone
+            label (str): コレクションが実体を持たないときに渡される固定の文字列
+                        　デフォルトはNone
 
         Returns:
             str: 作成したコレクションURI
@@ -246,8 +246,6 @@ class ProvenanceEditor:
 
         graph = entity_data.get("@graph", [])
 
-        if label is None:
-            label = Path(dst_path).name
         base_id = self.COLLECTION_BASE + label
 
         entity_id = generated_id(base_id)
@@ -258,8 +256,6 @@ class ProvenanceEditor:
             "label": label,
             "prov:hadMember": [{"@id": member} for member in members],
         }
-        if location:
-            new_collection["prov:atLocation"] = {"@id": location}
 
         graph.append(new_collection)
         entity_data["@graph"] = graph

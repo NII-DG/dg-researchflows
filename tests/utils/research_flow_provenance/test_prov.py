@@ -3,7 +3,8 @@ import hashlib
 from pathlib import Path
 import tempfile
 import os
-from unittest.mock import ANY, MagicMock, patch
+from types import SimpleNamespace
+from unittest.mock import ANY, MagicMock, call, patch
 from urllib.parse import urljoin
 
 import pytest
@@ -456,7 +457,7 @@ class TestProvenanceManager:
         self.mgr.editor.create_activity.assert_called_once()
         args, kwargs = self.mgr.editor.create_activity.call_args
         assert args[1] == "File Export"  # activity_typeチェック
-        assert "user_uri" in args[3] 
+        assert "user_uri" in args[3]
 
         # rdf_store.reload と output.write が呼ばれているかチェック
         self.mgr.rdf_store.reload.assert_called_once()
@@ -577,23 +578,25 @@ class TestProvenanceManager:
 
         # create_entity が2回呼ばれることを検証
         assert self.mgr.editor.create_entity.call_count == 2
-        self.mgr.editor.create_entity.assert_any_call(
-            "/path/upload1.csv", "link://upload1", "hash_/path/upload1.csv",
-            mocker.ANY, "src_link1", "user_uri"
-        )
-        self.mgr.editor.create_entity.assert_any_call(
-            "/path/upload2.csv", "link://upload2", "hash_/path/upload2.csv",
-            mocker.ANY, "src_link2", "user_uri"
-        )
+
+        # 呼び出し引数の検証（順番を気にしない）
+        expected_calls = [
+            call("/path/upload1.csv", "link://upload1", "hash_/path/upload1.csv", mocker.ANY, "urn:source:src_link1", "user_uri"),
+            call("/path/upload2.csv", "link://upload2", "hash_/path/upload2.csv", mocker.ANY, "urn:source:src_link2", "user_uri"),
+        ]
+
+        actual_calls = self.mgr.editor.create_entity.call_args_list
+        for expected_call in expected_calls:
+            assert expected_call in actual_calls
 
         # create_activity 呼び出し検証
         self.mgr.editor.create_activity.assert_called_once()
         args, _ = self.mgr.editor.create_activity.call_args
         assert args[1] == "File Upload"  # activity_type
-        assert args[2] == ["src_link1", "src_link2"]  # src_list
+        assert args[2] == ["urn:source:src_link1", "urn:source:src_link2"]  # src_list
         assert args[3] == "user_uri"
 
-        # output.write にupdated_filesが渡されているか
+        # output.write に updated_files が渡されているか
         self.mgr.output.write.assert_called_once_with(["link://upload1", "link://upload2"])
 
     def test_handle_file_upload_file_not_in_grdm(self):
@@ -611,108 +614,183 @@ class TestProvenanceManager:
         with pytest.raises(FileNotFoundError) as e:
             self.mgr._handle_file_upload("File Upload", upload_files)
 
-        assert "not_exist.csvがGRDMに存在しません" in str(e.value)
+        assert "not_exist.csvがGRDMに存在しない" in str(e.value)
 
     def test_handle_file_delete_success(self, mocker):
         """正常系のテストケースです。"""
+
         # GRDMファイル情報セット
         self.mgr.grdm_file_info = {
             "/path/delete1.csv": "link://delete1",
             "/path/delete2.csv": "link://delete2"
         }
+
         self.mgr.convert_grdm_path = lambda x: x
         self.mgr.convert_grdm_link = lambda x: x
 
-        # searcher.get_file_entity_list の戻り値設定
         self.mgr.searcher.get_file_entity_list = MagicMock(side_effect=[
-            ["entity_uri1"],  # delete1.csv のentityリスト
-            ["entity_uri2", "entity_uri3"]  # delete2.csv のentityリスト
+            ["entity_uri1"],
+            ["entity_uri2", "entity_uri3"]
         ])
 
-        # editor.create_activity モック
-        self.mgr.editor.create_activity = MagicMock()
-        # rdf_store.reload モック
-        self.mgr.rdf_store.reload = MagicMock()
-        # output.write モック
-        self.mgr.output.write = MagicMock()
+        self.mgr.searcher.get_all_entity_info = MagicMock(return_value="dummy_entity_info")
 
-        # 実行ユーザーURI
+        self.mgr.output.set_file_info = MagicMock(return_value=(
+            "ignored_value",
+            SimpleNamespace(related_files=[
+                {"activity": "deleteActivity", "location": "location1"},
+                {"activity": "otherActivity", "location": "location2"},
+                {"activity": "uploadActivity", "location": "location3"},  # 無視される
+            ])
+        ))
+
+        self.mgr.editor.create_activity = MagicMock()
+        self.mgr.rdf_store.reload = MagicMock()
+        self.mgr.output.write = MagicMock()
         self.mgr.excution_user = "user_uri"
 
         deleted_files = ["/path/delete1.csv", "/path/delete2.csv"]
 
-        # 関数実行
         self.mgr._handle_file_delete("File Delete", deleted_files)
 
         # create_activity 呼び出し検証
         self.mgr.editor.create_activity.assert_called_once()
         args, _ = self.mgr.editor.create_activity.call_args
-        assert args[1] == "File Delete"  # activity_type
-        # entity_uri1, entity_uri2, entity_uri3 がまとめられて渡されているか
+        assert args[1] == "File Delete"
         assert set(args[2]) == {"entity_uri1", "entity_uri2", "entity_uri3"}
         assert args[3] == "user_uri"
 
-        # output.write にupdated_filesが渡されているか
-        self.mgr.output.write.assert_called_once_with(["entity_uri1", "entity_uri2", "entity_uri3"])
+        # output.write に渡されたファイルリストを検証（重複込み）
+        expected_written_files = [
+            "link://delete1",
+            "location1",
+            "location2",
+            "link://delete2",
+            "location1",
+            "location2"
+        ]
+        self.mgr.output.write.assert_called_once()
+        args, _ = self.mgr.output.write.call_args
+        assert args[0] == expected_written_files
 
     def test_handle_file_delete_not_in_grdm(self):
         """GRDM上にファイルが存在しない場合のテストケースです。"""
+
+        # GRDM 上にあるファイル（1件だけ）
         self.mgr.grdm_file_info = {
             "/path/delete1.csv": "link://delete1"
         }
-        self.mgr.convert_grdm_path = lambda x: x
 
+        self.mgr.convert_grdm_path = lambda x: x
+        self.mgr.convert_grdm_link = lambda x: x
+
+        # 削除対象のファイル（2件目がGRDMに存在しない）
         deleted_files = ["/path/delete1.csv", "/path/not_exist.csv"]
 
+        # 削除処理に必要なモック
+        self.mgr.searcher.get_file_entity_list = MagicMock(return_value=["entity_uri1"])
+        self.mgr.searcher.get_all_entity_info = MagicMock(return_value="dummy_entity_info")
+        self.mgr.output.set_file_info = MagicMock(return_value=(
+            "ignored",
+            SimpleNamespace(related_files=[])
+        ))
+
+        # 実行して FileNotFoundError が出ることを確認
         with pytest.raises(FileNotFoundError) as e:
             self.mgr._handle_file_delete("File Delete", deleted_files)
 
         assert "not_exist.csvがGRDMに存在しない" in str(e.value)
 
     def test_handle_file_delete_entity_not_exist(self):
-        """エンティティが存在しない場合のテストケースです。"""
+        """エンティティが存在しない場合、処理がスキップされ例外が発生しないことの確認。"""
+
         self.mgr.grdm_file_info = {
             "/path/delete1.csv": "link://delete1"
         }
         self.mgr.convert_grdm_path = lambda x: x
         self.mgr.convert_grdm_link = lambda x: x
 
-        # entityリストが空の場合（存在しない）
+        # entityリストが空 → 存在しない想定
         self.mgr.searcher.get_file_entity_list = MagicMock(return_value=[])
+
+        # 他に必要なモック（処理されないとはいえ実行エラー防止のため）
+        self.mgr.searcher.get_all_entity_info = MagicMock()
+        self.mgr.output.set_file_info = MagicMock()
+        self.mgr.editor.create_activity = MagicMock()
+        self.mgr.rdf_store.reload = MagicMock()
+        self.mgr.output.write = MagicMock()
+        self.mgr.excution_user = "user_uri"
 
         deleted_files = ["/path/delete1.csv"]
 
-        with pytest.raises(FileNotFoundError) as e:
-            self.mgr._handle_file_delete("File Delete", deleted_files)
+        # 実行しても例外が出ないことを確認（つまり正常終了）
+        self.mgr._handle_file_delete("File Delete", deleted_files)
 
-        assert "delete1.csvのEntityが存在しない" in str(e.value)
+        # アクティビティは作成されていない（entityがないため）
+        self.mgr.editor.create_activity.assert_not_called()
+        self.mgr.output.write.assert_not_called()
 
     def test_handle_provenance_edit_success(self):
         """正常系のテストケースです。"""
+
         # GRDMファイル情報にテスト対象のパスを追加
         self.mgr.grdm_file_info["/path/file.txt"] = "link://file"
 
         new_path = "/path/file.txt"
         ids = ["entity1", "entity2"]
 
-        self.mgr._handle_provenance_edit(new_path, ids)
+        self.mgr.convert_grdm_path = lambda x: x
+        self.mgr.convert_grdm_link = lambda x: x
+        self.mgr.editor.change_entity_label = MagicMock()
+        self.mgr.rdf_store.reload = MagicMock()
+        self.mgr.output.write = MagicMock()
 
-        self.mgr.editor.change_entity_label.assert_any_call("entity1", new_path)
-        self.mgr.editor.change_entity_label.assert_any_call("entity2", new_path)
+        # モック: 関連ファイルを返すように
+        self.mgr.searcher.get_all_entity_info = MagicMock(return_value="dummy_info")
+        self.mgr.output.set_file_info = MagicMock(return_value=(
+            "ignored",
+            SimpleNamespace(related_files=[
+                {"activity": "deleteActivity", "location": "location1"},
+                {"activity": "editActivity", "location": "location2"},
+                {"activity": "uploadActivity", "location": "location3"},  # ←無視される
+            ])
+        ))
 
+        # 実行
+        self.mgr._handle_provenance_edit("Edit Activity", new_path, ids)
+
+        # change_entity_label が正しく呼ばれているか
+        self.mgr.editor.change_entity_label.assert_any_call("entity1", new_path, "link://file")
+        self.mgr.editor.change_entity_label.assert_any_call("entity2", new_path, "link://file")
+
+        # reload が呼ばれているか
         self.mgr.rdf_store.reload.assert_called_once()
-        self.mgr.output.write.assert_called_once_with(["link://file"])
+
+        # output.write に渡されたファイルリストを確認
+        expected_written_files = ['link://file', 'link://file', 'location1', 'location2']
+        args, _ = self.mgr.output.write.call_args
+        assert args[0] == expected_written_files
 
     def test_handle_provenance_edit_file_not_found(self):
-        """対象のファイルが見つからない場合のテストケースです。"""
+        """対象のファイルがGRDMに存在しない場合に FileNotFoundError が発生するかのテスト"""
+
         new_path = "/path/nonexistent.txt"
         ids = ["entity1"]
 
-        with pytest.raises(FileNotFoundError) as e:
-            self.mgr._handle_provenance_edit(new_path, ids)
+        self.mgr.grdm_file_info = {}  # 空にしておくことでファイルが存在しない状態に
+        self.mgr.convert_grdm_path = lambda x: x
 
+        # モックを準備（呼ばれないことを確認するため）
+        self.mgr.rdf_store.reload = MagicMock()
+        self.mgr.output.write = MagicMock()
+
+        with pytest.raises(FileNotFoundError) as e:
+            self.mgr._handle_provenance_edit("Edit Activity", new_path, ids)
+
+        # エラーメッセージ確認
         assert str(e.value) == f"{new_path}がGRDMに存在しない"
 
+        # reload や write は呼ばれていないことを確認
         self.mgr.rdf_store.reload.assert_not_called()
         self.mgr.output.write.assert_not_called()
 
@@ -812,15 +890,21 @@ class TestProvenanceManager:
         # output.writeはGRDMにあるファイルだけリンクにして呼ばれる
         self.mgr.output.write.assert_called_once_with(["link://file1"])
 
-    def test_convert_grdm_path(self):
+    def test_convert_grdm_path(self, monkeypatch):
+        """正常系のテストケースです。"""
         pm = ProvenanceManager.__new__(ProvenanceManager)  # __init__を呼ばずにインスタンス作成
         test_path = "/home/jovyan/project/data/file.txt"
+
+        # HOME環境変数をテスト用に設定
+        monkeypatch.setenv("HOME", "/home/jovyan")
+
         expected = os.path.join("osfstorage", "project/data/file.txt")
 
         result = pm.convert_grdm_path(test_path)
         assert result == expected
 
     def test_convert_grdm_link(self):
+        """正常系のテストケースです。"""
         pm = ProvenanceManager.__new__(ProvenanceManager)  # __init__は呼ばれない
         pm.project_id = "test_project"
         pm.grdm_url = "https://grdm.example.com"
@@ -831,19 +915,18 @@ class TestProvenanceManager:
         result = pm.convert_grdm_link(file_id)
         assert result == expected
 
-    def test_check_file_exist(self):
-        """正常系テストケースです。"""
-        # テスト対象のdir_path
+    def test_check_file_exist(self, monkeypatch):
+        # HOME環境変数をテスト想定値にセット
+        monkeypatch.setenv("HOME", "/home/jovyan")
+
+        # テスト対象のdir_path（HOMEに合わせて）
         dir_path = "/home/jovyan/project/data"
 
         # モックで返すsearcher.get_all_entitiesの戻り値
-        # {label: ids}
         mock_results = {
             "osfstorage/project/data/file1.txt": ["id1", "id2"],
             "osfstorage/project/data/file2.txt": ["id3"],
         }
-
-        # self.mgr.searcher.get_all_entitiesをモック設定
         self.mgr.searcher.get_all_entities = MagicMock(return_value=mock_results)
 
         def mock_exists(path):
@@ -856,21 +939,17 @@ class TestProvenanceManager:
         with patch("os.path.exists", side_effect=mock_exists):
             all_files, error_files = self.mgr.check_file_exist(dir_path)
 
-        # 期待されるall_filesのキーと値
         expected_all_files = {
             "/home/jovyan/project/data/file1.txt": ["id1", "id2"],
             "/home/jovyan/project/data/file2.txt": ["id3"],
         }
-        # 存在しないファイルだけerror_filesに入る
         expected_error_files = {
             "/home/jovyan/project/data/file2.txt": ["id3"],
         }
 
-        # 結果の検証
         assert all_files == expected_all_files
         assert error_files == expected_error_files
 
-        # get_all_entitiesが期待のパスで呼ばれているかも検証可能
         self.mgr.searcher.get_all_entities.assert_called_once_with("osfstorage/project/data")
 
     def test_get_activity_info_success(self):
@@ -939,4 +1018,3 @@ class TestProvenanceManager:
 
         result = self.mgr.get_activity_info(uri_list)
         assert result == {}
-

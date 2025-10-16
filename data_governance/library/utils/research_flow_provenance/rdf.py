@@ -3,11 +3,13 @@
 import os
 import shutil
 from typing import Optional
+
 from rdflib import Graph
 from rdflib.query import Result
 from owlrl import DeductiveClosure, OWLRL_Semantics
 
 from library.utils.config import path_config
+
 
 class RDFStore:
     """来歴情報をRDFとして読み込むクラスです。
@@ -122,7 +124,7 @@ class ProvenanceSearcher:
         """
         self.rdf_store = rdf_store
 
-    def get_excution_user(self, agent_uri:str)-> Optional[str]:
+    def get_excution_user(self, agent_uri:str) -> Optional[str]:
         """実行ユーザーの情報を取得する関数です。
 
         Args:
@@ -154,7 +156,7 @@ class ProvenanceSearcher:
 
         return None
 
-    def get_file_entity(self, file_link: str) ->Optional[str]:
+    def get_file_entity(self, file_link: str) -> Optional[str]:
         """指定されたリンクを持つ有効なエンティティをひとつ取得する。
 
         Args:
@@ -191,7 +193,7 @@ class ProvenanceSearcher:
 
         return None
 
-    def get_file_entity_list(self, file_link: str) ->Optional[list]:
+    def get_file_entity_list(self, file_link: str) -> Optional[list]:
         """指定されたリンクを持つ有効なエンティティを全て取得する。
 
         Args:

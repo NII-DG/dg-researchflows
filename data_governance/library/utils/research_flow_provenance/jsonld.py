@@ -6,7 +6,7 @@ JSON-LDファイルに来歴情報を書き込む処理を記載します。
 import json
 import os
 import shutil
-from typing import Union
+from typing import Union, Optional
 import uuid
 
 from datetime import datetime, timezone, timedelta
@@ -82,8 +82,8 @@ class ProvenanceEditor:
 
     def create_activity(
             self, activity_id: str, activity_type: str, used_entities: list,
-            agent_id: Union[str, list], comment: str=None,
-            old_provenances: list=None):
+            agent_id: Union[str, list], comment: str="",
+            old_provenances: list=[]):
         """アクティビティを新規作成する関数です。
 
         Args:
@@ -147,8 +147,8 @@ class ProvenanceEditor:
 
     def create_entity(
             self, dst_path: str, location: str, hash_value:str,
-            activity_id: str=None, src_path: Union[str, list[str]]=None,
-            agents: Union[str, list]=None) -> str:
+            activity_id: str="", src_path: Union[str, list[str]]=[],
+            agents: Union[str, list]=[]) -> str:
         """エンティティを新規作成する関数です。
 
         Args:
@@ -158,7 +158,7 @@ class ProvenanceEditor:
             activity_id (str): エンティティを作成するアクティビティのURI
                                 デフォルトはNone
             src_path (Union[str, list[str]]): エンティティの派生元となるエンティティのURI
-            　　　　　　　　　　　　　　　　　　　デフォルトはNone
+                                                デフォルトはNone
             agents (Optional[Union[str, list]]): エンティティを作成したエージェントのURI
                                                     デフォルトはNone
         Returns:
@@ -268,12 +268,12 @@ class ProvenanceEditor:
 
         return entity_id
 
-    def edit_entity(self, entity_id: str, activity_id: str=None, new_entities: list=None):
+    def edit_entity(self, entity_id: str, activity_id: Optional[str]=None, new_entities: list=[]):
         """エンティティを編集する関数です。
 
         Args:
             entity_id (str): 編集を行うエンティティのURI
-            activity_id (str): 編集を行うアクティビティのURI
+            activity_id (str|None): 編集を行うアクティビティのURI
             new_entities (list): 新しく関連付けるエンティティのURI
 
         Raises:
@@ -353,7 +353,7 @@ class ProvenanceEditor:
         except IOError as e:
             raise RuntimeError(f"{self.entity_file}の書き込みに失敗しました: {e}") from e
 
-    def create_agent(self, agent_id: str, agent_type: list, agent_name: str, comment: str=None) ->str:
+    def create_agent(self, agent_id: str, agent_type: list, agent_name: str, comment: str="") ->str:
         """エージェントを作成する関数です。
 
         Args:
@@ -440,7 +440,7 @@ class ProvenanceEditor:
         except IOError as e:
             raise RuntimeError(f"{self.activity_file}の書き込みに失敗しました: {e}") from e
 
-    def delete_entity(self, entity_uri:str):
+    def delete_entity(self, entity_uri: str):
         """エンティティの削除関数です。"""
         try:
             with open(self.entity_file, "r", encoding="utf-8") as f:

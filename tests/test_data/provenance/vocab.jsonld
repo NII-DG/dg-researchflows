@@ -1,0 +1,103 @@
+{
+    "@context": {
+        "prov": "http://www.w3.org/ns/prov#",
+        "xsd": "http://www.w3.org/2001/XMLSchema#",
+        "label": "http://www.w3.org/2000/01/rdf-schema#label",
+        "comment": "http://www.w3.org/2000/01/rdf-schema#comment",
+        "dcat": "http://www.w3.org/ns/dcat#",
+        "spdx": "http://spdx.org/rdf/terms#",
+        "owl": "http://www.w3.org/2002/07/owl#",
+        "prov:generated": {
+            "@type": "@id"
+        },
+        "prov:hadDerivation": {
+            "@type": "@id"
+        },
+        "prov:wasUsedBy": {
+            "@type": "@id"
+        },
+        "prov:contributed": {
+            "@type": "@id"
+        },
+        "prov:wasAssociateFor": {
+            "@type": "@id"
+        },
+        "prov:informed": {
+            "@type": "@id"
+        },
+        "prov:hadRevision": {
+            "@type": "@id"
+        },
+        "prov:wasMemberOf": {
+            "@type": "@id"
+        },
+        "prov:influenced": {
+            "@type": "@id"
+        }
+    },
+    "@graph": [
+        {
+            "@id": "prov:generated",
+            "@type": "owl:ObjectProperty",
+            "owl:inverseOf": {
+                "@id": "prov:wasGeneratedBy"
+            }
+        },
+        {
+            "@id": "prov:hadDerivation",
+            "@type": "owl:ObjectProperty",
+            "owl:inverseOf": {
+                "@id": "prov:wasDerivedFrom"
+            }
+        },
+        {
+            "@id": "prov:wasUsedBy",
+            "@type": "owl:ObjectProperty",
+            "owl:inverseOf": {
+                "@id": "prov:used"
+            }
+        },
+        {
+            "@id": "prov:contributed",
+            "@type": "owl:ObjectProperty",
+            "owl:inverseOf": {
+                "@id": "prov:wasAttributedTo"
+            }
+        },
+        {
+            "@id": "prov:wasAssociateFor",
+            "@type": "owl:ObjectProperty",
+            "owl:inverseOf": {
+                "@id": "prov:wasAssociatedWith"
+            }
+        },
+        {
+            "@id": "prov:informed",
+            "@type": "owl:ObjectProperty",
+            "owl:inverseOf": {
+                "@id": "prov:wasInformedBy"
+            }
+        },
+        {
+            "@id": "prov:hadRevision",
+            "@type": "owl:ObjectProperty",
+            "owl:inverseOf": {
+                "@id": "prov:wasRevisionOf"
+            }
+        },
+        {
+            "@id": "prov:hadMember",
+            "@type": "owl:ObjectProperty",
+            "owl:inverseOf": {
+                "@id": "prov:wasMemberOf"
+            }
+        },
+        {
+            "@id": "prov:influenced",
+            "@type": "owl:ObjectProperty",
+            "owl:inverseOf": {
+                "@id": "prov:wasInfluencedBy"
+            }
+        }
+    ]
+}

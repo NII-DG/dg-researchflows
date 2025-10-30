@@ -1,9 +1,12 @@
+# tox exec -- pytest --cov=data_governance/library/utils/storage_provider/grdm tests/utils/storage_provider/grdm/test_external.py -s -vv --cov-branch --cov-report=term
+
 import pytest
 from unittest.mock import AsyncMock, MagicMock
 
 from unittest.mock import patch
 from data_governance.library.utils.storage_provider.grdm.external import External
 
+# tox exec -- pytest tests/utils/storage_provider/grdm/test_external.py::TestExternal -s -vv
 class TestExternal:
     """Externalクラスのテストクラスです。"""
     @pytest.mark.asyncio

@@ -41,13 +41,16 @@ jobs:
           python -m pip install --upgrade pip
           pip install tox
 
+      - name: Install plugin
+        run: pip install pytest-github-actions-annotate-failures
+
       # 単体テスト実行
       - name: Run tox tests
         run: |
           set -o pipefail
           tox -e action -- --junitxml=pytest.xml | tee pytest-coverage.txt
 
-      # カバレッジをコメントに出力
+      # カバレッジをプルリクエストのコメントに出力
       - name: Pytest coverage comment
         if: github.event_name == 'pull_request'
         uses: MishaKav/pytest-coverage-comment@main

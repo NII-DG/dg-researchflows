@@ -1,4 +1,5 @@
 """outputクラスのテストを行うモジュールです。"""
+# tox exec -- pytest --cov=data_governance/library/utils/research_flow_provenance tests/utils/research_flow_provenance/test_output.py -s -vv --cov-branch --cov-report=term
 
 from pathlib import Path
 import re
@@ -7,9 +8,12 @@ from unittest import mock
 from unittest.mock import MagicMock
 
 from rdflib import Graph, Literal, Namespace, URIRef
+
 from data_governance.library.utils.config import path_config
 from data_governance.library.utils.research_flow_provenance.output import FileInfo, OutputProvenance
 
+
+# tox exec -- tests/utils/research_flow_provenance/test_output.py::TestFileInfo -s -vv
 class TestFileInfo:
     """FileInfoクラスのテストクラスです。"""
     def test_fileinfo_initialization(self):
@@ -34,6 +38,8 @@ class TestFileInfo:
         assert fi.related_files[0]["type"] == "コピー元"
         assert fi.related_files[1]["location"] == "削除済み"
 
+
+# tox exec -- tests/utils/research_flow_provenance/test_output.py::TestFileInfo -s -vv
 class TestOutputProvenance:
     def test_write_appends_new_section(self, tmp_readme_path, test_instance, patch_path_config):
         """README.mdファイルが既に存在する場合のテストケースです。"""

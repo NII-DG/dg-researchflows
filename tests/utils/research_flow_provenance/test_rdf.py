@@ -1,4 +1,5 @@
 """rdf.pyをテストするためのファイルです。"""
+# tox exec -- pytest --cov=data_governance/library/utils/research_flow_provenance tests/utils/research_flow_provenance/test_rdf.py -s -vv --cov-branch --cov-report=term
 
 import os
 import pytest
@@ -7,6 +8,8 @@ from unittest import mock
 from rdflib import Graph, URIRef
 from data_governance.library.utils.research_flow_provenance.rdf import RDFStore, ProvenanceSearcher
 
+
+# tox exec -- pytest tests/utils/research_flow_provenance/test_rdf.py::TestRdfStore -s -vv
 class TestRdfStore:
     """RdfStoreクラスをテストするためのクラスです。"""
     def test_constructor_success(self):
@@ -178,6 +181,8 @@ class TestRdfStore:
             store.reload()
             mock_load_graph.assert_called_once()
 
+
+# tox exec -- pytest tests/utils/research_flow_provenance/test_rdf.py::TestProvenanceSearcher -s -vv
 class TestProvenanceSearcher:
     """ProvenanceSearcherクラスのテストクラスです。"""
 

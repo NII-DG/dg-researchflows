@@ -3,6 +3,8 @@
 data_governance.library.utils.config.path_configモジュールのテストを行います。
 
 """
+# tox exec -- pytest --cov=data_governance/library/utils/research_flow_provenance  tests/utils/config/test_path_config.py -s -vv --cov-branch --cov-report=term
+
 from unittest import TestCase
 
 from data_governance.library.utils.config import path_config

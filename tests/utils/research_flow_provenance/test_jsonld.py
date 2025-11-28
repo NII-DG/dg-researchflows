@@ -1,4 +1,5 @@
 """jsonld.pyファイルのテストを記述したモジュールです。"""
+# tox exec -- pytest --cov=data_governance/library/utils/research_flow_provenance tests/utils/research_flow_provenance/test_jsonld.py -s -vv --cov-branch --cov-report=term
 
 from datetime import datetime, timedelta, timezone
 import json
@@ -11,6 +12,8 @@ import pytest
 from unittest import mock
 from data_governance.library.utils.research_flow_provenance.jsonld import generated_id, ProvenanceEditor
 
+
+# tox exec -- pytest tests/utils/research_flow_provenance/test_jsonld.py::test_generated_id -s -vv
 def test_generated_id():
     """test_generated_idの正常系テスト"""
     fake_uuid = uuid.UUID("12345678-1234-5678-1234-567812345678")
@@ -20,6 +23,8 @@ def test_generated_id():
 
     assert result == "base_id-12345678-1234-5678-1234-567812345678"
 
+
+# tox exec -- pytest tests/utils/research_flow_provenance/test_jsonld.py::TestProvenanceEditor -s -vv
 class TestProvenanceEditor:
     """ProvenanceEditorクラスをテストするクラスです。"""
 
@@ -1102,8 +1107,6 @@ class TestProvenanceEditor:
                 editor.edit_collection(entity_id, activity_id, new_member)
 
         assert "の読み込みに失敗しました" in str(excinfo.value)
-
-
 
     def test_edit_collection_file_write_fail(self):
         """ファイルの書き込みに失敗する場合のテストケースです。"""

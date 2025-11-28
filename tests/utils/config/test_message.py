@@ -3,6 +3,8 @@
 data_governance.library.utils.config.messageモジュールのメソッドのテストを行います。
 
 """
+# tox exec -- pytest tests/utils/research_flow_provenance/test_prov.py -s -vv
+
 from unittest import TestCase
 
 from data_governance.library.utils.config import message

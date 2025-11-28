@@ -1,16 +1,21 @@
 """prov.pyのテストモジュールです。"""
+# tox exec -- pytest --cov=data_governance/library/utils/research_flow_provenance tests/utils/research_flow_provenance/test_prov.py -s -vv --cov-branch --cov-report=term
+
 import hashlib
 from pathlib import Path
 import tempfile
 import os
+import pytest
 from types import SimpleNamespace
 from unittest.mock import ANY, MagicMock, call, patch
 from urllib.parse import urljoin
 
-import pytest
 from rdflib import Graph, Namespace, URIRef
+
 from data_governance.library.utils.research_flow_provenance.prov import calculate_sha256, ProvenanceManager
 
+
+# tox exec -- pytest tests/utils/research_flow_provenance/test_prov.py::test_calculate_sha256 -s -vv
 def test_calculate_sha256():
     # テスト用の内容
     content = b"Hello, World!"
@@ -31,9 +36,12 @@ def test_calculate_sha256():
         # テスト後に一時ファイルを削除
         os.remove(tmp_file_path)
 
+
+# tox exec -- pytest tests/utils/research_flow_provenance/test_prov.py::TestProvenanceManager -s -vv
 class TestProvenanceManager:
     """ProvenanceManagerクラスのテストクラスです。"""
 
+    # tox exec -- pytest tests/utils/research_flow_provenance/test_prov.py::TestProvenanceManager::test_provenance_manager_init -s -vv
     @patch("data_governance.library.utils.research_flow_provenance.prov.RDFStore")
     @patch("data_governance.library.utils.research_flow_provenance.prov.ProvenanceSearcher")
     @patch("data_governance.library.utils.research_flow_provenance.prov.OutputProvenance")

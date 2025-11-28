@@ -1,11 +1,16 @@
+# tox exec -- pytest --cov=data_governance/library/utils/storage_provider/grdm tests/utils/storage_provider/grdm/test_external.py -s -vv --cov-branch --cov-report=term
+
 import pytest
 from unittest.mock import AsyncMock, MagicMock
 
 from unittest.mock import patch
 from data_governance.library.utils.storage_provider.grdm.external import External
 
+# tox exec -- pytest tests/utils/storage_provider/grdm/test_external.py::TestExternal -s -vv
 class TestExternal:
     """Externalクラスのテストクラスです。"""
+
+    # tox exec -- pytest tests/utils/storage_provider/grdm/test_external.py::TestExternal::test_list_success -s -vv
     @pytest.mark.asyncio
     async def test_list_success(self, mock_osf, mock_helpers):
         """正常実行のテストケースです。"""
@@ -44,6 +49,7 @@ class TestExternal:
         assert result == expected
         osf_instance.aclose.assert_awaited()
 
+    # tox exec -- pytest tests/utils/storage_provider/grdm/test_external.py::TestExternal::test_list_auth_failure -s -vv
     @pytest.mark.asyncio
     async def test_list_auth_failure(self, mock_osf):
         """認証に失敗した場合のテストケースです。"""
@@ -60,6 +66,7 @@ class TestExternal:
                 project_id="abc123"
             )
 
+    # tox exec -- pytest tests/utils/storage_provider/grdm/test_external.py::TestExternal::test_list_with_base_path -s -vv
     @pytest.mark.asyncio
     async def test_list_with_base_path(self, mock_osf, mock_helpers):
         """base_path が指定されていているテストケースです。"""
@@ -97,6 +104,7 @@ class TestExternal:
         expected = {"osfstorage/dir/file.txt": "/osf/dir/file.txt"}
         assert result == expected
 
+    # tox exec -- pytest tests/utils/storage_provider/grdm/test_external.py::TestExternal::test_list_with_long_format -s -vv
     @pytest.mark.asyncio
     async def test_list_with_long_format(self, mock_osf, mock_helpers):
         """long_format=True の場合のテストケースです。"""

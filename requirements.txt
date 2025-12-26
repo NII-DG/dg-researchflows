@@ -12,6 +12,7 @@ osfclient @ git+https://github.com/RCOSDP/rdmclient.git@d9d2b7926ecdf53aede026e6
 owlrl==7.1.4
 pandas==2.1.4
 panel==1.3.0
+param==2.2.1
 pikepdf==9.5.1
 python_dateutil==2.9.0.post0
 rdflib==7.2.1

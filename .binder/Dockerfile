@@ -55,6 +55,7 @@ RUN pip install --no-cache chardet==4.0.0
 RUN pip install --no-cache openpyxl==3.1.3
 RUN pip install --no-cache owlrl==7.1.2
 RUN pip install --no-cache pandas==2.1.4
+RUN pip install --no-cache param==2.2.1
 RUN pip install --no-cache panel==1.3.0
 RUN pip install --no-cache pikepdf==9.5.1
 RUN pip install --no-cache python-magic==0.4.27

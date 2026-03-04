@@ -22,10 +22,8 @@
             "is_multiple": true,
             "is_required": false,
             "completed_count": 0,
-            "dependent_task_ids": [
-                "RF003001"
-            ],
-            "status": "unfeasible",
+            "dependent_task_ids": [],
+            "status": "unexecuted",
             "execution_environments": [],
             "active": true
         },

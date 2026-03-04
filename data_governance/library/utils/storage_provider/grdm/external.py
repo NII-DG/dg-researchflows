@@ -391,8 +391,8 @@ class External:
 
         Args:
             token (str): GRDMトークン
-            base_url (str): GRDMのベースURLli
-            project_id (str): プロジェクトURL
+            base_url (str): GRDMのベースURL (e.g.  https://rdm.nii.ac.jp)
+            project_id (str): プロジェクトID
             base_path (str): ディレクトリを指定する
                                 デフォルトはNone
             long_format (bool): フォーマット処理のフラグ
@@ -402,7 +402,7 @@ class External:
             KeyError: トークンによる認証に失敗した
 
         Returns:
-            dict: ファイルのパスとIDの辞書型データ
+            dict: GRDMのプロバイダーを含むファイルパスとファイルIDの辞書型データ
 
         """
         api_url_grdm = self.build_api_url(base_url,'')

@@ -1,4 +1,4 @@
-""" タブを開くボタンを表示するモジュールです。"""
+""" ウィジェットを整形するモジュールです。"""
 import os
 from pathlib import Path
 
@@ -116,6 +116,57 @@ def list_files_recursively(base_path):
             file_list.append(rel_path)
     return file_list
 
+def create_file_selector_checkbox(files: list[str]) -> tuple[pn.Column, dict]:
+    """
+    ファイル選択のためのチェックボックスをツリー構造で作成する関数です。
+
+    Args:
+        files (list[str]): ファイルパスのリスト
+
+    Returns:
+        pn.Column: ファイル選択のフォーム
+        dict: ファイルパスとチェックボックスの辞書
+    """
+    # ファイルパスと対応するCheckboxウィジェットのインスタンスを保持する辞書
+    file_checkbox_map = {}
+
+    # ツリー構造を作る
+    tree = {}
+
+    for file_path in files:
+        parts = file_path.split(os.sep)
+        current = tree
+        for part in parts[:-1]:
+            current = current.setdefault(part, {})
+
+        display_name = os.path.basename(file_path)  # ファイル名のみ表示
+        checkbox = pn.widgets.Checkbox(name=display_name, value=False, width=500)
+
+        file_checkbox_map[file_path] = checkbox  # キーはフルパスのまま
+        current[parts[-1]] = checkbox
+
+    def build_panel(node):
+        """
+        再帰的にPanelオブジェクトを構築する関数
+        node: dict
+        """
+        items = []
+        for key, value in sorted(node.items()):
+            if isinstance(value, dict):
+                content = build_panel(value)
+                card = pn.Accordion((key, content), width=500)
+                card.active = []
+                items.append(card)
+            else:
+                value.width = 500
+                items.append(value)
+
+        return pn.Column(*items, width=500)
+
+    ui = build_panel(tree)
+    return ui, file_checkbox_map
+
+
 def create_copy_selector(working_file: str, folder_name: str = "") -> tuple[pn.Column, str, dict]:
     """コピーするファイルを選択するためのウィジェットを作成します。
 
@@ -137,51 +188,13 @@ def create_copy_selector(working_file: str, folder_name: str = "") -> tuple[pn.C
         relative_path = os.path.join(relative_path, folder_name)
     files = list_files_recursively(relative_path)
 
-    checkbox_dict = {}
-
-    # ツリー構造を作る
-    tree = {}
-
-    for file_path in files:
-        parts = file_path.split(os.sep)
-        current = tree
-        for part in parts[:-1]:
-            current = current.setdefault(part, {})
-
-        display_name = os.path.basename(file_path)  # ファイル名のみ表示
-        checkbox = pn.widgets.Checkbox(name=display_name, value=False, width=500)
-
-        checkbox_dict[file_path] = checkbox  # キーはフルパスのまま
-        current[parts[-1]] = checkbox
-
-    def build_panel(node):
-        """
-        再帰的にPanelオブジェクトを構築する関数
-        node: dict or Checkbox
-        """
-        if isinstance(node, pn.widgets.Checkbox):
-            node.width = 500  # チェックボックスの幅も固定
-            return node
-
-        items = []
-        for key, value in sorted(node.items()):
-            if isinstance(value, dict):
-                content = build_panel(value)
-                card = pn.Accordion((key, content), width=500)
-                card.active = []
-                items.append(card)
-            else:
-                value.width = 500
-                items.append(value)
-
-        return pn.Column(*items, width=500)
-
-    ui = build_panel(tree)
+    # ファイル一覧からツリー構造のチェックボックスを作成
+    ui, checkbox_dict = create_file_selector_checkbox(files)
 
     return ui, relative_path, checkbox_dict
 
 def create_single_file_selector(working_file: str, folder_name: str = "") -> tuple[pn.Column, str, dict]:
-    """コピーするファイルを選択するためのウィジェットを作成します。
+    """ファイルを選択するためのウィジェットを作成します。
     ファイル選択はツリー構造のチェックボックスで、1つだけ選択可能に制御。
 
     Args:
@@ -201,22 +214,7 @@ def create_single_file_selector(working_file: str, folder_name: str = "") -> tup
         relative_path = os.path.join(relative_path, folder_name)
     files = list_files_recursively(relative_path)
 
-    checkbox_dict = {}
-
-    # ツリー構造を作る
-    tree = {}
-
-    for file_path in files:
-        parts = file_path.split(os.sep)
-        current = tree
-        for part in parts[:-1]:
-            current = current.setdefault(part, {})
-
-        display_name = os.path.basename(file_path)  # ファイル名のみ表示
-        checkbox = pn.widgets.Checkbox(name=display_name, value=False, width=500)
-        checkbox.file_path = os.path.abspath(os.path.join(relative_path, file_path))
-        checkbox_dict[file_path] = checkbox
-        current[parts[-1]] = checkbox
+    ui, checkbox_dict = create_file_selector_checkbox(files)
 
     # 一つだけ選択できるようにチェックボックスの相互排他制御をセット
     def checkbox_callback(event):
@@ -226,34 +224,13 @@ def create_single_file_selector(working_file: str, folder_name: str = "") -> tup
                 if cb is not event.obj:
                     cb.value = False
 
-    for cb in checkbox_dict.values():
-        cb.param.watch(checkbox_callback, 'value')
-
-    def build_panel(node):
-        """
-        再帰的にPanelオブジェクトを構築する関数
-        node: dict or Checkbox
-        """
-        if isinstance(node, pn.widgets.Checkbox):
-            node.width = 500
-            return node
-
-        items = []
-        for key, value in sorted(node.items()):
-            if isinstance(value, dict):
-                content = build_panel(value)
-                card = pn.Accordion((key, content), width=500)
-                card.active = []
-                items.append(card)
-            else:
-                value.width = 500
-                items.append(value)
-
-        return pn.Column(*items, width=500)
+    for file_path, checkbox in checkbox_dict.items():
+        checkbox.file_path = os.path.abspath(os.path.join(relative_path, file_path))
+        checkbox.param.watch(checkbox_callback, 'value')
 
     ui = pn.Column(
         pn.pane.Markdown("### ファイルを選択してください", width=500),
-        build_panel(tree),
+        ui,
         width=500
     )
 

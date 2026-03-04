@@ -417,6 +417,7 @@ class MainMenu(TaskLog):
                         await self.operation_file()
                         return
                     else:
+                        Vault().set_value('grdm_projectid', '')
                         self.research_flow_widget_box.clear()
                         self.research_flow_message.update_error(msg_config.get('form', 'insufficient_permission'))
                         return
@@ -506,6 +507,7 @@ class MainMenu(TaskLog):
                     if utils.check_grdm_access(self.grdm_url, self.token_input.value_input, self.tmp_project_id):
                         self.token = self.token_input.value_input
                         self.project_id = self.tmp_project_id
+                        vault.set_value('grdm_projectid', self.project_id)
                         self.token_input.visible = False
                         self.project_id_input.visible = False
                         await self.operation_file()
@@ -525,6 +527,7 @@ class MainMenu(TaskLog):
                         self.project_id = self.tmp_project_id
                         await self.operation_file()
                     else:
+                        vault.set_value('grdm_projectid', '')
                         self.research_flow_widget_box.clear()
                         self.research_flow_message.update_error(msg_config.get('form', 'insufficient_permission'))
                         return
@@ -536,6 +539,7 @@ class MainMenu(TaskLog):
                 self.tmp_project_id = self.project_id_input.value_input
                 if utils.check_grdm_access(self.grdm_url, self.token, self.tmp_project_id):
                     self.project_id = self.tmp_project_id
+                    vault.set_value('grdm_projectid', self.project_id)
                     await self.operation_file()
                 else:
                     self.research_flow_widget_box.clear()

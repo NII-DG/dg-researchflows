@@ -139,6 +139,7 @@ class CreateSubflowForm(BaseSubflowForm):
                         self.token_input.visible = False
                         self.project_id_input.visible = False
                     else:
+                        Vault().set_value('grdm_projectid', '')
                         self._err_output.update_error(msg_config.get('form', 'insufficient_permission'))
                         return
                 else:
@@ -427,6 +428,7 @@ class CreateSubflowForm(BaseSubflowForm):
                     if utils.check_grdm_access(self.grdm_url, token, self.tmp_project_id):
                         self.token = token
                         self.project_id = self.tmp_project_id
+                        vault.set_value('grdm_projectid', self.project_id)
                     else:
                         self.reset_form()
                         self.change_submit_button_error(msg_config.get('form', 'insufficient_permission'))
@@ -442,6 +444,7 @@ class CreateSubflowForm(BaseSubflowForm):
                         self.token = token
                         self.project_id = self.tmp_project_id
                     else:
+                        vault.set_value('grdm_projectid', '')
                         self.reset_form()
                         self.change_submit_button_error(msg_config.get('form', 'insufficient_permission'))
                         return
@@ -453,6 +456,7 @@ class CreateSubflowForm(BaseSubflowForm):
                 self.tmp_project_id = project_id
                 if utils.check_grdm_access(self.grdm_url, self.token, self.tmp_project_id):
                     self.project_id = self.tmp_project_id
+                    vault.set_value('grdm_projectid', self.project_id)
                 else:
                     self.reset_form()
                     self.change_submit_button_error(msg_config.get('form', 'insufficient_permission'))

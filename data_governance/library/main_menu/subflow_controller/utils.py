@@ -76,7 +76,17 @@ def get_project_id() -> Optional[str]:
         str: プロジェクトIDを返す。
     """
     grdm_connect = grdm.Grdm()
-    return grdm_connect.get_project_id()
+    project_id = grdm_connect.get_project_id()
+    if project_id:
+        return project_id
+    try:
+        vault = Vault()
+        project_id = vault.get_value('grdm_projectid')
+    except Exception as e:
+        raise UnusableVault from e
+    if not project_id:
+        return None
+    return project_id
 
 
 def get_token() -> Optional[str]:

@@ -172,7 +172,7 @@ def create_copy_selector(working_file: str, folder_name: str = "") -> tuple[pn.C
 
     Args:
         working_file (str): コピー元のワーキングディレクトリ
-        folder_name (str): コピー元のデータディレクトリのフォルダ名. Defaults to "".
+        folder_name (str): コピー元のデータディレクトリ内のフォルダ名. Defaults to "".
 
     Returns:
         pn.Column: ファイル選択のフォーム
@@ -199,7 +199,7 @@ def create_single_file_selector(working_file: str, folder_name: str = "") -> tup
 
     Args:
         working_file (str): コピー元のワーキングディレクトリ
-        folder_name (str): コピー元のデータディレクトリのフォルダ名. Defaults to "".
+        folder_name (str): コピー元のデータディレクトリ内のフォルダ名. Defaults to "".
 
     Returns:
         pn.Column: ファイル選択のフォーム

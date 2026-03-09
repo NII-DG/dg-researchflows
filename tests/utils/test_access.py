@@ -13,15 +13,14 @@ from data_governance.library.utils.access import open_main_menu, open_data_folde
 # def open_main_menu(working_file: str) -> None:
 # tox exec -- pytest tests/utils/test_access.py::test_open_main_menu -s -vv
 def test_open_main_menu(mocker, tmp_path):
+    """open_main_menuの正常系テスト。"""
     # ...各種モック...
-    #display_mock = mocker.patch("IPython.display.display")
     display_mock = mocker.patch("data_governance.library.utils.access.display")
     html_mock = mocker.patch("panel.pane.HTML", return_value="HTML_OBJ")
     # ダミーJavascriptクラス
     class DummyJS:
         def __init__(self, data):
             self.data = data
-    #js_mock = mocker.patch("IPython.core.display.Javascript", side_effect=DummyJS)
     js_mock = mocker.patch("data_governance.library.utils.access.Javascript", side_effect=DummyJS)
     # 実行
     open_main_menu(str(tmp_path / "notebook.ipynb"))
@@ -39,6 +38,7 @@ def test_open_main_menu(mocker, tmp_path):
 # def open_data_folder(working_file: str, folder_name: str = "", button_name:str = "") -> pn.pane.HTML:
 # tox exec -- pytest tests/utils/test_access.py::test_open_data_folder -s -vv
 def test_open_data_folder(monkeypatch, mocker, tmp_path):
+    """open_data_folderの正常系テスト。"""
     # 準備
     data_dir = tmp_path / "data"
     data_dir.mkdir(parents=True, exist_ok=True)
@@ -73,6 +73,7 @@ def test_open_data_folder(monkeypatch, mocker, tmp_path):
 # def open_data_file(working_file:str, file_path:str) -> pn.pane.HTML:
 # tox exec -- pytest tests/utils/test_access.py::test_open_data_file -s -vv
 def test_open_data_file(monkeypatch, mocker, tmp_path):
+    """open_data_fileの正常系テスト。"""
     # 準備
     data_dir = tmp_path / "data"
     data_dir.mkdir(parents=True, exist_ok=True)
@@ -87,7 +88,6 @@ def test_open_data_file(monkeypatch, mocker, tmp_path):
     working_file = str(tmp_path / "notebook.ipynb")
     file_path = "foo/日本語 file.txt"
     html = open_data_file(working_file, file_path)
-
     # create_buttonの呼び出し引数を確認
     args, kwargs = create_button_mock.call_args
     # urlにエンコード済みfile_pathが含まれる

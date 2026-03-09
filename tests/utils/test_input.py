@@ -30,12 +30,13 @@ def mock_vault():
 # def get_project_id() -> str:
 # tox exec -- pytest tests/utils/test_input.py::test_get_project_id -s -vv
 def test_get_project_id(mock_vault, mocker):
+    """get_project_idの正常系テストと異常系テスト。"""
     MockGrdm = mocker.patch('data_governance.library.utils.input.grdm.Grdm')
     mock_grdm = MockGrdm.return_value
     # プロジェクトIDがget_project_idから取得できる場合
     with patch.object(mock_grdm, 'get_project_id', return_value='test_project_id'):
         assert get_project_id() == 'test_project_id'
-        assert mock_vault.get_value('grdm_projectid') == None
+        assert mock_vault.get_value('grdm_projectid') is None
     # プロジェクトIDをVaultから取得する場合
     with patch.object(mock_grdm, 'get_project_id', return_value=None):
         mock_vault.set_value('grdm_projectid', 'vault_project_id')
@@ -63,6 +64,7 @@ def test_get_project_id(mock_vault, mocker):
 # def get_token(vault_key: str, check_auth: Callable[[str], bool], msg: str) -> str:
 # tox exec -- pytest tests/utils/test_input.py::test_get_token -s -vv
 def test_get_token(mock_vault, mocker):
+    """get_tokenの正常系テストと異常系テスト。"""
     # 'valid_token'の場合Trueを返すcheck_auth関数
     def check_auth(token):
         return token == 'valid_token'
@@ -96,6 +98,7 @@ def test_get_token(mock_vault, mocker):
 # def get_grdm_token(base_url: str, vault_key: str) -> str:
 # tox exec -- pytest tests/utils/test_input.py::test_get_grdm_token -s -vv
 def test_get_grdm_token(mock_vault):
+    """get_grdm_tokenの正常系テスト"""
     # Vaultから有効なトークンが取得できる場合
     with patch.object(mock_vault, 'get_value', return_value='valid_token'), \
         patch('data_governance.library.utils.input.grdm.Grdm') as MockGrdm:
@@ -120,6 +123,7 @@ def test_get_grdm_token(mock_vault):
 # def get_goveredrun_token(base_url: str) -> str:
 # tox exec -- pytest tests/utils/test_input.py::test_get_goveredrun_token -s -vv
 def test_get_goveredrun_token(mock_vault):
+    """get_goveredrun_tokenの正常系テスト"""
     # Vaultから有効なトークンが取得できる場合
     with patch.object(mock_vault, 'get_value', return_value='valid_token'), \
         patch('data_governance.library.utils.input.dg_web.Api') as MockApi:
@@ -144,6 +148,7 @@ def test_get_goveredrun_token(mock_vault):
 # def get_grdm_connection_parameters(base_url: str) -> tuple[str, str]:
 # tox exec -- pytest tests/utils/test_input.py::test_get_grdm_connection_parameters -s -vv
 def test_get_grdm_connection_parameters(mock_vault, mocker):
+    """get_grdm_connection_parametersの正常系テストと異常系テスト"""
     base_url = 'https://example.com'
     mocker.patch('data_governance.library.utils.input.get_project_id', return_value='pid')
     mocker.patch('data_governance.library.utils.input.get_grdm_token', return_value='token')

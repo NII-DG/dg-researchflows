@@ -25,6 +25,13 @@ def get_project_id() -> str:
     project_id = grdm_connect.get_project_id()
     if project_id:
         return project_id
+    try:
+        vault = Vault()
+        project_id = vault.get_value('grdm_projectid')
+    except Exception as e:
+        raise UnusableVault from e
+    if project_id:
+        return project_id
     while True:
         project_id = input(msg_config.get('form', 'pls_input_project_id'))
         project_id = StringManager.strip(project_id)
@@ -160,21 +167,25 @@ def get_grdm_connection_parameters(base_url: str) -> tuple[str, str]:
     """
 
     project_id = get_project_id()
-    vault_key = 'grdm_token'
+    token_vault_key = 'grdm_token'
+    project_id_vault_key = 'grdm_projectid'
+    vault = Vault()
 
     while True:
         try:
-            token = get_grdm_token(base_url, vault_key)
+            token = get_grdm_token(base_url, token_vault_key)
             grdm_connect = grdm.Grdm()
             if not grdm_connect.check_permission(base_url, token, project_id):
+                vault.set_value(project_id_vault_key, '')
                 raise RepoPermissionError
             break
         except UnauthorizedError:
-            vault = Vault()
-            vault.set_value(vault_key, '')
+            vault.set_value(token_vault_key, '')
             continue
         except ProjectNotExist as e:
+            vault.set_value(project_id_vault_key, '')
             msg = msg_config.get('form', 'project_id_not_exist').format(project_id)
             raise ProjectNotExist(msg) from e
 
+    vault.set_value(project_id_vault_key, project_id)
     return token, project_id
